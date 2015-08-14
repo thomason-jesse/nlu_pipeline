@@ -1,488 +1,561 @@
-import sys,copy,random
+import sys
+import copy
+import random
 import SemanticNode
 
+
 class Parser:
+    def __init__(self, ont, lex, learner, grounder, beam_width=10):
+        self.ontology = ont
+        self.lexicon = lex
+        self.learner = learner
+        self.grounder = grounder
+        self.beam_width = beam_width
 
-	def __init__(self, ont, lex, learner, grounder, beam_width=10):
-		self.ontology = ont
-		self.lexicon = lex
-		self.learner = learner
-		self.grounder = grounder
-		self.beam_width = beam_width
+    # print a SemanticNode as a string using the known ontology
+    def print_parse(self, p, show_category=False):
+        if show_category and p.category is not None:
+            s = self.lexicon.composeStrFromCategory(p.category) + " : "
+        else:
+            s = ''
+        if p.is_lambda:
+            if p.is_lambda_instantiation:
+                s += "lambda " + str(p.lambda_name) + ":" + self.ontology.composeStrFromType(p.type) + "."
+            else:
+                s += str(p.lambda_name)
+        else:
+            s += self.ontology.preds[p.idx]
+        if p.children is not None:
+            s += '(' + ','.join([self.print_parse(c) for c in p.children]) + ')'
+        return s
 
-	#print a SemanticNode as a string using the known ontology
-	def printParse(self, p, show_category=False):
-		if (show_category and p.category != None): s = self.lexicon.composeStrFromCategory(p.category)+" : "
-		else: s = ''
-		if (p.is_lambda):
-			if (p.is_lambda_instantiation): s += "lambda "+str(p.lambda_name)+":"+self.ontology.composeStrFromType(p.type)+"."
-			else: s += str(p.lambda_name)
-		else:
-			s += self.ontology.preds[p.idx]
-		if (p.children != None):
-			s += '('+','.join([self.printParse(c) for c in p.children])+')'
-		return s
+    # print a full parse tree using the ontology and internal structure
+    def print_semantic_parse_result(self, spr):
+        s = ''
+        for sp in spr:
+            s += self.print_semantic_parse_tree(sp) + "\n"
+        return s
 
-	#print a full parse tree using the ontology and internal structure
-	def printSemanticParseResult(self, spr):
-		s = ''
-		for sp in spr:
-			s += self.printSemanticParseTree(sp)+"\n"
-		return s	
-	def printSemanticParseTree(self, sp, d=0):
-		s = ''
-		for i in range(0,d): s += '-\t'
-		if (type(sp[1]) is str):
-			if (type(sp[0]) is int): s += self.printParse(self.lexicon.semantic_forms[sp[0]])+" -: "+sp[1]
-			else: s += "NONE -: "+sp[1]
-		else:
-			s += str(self.tokensOfParseTree(sp))
-			for i in range(0,len(sp)):
-				s += '\n'+self.printSemanticParseTree(sp[i],d=d+1)
-		return s
-	def tokensOfParseTree(self, sp):
-		if (type(sp[1]) is str): return sp[1]
-		else: return [self.tokensOfParseTree(m) for m in sp]
+    def print_semantic_parse_tree(self, sp, d=0):
+        s = ''
+        for i in range(0, d): s += '-\t'
+        if type(sp[1]) is str:
+            if type(sp[0]) is int:
+                s += self.print_parse(self.lexicon.semantic_forms[sp[0]]) + " -: " + sp[1]
+            else:
+                s += "NONE -: " + sp[1]
+        else:
+            s += str(self.tokens_of_parse_tree(sp))
+            for i in range(0, len(sp)):
+                s += '\n' + self.print_semantic_parse_tree(sp[i], d=d + 1)
+        return s
 
-	#read in data set of form utternace/denotation\n\n...
-	def readInPairedUtteranceDenotation(self, fname):
-		D = []
-		f = open(fname,'r')
-		f_lines = f.readlines()
-		f.close()
-		i = 0
-		while (i < len(f_lines)):
-			tokens = self.tokenize(f_lines[i].strip())
-			denotation_strs = f_lines[i+1].strip().split(';')
-			denotation = [self.strToList(ds.strip()) for ds in denotation_strs]
-			D.append([tokens,denotation])
-			i += 3
-		return D
-	def strToList(self, s):
-		if (s[0] == '[' and s[-1] == ']'):
-			b = 0
-			if (len(s) > 2):
-				for idx in range(1,len(s)-1):
-					if (s[idx] == '['): b += 1
-					elif (s[idx] == ']'): b -= 1
-					elif (b == 0 and s[idx] == ','): break
-				return [self.strToList(s[1:idx].strip().strip("'")),self.strToList(s[idx+1:-1].strip().strip("'"))]
-			else: return []
-		elif (s == 'True'): return True
-		else: return s
+    def tokens_of_parse_tree(self, sp):
+        if type(sp[1]) is str:
+            return sp[1]
+        else:
+            return [self.tokens_of_parse_tree(m) for m in sp]
 
-	#take in a data set D=(x,d) for x tokens and d correct denotations and update the learner's parameters
-	def trainLearnerOnDenotations(self, D, epochs=10, k=None, n=None):
-		if (k == None): k = self.beam_width
-		if (n == None): n = self.beam_width
-		for e in range(0,epochs):
-			print "epoch "+str(e) #DEBUG
-			T = []
-			correct = 0
-			for [x,d] in D:
-				n_best_parses = self.parseTokens(x,k,n)
-				highest_scoring_parse = n_best_parses[0]
-				correct_denotation_parse = None
-				for i in range(0,len(n_best_parses)):
-					candidate_denotation = self.grounder.groundSemanticNode(n_best_parses[i][0],[],[],[])
-					if (i == 0): highest_scoring_denotation = candidate_denotation
-					if (candidate_denotation == d):
-						correct_denotation_parse = n_best_parses[i]
-						break
-					else: print "candidate denotation "+str(candidate_denotation)+" does not match known correct d "+str(d)
-				if (correct_denotation_parse == None):
-					print "WARNING: did not find parse with correct denotation "+str(d)+" for tokens "+str(x)
-				elif (highest_scoring_denotation != d):
-					T.append([x,highest_scoring_parse[0],highest_scoring_parse[1],highest_scoring_denotation,correct_denotation_parse[0],correct_denotation_parse[1],d])
-				else: correct += 1
-			if (len(T) == 0):
-				print "WARNING: training converged; "+str(correct)+"/"+str(len(D))+" correct denotations"
-				break
-			random.shuffle(T)
-			self.learner.learnFromDenotations(T, epochs)
+    # read in data set of form utterance/denotation\n\n...
+    def read_in_paired_utterance_denotation(self, fname):
+        D = []
+        f = open(fname, 'r')
+        f_lines = f.readlines()
+        f.close()
+        i = 0
+        while i < len(f_lines):
+            tokens = self.tokenize(f_lines[i].strip())
+            denotation_strs = f_lines[i + 1].strip().split(';')
+            denotation = [self.str_to_list(ds.strip()) for ds in denotation_strs]
+            D.append([tokens, denotation])
+            i += 3
+        return D
 
-	#read in data set of form utterance\nsemantic_form\n\n...
-        def readInPairedUtteranceSemantics(self, fname):
-                D = []
-                f = open(fname,'r')
-                f_lines = f.readlines()
-                f.close()
-                i = 0
-                while i < len(f_lines):
-                        tokens = self.tokenize(f_lines[i].strip())
-                        form = self.lexicon.readSemanticFormFromStr(f_lines[i+1].strip(), None, None, [])
-                        D.append([tokens,form])
-                        i += 3
-                return D
+    def str_to_list(self, s):
+        if s[0] == '[' and s[-1] == ']':
+            b = 0
+            if len(s) > 2:
+                for idx in range(1, len(s) - 1):
+                    if s[idx] == '[':
+                        b += 1
+                    elif s[idx] == ']':
+                        b -= 1
+                    elif b == 0 and s[idx] == ',':
+                        break
+                return [self.str_to_list(s[1:idx].strip().strip("'")), self.str_to_list(s[idx + 1:-1].strip().strip("'"))]
+            else:
+                return []
+        elif s == 'True':
+            return True
+        else:
+            return s
 
-	#take in a data set D=(x,y) for x tokens and y correct semantic form and update the learner's parameters
-	def trainLearnerOnSemanticForms(self, D, reset_learner=False, epochs=10, k=None, n=10):
-		if (k == None): k = self.beam_width
-		for e in range(0,epochs):
-			print "epoch "+str(e) #DEBUG
-			T = []
-			all_matches = True
-			for [x,y] in D:
-				print x #DEBUG
-				n_best = self.parseTokens(x,k,n)
-				highest_scoring_parse = n_best[0]
-				for i in range(1,len(n_best)):
-					if (not y.__eq__(n_best[i][0]) and n_best[i][2]+1 >= n_best[i-1][2]):
-						highest_scoring_parse = n_best[i]
-						break
-				T.append([x,[highest_scoring_parse[0]],[y]]) #nest parses because feature extractor expects partials (list of partial parse trees)
-				if (y.__eq__(highest_scoring_parse[0]) == False):
-					print "mismatch: "+self.printParse(y)+" != "+self.printParse(highest_scoring_parse[0]) #DEBUG
-					print self.printSemanticParseResult(highest_scoring_parse[1]) #DEBUG
-					all_matches = False
-				else: "WARNING: could not find valid parse for '"+" ".join(x)+"' during training; ignoring example"
-			if (all_matches == True):
-				print "WARNING: training converged at epoch "+str(e)
-				break
-			random.shuffle(T)
-			self.learner.learnFromSemanticForms(T, reset_learner, epochs)
+    # take in a data set D=(x,d) for x tokens and d correct denotations and update the learner's parameters
+    def train_learner_on_denotations(self, D, epochs=10, k=None, n=None):
+        if k is None: k = self.beam_width
+        if n is None: n = self.beam_width
+        for e in range(0, epochs):
+            print "epoch " + str(e)  # DEBUG
+            T = []
+            correct = 0
+            for [x, d] in D:
+                n_best_parses = self.parse_tokens(x, k, n)
+                highest_scoring_parse = n_best_parses[0]
+                correct_denotation_parse = None
+                for i in range(0, len(n_best_parses)):
+                    candidate_denotation = self.grounder.groundSemanticNode(n_best_parses[i][0], [], [], [])
+                    if i == 0: highest_scoring_denotation = candidate_denotation
+                    if candidate_denotation == d:
+                        correct_denotation_parse = n_best_parses[i]
+                        break
+                    else:
+                        print "candidate denotation " + str(
+                            candidate_denotation) + " does not match known correct d " + str(d)
+                if correct_denotation_parse is None:
+                    print "WARNING: did not find parse with correct denotation " + str(d) + " for tokens " + str(x)
+                elif highest_scoring_denotation != d:
+                    T.append([x, highest_scoring_parse[0], highest_scoring_parse[1], highest_scoring_denotation,
+                              correct_denotation_parse[0], correct_denotation_parse[1], d])
+                else:
+                    correct += 1
+            if len(T) == 0:
+                print "WARNING: training converged; " + str(correct) + "/" + str(len(D)) + " correct denotations"
+                break
+            random.shuffle(T)
+            self.learner.learnFromDenotations(T, epochs)
 
-	#tokenizes str and passes it to a function to parse tokens
-	def parseExpression(self, s, k=None, n=1):
-		tokens = self.tokenize(s)
-		return self.parseTokens(tokens, k=k, n=n)
+    # read in data set of form utterance\nsemantic_form\n\n...
+    def read_in_paired_utterance_semantics(self, fname):
+        D = []
+        f = open(fname, 'r')
+        f_lines = f.readlines()
+        f.close()
+        i = 0
+        while i < len(f_lines):
+            tokens = self.tokenize(f_lines[i].strip())
+            form = self.lexicon.readSemanticFormFromStr(f_lines[i + 1].strip(), None, None, [])
+            D.append([tokens, form])
+            i += 3
+        return D
 
-	#given tokens, returns list of up to k [parse,semantic parse tree,score] pairs; less than k returned if fewer than k full parses could be found
-	def parseTokens(self, tokens, k=None, n=1):
-		if (k == None): k = self.beam_width
+    # take in a data set D=(x,y) for x tokens and y correct semantic form and update the learner's parameters
+    def train_learner_on_semantic_forms(self, D, reset_learner=False, epochs=10, k=None, n=10):
+        if k is None: k = self.beam_width
+        for e in range(0, epochs):
+            print "epoch " + str(e)  # DEBUG
+            T = []
+            all_matches = True
+            for [x, y] in D:
+                print x  # DEBUG
+                n_best = self.parse_tokens(x, k, n)
+                highest_scoring_parse = n_best[0]
+                for i in range(1, len(n_best)):
+                    if not y.__eq__(n_best[i][0]) and n_best[i][2] + 1 >= n_best[i - 1][2]:
+                        highest_scoring_parse = n_best[i]
+                        break
+                T.append([x, [highest_scoring_parse[0]],
+                          [y]])  # nest parses because feature extractor expects partials (list of partial parse trees)
+                if not y.__eq__(highest_scoring_parse[0]):
+                    print "mismatch: " + self.print_parse(y) + " != " + self.print_parse(
+                        highest_scoring_parse[0])  # DEBUG
+                    print self.print_semantic_parse_result(highest_scoring_parse[1])  # DEBUG
+                    all_matches = False
+                else:
+                    "WARNING: could not find valid parse for '" + " ".join(x) + "' during training; ignoring example"
+            if all_matches == True:
+                print "WARNING: training converged at epoch " + str(e)
+                break
+            random.shuffle(T)
+            self.learner.learnFromSemanticForms(T, reset_learner, epochs)
 
-		null_assignments_allowed = 0
-		candidate_semantic_forms = []
-		for surface_form in tokens:
-			candidate_semantic_forms.append(self.lexicon.getSemanticFormsForSurfaceForm(surface_form)) #as lexicon semantic idxs
-			if (len(candidate_semantic_forms[-1]) == 0): #this token is not in the lexicon
-				null_assignments_allowed += 1
+    # tokenizes str and passes it to a function to parse tokens
+    def parse_expression(self, s, k=None, n=1):
+        tokens = self.tokenize(s)
+        return self.parse_tokens(tokens, k=k, n=n)
 
-		#incrementally allow more None assignments, initially trying for none
-		full_parses = [] #contains both truly full parses and lists of trees such that all but one are leaves (eg one parse, some skipped words)			
-		while (len(full_parses) < n and null_assignments_allowed < len(tokens)):
+    # given tokens, returns list of up to k [parse,semantic parse tree,score] pairs;
+    # less than k returned if fewer than k full parses could be found
+    def parse_tokens(self, tokens, k=None, n=1):
+        if k is None: k = self.beam_width
 
-			#initialize set of partial parses to each token assigned each possible meaning
-			#a parse is represented as a vector of trees whose leaves in order are the tokens to mark; a complete parse is a single tree
-			#parse tree leaves are lexicon semantic form idxs; upper levels are instantiated SemanticNodes
-			#tokens assigned to None meaning are pushed in order to the back of the list for equality testing later
-			partial_parses_init = self.expandPartialParseWithAdditionalTokens([], tokens, candidate_semantic_forms, null_assignments_allowed)
-			partial_semantic_parse_trees = [[[pp[i],tokens[i]] for i in range(0,len(pp))] for pp in partial_parses_init]
-			partial_parses = [[partial_parses_init[i],partial_semantic_parse_trees[i]] for i in range(0,len(partial_parses_init))]
+        candidate_semantic_forms = []
+        for surface_form in tokens:
+            candidate_semantic_forms.append(
+                self.lexicon.getSemanticFormsForSurfaceForm(surface_form))  # as lexicon semantic idxs
 
-			#until full parses reaches some threshold k, score all partials and choose one to expand, adding full parses to the set; don't allow expansions leading to bad partials
-			#if a partial parse cannot be further expanded into a full parse, add it to the bad partial parses list and remove it from partial
-			bad_partial_parses = []
-			scores = [self.learner.scoreParse(tokens, pp[0], pp[1]) for pp in partial_parses]
-			while (len(full_parses) < k and len(partial_parses) > 0):
-				#print "Nones allowed:\t"+str(null_assignments_allowed) #DEBUG
-				#print "partial parses:\t"+str(len(partial_parses)) #DEBUG
-				#print "bad parses:\t"+str(len(bad_partial_parses)) #DEBUG
-				#print "full parses:\t"+str(len(full_parses)) #DEBUG
-				#choose maximum scoring parse and try to expand it by examining all possible leaf connections
-				max_score_idx = scores.index(max(scores))
-				if (null_assignments_allowed == len(tokens)-1): #no FA to be done, so just add highest scoring parse to full parses
-					pp = [None if p == None else self.lexicon.semantic_forms[p] for p in partial_parses[max_score_idx][0]]
-					full_parses.append([pp,partial_parses[max_score_idx][1]])
-				else:
-					new_partials = [[cpp,cpsp] for [cpp,cpsp] in self.expandPartialParse(partial_parses[max_score_idx]) if cpp not in bad_partial_parses]
-					if (len(new_partials) == 0): #then this parse is a bad partial
-						bad_partial_parses.append(partial_parses[max_score_idx])
-					#score new parses and add to partials / full where appropriate
-					new_partials_scores = [self.learner.scoreParse(tokens, npp[0], npp[1]) for npp in new_partials]
-					new_partials_beam_size = 0
-					while (new_partials_beam_size < k and len(new_partials) > 0):
-						max_new_score_idx = new_partials_scores.index(max(new_partials_scores))
-						num_internal_trees = sum([1 if p != None else 0 for p in new_partials[max_new_score_idx][0]])
-						if (num_internal_trees == 1 and self.anyExpansionsRemaining(new_partials[max_new_score_idx][0]) == False):
-							if (new_partials[max_new_score_idx] not in full_parses):
-								full_parses.append(new_partials[max_new_score_idx])
-							new_partials_beam_size += 1
-						elif (new_partials[max_new_score_idx] not in partial_parses):
-							partial_parses.append(new_partials[max_new_score_idx])
-							scores.append(new_partials_scores[max_new_score_idx])
-							new_partials_beam_size += 1
-						del new_partials[max_new_score_idx]
-						del new_partials_scores[max_new_score_idx]
-				#remove from partials list so we don't waste time expanding again
-				del partial_parses[max_score_idx]
-				del scores[max_score_idx]
+        # incrementally allow more None assignments, initially trying for none
+        null_assignments_allowed = 0
+        full_parses = []  # contains both truly full parses and lists of trees such that all but one are leaves
+        while len(full_parses) < n and null_assignments_allowed < len(tokens):
 
-			null_assignments_allowed += 1
+            # initialize set of partial parses to each token assigned each possible meaning
+            # a parse is represented as a vector of trees whose leaves in order are the tokens to mark
+            # a complete parse is a single tree
+            # parse tree leaves are lexicon semantic form idxs; upper levels are instantiated SemanticNodes
+            # tokens assigned to None meaning are pushed in order to the back of the list for equality testing later
+            partial_parses_init = self.expand_partial_parse_with_additional_tokens([], tokens, candidate_semantic_forms,
+                                                                              null_assignments_allowed)
+            partial_semantic_parse_trees = [[[pp[i], tokens[i]] for i in range(0, len(pp))] for pp in
+                                            partial_parses_init]
+            partial_parses = [[partial_parses_init[i], partial_semantic_parse_trees[i]] for i in
+                              range(0, len(partial_parses_init))]
 
-		#score full parses and return n best in order with scores
-		full_parse_scores = [self.learner.scoreParse(tokens, fp[0], fp[1]) for fp in full_parses]
-		k_best = []
-		while (len(k_best) < n and len(full_parses) > 0):
-			max_score_idx = full_parse_scores.index(max(full_parse_scores))
-			internal_tree_idx = [1 if p != None else 0 for p in full_parses[max_score_idx][0]].index(1)
-			k_best.append([full_parses[max_score_idx][0][internal_tree_idx],full_parses[max_score_idx][1],full_parse_scores[max_score_idx]])
-			del full_parses[max_score_idx]
-			del full_parse_scores[max_score_idx]
-		return k_best
+            # until full parses reaches some threshold k, score all partials and choose one to expand,
+            # adding full parses to the set; don't allow expansions leading to bad partials
+            # if a partial parse cannot be further expanded into a full parse, add it to the bad partial parses list
+            # and remove it from partial
+            bad_partial_parses = []
+            scores = [self.learner.scoreParse(tokens, pp[0], pp[1]) for pp in partial_parses]
+            while len(full_parses) < k and len(partial_parses) > 0:
+                # print "Nones allowed:\t"+str(null_assignments_allowed) #DEBUG
+                # print "partial parses:\t"+str(len(partial_parses)) #DEBUG
+                # print "bad parses:\t"+str(len(bad_partial_parses)) #DEBUG
+                # print "full parses:\t"+str(len(full_parses)) #DEBUG
+                # choose maximum scoring parse and try to expand it by examining all possible leaf connections
+                max_score_idx = scores.index(max(scores))
+                if (null_assignments_allowed == len(
+                        tokens) - 1):  # no FA to be done, so just add highest scoring parse to full parses
+                    pp = [None if p is None else self.lexicon.semantic_forms[p] for p in
+                          partial_parses[max_score_idx][0]]
+                    full_parses.append([pp, partial_parses[max_score_idx][1]])
+                else:
+                    new_partials = [[cpp, cpsp] for [cpp, cpsp] in
+                                    self.expand_partial_parse(partial_parses[max_score_idx]) if
+                                    cpp not in bad_partial_parses]
+                    if len(new_partials) == 0:  # then this parse is a bad partial
+                        bad_partial_parses.append(partial_parses[max_score_idx])
+                    # score new parses and add to partials / full where appropriate
+                    new_partials_scores = [self.learner.scoreParse(tokens, npp[0], npp[1]) for npp in new_partials]
+                    new_partials_beam_size = 0
+                    while new_partials_beam_size < k and len(new_partials) > 0:
+                        max_new_score_idx = new_partials_scores.index(max(new_partials_scores))
+                        num_internal_trees = sum([1 if p is not None else 0 for p
+                                                  in new_partials[max_new_score_idx][0]])
+                        if (num_internal_trees == 1 and self.any_expansions_remaining(
+                                new_partials[max_new_score_idx][0]) == False):
+                            if new_partials[max_new_score_idx] not in full_parses:
+                                full_parses.append(new_partials[max_new_score_idx])
+                            new_partials_beam_size += 1
+                        elif new_partials[max_new_score_idx] not in partial_parses:
+                            partial_parses.append(new_partials[max_new_score_idx])
+                            scores.append(new_partials_scores[max_new_score_idx])
+                            new_partials_beam_size += 1
+                        del new_partials[max_new_score_idx]
+                        del new_partials_scores[max_new_score_idx]
+                # remove from partials list so we don't waste time expanding again
+                del partial_parses[max_score_idx]
+                del scores[max_score_idx]
 
-	#return true if any A(B) can be performed in the given partial
-	def anyExpansionsRemaining(self, partial):
-		for i in range(0,len(partial)):
-			for j in range(0,len(partial)):
-				if (j == -1 or j == len(partial) or i == j): continue #edge cases
-				refs = [self.lexicon.semantic_forms[partial[idx]] if type(partial[idx]) is int else partial[idx] for idx in [i,j]]
-				if (self.canPerformFA(i,j,refs[0],refs[1])): return True
-				if (self.canPerformMerge(i,j,refs[0],refs[1])): return True
-		return False
+            null_assignments_allowed += 1
 
-	#given partial parse, expand by attempting to connect each partial tree to each other tree via composition
-	def expandPartialParse(self, p):
-		partial = p[0]
-		tree = p[1]
-		possible_joins = []
-		for i in range(0,len(partial)):
-			if (partial[i] == None): continue
-			lhs = rhs = None
-			for lhs in range(i-1,-1,-1):
-				if (partial[lhs] != None): break
-			for rhs in range(i+1,len(partial)):
-				if (partial[rhs] != None): break
-			for j in [lhs,rhs]:
-				#could allow i==j to do type-raising in the future
-				#could also look into merger or whatever it's called for when two equal types are adjacent and some function expects only one as an argument (join them)
-				if (j <= -1 or j >= len(partial) or i == j): continue #edge cases
+        # score full parses and return n best in order with scores
+        full_parse_scores = [self.learner.scoreParse(tokens, fp[0], fp[1]) for fp in full_parses]
+        k_best = []
+        while len(k_best) < n and len(full_parses) > 0:
+            max_score_idx = full_parse_scores.index(max(full_parse_scores))
+            internal_tree_idx = [1 if p is not None else 0 for p in full_parses[max_score_idx][0]].index(1)
+            k_best.append([full_parses[max_score_idx][0][internal_tree_idx], full_parses[max_score_idx][1],
+                           full_parse_scores[max_score_idx]])
+            del full_parses[max_score_idx]
+            del full_parse_scores[max_score_idx]
+        return k_best
 
-				refs = [self.lexicon.semantic_forms[partial[idx]] if type(partial[idx]) is int else partial[idx] for idx in [i,j]]
-				#try FA from i to j
-				if (self.canPerformFA(i,j,refs[0],refs[1])):
-					objs = [copy.deepcopy(self.lexicon.semantic_forms[partial[idx]]) if type(partial[idx]) is int else partial[idx] for idx in [i,j]]
-					joined_subtrees = self.performFA(objs[0],objs[1])
-					possible_joins.append([i,j,joined_subtrees,tree[i],tree[j]])
-				#try Composition from i to j
-				if (self.canPerformMerge(i,j,refs[0],refs[1])):
-					merged_subtrees = self.performMerge(refs[0],refs[1])
-					possible_joins.append([i,j,merged_subtrees,tree[i],tree[j]])
-			#try Type Raising on i
-			ref = self.lexicon.semantic_forms[partial[i]] if type(partial[i]) is int else partial[i]
-			if (self.canPerformTypeRaising(ref) == "DESC->N/N"):
-				raised_subtrees = self.performAdjectivalTypeRaise(ref)
-				possible_joins.append([i,i,raised_subtrees,tree[i],tree[i]])
+    # return true if any A(B) can be performed in the given partial
+    def any_expansions_remaining(self, partial):
+        for i in range(0, len(partial)):
+            for j in range(0, len(partial)):
+                if j == -1 or j == len(partial) or i == j: continue  # edge cases
+                refs = [self.lexicon.semantic_forms[partial[idx]] if type(partial[idx]) is int else partial[idx] for idx
+                        in [i, j]]
+                if self.can_perform_fa(i, j, refs[0], refs[1]): return True
+                if self.can_perform_merge(i, j, refs[0], refs[1]): return True
+        return False
 
-		expanded_partials = []
-		for join in possible_joins:
-			f = True if join[0]<join[1] else False
-			ordered_break = [join[0],join[1]] if f else [join[1],join[0]]
-			expanded_partial = partial[:ordered_break[0]]
-			expanded_tree = tree[:ordered_break[0]]
-			expanded_partial.append(join[2])
-			expanded_tree.append([join[3],join[4]])
-			expanded_partial.extend(partial[ordered_break[0]+1:ordered_break[1]])
-			expanded_tree.extend(tree[ordered_break[0]+1:ordered_break[1]])
-			expanded_partial.extend(partial[ordered_break[1]+1:])
-			expanded_tree.extend(tree[ordered_break[1]+1:])
-			expanded_partials.append([expanded_partial,expanded_tree])
-		return expanded_partials
+    # given partial parse, expand by attempting to connect each partial tree to each other tree via composition
+    def expand_partial_parse(self, p):
+        partial = p[0]
+        tree = p[1]
+        possible_joins = []
+        for i in range(0, len(partial)):
+            if partial[i] is None: continue
+            lhs = rhs = None
+            for lhs in range(i - 1, -1, -1):
+                if partial[lhs] is not None: break
+            for rhs in range(i + 1, len(partial)):
+                if partial[rhs] is not None: break
+            for j in [lhs, rhs]:
+                if j <= -1 or j >= len(partial) or i == j: continue  # edge cases
 
-	#return DESC : pred raised to N/N : lambda x.(pred(x))
-	def performAdjectivalTypeRaise(self, A):
-		#print "performing adjectival raise with '"+self.printParse(A,True)+"'" #DEBUG
-		child_pred = copy.deepcopy(A)
-		child_pred.children = [SemanticNode.SemanticNode(child_pred,self.ontology.types.index('e'),self.lexicon.categories.index('N'),is_lambda=True,lambda_name=1,is_lambda_instantiation=False)]
-		raised = SemanticNode.SemanticNode(None,None,None,True,lambda_name=1,is_lambda_instantiation=True)
-		raised.type = self.ontology.types.index('e')
-		raised.category = self.lexicon.categories.index([self.lexicon.categories.index('N'),1,self.lexicon.categories.index('N')])
-		raised.children = [child_pred]
-		raised.setReturnType(self.ontology)
-		#print "performed adjectival raise with '"+self.printParse(A,True)+"' to form '"+self.printParse(raised,True)+"'" #DEBUG
-		return raised
+                refs = [self.lexicon.semantic_forms[partial[idx]] if type(partial[idx]) is int else partial[idx] for idx
+                        in [i, j]]
+                # try FA from i to j
+                if self.can_perform_fa(i, j, refs[0], refs[1]):
+                    objs = [copy.deepcopy(self.lexicon.semantic_forms[partial[idx]]) if type(partial[idx]) is int else
+                            partial[idx] for idx in [i, j]]
+                    joined_subtrees = self.perform_fa(objs[0], objs[1])
+                    possible_joins.append([i, j, joined_subtrees, tree[i], tree[j]])
+                # try Composition from i to j
+                if self.can_perform_merge(i, j, refs[0], refs[1]):
+                    merged_subtrees = self.perform_merge(refs[0], refs[1])
+                    possible_joins.append([i, j, merged_subtrees, tree[i], tree[j]])
+            # try Type Raising on i
+            ref = self.lexicon.semantic_forms[partial[i]] if type(partial[i]) is int else partial[i]
+            if self.can_perform_type_raising(ref) == "DESC->N/N":
+                raised_subtrees = self.perform_adjectival_type_raise(ref)
+                possible_joins.append([i, i, raised_subtrees, tree[i], tree[i]])
 
-	#return true if A is a candidate for type-raising
-	def canPerformTypeRaising(self, A):
-		if ('DESC' not in self.lexicon.categories): return False #type-raising not allowed by lexicon writer
-		if (A == None): return False
-		#check for DESC : pred -> N/N : lambda x.(pred(x)) raise
-		if (A.children == None and A.category == self.lexicon.categories.index('DESC')):
-			return "DESC->N/N"
-		return False
+        expanded_partials = []
+        for join in possible_joins:
+            f = True if join[0] < join[1] else False
+            ordered_break = [join[0], join[1]] if f else [join[1], join[0]]
+            expanded_partial = partial[:ordered_break[0]]
+            expanded_tree = tree[:ordered_break[0]]
+            expanded_partial.append(join[2])
+            expanded_tree.append([join[3], join[4]])
+            expanded_partial.extend(partial[ordered_break[0] + 1:ordered_break[1]])
+            expanded_tree.extend(tree[ordered_break[0] + 1:ordered_break[1]])
+            expanded_partial.extend(partial[ordered_break[1] + 1:])
+            expanded_tree.extend(tree[ordered_break[1] + 1:])
+            expanded_partials.append([expanded_partial, expanded_tree])
+        return expanded_partials
 
-	#return A<>B; A and B must have matching lambda headers and syntactic categories to be AND merged
-	def performMerge(self, A, B):
-		#print "performing Merge with '"+self.printParse(A,True)+"' taking '"+self.printParse(B,True)+"'" #DEBUG
-		A_B_merged = copy.deepcopy(A)
-		A_B_merged.category = self.lexicon.getOrAddCategory([self.lexicon.categories[A.category][0],self.lexicon.categories[A.category][1],self.lexicon.categories[B.category][2]])
-		innermost_outer_lambda = A_B_merged
-		A_child = A.children[0]
-		B_child = B.children[0]
-		while (innermost_outer_lambda.children != None and innermost_outer_lambda.children[0].is_lambda and innermost_outer_lambda.children[0].is_lambda_instantiation):
-			innermost_outer_lambda = innermost_outer_lambda.children[0]
-			A_child = A.children[0]
-			B_child = B.children[0]
-		and_idx = self.ontology.preds.index('and')
-		innermost_outer_lambda.children = [SemanticNode.SemanticNode(innermost_outer_lambda, self.ontology.entries[and_idx], innermost_outer_lambda.children[0].category, False, idx=and_idx)]
-		innermost_outer_lambda.children[0].children = [copy.deepcopy(A_child),copy.deepcopy(B_child)]
-		#print "performed Merge with '"+self.printParse(A,True)+"' taking '"+self.printParse(B,True)+"' to form '"+self.printParse(A_B_merged,True)+"'" #DEBUG
-		return A_B_merged
+    # return DESC : pred raised to N/N : lambda x.(pred(x))
+    def perform_adjectival_type_raise(self, A):
+        # print "performing adjectival raise with '"+self.printParse(A,True)+"'" #DEBUG
+        child_pred = copy.deepcopy(A)
+        child_pred.children = [
+            SemanticNode.SemanticNode(child_pred, self.ontology.types.index('e'), self.lexicon.categories.index('N'),
+                                      is_lambda=True, lambda_name=1, is_lambda_instantiation=False)]
+        raised = SemanticNode.SemanticNode(None, None, None, True, lambda_name=1, is_lambda_instantiation=True)
+        raised.type = self.ontology.types.index('e')
+        raised.category = self.lexicon.categories.index(
+            [self.lexicon.categories.index('N'), 1, self.lexicon.categories.index('N')])
+        raised.children = [child_pred]
+        raised.setReturnType(self.ontology)
+        # print "performed adjectival raise with '"+self.printParse(A,True)+"' to form '"+self.printParse(raised,True)+"'" #DEBUG
+        return raised
 
-	#return true if A,B can be merged
-	def canPerformMerge(self, i, j, A, B):
-		if (A == None or B == None): return False
-		if (A.is_lambda == False or A.is_lambda_instantiation == False or B.is_lambda == False or B.is_lambda_instantiation == False): return False
-		if (type(self.lexicon.categories[A.category]) is not list or type(self.lexicon.categories[B.category]) is not list): return False
-		if (self.lexicon.categories[A.category] != self.lexicon.categories[B.category]): return False
-		curr_A = A
-		curr_B = B
-		while (curr_A.is_lambda and curr_A.is_lambda_instantiation):
-			if (curr_B.is_lambda == False or curr_B.is_lambda_instantiation == False or curr_B.type != curr_A.type): return False
-			curr_A = curr_A.children[0]
-			curr_B = curr_B.children[0]
-		return True
+    # return true if A is a candidate for type-raising
+    def can_perform_type_raising(self, A):
+        if 'DESC' not in self.lexicon.categories: return False  # type-raising not allowed by lexicon writer
+        if A is None: return False
+        # check for DESC : pred -> N/N : lambda x.(pred(x)) raise
+        if A.children is None and A.category == self.lexicon.categories.index('DESC'):
+            return "DESC->N/N"
+        return False
 
-	#this implementation of composition has the correct pre-conditions but performs an AND merge instead of f(g(x))
-	#return A<>B; A and B must have matching lambda headers and syntactically consume one another in the appropriate direction (eg. A D/N, B N/N, A<>B D/N)
-        #def performComposition(self, A, B):
-        #        print "performing Composition with '"+self.printParse(A,True)+"' taking '"+self.printParse(B,True)+"'" #DEBUG
-        #        A_B_composed = copy.deepcopy(A)
-        #        A_B_composed.category = self.lexicon.getOrAddCategory([self.lexicon.categories[A.category][0],self.lexicon.categories[A.category][1],self.lexicon.categories[B.category][2]])
-        #        innermost_outer_lambda = A_B_composed
-        #        A_child = A.children[0]
-        #        B_child = B.children[0]
-        #        while (innermost_outer_lambda.children != None and innermost_outer_lambda.children[0].is_lambda and innermost_outer_lambda.children[0].is_lambda_instantiation):
-        #                innermost_outer_lambda = innermost_outer_lambda.children[0]
-        #                A_child = A.children[0]
-        #                B_child = B.children[0]
-        #        and_idx = self.ontology.preds.index('and')
-        #        innermost_outer_lambda.children = [SemanticNode.SemanticNode(innermost_outer_lambda, self.ontology.entries[and_idx], innermost_outer_lambda.children[0].category, False, idx=and_idx)]
-        #        innermost_outer_lambda.children[0].children = [copy.deepcopy(A_child),copy.deepcopy(B_child)]
-        #        print "performed Composition with '"+self.printParse(A,True)+"' taking '"+self.printParse(B,True)+"' to form '"+self.printParse(A_B_composed,True)+"'" #DEBUG
-        #        return A_B_composed
-        #        
-        #return true if A,B can be composed
-        #def canPerformComposition(self, i, j, A, B):
-        #        if (A == None or B == None): return False
-        #        if (A.is_lambda == False or A.is_lambda_instantiation == False or B.is_lambda == False or B.is_lambda_instantiation == False): return False
-        #        if (type(self.lexicon.categories[A.category]) is not list or type(self.lexicon.categories[B.category]) is not list): return False
-        #        if (self.lexicon.categories[A.category][1] != self.lexicon.categories[B.category][1]): return False
-        #        dir = self.lexicon.categories[A.category][1]
-        #        if ((i-j > 0 and dir == 1) or (i-j < 0 and dir == 0)): return False
-        #        if (self.lexicon.categories[A.category][2] != self.lexicon.categories[B.category][0]): return False
-        #        curr_A = A
-        #        curr_B = B
-        #        while (curr_A.is_lambda and curr_A.is_lambda_instantiation):
-        #                if (curr_B.is_lambda == False or curr_B.is_lambda_instantiation == False or curr_B.type != curr_A.type): return False
-        #                curr_A = curr_A.children[0]
-        #                curr_B = curr_B.children[0]
-        #        return True
+    # return A<>B; A and B must have matching lambda headers and syntactic categories to be AND merged
+    def perform_merge(self, A, B):
+        # print "performing Merge with '"+self.printParse(A,True)+"' taking '"+self.printParse(B,True)+"'" #DEBUG
+        A_B_merged = copy.deepcopy(A)
+        A_B_merged.category = self.lexicon.getOrAddCategory(
+            [self.lexicon.categories[A.category][0], self.lexicon.categories[A.category][1],
+             self.lexicon.categories[B.category][2]])
+        innermost_outer_lambda = A_B_merged
+        A_child = A.children[0]
+        B_child = B.children[0]
+        while innermost_outer_lambda.children != None and innermost_outer_lambda.children[0].is_lambda and innermost_outer_lambda.children[0].is_lambda_instantiation:
+            innermost_outer_lambda = innermost_outer_lambda.children[0]
+            A_child = A.children[0]
+            B_child = B.children[0]
+        and_idx = self.ontology.preds.index('and')
+        innermost_outer_lambda.children = [
+            SemanticNode.SemanticNode(innermost_outer_lambda, self.ontology.entries[and_idx],
+                                      innermost_outer_lambda.children[0].category, False, idx=and_idx)]
+        innermost_outer_lambda.children[0].children = [copy.deepcopy(A_child), copy.deepcopy(B_child)]
+        # print "performed Merge with '"+self.printParse(A,True)+"' taking '"+self.printParse(B,True)+"' to form '"+self.printParse(A_B_merged,True)+"'" #DEBUG
+        return A_B_merged
+
+    # return true if A,B can be merged
+    def can_perform_merge(self, i, j, A, B):
+        if A is None or B is None: return False
+        if not A.is_lambda or not A.is_lambda_instantiation or not B.is_lambda or not B.is_lambda_instantiation:
+            return False
+        if type(self.lexicon.categories[A.category]) is not list or type(
+                self.lexicon.categories[B.category]) is not list:
+            return False
+        if self.lexicon.categories[A.category] != self.lexicon.categories[B.category]:
+            return False
+        curr_A = A
+        curr_B = B
+        while curr_A.is_lambda and curr_A.is_lambda_instantiation:
+            if not curr_B.is_lambda or not curr_B.is_lambda_instantiation or curr_B.type != curr_A.type: return False
+            curr_A = curr_A.children[0]
+            curr_B = curr_B.children[0]
+        return True
+
+    # this implementation of composition has the correct pre-conditions but performs an AND merge instead of f(g(x))
+    # return A<>B; A and B must have matching lambda headers and syntactically consume one another in the appropriate direction (eg. A D/N, B N/N, A<>B D/N)
+    # def performComposition(self, A, B):
+    #        print "performing Composition with '"+self.printParse(A,True)+"' taking '"+self.printParse(B,True)+"'" #DEBUG
+    #        A_B_composed = copy.deepcopy(A)
+    #        A_B_composed.category = self.lexicon.getOrAddCategory([self.lexicon.categories[A.category][0],self.lexicon.categories[A.category][1],self.lexicon.categories[B.category][2]])
+    #        innermost_outer_lambda = A_B_composed
+    #        A_child = A.children[0]
+    #        B_child = B.children[0]
+    #        while (innermost_outer_lambda.children != None and innermost_outer_lambda.children[0].is_lambda and innermost_outer_lambda.children[0].is_lambda_instantiation):
+    #                innermost_outer_lambda = innermost_outer_lambda.children[0]
+    #                A_child = A.children[0]
+    #                B_child = B.children[0]
+    #        and_idx = self.ontology.preds.index('and')
+    #        innermost_outer_lambda.children = [SemanticNode.SemanticNode(innermost_outer_lambda, self.ontology.entries[and_idx], innermost_outer_lambda.children[0].category, False, idx=and_idx)]
+    #        innermost_outer_lambda.children[0].children = [copy.deepcopy(A_child),copy.deepcopy(B_child)]
+    #        print "performed Composition with '"+self.printParse(A,True)+"' taking '"+self.printParse(B,True)+"' to form '"+self.printParse(A_B_composed,True)+"'" #DEBUG
+    #        return A_B_composed
+    #
+    # return true if A,B can be composed
+    # def canPerformComposition(self, i, j, A, B):
+    #        if (A == None or B == None): return False
+    #        if (A.is_lambda == False or A.is_lambda_instantiation == False or B.is_lambda == False or B.is_lambda_instantiation == False): return False
+    #        if (type(self.lexicon.categories[A.category]) is not list or type(self.lexicon.categories[B.category]) is not list): return False
+    #        if (self.lexicon.categories[A.category][1] != self.lexicon.categories[B.category][1]): return False
+    #        dir = self.lexicon.categories[A.category][1]
+    #        if ((i-j > 0 and dir == 1) or (i-j < 0 and dir == 0)): return False
+    #        if (self.lexicon.categories[A.category][2] != self.lexicon.categories[B.category][0]): return False
+    #        curr_A = A
+    #        curr_B = B
+    #        while (curr_A.is_lambda and curr_A.is_lambda_instantiation):
+    #                if (curr_B.is_lambda == False or curr_B.is_lambda_instantiation == False or curr_B.type != curr_A.type): return False
+    #                curr_A = curr_A.children[0]
+    #                curr_B = curr_B.children[0]
+    #        return True
 
 
-	#return A(B); A must be lambda headed with type equal to B's root type
-	def performFA(self, A, B):
-		#print "performing FA with '"+self.printParse(A,True)+"' taking '"+self.printParse(B,True)+"'" #DEBUG
-		A_FA_B = copy.deepcopy(A.children[0]) #A is lambda headed and so has a single child which will be the root of the composed tree
-		A_FA_B.parent = None
-		#traverse A_FA_B and replace references to lambda_A with B
-		A_FA_B_deepest_lambda = A.lambda_name
-		to_traverse = [[A_FA_B,A_FA_B_deepest_lambda]]
-		while (len(to_traverse) > 0):
-			[curr,deepest_lambda] = to_traverse.pop()
-			entire_replacement = False
-			if (curr.is_lambda == True and curr.is_lambda_instantiation == True):
-				deepest_lambda = curr.lambda_name
-			elif (curr.is_lambda == True and curr.is_lambda_instantiation == False and curr.lambda_name == A.lambda_name): #an instance of lambda_A to be replaced by B
-				#print "substituting '"+self.printParse(B,True)+"' for '"+self.printParse(curr,True)+"' with lambda offset "+str(deepest_lambda) #DEBUG
-				if (curr.parent == None):
-					if (curr.children == None):
-						#print "...whole tree is instance" #DEBUG
-						curr.copyAttributes(B) #instance is whole tree; add nothing more and loop will now exit
-						curr.category = self.lexicon.categories[A.category][0] #take on return type of A
-					elif (B.children == None):
-						#print "...instance heads tree; preserve children taking B"
-						curr.copyAttributes(B,deepest_lambda,preserve_children=True)
-					else:
-						sys.exit("Error: incompatible parentless, childed node A with childed node B")
-					entire_replacement = True
-				else:
-					for curr_parent_matching_idx in range(0,len(curr.parent.children)):
-						if (curr.parent.children[curr_parent_matching_idx] == curr): break
-					if (curr.children == None):
-						#print "...instance of B will preserve its children" #DEBUG
-						curr.parent.children[curr_parent_matching_idx].copyAttributes(B, deepest_lambda, preserve_parent=True) #lambda instance is a leaf
-					else:
-						if (B.children == None):
-							#print "...instance of B will keep children from A" #DEBUG
-							curr.parent.children[curr_parent_matching_idx].copyAttributes(B, deepest_lambda, preserve_parent=True, preserve_children=True)
-						else:
-							#print "...instance of A and B have matching lambda headers to be merged" #DEBUG
-							B_without_lambda_headers = B
-							num_leading_lambdas = 0
-							while (B_without_lambda_headers.is_lambda and B_without_lambda_headers.is_lambda_instantiation):
-								B_without_lambda_headers = B_without_lambda_headers.children[0]
-								num_leading_lambdas += 1
-							curr.parent.children[curr_parent_matching_idx].copyAttributes(B_without_lambda_headers, num_leading_lambdas, preserve_parent=True, preserve_children=False)
-					curr.parent.children[curr_parent_matching_idx].setReturnType(self.ontology) #not sure we need this
-			if (not entire_replacement and curr.children != None): to_traverse.extend([[c,deepest_lambda] for c in curr.children])
-		self.renumerateLambdas(A_FA_B, [])
-		#print "performed FA with '"+self.printParse(A,True)+"' taking '"+self.printParse(B,True)+"' to form '"+self.printParse(A_FA_B,True)+"'" #DEBUG
-		return A_FA_B
+    # return A(B); A must be lambda headed with type equal to B's root type
+    def perform_fa(self, A, B):
+        # print "performing FA with '"+self.printParse(A,True)+"' taking '"+self.printParse(B,True)+"'" #DEBUG
+        A_FA_B = copy.deepcopy(
+            A.children[0])  # A is lambda headed and so has a single child which will be the root of the composed tree
+        A_FA_B.parent = None
+        # traverse A_FA_B and replace references to lambda_A with B
+        A_FA_B_deepest_lambda = A.lambda_name
+        to_traverse = [[A_FA_B, A_FA_B_deepest_lambda]]
+        while len(to_traverse) > 0:
+            [curr, deepest_lambda] = to_traverse.pop()
+            entire_replacement = False
+            if curr.is_lambda and curr.is_lambda_instantiation:
+                deepest_lambda = curr.lambda_name
+            elif curr.is_lambda and not curr.is_lambda_instantiation and curr.lambda_name == A.lambda_name:  # an instance of lambda_A to be replaced by B
+                # print "substituting '"+self.printParse(B,True)+"' for '"+self.printParse(curr,True)+"' with lambda offset "+str(deepest_lambda) #DEBUG
+                if curr.parent is None:
+                    if curr.children is None:
+                        # print "...whole tree is instance" #DEBUG
+                        curr.copyAttributes(B)  # instance is whole tree; add nothing more and loop will now exit
+                        curr.category = self.lexicon.categories[A.category][0]  # take on return type of A
+                    elif B.children is None:
+                        # print "...instance heads tree; preserve children taking B"
+                        curr.copyAttributes(B, deepest_lambda, preserve_children=True)
+                    else:
+                        sys.exit("Error: incompatible parentless, childed node A with childed node B")
+                    entire_replacement = True
+                else:
+                    for curr_parent_matching_idx in range(0, len(curr.parent.children)):
+                        if curr.parent.children[curr_parent_matching_idx] == curr: break
+                    if curr.children is None:
+                        # print "...instance of B will preserve its children" #DEBUG
+                        curr.parent.children[curr_parent_matching_idx].copyAttributes(B, deepest_lambda,
+                                                                                      preserve_parent=True)  # lambda instance is a leaf
+                    else:
+                        if B.children is None:
+                            # print "...instance of B will keep children from A" #DEBUG
+                            curr.parent.children[curr_parent_matching_idx].copyAttributes(B, deepest_lambda,
+                                                                                          preserve_parent=True,
+                                                                                          preserve_children=True)
+                        else:
+                            # print "...instance of A and B have matching lambda headers to be merged" #DEBUG
+                            B_without_lambda_headers = B
+                            num_leading_lambdas = 0
+                            while B_without_lambda_headers.is_lambda and B_without_lambda_headers.is_lambda_instantiation:
+                                B_without_lambda_headers = B_without_lambda_headers.children[0]
+                                num_leading_lambdas += 1
+                            curr.parent.children[curr_parent_matching_idx].copyAttributes(B_without_lambda_headers,
+                                                                                          num_leading_lambdas,
+                                                                                          preserve_parent=True,
+                                                                                          preserve_children=False)
+                    curr.parent.children[curr_parent_matching_idx].setReturnType(self.ontology)  # not sure we need this
+            if not entire_replacement and curr.children is not None: to_traverse.extend([[c, deepest_lambda] for c in curr.children])
+        self.renumerate_lambdas(A_FA_B, [])
+        # print "performed FA with '"+self.printParse(A,True)+"' taking '"+self.printParse(B,True)+"' to form '"+self.printParse(A_FA_B,True)+"'" #DEBUG
+        return A_FA_B
 
-	#return true if A(B) is a valid for functional application
-	def canPerformFA(self, i, j, A, B):
-		if (A == None or B == None): return False
-		if (A.category is None or type(self.lexicon.categories[A.category]) is not list or (i-j > 0 and self.lexicon.categories[A.category][1] == 1) or (i-j < 0 and self.lexicon.categories[A.category][1] == 0)): return False #B is left/right when A expects right/left
-		if (A.is_lambda == False or A.is_lambda_instantiation == False or A.type != B.return_type): return False
-		if (self.lexicon.categories[A.category][2] != B.category): return False #B is not the input category A expects
-		if (A.parent == None and A.is_lambda and A.is_lambda_instantiation == False): return True #the whole tree of A will be replaced with the whole tree of B
-		to_traverse = [B]
-		B_lambda_context = []
-		while (len(to_traverse) > 0):
-			curr = to_traverse.pop()
-			if (curr.is_lambda and curr.is_lambda_instantiation): B_lambda_context.append(curr.type)
-			else: break
-			to_traverse.extend(B.children)
-		return self.lambdaValueReplacementsValid(A.children[0], A.lambda_name, [], B, B_lambda_context) #return True if all instances of A lambda appear in lambda contexts identical to what B expects
-	def lambdaValueReplacementsValid(self, A, lambda_name, A_lambda_context, B, B_lambda_context):
-		#print "checking whether '"+self.printParse(A)+"' lambda "+str(lambda_name)+" instances can be replaced by '"+self.printParse(B)+"' under contexts "+str(A_lambda_context)+","+str(B_lambda_context) #DEBUG
-		if (A.is_lambda and A.is_lambda_instantiation):
-			extended_context = A_lambda_context[:]
-			extended_context.append(A.type)
-			return self.lambdaValueReplacementsValid(A.children[0], lambda_name, extended_context, B, B_lambda_context)
-		if (A.is_lambda and A.is_lambda_instantiation == False and A.lambda_name == lambda_name): #this is an instance of A's lambda to be replaced by B
-			if (A.children != None and B.children != None): #the instance takes arguments
-				if (len(A_lambda_context) != len(B_lambda_context)): return False #the lambda contexts differ in length
-				matches = [1 if A_lambda_context[i] == B_lambda_context[i] else 0 for i in range(0,len(A_lambda_context))]
-				if (sum(matches) != len(A_lambda_context)): return False #the lambda contexts differ in content
-				return True
-			return True #ie A, B have no children
-		if (A.children == None): return True
-		valid_through_children = True
-                for c in A.children:
-                	valid_through_children = self.lambdaValueReplacementsValid(c, lambda_name, A_lambda_context, B, B_lambda_context)
-                        if (valid_through_children == False): break
-		return valid_through_children
+    # return true if A(B) is a valid for functional application
+    def can_perform_fa(self, i, j, A, B):
+        if A is None or B is None: return False
+        if A.category is None or type(self.lexicon.categories[A.category]) is not list or (
+                            i - j > 0 and self.lexicon.categories[A.category][1] == 1) or (
+                            i - j < 0 and self.lexicon.categories[A.category][
+                    1] == 0): return False  # B is left/right when A expects right/left
+        if not A.is_lambda or not A.is_lambda_instantiation or A.type != B.return_type: return False
+        if self.lexicon.categories[A.category][2] != B.category: return False  # B is not the input category A expects
+        if A.parent is None and A.is_lambda and not A.is_lambda_instantiation: return True  # the whole tree of A will be replaced with the whole tree of B
+        to_traverse = [B]
+        B_lambda_context = []
+        while len(to_traverse) > 0:
+            curr = to_traverse.pop()
+            if curr.is_lambda and curr.is_lambda_instantiation:
+                B_lambda_context.append(curr.type)
+            else:
+                break
+            to_traverse.extend(B.children)
+        return self.lambda_value_replacements_valid(A.children[0], A.lambda_name, [], B,
+                                                 B_lambda_context)  # return True if all instances of A lambda appear in lambda contexts identical to what B expects
 
-	def renumerateLambdas(self, A, lambdas):
-		if (A.is_lambda):
-			if (A.is_lambda_instantiation):
-				lambdas.append(A.lambda_name)
-				A.lambda_name = len(lambdas)
-			else:
-				A.lambda_name = lambdas.index(A.lambda_name)+1
-		if (A.children != None):
-			for c in A.children:
-				self.renumerateLambdas(c, lambdas[:])
+    def lambda_value_replacements_valid(self, A, lambda_name, A_lambda_context, B, B_lambda_context):
+        # print "checking whether '"+self.printParse(A)+"' lambda "+str(lambda_name)+" instances can be replaced by '"+self.printParse(B)+"' under contexts "+str(A_lambda_context)+","+str(B_lambda_context) #DEBUG
+        if A.is_lambda and A.is_lambda_instantiation:
+            extended_context = A_lambda_context[:]
+            extended_context.append(A.type)
+            return self.lambda_value_replacements_valid(A.children[0], lambda_name, extended_context, B, B_lambda_context)
+        if A.is_lambda and not A.is_lambda_instantiation and A.lambda_name == lambda_name:  # this is an instance of A's lambda to be replaced by B
+            if A.children is not None and B.children is not None:  # the instance takes arguments
+                if len(A_lambda_context) != len(B_lambda_context): return False  # the lambda contexts differ in length
+                matches = [1 if A_lambda_context[i] == B_lambda_context[i] else 0 for i in
+                           range(0, len(A_lambda_context))]
+                if sum(matches) != len(A_lambda_context): return False  # the lambda contexts differ in content
+                return True
+            return True  # ie A, B have no children
+        if A.children is None: return True
+        valid_through_children = True
+        for c in A.children:
+            valid_through_children = self.lambda_value_replacements_valid(c, lambda_name, A_lambda_context, B,
+                                                                       B_lambda_context)
+            if not valid_through_children: break
+        return valid_through_children
 
-	#recursvie procedure to build all possible leaf sets as partial parses
-	def expandPartialParseWithAdditionalTokens(self, partial, tokens, candidate_semantic_forms, nulls_remaining):
-		expanded_partials = []
-		for s in range(-1,len(candidate_semantic_forms[0])):
-			expanded = partial[:]
-			if (s == -1 and nulls_remaining > 0): expanded.append(None)
-			elif (s == -1): continue
-			else: expanded.append(candidate_semantic_forms[0][s])
-			if (expanded[-1] == None or nulls_remaining < len(tokens)):
-				if (len(tokens) > 1):
-					dx = -1 if expanded[-1] == None else 0
-					expanded_partials.extend(self.expandPartialParseWithAdditionalTokens(expanded, tokens[1:], candidate_semantic_forms[1:], nulls_remaining+dx))
-				else: expanded_partials.append(expanded)
-		return expanded_partials
+    def renumerate_lambdas(self, A, lambdas):
+        if A.is_lambda:
+            if A.is_lambda_instantiation:
+                lambdas.append(A.lambda_name)
+                A.lambda_name = len(lambdas)
+            else:
+                A.lambda_name = lambdas.index(A.lambda_name) + 1
+        if A.children is not None:
+            for c in A.children:
+                self.renumerate_lambdas(c, lambdas[:])
 
-	#turn a string into a sequence of tokens to be assigned semantic meanings
-	def tokenize(self, s):
-		s = s.replace("'s", " 's")
-		str_parts = s.split()
-		return [p for p in str_parts if len(p) > 0]
+    # recursive procedure to build all possible leaf sets as partial parses
+    def expand_partial_parse_with_additional_tokens(self, partial, tokens, candidate_semantic_forms, nulls_remaining):
+        expanded_partials = []
+        for s in range(-1, len(candidate_semantic_forms[0])):
+            expanded = partial[:]
+            if s == -1 and nulls_remaining > 0:
+                expanded.append(None)
+            elif s == -1:
+                continue
+            else:
+                expanded.append(candidate_semantic_forms[0][s])
+            if expanded[-1] is None or nulls_remaining < len(tokens):
+                if len(tokens) > 1:
+                    dx = -1 if expanded[-1] is None else 0
+                    expanded_partials.extend(
+                        self.expand_partial_parse_with_additional_tokens(expanded, tokens[1:], candidate_semantic_forms[1:],
+                                                                    nulls_remaining + dx))
+                else:
+                    expanded_partials.append(expanded)
+        return expanded_partials
+
+    # turn a string into a sequence of tokens to be assigned semantic meanings
+    def tokenize(self, s):
+        s = s.replace("'s", " 's")
+        str_parts = s.split()
+        return [p for p in str_parts if len(p) > 0]
