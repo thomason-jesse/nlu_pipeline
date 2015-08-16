@@ -15,7 +15,7 @@ class Parser:
     # print a SemanticNode as a string using the known ontology
     def print_parse(self, p, show_category=False):
         if show_category and p.category is not None:
-            s = self.lexicon.composeStrFromCategory(p.category) + " : "
+            s = self.lexicon.compose_str_from_category(p.category) + " : "
         else:
             s = ''
         if p.is_lambda:
@@ -100,6 +100,9 @@ class Parser:
             correct = 0
             for [x, d] in D:
                 n_best_parses = self.parse_tokens(x, k, n)
+                if len(n_best_parses) == 0:
+                    print "WARNING: could not find valid parse for tokens"+str(x)
+                    continue
                 highest_scoring_parse = n_best_parses[0]
                 correct_denotation_parse = None
                 for i in range(0, len(n_best_parses)):
@@ -133,7 +136,7 @@ class Parser:
         i = 0
         while i < len(f_lines):
             tokens = self.tokenize(f_lines[i].strip())
-            form = self.lexicon.readSemanticFormFromStr(f_lines[i + 1].strip(), None, None, [])
+            form = self.lexicon.read_semantic_form_from_str(f_lines[i + 1].strip(), None, None, [])
             D.append([tokens, form])
             i += 3
         return D
@@ -178,10 +181,16 @@ class Parser:
     def parse_tokens(self, tokens, k=None, n=1):
         if k is None: k = self.beam_width
 
-        candidate_semantic_forms = []
-        for surface_form in tokens:
-            candidate_semantic_forms.append(
-                self.lexicon.getSemanticFormsForSurfaceForm(surface_form))  # as lexicon semantic idxs
+        candidate_semantic_forms = {}
+        for i in range(0, len(tokens)):
+            for j in range(i, len(tokens)):
+                forms = self.lexicon.get_semantic_forms_for_surface_form(" ".join(tokens[i:j+1]))
+                if len(forms) > 0:  # if lexical entries, note span and form idxs
+                    candidate_semantic_forms[(i,j)] = forms
+                elif i == j:  # if single word with no entries, add to lexicon as blank for features
+                    self.lexicon.surface_forms.append(tokens[i])
+                    self.lexicon.entries[len(self.lexicon.surface_forms) - 1] = []
+                    candidate_semantic_forms[(i,j)] = []
 
         # incrementally allow more None assignments, initially trying for none
         null_assignments_allowed = 0
@@ -193,10 +202,11 @@ class Parser:
             # a complete parse is a single tree
             # parse tree leaves are lexicon semantic form idxs; upper levels are instantiated SemanticNodes
             # tokens assigned to None meaning are pushed in order to the back of the list for equality testing later
-            partial_parses_init = self.expand_partial_parse_with_additional_tokens([], tokens, candidate_semantic_forms,
-                                                                              null_assignments_allowed)
-            partial_semantic_parse_trees = [[[pp[i], tokens[i]] for i in range(0, len(pp))] for pp in
-                                            partial_parses_init]
+            partial_semantic_parse_trees = self.expand_partial_parse_with_additional_tokens(
+                                            [], tokens, candidate_semantic_forms, null_assignments_allowed, 0)
+            # partial_semantic_parse_trees = [[[ppi[i], tokens[i]] for i in range(0, len(ppi))] for ppi in
+            #                                 partial_parses_init]
+            partial_parses_init = [[pspt[i][0] for i in range(0, len(pspt))] for pspt in partial_semantic_parse_trees]
             partial_parses = [[partial_parses_init[i], partial_semantic_parse_trees[i]] for i in
                               range(0, len(partial_parses_init))]
 
@@ -253,9 +263,11 @@ class Parser:
         k_best = []
         while len(k_best) < n and len(full_parses) > 0:
             max_score_idx = full_parse_scores.index(max(full_parse_scores))
-            internal_tree_idx = [1 if p is not None else 0 for p in full_parses[max_score_idx][0]].index(1)
-            k_best.append([full_parses[max_score_idx][0][internal_tree_idx], full_parses[max_score_idx][1],
-                           full_parse_scores[max_score_idx]])
+            internal_tree_flags = [1 if p is not None else 0 for p in full_parses[max_score_idx][0]]
+            if 1 in internal_tree_flags:
+                internal_tree_idx = internal_tree_flags.index(1)
+                k_best.append([full_parses[max_score_idx][0][internal_tree_idx], full_parses[max_score_idx][1],
+                               full_parse_scores[max_score_idx]])
             del full_parses[max_score_idx]
             del full_parse_scores[max_score_idx]
         return k_best
@@ -348,7 +360,7 @@ class Parser:
     def perform_merge(self, A, B):
         # print "performing Merge with '"+self.printParse(A,True)+"' taking '"+self.printParse(B,True)+"'" #DEBUG
         A_B_merged = copy.deepcopy(A)
-        A_B_merged.category = self.lexicon.getOrAddCategory(
+        A_B_merged.category = self.lexicon.get_or_add_category(
             [self.lexicon.categories[A.category][0], self.lexicon.categories[A.category][1],
              self.lexicon.categories[B.category][2]])
         innermost_outer_lambda = A_B_merged
@@ -534,24 +546,31 @@ class Parser:
                 self.renumerate_lambdas(c, lambdas[:])
 
     # recursive procedure to build all possible leaf sets as partial parses
-    def expand_partial_parse_with_additional_tokens(self, partial, tokens, candidate_semantic_forms, nulls_remaining):
+
+    def expand_partial_parse_with_additional_tokens(self, partial, tokens, candidate_semantic_forms, nulls_remaining, idx):
         expanded_partials = []
-        for s in range(-1, len(candidate_semantic_forms[0])):
-            expanded = partial[:]
-            if s == -1 and nulls_remaining > 0:
-                expanded.append(None)
-            elif s == -1:
-                continue
-            else:
-                expanded.append(candidate_semantic_forms[0][s])
-            if expanded[-1] is None or nulls_remaining < len(tokens):
-                if len(tokens) > 1:
-                    dx = -1 if expanded[-1] is None else 0
-                    expanded_partials.extend(
-                        self.expand_partial_parse_with_additional_tokens(expanded, tokens[1:], candidate_semantic_forms[1:],
-                                                                    nulls_remaining + dx))
+        span = 0
+        #print partial,tokens[idx] #DEBUG
+        #r = raw_input()
+        while (idx,idx+span) in candidate_semantic_forms:
+            none_valid = -1 if span == 0 else 0
+            for s in range(none_valid,len(candidate_semantic_forms[idx,idx+span])):
+                expanded = partial[:]
+                if s == -1 and nulls_remaining > 0:
+                    expanded.append((None,tokens[idx]))
+                elif s == -1:
+                    continue
                 else:
-                    expanded_partials.append(expanded)
+                    expanded.append((candidate_semantic_forms[idx,idx+span][s]," ".join(tokens[idx:idx+span+1])))
+                if expanded[-1] is None or nulls_remaining < len(tokens)-idx:
+                    if len(tokens)-idx > span+1:
+                        dx = -1 if expanded[-1][0] is None else 0
+                        next_exp = self.expand_partial_parse_with_additional_tokens(
+                            expanded, tokens, candidate_semantic_forms, nulls_remaining+dx, idx+span+1)
+                        expanded_partials.extend(next_exp)
+                    else:
+                        expanded_partials.append(expanded)
+            span += 1
         return expanded_partials
 
     # turn a string into a sequence of tokens to be assigned semantic meanings
