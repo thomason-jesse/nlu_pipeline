@@ -17,7 +17,6 @@ no :- C : no
 #of :- N\(N/N)/N : lambda x:e.(lambda P:<e,t>.(lambda y:e.(and(P(y), hasoffice(x, y)))))
 #these are weird now bc there's some implicit knowledge in hasoffice that the second arg is an office
 #so basically we have to pick this predicate as a possibility and then just like ignore 'office' later
-'s :- N\N : lambda x:e.(the(lambda y:e.(hasoffice(x,y))))
 's office :- N\N : lambda x:e.(the(lambda y:e.(hasoffice(x,y))))
 of :- N/N : lambda x:e.(lambda y:e.(hasoffice(x,y)))
 
