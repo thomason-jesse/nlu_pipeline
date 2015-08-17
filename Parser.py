@@ -20,7 +20,7 @@ class Parser:
             s = ''
         if p.is_lambda:
             if p.is_lambda_instantiation:
-                s += "lambda " + str(p.lambda_name) + ":" + self.ontology.composeStrFromType(p.type) + "."
+                s += "lambda " + str(p.lambda_name) + ":" + self.ontology.compose_str_from_type(p.type) + "."
             else:
                 s += str(p.lambda_name)
         else:
@@ -204,11 +204,9 @@ class Parser:
             # tokens assigned to None meaning are pushed in order to the back of the list for equality testing later
             partial_semantic_parse_trees = self.expand_partial_parse_with_additional_tokens(
                                             [], tokens, candidate_semantic_forms, null_assignments_allowed, 0)
-            # partial_semantic_parse_trees = [[[ppi[i], tokens[i]] for i in range(0, len(ppi))] for ppi in
-            #                                 partial_parses_init]
-            partial_parses_init = [[pspt[i][0] for i in range(0, len(pspt))] for pspt in partial_semantic_parse_trees]
-            partial_parses = [[partial_parses_init[i], partial_semantic_parse_trees[i]] for i in
-                              range(0, len(partial_parses_init))]
+            partial_parse_forms = [[pspt[i][0] for i in range(0, len(pspt))] for pspt in partial_semantic_parse_trees]
+            partial_parses = [[partial_parse_forms[i], partial_semantic_parse_trees[i]] for i in
+                              range(0, len(partial_parse_forms))]
 
             # until full parses reaches some threshold k, score all partials and choose one to expand,
             # adding full parses to the set; don't allow expansions leading to bad partials
@@ -241,8 +239,8 @@ class Parser:
                         max_new_score_idx = new_partials_scores.index(max(new_partials_scores))
                         num_internal_trees = sum([1 if p is not None else 0 for p
                                                   in new_partials[max_new_score_idx][0]])
-                        if (num_internal_trees == 1 and self.any_expansions_remaining(
-                                new_partials[max_new_score_idx][0]) == False):
+                        if num_internal_trees == 1:
+                            # and self.any_expansions_remaining(new_partials[max_new_score_idx][0]) == False:
                             if new_partials[max_new_score_idx] not in full_parses:
                                 full_parses.append(new_partials[max_new_score_idx])
                             new_partials_beam_size += 1
@@ -283,7 +281,9 @@ class Parser:
                 if self.can_perform_merge(i, j, refs[0], refs[1]): return True
         return False
 
-    # given partial parse, expand by attempting to connect each partial tree to each other tree via composition
+    # given partial parse
+    # expand via function application (forwards and backwards), type-raising, and merge operations
+    # attempt to escape un-parsable situations through `parsing with unknowns'
     def expand_partial_parse(self, p):
         partial = p[0]
         tree = p[1]
@@ -306,7 +306,7 @@ class Parser:
                             partial[idx] for idx in [i, j]]
                     joined_subtrees = self.perform_fa(objs[0], objs[1])
                     possible_joins.append([i, j, joined_subtrees, tree[i], tree[j]])
-                # try Composition from i to j
+                # try merge from i to j
                 if self.can_perform_merge(i, j, refs[0], refs[1]):
                     merged_subtrees = self.perform_merge(refs[0], refs[1])
                     possible_joins.append([i, j, merged_subtrees, tree[i], tree[j]])
@@ -315,6 +315,16 @@ class Parser:
             if self.can_perform_type_raising(ref) == "DESC->N/N":
                 raised_subtrees = self.perform_adjectival_type_raise(ref)
                 possible_joins.append([i, i, raised_subtrees, tree[i], tree[i]])
+
+        # try parsing with unknowns
+        for i in range(0, len(partial)):
+            if partial[i] is not None: continue
+            # proceed only if no meanings for token known (this restriction can be relaxed but not sure it needs to be)
+            if len(self.lexicon.entries[self.lexicon.surface_forms.index(tree[i][1])]) == 0:
+                for d in [-1, 1]:
+                    if self.can_assign_unknown(partial, i, d):
+                        assigned_unknown_subtree = self.perform_assign_unknown(partial, i, d)
+                        possible_joins.append([i, i, assigned_unknown_subtree, tree[i], tree[i]])
 
         expanded_partials = []
         for join in possible_joins:
@@ -331,6 +341,33 @@ class Parser:
             expanded_partials.append([expanded_partial, expanded_tree])
         return expanded_partials
 
+    # return true if member idx is a candidate for unknown assignment in partial
+    def can_assign_unknown(self, partial, idx, d):
+        if partial[idx] is not None: return False
+        i = idx+d
+        if i < 0 or i == len(partial): return False
+        if partial[i] is None: return False
+        neighbor = self.lexicon.semantic_forms[partial[i]] if type(partial[i]) is int else partial[i]
+        n_cat = self.lexicon.categories[neighbor.category]
+        if type(n_cat) is str: return False
+        if not ((i < idx and n_cat[1] == 1) or (i > idx and n_cat[1] == 0)): return False
+        if not n_cat[2] == self.lexicon.categories.index('N'): return False
+        return True
+
+    def perform_assign_unknown(self, partial, idx, d):
+        i = idx+d
+        neighbor = self.lexicon.semantic_forms[partial[i]] if type(partial[i]) is int else partial[i]
+        n_cat = self.lexicon.categories[neighbor.category]
+        unk = None
+        if n_cat[2] == self.lexicon.categories.index('N'):  # idx is possible synonym noun
+            unk = SemanticNode.SemanticNode(None, None, None, False, idx=self.ontology.preds.index('UNK_E'))
+            unk.type = self.ontology.types.index('e')
+            unk.category = self.lexicon.categories.index('N')
+            unk.set_return_type(self.ontology)
+        # TODO: possible synonym actions
+        # TODO: predicate induction (treat each new adjective as new predicate for now)
+        return unk
+
     # return DESC : pred raised to N/N : lambda x.(pred(x))
     def perform_adjectival_type_raise(self, A):
         # print "performing adjectival raise with '"+self.printParse(A,True)+"'" #DEBUG
@@ -343,7 +380,7 @@ class Parser:
         raised.category = self.lexicon.categories.index(
             [self.lexicon.categories.index('N'), 1, self.lexicon.categories.index('N')])
         raised.children = [child_pred]
-        raised.setReturnType(self.ontology)
+        raised.set_return_type(self.ontology)
         # print "performed adjectival raise with '"+self.printParse(A,True)+"' to form '"+self.printParse(raised,True)+"'" #DEBUG
         return raised
 
@@ -452,11 +489,11 @@ class Parser:
                 if curr.parent is None:
                     if curr.children is None:
                         # print "...whole tree is instance" #DEBUG
-                        curr.copyAttributes(B)  # instance is whole tree; add nothing more and loop will now exit
+                        curr.copy_attributes(B)  # instance is whole tree; add nothing more and loop will now exit
                         curr.category = self.lexicon.categories[A.category][0]  # take on return type of A
                     elif B.children is None:
                         # print "...instance heads tree; preserve children taking B"
-                        curr.copyAttributes(B, deepest_lambda, preserve_children=True)
+                        curr.copy_attributes(B, deepest_lambda, preserve_children=True)
                     else:
                         sys.exit("Error: incompatible parentless, childed node A with childed node B")
                     entire_replacement = True
@@ -465,12 +502,12 @@ class Parser:
                         if curr.parent.children[curr_parent_matching_idx] == curr: break
                     if curr.children is None:
                         # print "...instance of B will preserve its children" #DEBUG
-                        curr.parent.children[curr_parent_matching_idx].copyAttributes(B, deepest_lambda,
+                        curr.parent.children[curr_parent_matching_idx].copy_attributes(B, deepest_lambda,
                                                                                       preserve_parent=True)  # lambda instance is a leaf
                     else:
                         if B.children is None:
                             # print "...instance of B will keep children from A" #DEBUG
-                            curr.parent.children[curr_parent_matching_idx].copyAttributes(B, deepest_lambda,
+                            curr.parent.children[curr_parent_matching_idx].copy_attributes(B, deepest_lambda,
                                                                                           preserve_parent=True,
                                                                                           preserve_children=True)
                         else:
@@ -480,11 +517,11 @@ class Parser:
                             while B_without_lambda_headers.is_lambda and B_without_lambda_headers.is_lambda_instantiation:
                                 B_without_lambda_headers = B_without_lambda_headers.children[0]
                                 num_leading_lambdas += 1
-                            curr.parent.children[curr_parent_matching_idx].copyAttributes(B_without_lambda_headers,
+                            curr.parent.children[curr_parent_matching_idx].copy_attributes(B_without_lambda_headers,
                                                                                           num_leading_lambdas,
                                                                                           preserve_parent=True,
                                                                                           preserve_children=False)
-                    curr.parent.children[curr_parent_matching_idx].setReturnType(self.ontology)  # not sure we need this
+                    curr.parent.children[curr_parent_matching_idx].set_return_type(self.ontology)  # not sure we need this
             if not entire_replacement and curr.children is not None: to_traverse.extend([[c, deepest_lambda] for c in curr.children])
         self.renumerate_lambdas(A_FA_B, [])
         # print "performed FA with '"+self.printParse(A,True)+"' taking '"+self.printParse(B,True)+"' to form '"+self.printParse(A_FA_B,True)+"'" #DEBUG

@@ -158,7 +158,7 @@ class Lexicon:
             name, type_str = info.split(':')
             scoped_lambdas.append(name)
             name_idx = len(scoped_lambdas)
-            t = self.ontology.readTypeFromStr(type_str)
+            t = self.ontology.read_type_from_str(type_str)
             node = SemanticNode.SemanticNode(parent, t, category, True, lambda_name=name_idx,
                                              is_lambda_instantiation=True)
             str_remaining = '.'.join(str_parts[1:])  # remove lambda prefix
@@ -227,7 +227,7 @@ class Lexicon:
                     self.read_semantic_form_from_str(str_remaining[splits[i-1] + 1:splits[i]], e_cat, node, scoped_lambdas[:]))
             node.children = children
         try:
-            node.setReturnType(self.ontology)
+            node.set_return_type(self.ontology)
         except TypeError as e:
             print e
             sys.exit("Offending string: '" + s + "'")

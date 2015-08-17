@@ -29,7 +29,7 @@ class LinearLearner:
 				self.copyDict(s[k], t[k])
 
 	def extractFeatureMap(self, t, p, ps, d):
-		f_map = self.feature_extractor.extractFeatureMap(t,p,ps,d)
+		f_map = self.feature_extractor.extract_feature_map(t,p,ps,d)
 		expanded_f_map = self.updateThetaMapReturnFullFeatureMap(f_map)
 		return expanded_f_map
 	def scoreFeatures(self, m, lt=None):
