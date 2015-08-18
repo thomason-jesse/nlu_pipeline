@@ -55,3 +55,4 @@ and:<t,<t,t>>
 or:<t,<t,t>>
 not:<t,t>
 the:<<e,t>,e>
+a:<<e,t>,e>

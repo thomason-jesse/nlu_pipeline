@@ -106,6 +106,7 @@ class Parser:
                 highest_scoring_parse = n_best_parses[0]
                 correct_denotation_parse = None
                 for i in range(0, len(n_best_parses)):
+                    print "candidate parse: "+self.print_parse(n_best_parses[i][0])  # DEBUG
                     candidate_denotation = self.grounder.groundSemanticNode(n_best_parses[i][0], [], [], [])
                     if i == 0: highest_scoring_denotation = candidate_denotation
                     if candidate_denotation == d:
@@ -428,7 +429,11 @@ class Parser:
         curr_A = A
         curr_B = B
         while curr_A.is_lambda and curr_A.is_lambda_instantiation:
-            if not curr_B.is_lambda or not curr_B.is_lambda_instantiation or curr_B.type != curr_A.type: return False
+            if curr_A.return_type is None: curr_A.set_return_type(self.ontology)
+            if curr_B.return_type is None: curr_B.set_return_type(self.ontology)
+            if (not curr_B.is_lambda or not curr_B.is_lambda_instantiation or curr_B.type != curr_A.type
+                    or curr_A.return_type != curr_B.return_type):
+                return False
             curr_A = curr_A.children[0]
             curr_B = curr_B.children[0]
         return True
