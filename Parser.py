@@ -187,11 +187,13 @@ class Parser:
             for j in range(i, len(tokens)):
                 forms = self.lexicon.get_semantic_forms_for_surface_form(" ".join(tokens[i:j+1]))
                 if len(forms) > 0:  # if lexical entries, note span and form idxs
-                    candidate_semantic_forms[(i,j)] = forms
+                    candidate_semantic_forms[(i, j)] = forms
                 elif i == j:  # if single word with no entries, add to lexicon as blank for features
                     self.lexicon.surface_forms.append(tokens[i])
                     self.lexicon.entries[len(self.lexicon.surface_forms) - 1] = []
-                    candidate_semantic_forms[(i,j)] = []
+                    candidate_semantic_forms[(i, j)] = []
+        print "tokens "+str(tokens)  # DEBUG
+        print "candidate forms "+str(candidate_semantic_forms)  # DEBUG
 
         # incrementally allow more None assignments, initially trying for none
         null_assignments_allowed = 0
@@ -208,6 +210,10 @@ class Parser:
             partial_parse_forms = [[pspt[i][0] for i in range(0, len(pspt))] for pspt in partial_semantic_parse_trees]
             partial_parses = [[partial_parse_forms[i], partial_semantic_parse_trees[i]] for i in
                               range(0, len(partial_parse_forms))]
+            print "Nones allowed:\t"+str(null_assignments_allowed)  # DEBUG
+            print "partial_semantic_parse_trees: "+str(partial_semantic_parse_trees)  # DEBUG
+            print "partial_parse_forms: "+str(partial_parse_forms)  # DEBUG
+            print "partial_parses: "+str(partial_parses)  # DEBUG
 
             # until full parses reaches some threshold k, score all partials and choose one to expand,
             # adding full parses to the set; don't allow expansions leading to bad partials
@@ -216,10 +222,9 @@ class Parser:
             bad_partial_parses = []
             scores = [self.learner.scoreParse(tokens, pp[0], pp[1]) for pp in partial_parses]
             while len(full_parses) < k and len(partial_parses) > 0:
-                # print "Nones allowed:\t"+str(null_assignments_allowed) #DEBUG
-                # print "partial parses:\t"+str(len(partial_parses)) #DEBUG
-                # print "bad parses:\t"+str(len(bad_partial_parses)) #DEBUG
-                # print "full parses:\t"+str(len(full_parses)) #DEBUG
+                print "partial parses:\t"+str(len(partial_parses))  # DEBUG
+                print "bad parses:\t"+str(len(bad_partial_parses))  # DEBUG
+                print "full parses:\t"+str(len(full_parses))  # DEBUG
                 # choose maximum scoring parse and try to expand it by examining all possible leaf connections
                 max_score_idx = scores.index(max(scores))
                 if (null_assignments_allowed == len(
@@ -588,23 +593,22 @@ class Parser:
                 self.renumerate_lambdas(c, lambdas[:])
 
     # recursive procedure to build all possible leaf sets as partial parses
-
     def expand_partial_parse_with_additional_tokens(self, partial, tokens, candidate_semantic_forms, nulls_remaining, idx):
         expanded_partials = []
         span = 0
-        #print partial,tokens[idx] #DEBUG
-        #r = raw_input()
-        while (idx,idx+span) in candidate_semantic_forms:
+        print partial, tokens[idx] #DEBUG
+        # r = raw_input()
+        while (idx, idx+span) in candidate_semantic_forms:
             none_valid = -1 if span == 0 else 0
-            for s in range(none_valid,len(candidate_semantic_forms[idx,idx+span])):
+            for s in range(none_valid, len(candidate_semantic_forms[idx, idx+span])):
                 expanded = partial[:]
                 if s == -1 and nulls_remaining > 0:
-                    expanded.append((None,tokens[idx]))
+                    expanded.append((None, tokens[idx]))
                 elif s == -1:
                     continue
                 else:
-                    expanded.append((candidate_semantic_forms[idx,idx+span][s]," ".join(tokens[idx:idx+span+1])))
-                if expanded[-1] is None or nulls_remaining < len(tokens)-idx:
+                    expanded.append((candidate_semantic_forms[idx, idx+span][s], " ".join(tokens[idx:idx+span+1])))
+                if expanded[-1][0] is None or nulls_remaining < len(tokens)-idx:
                     if len(tokens)-idx > span+1:
                         dx = -1 if expanded[-1][0] is None else 0
                         next_exp = self.expand_partial_parse_with_additional_tokens(
@@ -619,4 +623,6 @@ class Parser:
     def tokenize(self, s):
         s = s.replace("'s", " 's")
         str_parts = s.split()
+        for i in range(0, len(str_parts)):
+            if str_parts[i] == "an": str_parts[i] = "a"
         return [p for p in str_parts if len(p) > 0]

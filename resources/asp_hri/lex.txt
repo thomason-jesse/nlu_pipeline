@@ -18,7 +18,7 @@ no :- C : no
 #these are weird now bc there's some implicit knowledge in hasoffice that the second arg is an office
 #so basically we have to pick this predicate as a possibility and then just like ignore 'office' later
 's office :- N\N : lambda x:e.(the(lambda y:e.(hasoffice(x,y))))
-of :- N/N : lambda x:e.(lambda y:e.(hasoffice(x,y)))
+office of :- N/N : lambda x:e.(lambda y:e.(hasoffice(x,y)))
 
 #other interrogatives
 is :- I/I : lambda x:t.(x)
@@ -38,6 +38,7 @@ and :- I/I\I : lambda x:t.(lambda y:t.(and(x,y)))
 or :- I/I\I : lambda x:t.(lambda y:t.(or(x,y)))
 not :- I/I : lambda x:t.(not(x))
 the :- N/DESC : lambda P:<e,t>.(the(lambda x:e.(P(x))))
+the :- N/N : lambda P:<e,t>.(the(P))
 a :- N/DESC : lambda P:<e,t>.(a(lambda x:e.(P(x))))
 a :- DESC/DESC : lambda P:<e,t>.(P)
 

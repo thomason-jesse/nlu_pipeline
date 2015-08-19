@@ -21,6 +21,12 @@ class KBGrounder:
         except rospy.ServiceException, e:
             print "Service call failed: %s" % e
 
+    # take in a semantic grounding list and return an answer set
+    def grounding_to_answer_set(self, g):
+        if len(g) == 0: return []
+        if type(g[0]) is str: return g
+        return [gr[1] for gr in g]
+
     # returns possible groundings for given semantic node
     def groundSemanticNode(self, root, lambda_names, lambda_types, lambda_assignments):
         groundings = []
