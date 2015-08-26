@@ -1,3 +1,6 @@
+import random
+import Action
+
 class DialogAgent:
 
     def __init__(self, parser, grounder):
@@ -5,6 +8,54 @@ class DialogAgent:
         self.grounder = grounder
 
     def respond_to_utterance(self, u):
+
+        try:
+            action = self.get_action_from_utterance(u)
+        except Exception as err:
+            return "action from utterance failed with error: '"+str(err.args)+"'"
+
+        # speak answer
+        if action.name == "speak":
+            return action.params[0]  # eventually use reversed-parsing for this
+
+        # take action
+        else:
+            return "ACTION: "+str(action)
+
+    def read_in_utterance_action_pairs(self, fname):
+        f = open(fname,'r')
+        f_lines = f.readlines()
+        pairs = []
+        for i in range(0,len(f_lines)):
+            t = self.parser.tokenize(f_lines[i].strip())
+            a_str = f_lines[i+1]
+            a_name,a_params_str = a_str.strip(')').split('(')
+            pairs.append([t,Action.Action(a_name,a_params_str.split(','))])
+        f.close()
+        return pairs
+
+    def train_parser_from_utterance_action_pairs(self, pairs, epochs=10, parse_beam=10):
+        for e in range(0,epochs):
+            random.shuffle(pairs)
+            train_data = []
+            all_match = True
+            for t,a in pairs:
+                n_best_parses = self.parser.parse_tokens(t, n=parse_beam)
+                for i in range(0,len(n_best_parses)):
+                    a_chosen = self.get_action_from_parse(n_best_parses[i][0])
+                    if a_chosen == a:
+                        break  # the action matches gold and this parse should be used in training
+                if i == len(n_best_parses):
+                    print "WARNING: could not find correct action '"+str(a)+"' for tokens "+str(t)
+                if i != 0:
+                    all_match = False
+                    train_data.append([t, n_best_parses[0], a_chosen, n_best_parses[i], a])
+            if all_match:
+                print "WARNING: training converged at epoch "+str(e)+"/"+str(epochs)
+                break
+            self.parser.learner.learn_from_actions(train_data)
+
+    def get_action_from_utterance(self, u):
 
         # get response from parser
         n_best_parses = self.parser.parse_expression(u, n=100)
@@ -16,6 +67,11 @@ class DialogAgent:
             parse_tree = parse[1]
             print "parse: " + self.parser.print_parse(root)
             print self.parser.print_semantic_parse_result(parse_tree)
+
+        return self.get_action_from_parse(root)
+
+    def get_action_from_parse(self, root):
+
         root.set_return_type(self.parser.ontology)  # in case this was not calculated during parsing
 
         # answer interrogative utterances (true/false)
@@ -24,11 +80,9 @@ class DialogAgent:
             print g  # DEBUG
             answer = self.grounder.grounding_to_answer_set(g)
             if len(answer) == 0:
-                return "under no circumstances"
-            elif len(answer) > 1:
-                return "under multiple circumstances"
+                return Action.Action("speak", ["no"])
             else:
-                return "yes"
+                return Action.Action("speak", ["yes"])
 
         # answer interrogative utterances (value)
         elif root.return_type == self.parser.ontology.types.index('e'):
@@ -36,11 +90,9 @@ class DialogAgent:
             print g  # DEBUG
             answer = self.grounder.grounding_to_answer_set(g)
             if len(answer) == 0:
-                return "there is no such thing"
-            elif len(answer) > 1:
-                return "under different circumstances, it could be "+", ".join(answer)
+                return Action.Action("speak", [""])
             else:
-                return answer[0]
+                return Action.Action("speak", [answer[0]])
 
         # execute action from imperative utterance
         elif root.return_type == self.parser.ontology.types.index('a'):
@@ -54,21 +106,16 @@ class DialogAgent:
                 print "arg: "+str(g)  # DEBUG
                 answer = self.grounder.grounding_to_answer_set(g)
                 if len(answer) == 0:
-                    return "could not recognize action argument"
+                    raise LookupError("action argument unrecognized. arg: '"+str(answer)+"'")
                 elif len(answer) > 1:
-                    return "multiple interpretations of action argument renders command ambiguous"
+                    raise LookupError("multiple interpretations of action argument renders command ambiguous. arg: '"+str(answer)+"'")
                 else:
                     g_args.append(answer[0])
-            return "ACTION: "+action+"("+",".join(g_args)+")"
+            return Action.Action(action, g_args)
 
         # update internal knowledge from declarative utterance
         elif root.return_type == self.parser.ontology.types.index('d'):
-            return "cannot yet consider declaratives"
-
-        # user said yes or no
-        elif root.return_type == self.parser.ontology.types.index('c'):
-            return "confirmed '"+self.grounder.grounding_to_answer_set(self.grounder.groundSemanticNode(root, [], [], []))[0]+"'"
+            raise Exception("cannot yet consider declaratives")
 
         else:
-            print "WARNING: unrecognized return type "+str(self.parser.ontology.types[root.return_type])
-            return "could not respond to parse of utterance"
+            raise Exception("unrecognized return type "+str(self.parser.ontology.types[root.return_type]))

@@ -20,8 +20,10 @@ office of :- N/N : lambda x:e.(lambda y:e.(hasoffice(x,y)))
 #other interrogatives
 is :- I/I : lambda x:t.(x)
 is :- N/DESC/N : lambda x:e.(lambda P:<e,t>.(P(x)))
+is :- N/(N/N)/N : lambda x:e.(lambda P:<e,t>.(P(x)))
 in :- I/N\N : lambda p:e.(lambda r:e.(inroom(p,r)))
 in :- I\N : lambda p:e.(inoffice(p))
+where is :- I/N : lambda x:e.(x)
 
 #entity descriptor words
 #can be type-raised to N/N : lambda x:e.(pred(x))
@@ -38,6 +40,7 @@ the :- N/N : lambda P:<e,t>.(the(P))
 the :- N/N : lambda x:e.(x)
 a :- N/DESC : lambda P:<e,t>.(a(lambda x:e.(P(x))))
 a :- DESC/DESC : lambda P:<e,t>.(P)
+a :- (N/N)/(N/N) : lambda P:<e,t>.(lambda x:e.(P(x)))
 a :- N/N : lambda x:e.(x)
 
 #atoms

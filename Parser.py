@@ -309,7 +309,7 @@ class Parser:
                     possible_joins.append([i, j, joined_subtrees, tree[i], tree[j]])
                     pairwise_joins = True
                 # try merge from i to j
-                if self.can_perform_merge(i, j, refs[0], refs[1]):
+                if self.can_perform_merge(refs[0], refs[1]):
                     merged_subtrees = self.perform_merge(refs[0], refs[1])
                     possible_joins.append([i, j, merged_subtrees, tree[i], tree[j]])
                     pairwise_joins = True
@@ -414,7 +414,7 @@ class Parser:
 
     # return A<>B; A and B must have matching lambda headers and syntactic categories to be AND merged
     def perform_merge(self, A, B):
-        # print "performing Merge with '"+self.printParse(A,True)+"' taking '"+self.printParse(B,True)+"'" #DEBUG
+        print "performing Merge with '"+self.print_parse(A,True)+"' taking '"+self.print_parse(B,True)+"'" #DEBUG
         A_B_merged = copy.deepcopy(A)
         A_B_merged.category = self.lexicon.get_or_add_category(
             [self.lexicon.categories[A.category][0], self.lexicon.categories[A.category][1],
@@ -431,11 +431,11 @@ class Parser:
             SemanticNode.SemanticNode(innermost_outer_lambda, self.ontology.entries[and_idx],
                                       innermost_outer_lambda.children[0].category, False, idx=and_idx)]
         innermost_outer_lambda.children[0].children = [copy.deepcopy(A_child), copy.deepcopy(B_child)]
-        # print "performed Merge with '"+self.printParse(A,True)+"' taking '"+self.printParse(B,True)+"' to form '"+self.printParse(A_B_merged,True)+"'" #DEBUG
+        print "performed Merge with '"+self.print_parse(A,True)+"' taking '"+self.print_parse(B,True)+"' to form '"+self.print_parse(A_B_merged,True)+"'" #DEBUG
         return A_B_merged
 
     # return true if A,B can be merged
-    def can_perform_merge(self, i, j, A, B):
+    def can_perform_merge(self, A, B):
         if A is None or B is None: return False
         if not A.is_lambda or not A.is_lambda_instantiation or not B.is_lambda or not B.is_lambda_instantiation:
             return False
@@ -546,6 +546,7 @@ class Parser:
                     curr.parent.children[curr_parent_matching_idx].set_return_type(self.ontology)  # not sure we need this
             if not entire_replacement and curr.children is not None: to_traverse.extend([[c, deepest_lambda] for c in curr.children])
         self.renumerate_lambdas(A_FA_B, [])
+        A_FA_B.category = self.lexicon.categories[A.category][0]
         # print "performed FA with '"+self.print_parse(A,True)+"' taking '"+self.print_parse(B,True)+"' to form '"+self.print_parse(A_FA_B,True)+"'" #DEBUG
         return A_FA_B
 

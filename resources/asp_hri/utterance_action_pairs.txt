@@ -1,0 +1,20 @@
+where is peter's office
+speak(l3_508)
+
+search ray's office for peter
+searchroom(peter,l3_512)
+
+ask peter about ray
+askperson(peter,ray)
+
+ask peter where ray is
+askperson(peter,ray)
+
+remind peter about the bwi meeting in jivko's office
+remind(peter,bwi_m,l3_432)
+
+is ray a person
+speak(True)
+
+the group
+speak(bwi)
