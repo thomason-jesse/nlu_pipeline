@@ -14,7 +14,8 @@ class Parser:
 
     # print a SemanticNode as a string using the known ontology
     def print_parse(self, p, show_category=False):
-        if show_category and p.category is not None:
+        if p is None: return "NONE"
+        elif show_category and p.category is not None:
             s = self.lexicon.compose_str_from_category(p.category) + " : "
         else:
             s = ''
@@ -192,8 +193,8 @@ class Parser:
                     self.lexicon.surface_forms.append(tokens[i])
                     self.lexicon.entries[len(self.lexicon.surface_forms) - 1] = []
                     candidate_semantic_forms[(i, j)] = []
-        print "tokens "+str(tokens)  # DEBUG
-        print "candidate forms "+str(candidate_semantic_forms)  # DEBUG
+        # print "tokens "+str(tokens)  # DEBUG
+        # print "candidate forms "+str(candidate_semantic_forms)  # DEBUG
 
         # incrementally allow more None assignments, initially trying for none
         null_assignments_allowed = 0
@@ -210,10 +211,10 @@ class Parser:
             partial_parse_forms = [[pspt[i][0] for i in range(0, len(pspt))] for pspt in partial_semantic_parse_trees]
             partial_parses = [[partial_parse_forms[i], partial_semantic_parse_trees[i]] for i in
                               range(0, len(partial_parse_forms))]
-            print "Nones allowed:\t"+str(null_assignments_allowed)  # DEBUG
-            print "partial_semantic_parse_trees: "+str(partial_semantic_parse_trees)  # DEBUG
-            print "partial_parse_forms: "+str(partial_parse_forms)  # DEBUG
-            print "partial_parses: "+str(partial_parses)  # DEBUG
+            # print "Nones allowed:\t"+str(null_assignments_allowed)  # DEBUG
+            # print "partial_semantic_parse_trees: "+str(partial_semantic_parse_trees)  # DEBUG
+            # print "partial_parse_forms: "+str(partial_parse_forms)  # DEBUG
+            # print "partial_parses: "+str(partial_parses)  # DEBUG
 
             # until full parses reaches some threshold k, score all partials and choose one to expand,
             # adding full parses to the set; don't allow expansions leading to bad partials
@@ -222,9 +223,9 @@ class Parser:
             bad_partial_parses = []
             scores = [self.learner.scoreParse(tokens, pp[0], pp[1]) for pp in partial_parses]
             while len(full_parses) < k and len(partial_parses) > 0:
-                print "partial parses:\t"+str(len(partial_parses))  # DEBUG
-                print "bad parses:\t"+str(len(bad_partial_parses))  # DEBUG
-                print "full parses:\t"+str(len(full_parses))  # DEBUG
+                # print "partial parses:\t"+str(len(partial_parses))  # DEBUG
+                # print "bad parses:\t"+str(len(bad_partial_parses))  # DEBUG
+                # print "full parses:\t"+str(len(full_parses))  # DEBUG
                 # choose maximum scoring parse and try to expand it by examining all possible leaf connections
                 max_score_idx = scores.index(max(scores))
                 if (null_assignments_allowed == len(
@@ -233,9 +234,19 @@ class Parser:
                           partial_parses[max_score_idx][0]]
                     full_parses.append([pp, partial_parses[max_score_idx][1]])
                 else:
+                    # try:
                     new_partials = [[cpp, cpsp] for [cpp, cpsp] in
-                                    self.expand_partial_parse(partial_parses[max_score_idx]) if
-                                    cpp not in bad_partial_parses]
+                                self.expand_partial_parse(partial_parses[max_score_idx]) if
+                                cpp not in bad_partial_parses]
+                    # except:  # DEBUG
+                    #     for p in partial_parses[max_score_idx][0]:
+                    #         if p is not None:
+                    #             print self.print_parse(p, True)
+                    #     print self.print_semantic_parse_result(partial_parses[max_score_idx][1])
+                    #     sys.exit()
+                    for p in partial_parses[max_score_idx][0]:  # DEBUG
+                        print self.print_parse(self.lexicon.semantic_forms[p] if type(p) is int else p, True)
+                    print self.print_semantic_parse_result(partial_parses[max_score_idx][1])
                     if len(new_partials) == 0:  # then this parse is a bad partial
                         bad_partial_parses.append(partial_parses[max_score_idx])
                     # score new parses and add to partials / full where appropriate
@@ -294,6 +305,7 @@ class Parser:
         partial = p[0]
         tree = p[1]
         possible_joins = []
+        pairwise_joins = False
         for i in range(0, len(partial)):
             if partial[i] is None: continue
             lhs = rhs = None
@@ -302,7 +314,8 @@ class Parser:
             for rhs in range(i + 1, len(partial)):
                 if partial[rhs] is not None: break
             for j in [lhs, rhs]:
-                if j <= -1 or j >= len(partial) or i == j: continue  # edge cases
+                if j <= -1 or j >= len(partial) or i == j:
+                    continue  # edge cases
 
                 refs = [self.lexicon.semantic_forms[partial[idx]] if type(partial[idx]) is int else partial[idx] for idx
                         in [i, j]]
@@ -312,25 +325,30 @@ class Parser:
                             partial[idx] for idx in [i, j]]
                     joined_subtrees = self.perform_fa(objs[0], objs[1])
                     possible_joins.append([i, j, joined_subtrees, tree[i], tree[j]])
+                    pairwise_joins = True
                 # try merge from i to j
                 if self.can_perform_merge(i, j, refs[0], refs[1]):
                     merged_subtrees = self.perform_merge(refs[0], refs[1])
                     possible_joins.append([i, j, merged_subtrees, tree[i], tree[j]])
+                    pairwise_joins = True
             # try Type Raising on i
             ref = self.lexicon.semantic_forms[partial[i]] if type(partial[i]) is int else partial[i]
             if self.can_perform_type_raising(ref) == "DESC->N/N":
                 raised_subtrees = self.perform_adjectival_type_raise(ref)
                 possible_joins.append([i, i, raised_subtrees, tree[i], tree[i]])
 
-        # try parsing with unknowns
-        for i in range(0, len(partial)):
-            if partial[i] is not None: continue
-            # proceed only if no meanings for token known (this restriction can be relaxed but not sure it needs to be)
-            if len(self.lexicon.entries[self.lexicon.surface_forms.index(tree[i][1])]) == 0:
-                for d in [-1, 1]:
-                    if self.can_assign_unknown(partial, i, d):
-                        assigned_unknown_subtree = self.perform_assign_unknown(partial, i, d)
-                        possible_joins.append([i, i, assigned_unknown_subtree, tree[i], tree[i]])
+        # try parsing with unknowns if no pairwise connections remain
+        if not pairwise_joins:
+            print "trying parsing with unknowns"
+            for i in range(0, len(partial)):
+                if partial[i] is not None: continue
+                # proceed only if no meanings for token known (this restriction can be relaxed but not sure it needs to be)
+                if len(self.lexicon.entries[self.lexicon.surface_forms.index(tree[i][1])]) == 0:
+                    for d in [-1, 1]:
+                        # TODO: for adjectives (DESC), will eventually need special create-new-predicate rules
+                        candidate_assignments = self.genlex_for_missing_entry(partial, i, d)
+                        for candidate_assignment in candidate_assignments:
+                            possible_joins.append([i, i, candidate_assignment, tree[i], tree[i]])
 
         expanded_partials = []
         for join in possible_joins:
@@ -347,47 +365,65 @@ class Parser:
             expanded_partials.append([expanded_partial, expanded_tree])
         return expanded_partials
 
-    # return true if member idx is a candidate for unknown assignment in partial
-    def can_assign_unknown(self, partial, idx, d):
-        if partial[idx] is not None: return False
-        i = idx+d
-        if i < 0 or i == len(partial): return False
-        if partial[i] is None: return False
-        neighbor = self.lexicon.semantic_forms[partial[i]] if type(partial[i]) is int else partial[i]
-        n_cat = self.lexicon.categories[neighbor.category]
-        if type(n_cat) is str: return False
-        if not ((i < idx and n_cat[1] == 1) or (i > idx and n_cat[1] == 0)): return False
-        if not n_cat[2] == self.lexicon.categories.index('N'): return False
-        return True
+    # return set of candidate entries for idx of given partial with respect to its neighbor in direction d
+    # performs exact syntax/semantics match against lexicon; can only learn perfect synonyms
+    # has special allowances for UNK assignments to tokens for certain syntactic categories
+    def genlex_for_missing_entry(self, partial, idx, d):
 
-    def perform_assign_unknown(self, partial, idx, d):
+        # ensure the given parameters are candidates for generating new lexical entries
+        print partial,idx,d  # DEBUG
+        if partial[idx] is not None: return []
         i = idx+d
+        if i < 0 or i == len(partial): return []
+        if partial[i] is None: return []  # TODO: should allow multi-word entries through sequence of None
         neighbor = self.lexicon.semantic_forms[partial[i]] if type(partial[i]) is int else partial[i]
         n_cat = self.lexicon.categories[neighbor.category]
-        unk = None
-        if n_cat[2] == self.lexicon.categories.index('N'):  # idx is possible synonym noun
-            unk = SemanticNode.SemanticNode(None, None, None, False, idx=self.ontology.preds.index('UNK_E'))
-            unk.type = self.ontology.types.index('e')
-            unk.category = self.lexicon.categories.index('N')
-            unk.set_return_type(self.ontology)
-        # TODO: possible synonym actions
-        # TODO: predicate induction (treat each new adjective as new predicate for now)
-        return unk
+        candidates = []
+        print "passed general tests"+str(n_cat)
+
+        # try consuming n_cat in direction d
+        consume_d = 0 if d == -1 else 1
+        for form in self.lexicon.semantic_forms:
+            form_cat = self.lexicon.categories[form.category]
+            if type(form_cat) is list and form_cat[1] == consume_d and form_cat[2] == neighbor.category:
+                    candidates.append(form)
+
+        # try being consumed by n_cat from direction d
+        if (type(n_cat) is list
+                and ((i < idx and n_cat[1] == 1) or (i > idx and n_cat[1] == 0))):
+            print n_cat[2], self.lexicon.categories.index('N')  # DEBUG
+            if n_cat[2] == self.lexicon.categories.index('N'):
+                # 'N' is a candidate to receive UNK token
+                unk = SemanticNode.SemanticNode(None, None, None, False, idx=self.ontology.preds.index('UNK_E'))
+                unk.type = self.ontology.types.index('e')
+                unk.category = self.lexicon.categories.index('N')
+                unk.set_return_type(self.ontology)
+                candidates.append(unk)
+                print "passed up UNK "+str(unk)
+            # only look generally if neighbor is not looking for an N,
+            # which should be treated as UNK due to massive ambiguity
+            else:
+                for form in self.lexicon.semantic_forms:
+                    if n_cat[2] == form.category:
+                        candidates.append(form)
+
+        return candidates
 
     # return DESC : pred raised to N/N : lambda x.(pred(x))
     def perform_adjectival_type_raise(self, A):
-        # print "performing adjectival raise with '"+self.printParse(A,True)+"'" #DEBUG
+        # print "performing adjectival raise with '"+self.print_parse(A,True)+"'" #DEBUG
         child_pred = copy.deepcopy(A)
         child_pred.children = [
             SemanticNode.SemanticNode(child_pred, self.ontology.types.index('e'), self.lexicon.categories.index('N'),
                                       is_lambda=True, lambda_name=1, is_lambda_instantiation=False)]
+        child_pred.category = self.lexicon.categories.index('N')  # change from DESC return type
         raised = SemanticNode.SemanticNode(None, None, None, True, lambda_name=1, is_lambda_instantiation=True)
         raised.type = self.ontology.types.index('e')
         raised.category = self.lexicon.categories.index(
             [self.lexicon.categories.index('N'), 1, self.lexicon.categories.index('N')])
         raised.children = [child_pred]
         raised.set_return_type(self.ontology)
-        # print "performed adjectival raise with '"+self.printParse(A,True)+"' to form '"+self.printParse(raised,True)+"'" #DEBUG
+        # print "performed adjectival raise with '"+self.print_parse(A,True)+"' to form '"+self.print_parse(raised,True)+"'" #DEBUG
         return raised
 
     # return true if A is a candidate for type-raising
@@ -479,10 +515,9 @@ class Parser:
     #                curr_B = curr_B.children[0]
     #        return True
 
-
     # return A(B); A must be lambda headed with type equal to B's root type
     def perform_fa(self, A, B):
-        # print "performing FA with '"+self.printParse(A,True)+"' taking '"+self.printParse(B,True)+"'" #DEBUG
+        # print "performing FA with '"+self.print_parse(A,True)+"' taking '"+self.print_parse(B,True)+"'" #DEBUG
         A_FA_B = copy.deepcopy(
             A.children[0])  # A is lambda headed and so has a single child which will be the root of the composed tree
         A_FA_B.parent = None
@@ -495,7 +530,7 @@ class Parser:
             if curr.is_lambda and curr.is_lambda_instantiation:
                 deepest_lambda = curr.lambda_name
             elif curr.is_lambda and not curr.is_lambda_instantiation and curr.lambda_name == A.lambda_name:  # an instance of lambda_A to be replaced by B
-                # print "substituting '"+self.printParse(B,True)+"' for '"+self.printParse(curr,True)+"' with lambda offset "+str(deepest_lambda) #DEBUG
+                # print "substituting '"+self.print_parse(B,True)+"' for '"+self.print_parse(curr,True)+"' with lambda offset "+str(deepest_lambda) #DEBUG
                 if curr.parent is None:
                     if curr.children is None:
                         # print "...whole tree is instance" #DEBUG
@@ -534,7 +569,7 @@ class Parser:
                     curr.parent.children[curr_parent_matching_idx].set_return_type(self.ontology)  # not sure we need this
             if not entire_replacement and curr.children is not None: to_traverse.extend([[c, deepest_lambda] for c in curr.children])
         self.renumerate_lambdas(A_FA_B, [])
-        # print "performed FA with '"+self.printParse(A,True)+"' taking '"+self.printParse(B,True)+"' to form '"+self.printParse(A_FA_B,True)+"'" #DEBUG
+        # print "performed FA with '"+self.print_parse(A,True)+"' taking '"+self.print_parse(B,True)+"' to form '"+self.print_parse(A_FA_B,True)+"'" #DEBUG
         return A_FA_B
 
     # return true if A(B) is a valid for functional application
@@ -542,8 +577,8 @@ class Parser:
         if A is None or B is None: return False
         if A.category is None or type(self.lexicon.categories[A.category]) is not list or (
                             i - j > 0 and self.lexicon.categories[A.category][1] == 1) or (
-                            i - j < 0 and self.lexicon.categories[A.category][
-                    1] == 0): return False  # B is left/right when A expects right/left
+                            i - j < 0 and self.lexicon.categories[A.category][1] == 0):
+            return False  # B is left/right when A expects right/left
         if not A.is_lambda or not A.is_lambda_instantiation or A.type != B.return_type: return False
         if self.lexicon.categories[A.category][2] != B.category: return False  # B is not the input category A expects
         if A.parent is None and A.is_lambda and not A.is_lambda_instantiation: return True  # the whole tree of A will be replaced with the whole tree of B
@@ -596,7 +631,7 @@ class Parser:
     def expand_partial_parse_with_additional_tokens(self, partial, tokens, candidate_semantic_forms, nulls_remaining, idx):
         expanded_partials = []
         span = 0
-        print partial, tokens[idx] #DEBUG
+        # print partial, tokens[idx] #DEBUG
         # r = raw_input()
         while (idx, idx+span) in candidate_semantic_forms:
             none_valid = -1 if span == 0 else 0

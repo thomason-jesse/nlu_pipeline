@@ -22,7 +22,7 @@ class Ontology:
     def calc_num_pred_args(self, idx):
         num_args = 0
         curr_type = self.types[self.entries[idx]]
-        while len(curr_type) == 2:
+        while type(curr_type) is list:
             num_args += 1
             curr_type = self.types[curr_type[1]]
         return num_args

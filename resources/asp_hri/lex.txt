@@ -1,20 +1,18 @@
 #imperative
 search :- M/PP/N : lambda r:e.(lambda p:e.(searchroom(p,r)))
-ask :- M/N/N : lambda p1:e.(lambda p2:e.(askperson(p1,p2)))
+ask :- M/PP/N : lambda p1:e.(lambda p2:e.(askperson(p1,p2)))
 remind :- M/PP/PP/N : lambda p:e.(lambda m:e.(lambda r:e.(remind(p,m,r))))
 
 #prepositional arguments to commands
 for :- PP/N : lambda x:e.(x)
 of :- PP/N : lambda x:e.(x)
 in :- PP/N : lambda x:e.(x)
+about :- PP/N : lambda x:e.(x)
 
 #confirmations
 yes :- C : yes
 no :- C : no
 
-#for "bob 's office"; "office of the chair"
-#'s :- N/(N/N)\N : lambda x:e.(lambda P:<e,t>.(the(lambda y:e.(and(P(y), hasoffice(x, y))))))
-#of :- N\(N/N)/N : lambda x:e.(lambda P:<e,t>.(lambda y:e.(and(P(y), hasoffice(x, y)))))
 #these are weird now bc there's some implicit knowledge in hasoffice that the second arg is an office
 #so basically we have to pick this predicate as a possibility and then just like ignore 'office' later
 's office :- N\N : lambda x:e.(the(lambda y:e.(hasoffice(x,y))))

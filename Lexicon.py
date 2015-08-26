@@ -9,6 +9,23 @@ class Lexicon:
         self.categories = []  # will grow on its own
         self.surface_forms, self.semantic_forms, self.entries, self.pred_to_surface = self.read_lex_from_file(
             lexicon_fname)
+        self.sem_form_expected_args = [self.calc_exp_args(i) for i in range(0, len(self.semantic_forms))]
+        self.sem_form_return_cat = [self.calc_return_cat(i) for i in range(0, len(self.semantic_forms))]
+        print self.sem_form_return_cat
+
+    def calc_exp_args(self, idx):
+        exp_args = 0
+        curr_cat = self.semantic_forms[idx].category
+        while type(self.categories[curr_cat]) is list:
+            exp_args += 1
+            curr_cat = self.categories[curr_cat][0]
+        return exp_args
+
+    def calc_return_cat(self, idx):
+        curr_cat = self.semantic_forms[idx].category
+        while type(self.categories[curr_cat]) is list:
+            curr_cat = self.categories[curr_cat][0]
+        return curr_cat
 
     def get_or_add_category(self, c):
         if c in self.categories:
