@@ -234,19 +234,13 @@ class Parser:
                           partial_parses[max_score_idx][0]]
                     full_parses.append([pp, partial_parses[max_score_idx][1]])
                 else:
-                    # try:
+                    #print "expanding: "  # DEBUG
+                    #for p in partial_parses[max_score_idx][0]:  # DEBUG
+                    #    print self.print_parse(self.lexicon.semantic_forms[p] if type(p) is int else p, True)
+                    #print self.print_semantic_parse_result(partial_parses[max_score_idx][1])  # DEBUG
                     new_partials = [[cpp, cpsp] for [cpp, cpsp] in
                                 self.expand_partial_parse(partial_parses[max_score_idx]) if
                                 cpp not in bad_partial_parses]
-                    # except:  # DEBUG
-                    #     for p in partial_parses[max_score_idx][0]:
-                    #         if p is not None:
-                    #             print self.print_parse(p, True)
-                    #     print self.print_semantic_parse_result(partial_parses[max_score_idx][1])
-                    #     sys.exit()
-                    for p in partial_parses[max_score_idx][0]:  # DEBUG
-                        print self.print_parse(self.lexicon.semantic_forms[p] if type(p) is int else p, True)
-                    print self.print_semantic_parse_result(partial_parses[max_score_idx][1])
                     if len(new_partials) == 0:  # then this parse is a bad partial
                         bad_partial_parses.append(partial_parses[max_score_idx])
                     # score new parses and add to partials / full where appropriate
@@ -257,7 +251,6 @@ class Parser:
                         num_internal_trees = sum([1 if p is not None else 0 for p
                                                   in new_partials[max_new_score_idx][0]])
                         if num_internal_trees == 1:
-                            # and self.any_expansions_remaining(new_partials[max_new_score_idx][0]) == False:
                             if new_partials[max_new_score_idx] not in full_parses:
                                 full_parses.append(new_partials[max_new_score_idx])
                             new_partials_beam_size += 1
@@ -286,17 +279,6 @@ class Parser:
             del full_parses[max_score_idx]
             del full_parse_scores[max_score_idx]
         return k_best
-
-    # return true if any A(B) can be performed in the given partial
-    def any_expansions_remaining(self, partial):
-        for i in range(0, len(partial)):
-            for j in range(0, len(partial)):
-                if j == -1 or j == len(partial) or i == j: continue  # edge cases
-                refs = [self.lexicon.semantic_forms[partial[idx]] if type(partial[idx]) is int else partial[idx] for idx
-                        in [i, j]]
-                if self.can_perform_fa(i, j, refs[0], refs[1]): return True
-                if self.can_perform_merge(i, j, refs[0], refs[1]): return True
-        return False
 
     # given partial parse
     # expand via function application (forwards and backwards), type-raising, and merge operations
@@ -339,10 +321,9 @@ class Parser:
 
         # try parsing with unknowns if no pairwise connections remain
         if not pairwise_joins:
-            print "trying parsing with unknowns"
             for i in range(0, len(partial)):
                 if partial[i] is not None: continue
-                # proceed only if no meanings for token known (this restriction can be relaxed but not sure it needs to be)
+                # proceed only if no meanings for token known (should be relaxed eventually; beam can handle exp)
                 if len(self.lexicon.entries[self.lexicon.surface_forms.index(tree[i][1])]) == 0:
                     for d in [-1, 1]:
                         # TODO: for adjectives (DESC), will eventually need special create-new-predicate rules
@@ -371,7 +352,6 @@ class Parser:
     def genlex_for_missing_entry(self, partial, idx, d):
 
         # ensure the given parameters are candidates for generating new lexical entries
-        print partial,idx,d  # DEBUG
         if partial[idx] is not None: return []
         i = idx+d
         if i < 0 or i == len(partial): return []
@@ -379,7 +359,6 @@ class Parser:
         neighbor = self.lexicon.semantic_forms[partial[i]] if type(partial[i]) is int else partial[i]
         n_cat = self.lexicon.categories[neighbor.category]
         candidates = []
-        print "passed general tests"+str(n_cat)
 
         # try consuming n_cat in direction d
         consume_d = 0 if d == -1 else 1
@@ -391,7 +370,6 @@ class Parser:
         # try being consumed by n_cat from direction d
         if (type(n_cat) is list
                 and ((i < idx and n_cat[1] == 1) or (i > idx and n_cat[1] == 0))):
-            print n_cat[2], self.lexicon.categories.index('N')  # DEBUG
             if n_cat[2] == self.lexicon.categories.index('N'):
                 # 'N' is a candidate to receive UNK token
                 unk = SemanticNode.SemanticNode(None, None, None, False, idx=self.ontology.preds.index('UNK_E'))
@@ -399,7 +377,6 @@ class Parser:
                 unk.category = self.lexicon.categories.index('N')
                 unk.set_return_type(self.ontology)
                 candidates.append(unk)
-                print "passed up UNK "+str(unk)
             # only look generally if neighbor is not looking for an N,
             # which should be treated as UNK due to massive ambiguity
             else:
@@ -535,13 +512,13 @@ class Parser:
                     if curr.children is None:
                         # print "...whole tree is instance" #DEBUG
                         curr.copy_attributes(B)  # instance is whole tree; add nothing more and loop will now exit
-                        curr.category = self.lexicon.categories[A.category][0]  # take on return type of A
                     elif B.children is None:
                         # print "...instance heads tree; preserve children taking B"
                         curr.copy_attributes(B, deepest_lambda, preserve_children=True)
                     else:
                         sys.exit("Error: incompatible parentless, childed node A with childed node B")
                     entire_replacement = True
+                    curr.category = self.lexicon.categories[A.category][0]  # take on return type of A
                 else:
                     for curr_parent_matching_idx in range(0, len(curr.parent.children)):
                         if curr.parent.children[curr_parent_matching_idx] == curr: break

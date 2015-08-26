@@ -14,7 +14,6 @@ yes :- C : yes
 no :- C : no
 
 #these are weird now bc there's some implicit knowledge in hasoffice that the second arg is an office
-#so basically we have to pick this predicate as a possibility and then just like ignore 'office' later
 's office :- N\N : lambda x:e.(the(lambda y:e.(hasoffice(x,y))))
 office of :- N/N : lambda x:e.(lambda y:e.(hasoffice(x,y)))
 
@@ -28,7 +27,6 @@ in :- I\N : lambda p:e.(inoffice(p))
 #can be type-raised to N/N : lambda x:e.(pred(x))
 room :- DESC : room
 person :- DESC : person
-meeting :- DESC : meeting
 group :- DESC : group
 
 #closed category
@@ -37,8 +35,10 @@ or :- I/I\I : lambda x:t.(lambda y:t.(or(x,y)))
 not :- I/I : lambda x:t.(not(x))
 the :- N/DESC : lambda P:<e,t>.(the(lambda x:e.(P(x))))
 the :- N/N : lambda P:<e,t>.(the(P))
+the :- N/N : lambda x:e.(x)
 a :- N/DESC : lambda P:<e,t>.(a(lambda x:e.(P(x))))
 a :- DESC/DESC : lambda P:<e,t>.(P)
+a :- N/N : lambda x:e.(x)
 
 #atoms
 peter :- N : peter

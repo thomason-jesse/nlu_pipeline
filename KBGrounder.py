@@ -23,9 +23,11 @@ class KBGrounder:
 
     # take in a semantic grounding list and return an answer set
     def grounding_to_answer_set(self, g):
-        if len(g) == 0: return []
-        if type(g[0]) is str: return g
-        return [gr[1] for gr in g]
+        if type(g) is list:
+            if len(g) == 0: return []
+            if type(g[0]) is str: return g
+            return [gr[1] for gr in g]
+        else: return g
 
     # returns possible groundings for given semantic node
     def groundSemanticNode(self, root, lambda_names, lambda_types, lambda_assignments):
@@ -113,14 +115,12 @@ class KBGrounder:
                     a.name = self.ontology.preds[root.idx]
                     a.params = []
                     for i in range(0, len(root.children)):
-                        if len(child_grounds[i]) == 2 and type(child_grounds[i][0]) is list:
-                            a.params.append(child_grounds[i][1])
-                        else:
-                            a.params.append(child_grounds[i][child_ground_idx[i]])
-                    #a.params = [child_grounds[i][child_ground_idx[i]] for i in range(0, len(root.children))]
+                        # take the first grounding result from the set if it is multi-element
+                        a.params.append(self.grounding_to_answer_set(child_grounds[i])[0])
                     req.facts.append(a)
                     try:
                         res = self.static_fact_query_client(req)
+                        # print "KB request: "+str(req)+"\nsatisfied: "+str(res.satisfied)  # DEBUG
                     except genpy.message.SerializationError:
                         sys.exit("Invoked ROS KB with unknown predicate or parameters: \n" + str(req))
                         # + "\n"+"\n".join([str(child_grounds), str(child_ground_idx), str(root.children)]))

@@ -65,6 +65,10 @@ class DialogAgent:
         elif root.return_type == self.parser.ontology.types.index('d'):
             return "cannot yet consider declaratives"
 
+        # user said yes or no
+        elif root.return_type == self.parser.ontology.types.index('c'):
+            return "confirmed '"+self.grounder.grounding_to_answer_set(self.grounder.groundSemanticNode(root, [], [], []))[0]+"'"
+
         else:
             print "WARNING: unrecognized return type "+str(self.parser.ontology.types[root.return_type])
             return "could not respond to parse of utterance"
