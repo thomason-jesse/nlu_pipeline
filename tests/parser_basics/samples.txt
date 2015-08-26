@@ -25,9 +25,6 @@ equals(3506,the(lambda x:e.(and(office(x),possesses(ray,x)))))
 walk to 3506
 walk(3506)
 
-walk to ray's office or peter's office
-walk(or_e(the(lambda x:e.(and(office(x),possesses(ray,x)))),the(lambda x:e.(and(office(x),possesses(peter,x))))))
-
 bring the heavy blue object to ray
 bring(the(lambda 1:e.(and(and(heavy(1),blue(1)),object(1)))),ray)
 

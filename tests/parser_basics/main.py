@@ -25,10 +25,10 @@ print "instantiating Parser"
 parser = Parser.Parser(ont, lex, learner, grounder=None, beam_width=100)
 
 print "reading in data and beginning test"
-D = parser.readInPairedUtteranceSemantics(sys.argv[3])
+D = parser.read_in_paired_utterance_semantics(sys.argv[3])
 for [x,y] in D:
 	print "parsing "+str(x)
-	k_best = parser.parseTokens(x)
+	k_best = parser.parse_tokens(x)
 	correct_found = False
 	for ans in k_best:
 		if (y.__eq__(ans[0])):
@@ -37,10 +37,10 @@ for [x,y] in D:
 	if (correct_found == False):
 		print "mismatch on tokens "+str(x)
 		print "correct form: "
-		print parser.printParse(y)
+		print parser.print_parse(y)
 		print "predicted forms:"
 		for ans in k_best:
 			print ans[2]
-			print parser.printParse(ans[0])
-			print parser.printSemanticParseResult(ans[1])
+			print parser.print_parse(ans[0])
+			print parser.print_semantic_parse_result(ans[1])
 		raise AssertionError("Correct parse was not generated for "+str(x))
