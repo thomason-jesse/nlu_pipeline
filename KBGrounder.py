@@ -81,15 +81,15 @@ class KBGrounder:
 
                 # if special predicate, handle here
                 if self.ontology.preds[root.idx] == 'and':
-                    satisfied = child_grounds[i][child_ground_idx[i]][1]
-                    for i in range(0, len(root.children)):
-                        if not child_grounds[i][child_ground_idx[i]][1]:
+                    satisfied = child_grounds[0][child_ground_idx[0]][1]
+                    for i in range(1, len(root.children)):
+                        if satisfied != child_grounds[i][child_ground_idx[i]][1]:
                             satisfied = False
                             break
                 elif self.ontology.preds[root.idx] == 'or':
                     satisfied = False
                     for i in range(0, len(root.children)):
-                        if child_grounds[i][child_ground_idx[i]][1] != False:
+                        if child_grounds[i][child_ground_idx[i]][1] is not False:
                             satisfied = child_grounds[i][child_ground_idx[i]][1]
                             break
                 elif self.ontology.preds[root.idx] == 'the':

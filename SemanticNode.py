@@ -22,6 +22,7 @@ class SemanticNode:
         # lambdas 'return' <type,child_return_type> if consumed by upper functions
         if self.is_lambda_instantiation:
             type_str = ontology.compose_str_from_type(self.type)
+            if self.children[0].return_type is None: self.children[0].set_return_type(ontology)
             child_return_type_str = ontology.compose_str_from_type(self.children[0].return_type)
             self.return_type = ontology.read_type_from_str("<" + type_str + "," + child_return_type_str + ">")
         elif self.children is None:

@@ -14,7 +14,10 @@ remind peter about the bwi meeting in jivko's office
 remind(peter,bwi_m,l3_432)
 
 is ray a person
-speak(True)
+speak(yes)
 
 the group
 speak(bwi)
+
+is shiqi a room
+speak(no)

@@ -13,6 +13,7 @@ class Action:
             return False
         if len(self.params) != len(other.params):
             return False
-        for i in range(0,len(self.params)):
-            if self.params(i) != other.params[i]:
+        for i in range(0, len(self.params)):
+            if self.params[i] != other.params[i]:
                 return False
+        return True

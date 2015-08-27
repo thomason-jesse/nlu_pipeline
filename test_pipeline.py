@@ -32,15 +32,15 @@ print "instantiating KBGrounder"
 grounder = KBGrounder.KBGrounder(ont)
 
 print "instantiating Parser"
-parser = Parser.Parser(ont, lex, learner, grounder, beam_width=100)
-
-print "reading in data and training parser"
-D = parser.read_in_paired_utterance_denotation(sys.argv[3])
-parser.train_learner_on_denotations(D, epochs=10)
-print parser.learner.theta
+parser = Parser.Parser(ont, lex, learner, grounder, beam_width=10)
 
 print "instantiating DialogAgent"
 A = DialogAgent.DialogAgent(parser, grounder)
+
+print "reading in data and training parser from actions"
+D = A.read_in_utterance_action_pairs(sys.argv[3])
+A.train_parser_from_utterance_action_pairs(D, epochs=10, parse_beam=30)
+print "theta: "+str(parser.learner.theta)
 
 while True:
     print "\nsentence to be parsed:"

@@ -81,7 +81,7 @@ class Ontology:
     def compose_str_from_type(self, t):
         s = ''
         # a complex type
-        if type(self.types[t]) is not str:
+        if type(self.types[t]) is list:
             s += '<' + self.compose_str_from_type(self.types[t][0]) + ',' + self.compose_str_from_type(self.types[t][1]) + '>'
         # a primitive type
         else:

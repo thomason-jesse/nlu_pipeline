@@ -1,4 +1,6 @@
-import sys, math, random, copy
+import math
+import copy
+import Action
 
 
 class LinearLearner:
@@ -34,8 +36,8 @@ class LinearLearner:
                 if (k not in t): t[k] = {}
                 self.copyDict(s[k], t[k])
 
-    def extractFeatureMap(self, t, p, ps, d):
-        f_map = self.feature_extractor.extract_feature_map(t, p, ps, d)
+    def extractFeatureMap(self, t, p, a):
+        f_map = self.feature_extractor.extract_feature_map(t, p, a)
         expanded_f_map = self.updateThetaMapReturnFullFeatureMap(f_map)
         return expanded_f_map
 
@@ -49,19 +51,25 @@ class LinearLearner:
                 s += self.scoreFeatures(m[k], lt[k])
         return s
 
-    def scoreDenotation(self, t, p, ps, d):
-        return self.scoreFeatures(self.extractFeatureMap(t, p, ps, d))
+    def score_action(self, t, p, a):
+        return self.scoreFeatures(self.extractFeatureMap(t, p, a))
 
     # probably a better way to do this that we need to think about
-    def scoreParse(self, t, p, ps):
-        return self.scoreDenotation(t, p, ps, [[[], False]])
+    def scoreParse(self, t, p):
+        return self.score_action(t, p, Action.Action())
 
     # takes in training examples tokens, candidate parse and action, gold parse and action
     def learn_from_actions(self, t, learning_rate=None):
         if learning_rate is None: learning_rate = 1 / math.sqrt(float(len(t)))
         for [t, cp, ca, gp, ga] in t:
-            # TODO: update learner to handle features from tokens to actions
-            pass
+            f = self.extractFeatureMap(t, cp, ca)
+            g = self.extractFeatureMap(t, gp, ga)
+            g_zeros = copy.deepcopy(g)
+            self.zeroDict(g_zeros)
+            f_full = copy.deepcopy(f)
+            self.copyDict(g_zeros, f_full)
+            self.copyDict(f, f_full)  # in case g introduced new features f lacks
+            self.updateTheta(f_full, g, learning_rate)
 
     # takes in training examples T=(x,y,d,y',d')
     # x is token sequence input
@@ -81,7 +89,7 @@ class LinearLearner:
 
     def updateTheta(self, f, g, lr, lt=None):
         if (lt == None): lt = self.theta
-        print "updating theta sub-component " + str(lt) + " from f=" + str(f) + " and g=" + str(g)  # DEBUG
+        #print "updating theta sub-component " + str(lt) + " from f=" + str(f) + " and g=" + str(g)  # DEBUG
         for k in lt:
             if (type(lt[k]) is not dict):
                 lt[k] += lr * (g[k] - f[k])

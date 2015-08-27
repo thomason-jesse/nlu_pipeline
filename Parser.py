@@ -221,7 +221,7 @@ class Parser:
             # if a partial parse cannot be further expanded into a full parse, add it to the bad partial parses list
             # and remove it from partial
             bad_partial_parses = []
-            scores = [self.learner.scoreParse(tokens, pp[0], pp[1]) for pp in partial_parses]
+            scores = [self.learner.scoreParse(tokens, pp) for pp in partial_parses]
             while len(full_parses) < k and len(partial_parses) > 0:
                 # print "partial parses:\t"+str(len(partial_parses))  # DEBUG
                 # print "bad parses:\t"+str(len(bad_partial_parses))  # DEBUG
@@ -244,7 +244,7 @@ class Parser:
                     if len(new_partials) == 0:  # then this parse is a bad partial
                         bad_partial_parses.append(partial_parses[max_score_idx])
                     # score new parses and add to partials / full where appropriate
-                    new_partials_scores = [self.learner.scoreParse(tokens, npp[0], npp[1]) for npp in new_partials]
+                    new_partials_scores = [self.learner.scoreParse(tokens, npp) for npp in new_partials]
                     new_partials_beam_size = 0
                     while new_partials_beam_size < k and len(new_partials) > 0:
                         max_new_score_idx = new_partials_scores.index(max(new_partials_scores))
@@ -267,7 +267,7 @@ class Parser:
             null_assignments_allowed += 1
 
         # score full parses and return n best in order with scores
-        full_parse_scores = [self.learner.scoreParse(tokens, fp[0], fp[1]) for fp in full_parses]
+        full_parse_scores = [self.learner.scoreParse(tokens, fp) for fp in full_parses]
         k_best = []
         while len(k_best) < n and len(full_parses) > 0:
             max_score_idx = full_parse_scores.index(max(full_parse_scores))
@@ -414,7 +414,7 @@ class Parser:
 
     # return A<>B; A and B must have matching lambda headers and syntactic categories to be AND merged
     def perform_merge(self, A, B):
-        print "performing Merge with '"+self.print_parse(A,True)+"' taking '"+self.print_parse(B,True)+"'" #DEBUG
+        # print "performing Merge with '"+self.print_parse(A,True)+"' taking '"+self.print_parse(B,True)+"'" #DEBUG
         A_B_merged = copy.deepcopy(A)
         A_B_merged.category = self.lexicon.get_or_add_category(
             [self.lexicon.categories[A.category][0], self.lexicon.categories[A.category][1],
@@ -431,7 +431,16 @@ class Parser:
             SemanticNode.SemanticNode(innermost_outer_lambda, self.ontology.entries[and_idx],
                                       innermost_outer_lambda.children[0].category, False, idx=and_idx)]
         innermost_outer_lambda.children[0].children = [copy.deepcopy(A_child), copy.deepcopy(B_child)]
-        print "performed Merge with '"+self.print_parse(A,True)+"' taking '"+self.print_parse(B,True)+"' to form '"+self.print_parse(A_B_merged,True)+"'" #DEBUG
+        # 'and' adopts type taking each child's and returning the same
+        A_child.set_return_type(self.ontology)
+        input_type = [A_child.return_type, A_child.return_type]
+        if input_type not in self.ontology.types:
+            self.ontology.types.append(input_type)
+        full_type = [A_child.return_type, self.ontology.types.index(input_type)]
+        if full_type not in self.ontology.types:
+            self.ontology.types.append(full_type)
+        innermost_outer_lambda.children[0].type = self.ontology.types.index(full_type)
+        # print "performed Merge with '"+self.print_parse(A,True)+"' taking '"+self.print_parse(B,True)+"' to form '"+self.print_parse(A_B_merged,True)+"'" #DEBUG
         return A_B_merged
 
     # return true if A,B can be merged
