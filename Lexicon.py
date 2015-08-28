@@ -11,7 +11,6 @@ class Lexicon:
             lexicon_fname)
         self.sem_form_expected_args = [self.calc_exp_args(i) for i in range(0, len(self.semantic_forms))]
         self.sem_form_return_cat = [self.calc_return_cat(i) for i in range(0, len(self.semantic_forms))]
-        print self.sem_form_return_cat
 
     def calc_exp_args(self, idx):
         exp_args = 0
@@ -47,12 +46,10 @@ class Lexicon:
         return s + s2
 
     def get_semantic_forms_for_surface_form(self, surface_form):
-        if surface_form in self.surface_forms:
-            return self.entries[self.surface_forms.index(surface_form)]
-        else:
+        if surface_form not in self.surface_forms:
             self.surface_forms.append(surface_form)
-            self.entries[len(self.surface_forms) - 1] = []
-            return []
+            self.entries.append([])
+        return self.entries[self.surface_forms.index(surface_form)]
 
     def get_surface_forms_for_predicate(self, pred):
         if type(pred) is str:
@@ -70,7 +67,7 @@ class Lexicon:
 
         surface_forms = []
         semantic_forms = []
-        entries = {}
+        entries = []
         pred_to_surface = {}
         f = open(fname, 'r')
         lines = f.readlines()
@@ -90,6 +87,7 @@ class Lexicon:
             except ValueError:
                 sur_idx = len(surface_forms)
                 surface_forms.append(surface_form)
+                entries.append([])
 
             rlhs, rrhs = rhs.split(" : ")
             cat_idx = self.read_category_from_str(rlhs.strip())
@@ -99,10 +97,7 @@ class Lexicon:
             except ValueError:
                 sem_idx = len(semantic_forms)
                 semantic_forms.append(semantic_form)
-            if sur_idx in entries:
-                entries[sur_idx].append(sem_idx)
-            else:
-                entries[sur_idx] = [sem_idx]
+            entries[sur_idx].append(sem_idx)
             preds_in_semantic_form = self.get_all_preds_from_semantic_form(semantic_forms[sem_idx])
             for pred in preds_in_semantic_form:
                 if pred in pred_to_surface:

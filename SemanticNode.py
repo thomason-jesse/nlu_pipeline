@@ -74,12 +74,11 @@ class SemanticNode:
         return s
 
     # this is a forward comparison, so two trees are considered equal if their roots have different parents,
-    # as long as the roots and children down are identical categories need not match since this is a test
-    # for semantic, not syntactic, equality
+    # as long as the roots and children down are identical categories
     def __eq__(self, other):
         if type(self) != type(other): return False  # ie no casting
         if (self.type == other.type and self.is_lambda == other.is_lambda and self.idx == other.idx and
-                self.lambda_name == other.lambda_name):
+                self.lambda_name == other.lambda_name and self.category == other.category):
             if self.children is None and other.children is None: return True
             if self.children is None and other.children is not None: return False
             if self.children is not None and other.children is None: return False

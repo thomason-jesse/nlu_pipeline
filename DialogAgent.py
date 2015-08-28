@@ -78,7 +78,7 @@ class DialogAgent:
         # get response from parser
         n_best_parses = self.parser.parse_expression(u, n=100)
         if len(n_best_parses) == 0:
-            return "could not parse utterance"
+            raise LookupError("could not parse utterance")
         for i in range(len(n_best_parses)-1, -1, -1):
             parse = n_best_parses[i]
             root = parse[0]

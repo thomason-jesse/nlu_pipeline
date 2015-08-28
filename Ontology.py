@@ -13,7 +13,7 @@ class Ontology:
 
         # set special UNK predicates the parser can assign to for parsing with unknowns in synonym detection
         self.preds.append("UNK_E")
-        self.entries[len(self.preds)-1] = self.types.index('e')
+        self.entries.append(self.types.index('e'))
 
         # calculate and store number of arguments each predicate takes (atoms take 0)
         self.num_args = [self.calc_num_pred_args(i) for i in range(0, len(self.preds))]
@@ -33,7 +33,7 @@ class Ontology:
     def read_sem_from_file(self, fname):
 
         preds = []
-        entries = {}  # map of pred_idx:type read in
+        entries = []  # map of pred_idx:type read in
         f = open(fname, 'r')
         for line in f.readlines():
 
@@ -45,7 +45,7 @@ class Ontology:
             # create semantic meaning representation from string
             [name, type_str] = line.split(':')
             if name in preds: sys.exit("Multiply defined type for predicate '" + name + "'")
-            entries[len(preds)] = self.read_type_from_str(type_str)
+            entries.append(self.read_type_from_str(type_str))
             preds.append(name)
         f.close()
         return preds, entries

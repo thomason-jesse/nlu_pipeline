@@ -187,12 +187,7 @@ class Parser:
         for i in range(0, len(tokens)):
             for j in range(i, len(tokens)):
                 forms = self.lexicon.get_semantic_forms_for_surface_form(" ".join(tokens[i:j+1]))
-                if len(forms) > 0:  # if lexical entries, note span and form idxs
-                    candidate_semantic_forms[(i, j)] = forms
-                elif i == j:  # if single word with no entries, add to lexicon as blank for features
-                    self.lexicon.surface_forms.append(tokens[i])
-                    self.lexicon.entries[len(self.lexicon.surface_forms) - 1] = []
-                    candidate_semantic_forms[(i, j)] = []
+                candidate_semantic_forms[(i, j)] = forms
         # print "tokens "+str(tokens)  # DEBUG
         # print "candidate forms "+str(candidate_semantic_forms)  # DEBUG
 
