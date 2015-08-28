@@ -40,15 +40,22 @@ class Parser:
     def print_semantic_parse_tree(self, sp, d=0):
         s = ''
         for i in range(0, d): s += '-\t'
-        if type(sp[1]) is str:
+        if len(sp) == 2 and type(sp[0]) is int or sp[0] is None:
             if type(sp[0]) is int:
-                s += self.print_parse(self.lexicon.semantic_forms[sp[0]]) + " -: " + sp[1]
-            else:
+                s += self.print_parse(self.lexicon.semantic_forms[sp[0]])
+            if type(sp[1]) is list:
+                for i in range(0, len(sp[1])):
+                    s += '\n' + self.print_semantic_parse_tree(sp[1][i], d=d+1)
+            elif type(sp[1]) is str:
+                s += " -: " + sp[1]
+        elif type(sp) is tuple:
+            if type(sp[1]) is str:
                 s += "NONE -: " + sp[1]
+            else:
+                s += self.print_parse(self.lexicon.semantic_forms[sp[0]]) + " -: " + sp[1]
         else:
-            s += str(self.tokens_of_parse_tree(sp))
             for i in range(0, len(sp)):
-                s += '\n' + self.print_semantic_parse_tree(sp[i], d=d + 1)
+                s += '\n' + self.print_semantic_parse_tree(sp[i])
         return s
 
     def tokens_of_parse_tree(self, sp):
@@ -301,18 +308,18 @@ class Parser:
                     objs = [copy.deepcopy(self.lexicon.semantic_forms[partial[idx]]) if type(partial[idx]) is int else
                             partial[idx] for idx in [i, j]]
                     joined_subtrees = self.perform_fa(objs[0], objs[1])
-                    possible_joins.append([i, j, joined_subtrees, tree[i], tree[j]])
+                    possible_joins.append([i, j, joined_subtrees, tree[i], tree[j], None])
                     pairwise_joins = True
                 # try merge from i to j
                 if self.can_perform_merge(refs[0], refs[1]):
                     merged_subtrees = self.perform_merge(refs[0], refs[1])
-                    possible_joins.append([i, j, merged_subtrees, tree[i], tree[j]])
+                    possible_joins.append([i, j, merged_subtrees, tree[i], tree[j], None])
                     pairwise_joins = True
             # try Type Raising on i
             ref = self.lexicon.semantic_forms[partial[i]] if type(partial[i]) is int else partial[i]
             if self.can_perform_type_raising(ref) == "DESC->N/N":
                 raised_subtrees = self.perform_adjectival_type_raise(ref)
-                possible_joins.append([i, i, raised_subtrees, tree[i], tree[i]])
+                possible_joins.append([i, i, raised_subtrees, tree[i], tree[i], None])
 
         # try parsing with unknowns if no pairwise connections remain
         if not pairwise_joins:
@@ -323,8 +330,8 @@ class Parser:
                     for d in [-1, 1]:
                         # TODO: for adjectives (DESC), will eventually need special create-new-predicate rules
                         candidate_assignments = self.genlex_for_missing_entry(partial, i, d)
-                        for candidate_assignment in candidate_assignments:
-                            possible_joins.append([i, i, candidate_assignment, tree[i], tree[i]])
+                        for candidate_assignment, syn_idx in candidate_assignments:
+                            possible_joins.append([i, i, candidate_assignment, tree[i], tree[i], syn_idx])
 
         expanded_partials = []
         for join in possible_joins:
@@ -333,7 +340,7 @@ class Parser:
             expanded_partial = partial[:ordered_break[0]]
             expanded_tree = tree[:ordered_break[0]]
             expanded_partial.append(join[2])
-            expanded_tree.append([join[3], join[4]])
+            expanded_tree.append([join[5], [join[3], join[4]]])
             expanded_partial.extend(partial[ordered_break[0] + 1:ordered_break[1]])
             expanded_tree.extend(tree[ordered_break[0] + 1:ordered_break[1]])
             expanded_partial.extend(partial[ordered_break[1] + 1:])
@@ -357,10 +364,11 @@ class Parser:
 
         # try consuming n_cat in direction d
         consume_d = 0 if d == -1 else 1
-        for form in self.lexicon.semantic_forms:
+        for form_idx in range(0, len(self.lexicon.semantic_forms)):
+            form = self.lexicon.semantic_forms[form_idx]
             form_cat = self.lexicon.categories[form.category]
             if type(form_cat) is list and form_cat[1] == consume_d and form_cat[2] == neighbor.category:
-                    candidates.append(form)
+                    candidates.append([form, form_idx])
 
         # try being consumed by n_cat from direction d
         if (type(n_cat) is list
@@ -371,13 +379,14 @@ class Parser:
                 unk.type = self.ontology.types.index('e')
                 unk.category = self.lexicon.categories.index('N')
                 unk.set_return_type(self.ontology)
-                candidates.append(unk)
+                candidates.append([unk, None])
             # only look generally if neighbor is not looking for an N,
             # which should be treated as UNK due to massive ambiguity
             else:
-                for form in self.lexicon.semantic_forms:
+                for form_idx in range(0, len(self.lexicon.semantic_forms)):
+                    form = self.lexicon.semantic_forms[form_idx]
                     if n_cat[2] == form.category:
-                        candidates.append(form)
+                        candidates.append([form, form_idx])
 
         return candidates
 
@@ -459,42 +468,6 @@ class Parser:
             curr_A = curr_A.children[0]
             curr_B = curr_B.children[0]
         return True
-
-    # this implementation of composition has the correct pre-conditions but performs an AND merge instead of f(g(x))
-    # return A<>B; A and B must have matching lambda headers and syntactically consume one another in the appropriate direction (eg. A D/N, B N/N, A<>B D/N)
-    # def performComposition(self, A, B):
-    #        print "performing Composition with '"+self.printParse(A,True)+"' taking '"+self.printParse(B,True)+"'" #DEBUG
-    #        A_B_composed = copy.deepcopy(A)
-    #        A_B_composed.category = self.lexicon.getOrAddCategory([self.lexicon.categories[A.category][0],self.lexicon.categories[A.category][1],self.lexicon.categories[B.category][2]])
-    #        innermost_outer_lambda = A_B_composed
-    #        A_child = A.children[0]
-    #        B_child = B.children[0]
-    #        while (innermost_outer_lambda.children != None and innermost_outer_lambda.children[0].is_lambda and innermost_outer_lambda.children[0].is_lambda_instantiation):
-    #                innermost_outer_lambda = innermost_outer_lambda.children[0]
-    #                A_child = A.children[0]
-    #                B_child = B.children[0]
-    #        and_idx = self.ontology.preds.index('and')
-    #        innermost_outer_lambda.children = [SemanticNode.SemanticNode(innermost_outer_lambda, self.ontology.entries[and_idx], innermost_outer_lambda.children[0].category, False, idx=and_idx)]
-    #        innermost_outer_lambda.children[0].children = [copy.deepcopy(A_child),copy.deepcopy(B_child)]
-    #        print "performed Composition with '"+self.printParse(A,True)+"' taking '"+self.printParse(B,True)+"' to form '"+self.printParse(A_B_composed,True)+"'" #DEBUG
-    #        return A_B_composed
-    #
-    # return true if A,B can be composed
-    # def canPerformComposition(self, i, j, A, B):
-    #        if (A == None or B == None): return False
-    #        if (A.is_lambda == False or A.is_lambda_instantiation == False or B.is_lambda == False or B.is_lambda_instantiation == False): return False
-    #        if (type(self.lexicon.categories[A.category]) is not list or type(self.lexicon.categories[B.category]) is not list): return False
-    #        if (self.lexicon.categories[A.category][1] != self.lexicon.categories[B.category][1]): return False
-    #        dir = self.lexicon.categories[A.category][1]
-    #        if ((i-j > 0 and dir == 1) or (i-j < 0 and dir == 0)): return False
-    #        if (self.lexicon.categories[A.category][2] != self.lexicon.categories[B.category][0]): return False
-    #        curr_A = A
-    #        curr_B = B
-    #        while (curr_A.is_lambda and curr_A.is_lambda_instantiation):
-    #                if (curr_B.is_lambda == False or curr_B.is_lambda_instantiation == False or curr_B.type != curr_A.type): return False
-    #                curr_A = curr_A.children[0]
-    #                curr_B = curr_B.children[0]
-    #        return True
 
     # return A(B); A must be lambda headed with type equal to B's root type
     def perform_fa(self, A, B):

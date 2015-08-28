@@ -25,7 +25,8 @@ class FeatureExtractor:
             for np in needle_parts:
                 ta[t.index(np)] = ps[0]
         else:
-            for psc in ps:
+            iterate_over = ps if ps[0] is not None and type(ps[0]) is not int else ps[1]
+            for psc in iterate_over:
                 self.read_parse_structure_to_token_assignments(t, ta, psc)
 
     def extract_feature_map(self, tokens, parse, action):
