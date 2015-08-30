@@ -47,9 +47,9 @@ class Lexicon:
 
     def get_semantic_forms_for_surface_form(self, surface_form):
         if surface_form not in self.surface_forms:
-            self.surface_forms.append(surface_form)
-            self.entries.append([])
-        return self.entries[self.surface_forms.index(surface_form)]
+            return []
+        else:
+            return self.entries[self.surface_forms.index(surface_form)]
 
     def get_surface_forms_for_predicate(self, pred):
         if type(pred) is str:

@@ -21,3 +21,6 @@ speak(bwi)
 
 is shiqi a room
 speak(no)
+
+check jivko's office for ray
+searchroom(ray,l3_432)

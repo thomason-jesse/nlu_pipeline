@@ -176,6 +176,42 @@ class Parser:
             random.shuffle(T)
             self.learner.learnFromSemanticForms(T, reset_learner, epochs)
 
+    # iterate over partials and add genlex entries to lexicon
+    def add_genlex_entries_to_lexicon_from_partial(self, partial_bracketing):
+        for pb in partial_bracketing:
+            self.add_genlex_entries_to_lexicon_from_bracketing(pb)
+
+    # trace a parse for genlex entries and make them mapped members of the lexicon
+    def add_genlex_entries_to_lexicon_from_bracketing(self, bracketing):
+        if type(bracketing) is tuple:
+            return
+        if type(bracketing[0]) is int:
+            candidate = True
+            for i in range(0, 2):
+                if type(bracketing[1][i]) is not tuple:
+                    candidate = False
+                elif bracketing[1][i][0] is not None:
+                    candidate = False
+                elif type(bracketing[1][i][1]) is not str:
+                    candidate = False
+                if not candidate:
+                    break
+            if candidate and bracketing[1][0][1] == bracketing[1][1][1]:
+                sur = bracketing[1][0][1]
+                print sur, bracketing[0]
+                if sur not in self.lexicon.surface_forms:
+                    self.lexicon.surface_forms.append(sur)
+                    self.lexicon.entries.append([bracketing[0]])
+                else:
+                    sur_idx = self.lexicon.surface_forms.index(sur)
+                    self.lexicon.entries[sur_idx].append(bracketing[0])
+                print "added lexical entry '"+sur+"' : "+self.print_parse(self.lexicon.semantic_forms[bracketing[0]]) #  DEBUG
+                print "surface forms: "+str(self.lexicon.surface_forms)
+                print "entries: "+str(self.lexicon.entries)
+        if type(bracketing[1]) is list:
+            for i in range(0, len(bracketing[1])):
+                self.add_genlex_entries_to_lexicon_from_bracketing(bracketing[1][i])
+
     # tokenizes str and passes it to a function to parse tokens
     def parse_expression(self, s, k=None, n=1):
         tokens = self.tokenize(s)
@@ -190,6 +226,10 @@ class Parser:
         for i in range(0, len(tokens)):
             for j in range(i, len(tokens)):
                 forms = self.lexicon.get_semantic_forms_for_surface_form(" ".join(tokens[i:j+1]))
+                if len(forms) == 0 and i == j: # add missing tokens to surface forms, but not spans of tokens
+                    if tokens[i] not in self.lexicon.surface_forms:
+                        self.lexicon.surface_forms.append(tokens[i])
+                        self.lexicon.entries.append([])
                 candidate_semantic_forms[(i, j)] = forms
         # print "tokens "+str(tokens)  # DEBUG
         # print "candidate forms "+str(candidate_semantic_forms)  # DEBUG
