@@ -40,29 +40,25 @@ class Parser:
     def print_semantic_parse_tree(self, sp, d=0):
         s = ''
         for i in range(0, d): s += '-\t'
-        if len(sp) == 2 and type(sp[0]) is int or sp[0] is None:
+        if type(sp) is not tuple:
             if type(sp[0]) is int:
                 s += self.print_parse(self.lexicon.semantic_forms[sp[0]])
-            if type(sp[1]) is list:
-                for i in range(0, len(sp[1])):
-                    s += '\n' + self.print_semantic_parse_tree(sp[1][i], d=d+1)
-            elif type(sp[1]) is str:
-                s += " -: " + sp[1]
-        elif type(sp) is tuple:
-            if type(sp[1]) is str:
+            else:
+                s += str(self.tokens_of_parse_tree(sp))
+            for i in range(0, len(sp[1])):
+                s += '\n' + self.print_semantic_parse_tree(sp[1][i], d=d+1)
+        else:
+            if sp[0] is None:
                 s += "NONE -: " + sp[1]
             else:
                 s += self.print_parse(self.lexicon.semantic_forms[sp[0]]) + " -: " + sp[1]
-        else:
-            for i in range(0, len(sp)):
-                s += '\n' + self.print_semantic_parse_tree(sp[i])
         return s
 
     def tokens_of_parse_tree(self, sp):
         if type(sp[1]) is str:
             return sp[1]
         else:
-            return [self.tokens_of_parse_tree(m) for m in sp]
+            return [self.tokens_of_parse_tree(m) for m in sp[1]]
 
     # read in data set of form utterance/denotation\n\n...
     def read_in_paired_utterance_denotation(self, fname):
