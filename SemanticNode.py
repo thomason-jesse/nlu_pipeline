@@ -73,20 +73,29 @@ class SemanticNode:
                 s += str(c)
         return s
 
-    # this is a forward comparison, so two trees are considered equal if their roots have different parents,
+    # these are a forward comparisons, so two trees are considered equal if their roots have different parents,
     # as long as the roots and children down are identical categories
-    def __eq__(self, other):
+
+    # ignores category match requirement
+    def equal_ignoring_syntax(self, other, ignore_syntax=True):
         if type(self) != type(other): return False  # ie no casting
         if (self.type == other.type and self.is_lambda == other.is_lambda and self.idx == other.idx and
-                self.lambda_name == other.lambda_name and self.category == other.category):
+                self.lambda_name == other.lambda_name and
+                (ignore_syntax or self.category == other.category)):
             if self.children is None and other.children is None: return True
             if self.children is None and other.children is not None: return False
             if self.children is not None and other.children is None: return False
             if len(self.children) == len(other.children):
                 for i in range(0, len(self.children)):
-                    if not (self.children[i] == other.children[i]): return False
+                    if not (self.children[i].equal_ignoring_syntax(other.children[i], ignore_syntax=ignore_syntax)):
+                        return False
                 return True
             else:
                 return False
         else:
             return False
+
+    def __eq__(self, other):
+        if not self.equal_ignoring_syntax(other, ignore_syntax=False):
+            return False
+        return True
