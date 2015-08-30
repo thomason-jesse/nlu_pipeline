@@ -11,7 +11,7 @@ class DialogAgent:
 
         try:
             action = self.get_action_from_utterance(u)
-        except Exception as err:
+        except SystemError as err:
             return "action from utterance failed with error: '"+str(err.args)+"'"
 
         # speak answer
@@ -54,12 +54,13 @@ class DialogAgent:
                         # print self.parser.print_semantic_parse_result(n_best_parses[i][1])  # DEBUG
                         a_candidate = self.get_action_from_parse(n_best_parses[i][0])
                         # print "candidate: "+str(a_candidate)  # DEBUG
-                    except LookupError:
+                    except SystemError:
                         a_candidate = Action.Action()
                     if i == 0:
                         a_chosen = a_candidate
                     if a_candidate.__eq__(a):
                         correct_found = True
+                        self.parser.add_genlex_entries_to_lexicon_from_partial(n_best_parses[i][1])
                         break  # the action matches gold and this parse should be used in training
                 if not correct_found:
                     print "WARNING: could not find correct action '"+str(a)+"' for tokens "+str(t)
@@ -78,7 +79,7 @@ class DialogAgent:
         # get response from parser
         n_best_parses = self.parser.parse_expression(u, n=100)
         if len(n_best_parses) == 0:
-            raise LookupError("could not parse utterance")
+            raise SystemError("could not parse utterance")
         for i in range(len(n_best_parses)-1, -1, -1):
             parse = n_best_parses[i]
             root = parse[0]
@@ -124,16 +125,16 @@ class DialogAgent:
                 # print "arg: "+str(g)  # DEBUG
                 answer = self.grounder.grounding_to_answer_set(g)
                 if len(answer) == 0:
-                    raise LookupError("action argument unrecognized. arg: '"+str(answer)+"'")
+                    raise SystemError("action argument unrecognized. arg: '"+str(answer)+"'")
                 elif len(answer) > 1:
-                    raise LookupError("multiple interpretations of action argument renders command ambiguous. arg: '"+str(answer)+"'")
+                    raise SystemError("multiple interpretations of action argument renders command ambiguous. arg: '"+str(answer)+"'")
                 else:
                     g_args.append(answer[0])
             return Action.Action(action, g_args)
 
         # update internal knowledge from declarative utterance
         elif root.return_type == self.parser.ontology.types.index('d'):
-            raise LookupError("cannot yet consider declaratives")
+            raise SystemError("cannot yet consider declaratives")
 
         else:
-            raise LookupError("unrecognized return type "+str(self.parser.ontology.types[root.return_type]))
+            raise SystemError("unrecognized return type "+str(self.parser.ontology.types[root.return_type]))
