@@ -1,9 +1,12 @@
-import os, sys
+import os
+import sys
 
 tests = [('parser_basics',
           'python tests/parser_basics/main.py tests/parser_basics/ont.txt tests/parser_basics/lex.txt tests/parser_basics/samples.txt'),
         ('grounding_recall',
-          'rosrun bwi_dialog src/tests/grounding_recall/main.py tests/grounding_recall/ont.txt tests/grounding_recall/lex.txt tests/grounding_recall/samples.txt')]
+          'rosrun bwi_dialog src/tests/grounding_recall/main.py tests/grounding_recall/ont.txt tests/grounding_recall/lex.txt tests/grounding_recall/samples.txt'),
+        ('action_grounding',
+          'rosrun bwi_dialog src/tests/action_grounding/main.py tests/action_grounding/ont.txt tests/action_grounding/lex.txt tests/action_grounding/utterance_action_pairs.txt')]
 
 tests_to_output = []
 tests_to_debug = []

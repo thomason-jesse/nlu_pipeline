@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 import sys
+
+sys.path.append('.')  # necessary to import local libraries
 import Ontology
 import Lexicon
 import FeatureExtractor
@@ -42,8 +44,5 @@ D = A.read_in_utterance_action_pairs(sys.argv[3])
 converged = A.train_parser_from_utterance_action_pairs(D, epochs=10, parse_beam=30)
 print "theta: "+str(parser.learner.theta)
 
-while True:
-    print "\nsentence to be parsed:"
-    s = raw_input()
-    if s == 'stop': break
-    print "RESPONSE: "+str(A.respond_to_utterance(s))
+if not converged:
+    raise AssertionError("Training from utterance/action pairs failed to converge")

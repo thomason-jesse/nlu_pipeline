@@ -76,7 +76,6 @@ class SemanticNode:
     # these are a forward comparisons, so two trees are considered equal if their roots have different parents,
     # as long as the roots and children down are identical categories
 
-    # ignores category match requirement
     def equal_ignoring_syntax(self, other, ignore_syntax=True):
         if type(self) != type(other): return False  # ie no casting
         if (self.type == other.type and self.is_lambda == other.is_lambda and self.idx == other.idx and

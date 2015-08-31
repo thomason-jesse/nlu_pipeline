@@ -34,6 +34,7 @@ class DialogAgent:
         f.close()
         return pairs
 
+    # returns True if training converges in given epoch horizon, False otherwise
     def train_parser_from_utterance_action_pairs(self, pairs, epochs=10, parse_beam=10):
         for e in range(0, epochs):
             print "training epoch "+str(e)
@@ -71,8 +72,9 @@ class DialogAgent:
             print "\t"+str(num_correct)+"/"+str(len(pairs))+" top choices"
             if num_correct == len(pairs):
                 print "WARNING: training converged at epoch "+str(e)+"/"+str(epochs)
-                break
+                return True
             self.parser.learner.learn_from_actions(train_data)
+        return False
 
     def get_action_from_utterance(self, u):
 
