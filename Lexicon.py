@@ -71,6 +71,12 @@ class Lexicon:
         pred_to_surface = {}
         f = open(fname, 'r')
         lines = f.readlines()
+        self.expand_lex_from_strs(lines, surface_forms, semantic_forms, entries, pred_to_surface)
+        f.close()
+        return surface_forms, semantic_forms, entries, pred_to_surface
+
+    def expand_lex_from_strs(self, lines, surface_forms, semantic_forms, entries, pred_to_surface):
+
         for line_idx in range(0, len(lines)):
             line = lines[line_idx]
 
@@ -104,9 +110,6 @@ class Lexicon:
                     pred_to_surface[pred].append(sur_idx)
                 else:
                     pred_to_surface[pred] = [sur_idx]
-
-        f.close()
-        return surface_forms, semantic_forms, entries, pred_to_surface
 
     def get_all_preds_from_semantic_form(self, node):
         node_preds = []

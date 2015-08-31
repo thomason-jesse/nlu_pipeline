@@ -62,7 +62,7 @@ class SemanticNode:
 
     def __str__(self):
         s = "(" + ",".join(
-            [str(self.is_lambda), str(self.type), str(self.lambda_name) if self.is_lambda else str(self.idx)]) + ")"
+            [str(self.is_lambda), str(self.category), str(self.type), str(self.lambda_name) if self.is_lambda else str(self.idx)]) + ")"
         if self.children is not None:
             for c in self.children:
                 s += "\n"

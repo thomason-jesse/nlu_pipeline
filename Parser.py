@@ -11,6 +11,7 @@ class Parser:
         self.learner = learner
         self.grounder = grounder
         self.beam_width = beam_width
+        self.new_adjectives = [] # cleared before every parsing job
 
     # print a SemanticNode as a string using the known ontology
     def print_parse(self, p, show_category=False):
@@ -198,13 +199,13 @@ class Parser:
                     break
             if candidate and bracketing[1][0][1] == bracketing[1][1][1]:
                 sur = bracketing[1][0][1]
-                print sur, bracketing[0]
                 if sur not in self.lexicon.surface_forms:
                     self.lexicon.surface_forms.append(sur)
                     self.lexicon.entries.append([bracketing[0]])
                 else:
                     sur_idx = self.lexicon.surface_forms.index(sur)
-                    self.lexicon.entries[sur_idx].append(bracketing[0])
+                    if bracketing[0] not in self.lexicon.entries[sur_idx]:
+                        self.lexicon.entries[sur_idx].append(bracketing[0])
                 print "added lexical entry '"+sur+"' : "+self.print_parse(self.lexicon.semantic_forms[bracketing[0]]) #  DEBUG
                 print "surface forms: "+str(self.lexicon.surface_forms)
                 print "entries: "+str(self.lexicon.entries)
@@ -221,6 +222,7 @@ class Parser:
     # less than k returned if fewer than k full parses could be found
     def parse_tokens(self, tokens, k=None, n=1):
         if k is None: k = self.beam_width
+        self.new_adjectives = []
 
         candidate_semantic_forms = {}
         for i in range(0, len(tokens)):
@@ -362,10 +364,10 @@ class Parser:
             for i in range(0, len(partial)):
                 if partial[i] is not None: continue
                 # proceed only if no meanings for token known (should be relaxed eventually; beam can handle exp)
-                if len(self.lexicon.entries[self.lexicon.surface_forms.index(tree[i][1])]) == 0:
+                if (len(self.lexicon.entries[self.lexicon.surface_forms.index(tree[i][1])]) == 0
+                        or tree[i][1] in self.new_adjectives):
                     for d in [-1, 1]:
-                        # TODO: for adjectives (DESC), will eventually need special create-new-predicate rules
-                        candidate_assignments = self.genlex_for_missing_entry(partial, i, d)
+                        candidate_assignments = self.genlex_for_missing_entry(partial, i, d, tree[i][1])
                         for candidate_assignment, syn_idx in candidate_assignments:
                             possible_joins.append([i, i, candidate_assignment, tree[i], tree[i], syn_idx])
 
@@ -387,16 +389,27 @@ class Parser:
     # return set of candidate entries for idx of given partial with respect to its neighbor in direction d
     # performs exact syntax/semantics match against lexicon; can only learn perfect synonyms
     # has special allowances for UNK assignments to tokens for certain syntactic categories
-    def genlex_for_missing_entry(self, partial, idx, d):
+    def genlex_for_missing_entry(self, partial, idx, d, token):
 
         # ensure the given parameters are candidates for generating new lexical entries
         if partial[idx] is not None: return []
         i = idx+d
         if i < 0 or i == len(partial): return []
-        if partial[i] is None: return []  # TODO: should allow multi-word entries through sequence of None
+        if partial[i] is None: return []  # TODO: allow multi-word entries through sequence of None
         neighbor = self.lexicon.semantic_forms[partial[i]] if type(partial[i]) is int else partial[i]
         n_cat = self.lexicon.categories[neighbor.category]
         candidates = []
+        adj_cats = []
+        try:
+            adj_cats.append(self.lexicon.categories.index('DESC'))
+        except LookupError:
+            pass
+        try:
+            adj_cats.append(self.lexicon.categories.index([self.lexicon.categories.index('N'), 1,
+                                                           self.lexicon.categories.index('N')]))
+        except LookupError:
+            pass
+        possible_adjective = False
 
         # try consuming n_cat in direction d
         consume_d = 0 if d == -1 else 1
@@ -404,11 +417,15 @@ class Parser:
             form = self.lexicon.semantic_forms[form_idx]
             form_cat = self.lexicon.categories[form.category]
             if type(form_cat) is list and form_cat[1] == consume_d and form_cat[2] == neighbor.category:
+                if form_cat in adj_cats:
+                    possible_adjective = True
+                else:
                     candidates.append([form, form_idx])
 
         # try being consumed by n_cat from direction d
         if (type(n_cat) is list
                 and ((i < idx and n_cat[1] == 1) or (i > idx and n_cat[1] == 0))):
+            # if neighbor is looking for an N, treat as UNK due to ambiguity
             if n_cat[2] == self.lexicon.categories.index('N'):
                 # 'N' is a candidate to receive UNK token
                 unk = SemanticNode.SemanticNode(None, None, None, False, idx=self.ontology.preds.index('UNK_E'))
@@ -416,13 +433,37 @@ class Parser:
                 unk.category = self.lexicon.categories.index('N')
                 unk.set_return_type(self.ontology)
                 candidates.append([unk, None])
-            # only look generally if neighbor is not looking for an N,
-            # which should be treated as UNK due to massive ambiguity
+            # if neighbor is looking for an adjective, stave off decision for later
+            elif n_cat[2] in adj_cats:
+                possible_adjective = True
+            # look generally for consumable candidates
             else:
                 for form_idx in range(0, len(self.lexicon.semantic_forms)):
                     form = self.lexicon.semantic_forms[form_idx]
                     if n_cat[2] == form.category:
                         candidates.append([form, form_idx])
+
+        # if procedure has determined that some candidate is an adjective, add as new entry to the
+        # ontology of predicates, since perception should eventually merge/split these appropriately
+        # liberally add new adjective predicate SemanticNode to the lexicon and a surface->semantic entry
+        # TODO: separate KB and perceptual predicates, only fire this procedure to prevent synonym perceptuals
+        if possible_adjective:
+            if token not in self.new_adjectives:
+                self.ontology.preds.append(token)
+                self.ontology.entries.append(self.ontology.read_type_from_str("<e,t>"))
+                print self.ontology.preds  # DEBUG
+                print self.ontology.entries  # DEBUG
+                self.ontology.num_args.append(1)
+                new_lex = [token + " :- DESC : " + token]
+                print "adding adjective " + str(new_lex)  # DEBUG
+                self.lexicon.expand_lex_from_strs(new_lex, self.lexicon.surface_forms,
+                                                  self.lexicon.semantic_forms, self.lexicon.entries,
+                                                  self.lexicon.pred_to_surface)
+                print "surface forms: "+str(self.lexicon.surface_forms)  # DEBUG
+                print "entries: "+str(self.lexicon.entries)  # DEBUG
+                self.new_adjectives.append(token)
+            adj_idx = self.lexicon.entries[self.lexicon.surface_forms.index(token)][0]
+            candidates.append([self.lexicon.semantic_forms[adj_idx], adj_idx])
 
         return candidates
 

@@ -38,8 +38,8 @@ print "instantiating DialogAgent"
 A = DialogAgent.DialogAgent(parser, grounder)
 
 print "reading in data and training parser from actions"
-D = A.read_in_utterance_action_pairs(sys.argv[3])
-converged = A.train_parser_from_utterance_action_pairs(D, epochs=10, parse_beam=30)
+#D = A.read_in_utterance_action_pairs(sys.argv[3])
+#converged = A.train_parser_from_utterance_action_pairs(D, epochs=10, parse_beam=30)
 print "theta: "+str(parser.learner.theta)
 
 while True:
