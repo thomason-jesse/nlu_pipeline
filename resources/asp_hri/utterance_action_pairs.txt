@@ -24,3 +24,6 @@ speak(no)
 
 check jivko's office for ray
 searchroom(ray,l3_432)
+
+is peter a room person
+speak(no)

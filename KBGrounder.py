@@ -103,7 +103,12 @@ class KBGrounder:
                     # print "'a' child grounds to inspect: " + str(child_grounds[0][child_ground_idx[0]])  # DEBUG
                     if len(child_grounds[0]) > 0:
                         # set satisfies, so choose arbitrary element to return (here, first)
-                        satisfied = child_grounds[0][child_ground_idx[0]][0][len(lambda_assignments)]
+                        if type(child_grounds[0][child_ground_idx[0]]) is list:
+                            satisfied = child_grounds[0][child_ground_idx[0]][0][len(lambda_assignments)]
+                        elif type(child_grounds[0][child_ground_idx[0]]) is str:
+                            satisfied = child_grounds[0][child_ground_idx[0]]
+                        else:
+                            sys.exit("ERROR: grounding 'a' failed; unexpected child ground entry "+str(child_grounds[0][child_ground_idx[0]]))
                     else:
                         satisfied = False
 

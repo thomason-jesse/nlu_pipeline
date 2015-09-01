@@ -30,13 +30,13 @@ class SemanticNode:
         else:
             candidate_type = self.type
             for c in self.children:
-                if c.return_type is None: c.set_return_type(ontology)
+                c.set_return_type(ontology)
                 if ontology.types[candidate_type][0] == c.return_type:
                     candidate_type = ontology.types[candidate_type][1]
                 else:
-                    raise TypeError("Non-matching child type " + str(
-                        ontology.types[c.return_type]) + " (" + c.print_little() + ") for parent " + str(
-                        ontology.types[candidate_type]) + " (" + self.print_little() + ")")
+                    raise TypeError("Non-matching child type " +
+                        ontology.compose_str_from_type(c.return_type) + " (" + c.print_little() + ") for parent " +
+                        ontology.compose_str_from_type(candidate_type) + " (" + self.print_little() + ")")
             self.return_type = candidate_type
 
     # copy attributes of the given SemanticNode into this one (essentially, clone the second into this space)

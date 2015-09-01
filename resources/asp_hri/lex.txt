@@ -40,7 +40,7 @@ the :- N/N : lambda P:<e,t>.(the(P))
 the :- N/N : lambda x:e.(x)
 a :- N/DESC : lambda P:<e,t>.(a(lambda x:e.(P(x))))
 a :- DESC/DESC : lambda P:<e,t>.(P)
-a :- (N/N)/(N/N) : lambda P:<e,t>.(lambda x:e.(P(x)))
+a :- (N/N)/(N/N) : lambda P:<e,t>.(P)
 a :- N/N : lambda x:e.(x)
 
 #atoms

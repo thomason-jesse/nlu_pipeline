@@ -402,12 +402,12 @@ class Parser:
         adj_cats = []
         try:
             adj_cats.append(self.lexicon.categories.index('DESC'))
-        except LookupError:
+        except ValueError:
             pass
         try:
             adj_cats.append(self.lexicon.categories.index([self.lexicon.categories.index('N'), 1,
                                                            self.lexicon.categories.index('N')]))
-        except LookupError:
+        except ValueError:
             pass
         possible_adjective = False
 
@@ -496,44 +496,63 @@ class Parser:
     # return A<>B; A and B must have matching lambda headers and syntactic categories to be AND merged
     def perform_merge(self, A, B):
         # print "performing Merge with '"+self.print_parse(A,True)+"' taking '"+self.print_parse(B,True)+"'" #DEBUG
-        A_B_merged = copy.deepcopy(A)
-        A_B_merged.category = self.lexicon.get_or_add_category(
-            [self.lexicon.categories[A.category][0], self.lexicon.categories[A.category][1],
-             self.lexicon.categories[B.category][2]])
-        innermost_outer_lambda = A_B_merged
-        A_child = A.children[0]
-        B_child = B.children[0]
-        while innermost_outer_lambda.children != None and innermost_outer_lambda.children[0].is_lambda and innermost_outer_lambda.children[0].is_lambda_instantiation:
-            innermost_outer_lambda = innermost_outer_lambda.children[0]
+
+        and_idx = self.ontology.preds.index('and')
+
+        if A.is_lambda_instantiation:
+            A_B_merged = copy.deepcopy(A)
+            A_B_merged.category = A.category
+            innermost_outer_lambda = A_B_merged
             A_child = A.children[0]
             B_child = B.children[0]
-        and_idx = self.ontology.preds.index('and')
-        innermost_outer_lambda.children = [
-            SemanticNode.SemanticNode(innermost_outer_lambda, self.ontology.entries[and_idx],
-                                      innermost_outer_lambda.children[0].category, False, idx=and_idx)]
-        innermost_outer_lambda.children[0].children = [copy.deepcopy(A_child), copy.deepcopy(B_child)]
-        # 'and' adopts type taking each child's and returning the same
-        A_child.set_return_type(self.ontology)
-        input_type = [A_child.return_type, A_child.return_type]
-        if input_type not in self.ontology.types:
-            self.ontology.types.append(input_type)
-        full_type = [A_child.return_type, self.ontology.types.index(input_type)]
-        if full_type not in self.ontology.types:
-            self.ontology.types.append(full_type)
-        innermost_outer_lambda.children[0].type = self.ontology.types.index(full_type)
+            while innermost_outer_lambda.children != None and innermost_outer_lambda.children[0].is_lambda and innermost_outer_lambda.children[0].is_lambda_instantiation:
+                innermost_outer_lambda = innermost_outer_lambda.children[0]
+                A_child = A.children[0]
+                B_child = B.children[0]
+            innermost_outer_lambda.children = [
+                SemanticNode.SemanticNode(innermost_outer_lambda, self.ontology.entries[and_idx],
+                                          innermost_outer_lambda.children[0].category, False, idx=and_idx)]
+            innermost_outer_lambda.children[0].children = [copy.deepcopy(A_child), copy.deepcopy(B_child)]
+
+            # 'and' adopts type taking each child's and returning the same
+            A_child.set_return_type(self.ontology)
+            B_child.set_return_type(self.ontology)
+            input_type = [A_child.return_type, A_child.return_type]
+            if input_type not in self.ontology.types:
+                self.ontology.types.append(input_type)
+            full_type = [A_child.return_type, self.ontology.types.index(input_type)]
+            if full_type not in self.ontology.types:
+                self.ontology.types.append(full_type)
+            innermost_outer_lambda.children[0].type = self.ontology.types.index(full_type)
+            innermost_outer_lambda.children[0].set_return_type(self.ontology)
+        else:
+            input_type = [A.return_type, A.return_type]
+            if input_type not in self.ontology.types:
+                self.ontology.types.append(input_type)
+            full_type = [A.return_type, self.ontology.types.index(input_type)]
+            if full_type not in self.ontology.types:
+                self.ontology.types.append(full_type)
+            A_B_merged = SemanticNode.SemanticNode(None, self.ontology.types.index(full_type),
+                                                   A.category, False, idx=and_idx)
+            A_B_merged.children = [A, B]
+            A_B_merged.set_return_type(self.ontology)
+
         # print "performed Merge with '"+self.print_parse(A,True)+"' taking '"+self.print_parse(B,True)+"' to form '"+self.print_parse(A_B_merged,True)+"'" #DEBUG
         return A_B_merged
 
     # return true if A,B can be merged
     def can_perform_merge(self, A, B):
         if A is None or B is None: return False
-        if not A.is_lambda or not A.is_lambda_instantiation or not B.is_lambda or not B.is_lambda_instantiation:
-            return False
-        if type(self.lexicon.categories[A.category]) is not list or type(
-                self.lexicon.categories[B.category]) is not list:
-            return False
+        # if not A.is_lambda or not A.is_lambda_instantiation or not B.is_lambda or not B.is_lambda_instantiation:
+        #     return False
+        # if type(self.lexicon.categories[A.category]) is not list or type(
+        #         self.lexicon.categories[B.category]) is not list:
+        #     return False
         if self.lexicon.categories[A.category] != self.lexicon.categories[B.category]:
             return False
+        if A.return_type is None: A.set_return_type(self.ontology)
+        if B.return_type is None: B.set_return_type(self.ontology)
+        if A.return_type != B.return_type: return False
         curr_A = A
         curr_B = B
         while curr_A.is_lambda and curr_A.is_lambda_instantiation:
@@ -549,6 +568,16 @@ class Parser:
     # return A(B); A must be lambda headed with type equal to B's root type
     def perform_fa(self, A, B):
         # print "performing FA with '"+self.print_parse(A,True)+"' taking '"+self.print_parse(B,True)+"'" #DEBUG
+
+        # if A is 'and', apply B to children
+        if not A.is_lambda and self.ontology.preds[A.idx] == 'and':
+            for i in range(0, len(A.children)):
+                c = A.children[i]
+                c_obj = copy.deepcopy(self.lexicon.semantic_forms[c]) if type(c) is int else c
+                A.children[i] = self.perform_fa(c_obj, B)
+            return A
+
+        # else, proceed as expected
         A_FA_B = copy.deepcopy(
             A.children[0])  # A is lambda headed and so has a single child which will be the root of the composed tree
         A_FA_B.parent = None
@@ -569,6 +598,15 @@ class Parser:
                     elif B.children is None:
                         # print "...instance heads tree; preserve children taking B"
                         curr.copy_attributes(B, deepest_lambda, preserve_children=True)
+                    elif not B.is_lambda and self.ontology.preds[B.idx] == 'and':
+                        # if B is 'and', can preserve it and interleave A's children as arguments
+                        for i in range(0, len(B.children)):
+                            c = B.children[i]
+                            c_obj = copy.deepcopy(self.lexicon.semantic_forms[c]) if type(c) is int else c
+                            if self.can_perform_type_raising(c_obj) == "DESC->N/N":
+                                c_obj = self.perform_adjectival_type_raise(c_obj)
+                            B.children[i] = self.perform_fa(c_obj, curr.children[0])
+                        curr.copy_attributes(B)
                     else:
                         sys.exit("Error: incompatible parentless, childed node A with childed node B")
                     entire_replacement = True
@@ -611,9 +649,12 @@ class Parser:
                             i - j > 0 and self.lexicon.categories[A.category][1] == 1) or (
                             i - j < 0 and self.lexicon.categories[A.category][1] == 0):
             return False  # B is left/right when A expects right/left
-        if not A.is_lambda or not A.is_lambda_instantiation or A.type != B.return_type: return False
-        if self.lexicon.categories[A.category][2] != B.category: return False  # B is not the input category A expects
-        if A.parent is None and A.is_lambda and not A.is_lambda_instantiation: return True  # the whole tree of A will be replaced with the whole tree of B
+        if not A.is_lambda or not A.is_lambda_instantiation or A.type != B.return_type:
+            return False
+        if self.lexicon.categories[A.category][2] != B.category:
+            return False  # B is not the input category A expects
+        if A.parent is None and A.is_lambda and not A.is_lambda_instantiation:
+            return True  # the whole tree of A will be replaced with the whole tree of B
         to_traverse = [B]
         B_lambda_context = []
         while len(to_traverse) > 0:
