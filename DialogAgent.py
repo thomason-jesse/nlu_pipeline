@@ -14,13 +14,7 @@ class DialogAgent:
         except SystemError as err:
             return "action from utterance failed with error: '"+str(err.args)+"'"
 
-        # speak answer
-        if action.name == "speak":
-            return action.params[0]  # eventually use reversed-parsing for this
-
-        # take action
-        else:
-            return "ACTION: "+str(action)
+        return "ACTION: "+str(action)
 
     def read_in_utterance_action_pairs(self, fname):
         f = open(fname,'r')
@@ -30,11 +24,16 @@ class DialogAgent:
             t = self.parser.tokenize(f_lines[i].strip())
             a_str = f_lines[i+1].strip()
             a_name, a_params_str = a_str.strip(')').split('(')
-            pairs.append([t, Action.Action(a_name, a_params_str.split(','))])
+            a_params = a_params_str.split(',')
+            for j in range(0, len(a_params)):
+                if a_params[j] == "True":
+                    a_params[j] = True
+                elif a_params[j] == "False":
+                    a_params[j] = False
+            pairs.append([t, Action.Action(a_name, a_params)])
         f.close()
         return pairs
 
-    # returns True if training converges in given epoch horizon, False otherwise
     def train_parser_from_utterance_action_pairs(self, pairs, epochs=10, parse_beam=10):
         for e in range(0, epochs):
             print "training epoch "+str(e)
@@ -82,61 +81,55 @@ class DialogAgent:
         n_best_parses = self.parser.parse_expression(u, n=100)
         if len(n_best_parses) == 0:
             raise SystemError("could not parse utterance")
+        print n_best_parses
         for i in range(len(n_best_parses)-1, -1, -1):
             parse = n_best_parses[i]
             root = parse[0]
             parse_tree = parse[1]
-            print "parse: " + self.parser.print_parse(root)
+            print "candidate parse: " + self.parser.print_parse(root)
             print self.parser.print_semantic_parse_result(parse_tree)
+            try:
+                a_response = self.get_action_from_parse(root)
+            except SystemError as err:
+                a_response = "failed to ground action"
+            print a_response
+            print "\n"
 
         return self.get_action_from_parse(root)
 
     def get_action_from_parse(self, root):
 
+        # print "parse to get action from: " + self.parser.print_parse(root)  # DEBUG
+
         root.set_return_type(self.parser.ontology)  # in case this was not calculated during parsing
 
-        # answer interrogative utterances (true/false)
-        if root.return_type == self.parser.ontology.types.index('t'):
-            g = self.grounder.groundSemanticNode(root, [], [], [])
-            # print g  # DEBUG
-            answer = self.grounder.grounding_to_answer_set(g)
-            if len(answer) == 0:
-                return Action.Action("speak", ["no"])
-            else:
-                return Action.Action("speak", ["yes"])
-
-        # answer interrogative utterances (value)
-        elif root.return_type == self.parser.ontology.types.index('e'):
-            g = self.grounder.groundSemanticNode(root, [], [], [])
-            # print g  # DEBUG
-            answer = self.grounder.grounding_to_answer_set(g)
-            if len(answer) == 0:
-                return Action.Action("speak", [""])
-            else:
-                return Action.Action("speak", [answer[0]])
-
         # execute action from imperative utterance
-        elif root.return_type == self.parser.ontology.types.index('a'):
+        if root.return_type == self.parser.ontology.types.index('a'):
             # assume for now that logical connectives do not operate over actions (eg. no (do action a and action b))
             # ground action arguments
             action = self.parser.ontology.preds[root.idx]
-            # print "action: "+action
+            # print "action: "+action  # DEBUG
             g_args = []
             for arg in root.children:
                 g = self.grounder.groundSemanticNode(arg, [], [], [])
                 # print "arg: "+str(g)  # DEBUG
                 answer = self.grounder.grounding_to_answer_set(g)
                 if len(answer) == 0:
-                    raise SystemError("action argument unrecognized. arg: '"+str(answer)+"'")
+                    if action == "speak_t":
+                        g_args.append(False)
+                    elif action == "speak_e":
+                        g_args.append(None)
+                    else:
+                        raise SystemError("action argument unrecognized. arg: '"+str(answer)+"'")
                 elif len(answer) > 1:
                     raise SystemError("multiple interpretations of action argument renders command ambiguous. arg: '"+str(answer)+"'")
                 else:
-                    g_args.append(answer[0])
+                    if action == "speak_t":
+                        g_args.append(True)
+                    else:
+                        g_args.append(answer[0])
+            # print "args: "+str(g_args)  # DEBUG
             return Action.Action(action, g_args)
 
-        # update internal knowledge from declarative utterance
-        elif root.return_type == self.parser.ontology.types.index('d'):
-            raise SystemError("cannot yet consider declaratives")
-
         else:
-            raise SystemError("unrecognized return type "+str(self.parser.ontology.types[root.return_type]))
+            raise SystemError("cannot get action from return type "+str(self.parser.ontology.types[root.return_type]))

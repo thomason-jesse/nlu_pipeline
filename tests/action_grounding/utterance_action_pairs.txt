@@ -1,5 +1,5 @@
 where is peter's office
-speak(l3_508)
+speak_e(l3_508)
 
 search ray's office for peter
 searchroom(peter,l3_512)
@@ -14,13 +14,16 @@ remind peter about the bwi meeting in jivko's office
 remind(peter,bwi_m,l3_432)
 
 is ray a person
-speak(yes)
+speak_t(True)
 
-the group
-speak(bwi)
+which is the group
+speak_e(bwi)
 
 is shiqi a room
-speak(no)
+speak_t(False)
 
 check jivko's office for ray
 searchroom(ray,l3_432)
+
+is peter a room person
+speak_t(False)

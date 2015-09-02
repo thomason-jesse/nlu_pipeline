@@ -31,6 +31,8 @@ l3_414b:e
 searchroom:<e,<e,a>>
 askperson:<e,<e,a>>
 remind:<e,<e,<e,a>>>
+speak_t:<t,a>
+speak_e:<e,a>
 
 #int preds
 inroom:<e,<e,t>>

@@ -591,22 +591,26 @@ class Parser:
                 deepest_lambda = curr.lambda_name
             elif curr.is_lambda and not curr.is_lambda_instantiation and curr.lambda_name == A.lambda_name:  # an instance of lambda_A to be replaced by B
                 # print "substituting '"+self.print_parse(B,True)+"' for '"+self.print_parse(curr,True)+"' with lambda offset "+str(deepest_lambda) #DEBUG
-                if curr.parent is None:
+                if (not B.is_lambda and self.ontology.preds[B.idx] == 'and'
+                        and curr.children is not None and B.children is not None):
+                    # if B is 'and', can preserve it and interleave A's children as arguments
+                    for i in range(0, len(B.children)):
+                        c = B.children[i]
+                        c_obj = copy.deepcopy(self.lexicon.semantic_forms[c]) if type(c) is int else c
+                        if self.can_perform_type_raising(c_obj) == "DESC->N/N":
+                            c_obj = self.perform_adjectival_type_raise(c_obj)
+                        B.children[i] = self.perform_fa(c_obj, curr.children[0])
+                        B.children[i].set_return_type(self.ontology)
+                    curr.copy_attributes(B)
+                    curr.type = self.ontology.types.index([curr.children[0].return_type, self.ontology.types.index(
+                        [curr.children[0].return_type, curr.children[0].return_type])])
+                elif curr.parent is None:
                     if curr.children is None:
                         # print "...whole tree is instance" #DEBUG
                         curr.copy_attributes(B)  # instance is whole tree; add nothing more and loop will now exit
                     elif B.children is None:
                         # print "...instance heads tree; preserve children taking B"
                         curr.copy_attributes(B, deepest_lambda, preserve_children=True)
-                    elif not B.is_lambda and self.ontology.preds[B.idx] == 'and':
-                        # if B is 'and', can preserve it and interleave A's children as arguments
-                        for i in range(0, len(B.children)):
-                            c = B.children[i]
-                            c_obj = copy.deepcopy(self.lexicon.semantic_forms[c]) if type(c) is int else c
-                            if self.can_perform_type_raising(c_obj) == "DESC->N/N":
-                                c_obj = self.perform_adjectival_type_raise(c_obj)
-                            B.children[i] = self.perform_fa(c_obj, curr.children[0])
-                        curr.copy_attributes(B)
                     else:
                         sys.exit("Error: incompatible parentless, childed node A with childed node B")
                     entire_replacement = True
