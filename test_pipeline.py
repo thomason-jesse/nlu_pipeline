@@ -8,6 +8,23 @@ import LinearLearner
 import KBGrounder
 import Parser
 import DialogAgent
+import StaticDialogPolicy
+
+
+class InputFromKeyboard:
+    def __init__(self):
+        pass
+
+    def get(self):
+        return raw_input()
+
+
+class OutputToStdout:
+    def __init__(self):
+        pass
+
+    def say(self, s):
+        print "SYSTEM: "+s
 
 print "reading in Ontology"
 ont = Ontology.Ontology(sys.argv[1])
@@ -35,7 +52,10 @@ print "instantiating Parser"
 parser = Parser.Parser(ont, lex, learner, grounder, beam_width=10)
 
 print "instantiating DialogAgent"
-A = DialogAgent.DialogAgent(parser, grounder)
+u_in = InputFromKeyboard()
+u_out = OutputToStdout()
+static_policy = StaticDialogPolicy.StaticDialogPolicy()
+A = DialogAgent.DialogAgent(parser, grounder, static_policy, u_in, u_out)
 
 print "reading in data and training parser from actions"
 D = A.read_in_utterance_action_pairs(sys.argv[3])
@@ -43,7 +63,10 @@ converged = A.train_parser_from_utterance_action_pairs(D, epochs=10, parse_beam=
 print "theta: "+str(parser.learner.theta)
 
 while True:
-    print "\nsentence to be parsed:"
+    u_out.say("How can I help?")
     s = raw_input()
-    if s == 'stop': break
-    print "RESPONSE: "+str(A.respond_to_utterance(s))
+    if s == 'stop':
+        break
+    a = A.initiate_dialog_to_get_action(s)
+    print "ACTION: "+str(a)
+

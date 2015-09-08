@@ -1,20 +1,103 @@
 import random
+import copy
+import sys
 import Action
+import DialogState
+
 
 class DialogAgent:
 
-    def __init__(self, parser, grounder):
+    def __init__(self, parser, grounder, policy, u_input, output, parse_depth=10):
         self.parser = parser
         self.grounder = grounder
+        self.parse_depth = parse_depth
+        self.state = None
+        self.policy = policy
+        self.input = u_input
+        self.output = output
 
-    def respond_to_utterance(self, u):
+        # define action names and functions they correspond to
+        self.dialog_actions = ["repeat_goal"]
+        self.dialog_action_functions = [self.request_user_initiative]
 
+    # initiate a new dialog with the agent with initial utterance u
+    def initiate_dialog_to_get_action(self, u):
+
+        self.state = DialogState.DialogState()
+        self.update_state_from_user_initiative(u)
+
+        # select next action from state
+        action = None
+        while action is None:
+            print "dialog state: "+str(self.state)  # DEBUG
+            action = self.policy.resolve_state_to_action(self.state)
+
+            # if the state does not clearly define a user goal, take a dialog action to move towards it
+            if action is None:
+                dialog_action = self.policy.select_dialog_action(self.state)
+                if dialog_action not in self.dialog_actions:
+                    sys.exit("ERROR: unrecognized dialog action '"+dialog_action+"' returned by policy for state "+str(self.state))
+                self.dialog_action_functions[self.dialog_actions.index(dialog_action)]()
+
+        return action
+
+    # request the user repeat their original goal
+    def request_user_initiative(self):
+        self.output.say("Can you restate your question or command?")
+        u = self.input.get()
+        self.update_state_from_user_initiative(u)
+
+    # update state after asking user-initiative (open-ended) question about user goal
+    def update_state_from_user_initiative(self, u):
+        self.state.update_requested_user_turn()
+
+        # get n best parses for utterance
+        n_best_parses = self.parser.parse_expression(u, n=self.parse_depth)
+
+        # try to digest parses to action request to achieve an initial state
+        success = False
+        for i in range(0, len(n_best_parses)):
+            success = self.update_state_from_action_parse(n_best_parses[i][0])
+            if success:
+                break
+
+        # no parses could be resolved into actions for state update
+        if not success:
+            self.state.update_from_failed_parse()
+
+    # get dialog state under assumption that utterance is an action
+    def update_state_from_action_parse(self, p):
+
+        # get action, if any, from the given parse
         try:
-            action = self.get_action_from_utterance(u)
-        except SystemError as err:
-            return "action from utterance failed with error: '"+str(err.args)+"'"
+            p_action = self.get_action_from_parse(p)
+        except SystemError:
+            p_action = None
+        if p_action is not None:
+            self.state.update_from_action(p_action, p)
+            return True
 
-        return "ACTION: "+str(action)
+        # if this failed, try again allowing missing lambdas to become UNK without token ties
+        UNK_root = copy.deepcopy(p)
+        curr = UNK_root
+        heading_lambdas = []
+        if curr.is_lambda and curr.is_lambda_instantiation:
+            heading_lambdas.append(curr.lambda_name)
+            curr = curr.children[0]
+        if curr.children is not None:
+            for i in range(0, len(curr.children)):
+                if curr.children[i].is_lambda and curr.children[i].lambda_name in heading_lambdas:
+                    curr.children[i] = self.parser.create_unk_node()
+        try:
+            p_unk_action = self.get_action_from_parse(UNK_root)
+        except SystemError:
+            p_unk_action = None
+        if p_unk_action is not None:
+            self.state.update_from_action(p_unk_action, UNK_root)
+            return True
+
+        # parse could not be resolved into an action with which to update state
+        return False
 
     def read_in_utterance_action_pairs(self, fname):
         f = open(fname,'r')
@@ -74,28 +157,6 @@ class DialogAgent:
                 return True
             self.parser.learner.learn_from_actions(train_data)
         return False
-
-    def get_action_from_utterance(self, u):
-
-        # get response from parser
-        n_best_parses = self.parser.parse_expression(u, n=100)
-        if len(n_best_parses) == 0:
-            raise SystemError("could not parse utterance")
-        print n_best_parses
-        for i in range(len(n_best_parses)-1, -1, -1):
-            parse = n_best_parses[i]
-            root = parse[0]
-            parse_tree = parse[1]
-            print "candidate parse: " + self.parser.print_parse(root)
-            print self.parser.print_semantic_parse_result(parse_tree)
-            try:
-                a_response = self.get_action_from_parse(root)
-            except SystemError as err:
-                a_response = "failed to ground action"
-            print a_response
-            print "\n"
-
-        return self.get_action_from_parse(root)
 
     def get_action_from_parse(self, root):
 

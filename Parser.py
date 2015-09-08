@@ -428,10 +428,7 @@ class Parser:
             # if neighbor is looking for an N, treat as UNK due to ambiguity
             if n_cat[2] == self.lexicon.categories.index('N'):
                 # 'N' is a candidate to receive UNK token
-                unk = SemanticNode.SemanticNode(None, None, None, False, idx=self.ontology.preds.index('UNK_E'))
-                unk.type = self.ontology.types.index('e')
-                unk.category = self.lexicon.categories.index('N')
-                unk.set_return_type(self.ontology)
+                unk = self.create_unk_node()
                 candidates.append([unk, None])
             # if neighbor is looking for an adjective, stave off decision for later
             elif n_cat[2] in adj_cats:
@@ -466,6 +463,14 @@ class Parser:
             candidates.append([self.lexicon.semantic_forms[adj_idx], adj_idx])
 
         return candidates
+
+    # instantiate a new UNK node and return it
+    def create_unk_node(self):
+        unk = SemanticNode.SemanticNode(None, None, None, False, idx=self.ontology.preds.index('UNK_E'))
+        unk.type = self.ontology.types.index('e')
+        unk.category = self.lexicon.categories.index('N')
+        unk.set_return_type(self.ontology)
+        return unk
 
     # return DESC : pred raised to N/N : lambda x.(pred(x))
     def perform_adjectival_type_raise(self, A):
@@ -733,6 +738,7 @@ class Parser:
 
     # turn a string into a sequence of tokens to be assigned semantic meanings
     def tokenize(self, s):
+        s = s.replace('?', '')
         s = s.replace("'s", " 's")
         str_parts = s.split()
         for i in range(0, len(str_parts)):
