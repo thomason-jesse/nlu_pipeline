@@ -1,4 +1,5 @@
-import os
+__author__ = 'jesse'
+
 import sys
 import SemanticNode
 

@@ -1,3 +1,5 @@
+__author__ = 'jesse'
+
 import os
 import sys
 

@@ -1,4 +1,6 @@
-import os, sys
+__author__ = 'jesse'
+
+import sys
 
 sys.path.append('.')  # necessary to import local libraries
 import Ontology, Lexicon, FeatureExtractor, LinearLearner, Parser

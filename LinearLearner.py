@@ -1,3 +1,5 @@
+__author__ = 'jesse'
+
 import math
 import copy
 import Action

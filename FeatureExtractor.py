@@ -1,4 +1,4 @@
-import sys
+__author__ = 'jesse'
 
 
 class FeatureExtractor:
