@@ -1,3 +1,5 @@
+__author__ = 'jesse'
+
 class DialogState:
 
     def __init__(self):

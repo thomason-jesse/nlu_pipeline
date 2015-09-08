@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+__author__ = 'jesse'
 
 import sys
 import Ontology

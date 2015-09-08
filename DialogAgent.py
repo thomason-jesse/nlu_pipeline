@@ -1,3 +1,5 @@
+__author__ = 'jesse'
+
 import random
 import copy
 import sys

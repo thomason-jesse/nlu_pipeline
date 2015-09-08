@@ -1,3 +1,5 @@
+__author__ = 'jesse'
+
 class Action:
 
     def __init__(self, name=None, params=None):
