@@ -19,8 +19,8 @@ class DialogAgent:
         self.output = output
 
         # define action names and functions they correspond to
-        self.dialog_actions = ["repeat_goal"]
-        self.dialog_action_functions = [self.request_user_initiative]
+        self.dialog_actions = ["repeat_goal", "confirm_action", "request_missing_param"]
+        self.dialog_action_functions = [self.request_user_initiative, self.confirm_action, self.request_missing_param]
 
     # initiate a new dialog with the agent with initial utterance u
     def initiate_dialog_to_get_action(self, u):
@@ -36,18 +36,83 @@ class DialogAgent:
 
             # if the state does not clearly define a user goal, take a dialog action to move towards it
             if action is None:
-                dialog_action = self.policy.select_dialog_action(self.state)
+                dialog_action, dialog_action_args = self.policy.select_dialog_action(self.state)
                 if dialog_action not in self.dialog_actions:
                     sys.exit("ERROR: unrecognized dialog action '"+dialog_action+"' returned by policy for state "+str(self.state))
-                self.dialog_action_functions[self.dialog_actions.index(dialog_action)]()
+                self.state.previous_action = [dialog_action, dialog_action_args]
+                self.dialog_action_functions[self.dialog_actions.index(dialog_action)](dialog_action_args)
 
         return action
 
     # request the user repeat their original goal
-    def request_user_initiative(self):
+    def request_user_initiative(self, args):
         self.output.say("Can you restate your question or command?")
         u = self.input.get()
         self.update_state_from_user_initiative(u)
+
+    # request a missing action parameter
+    def request_missing_param(self, args):
+        idx = args[0]
+        # not sure whether reverse parsing could frame this
+        theme = None
+        if idx == 0:
+            theme = "agent"
+        elif idx == 1:
+            theme = "patient"
+        elif idx == 2:
+            theme = "location"
+        else:
+            sys.exit("ERROR: unrecognized theme idx "+str(idx))
+        self.output.say("What is the " + theme + " of the action you'd like me to take?")
+        u = self.input.get()
+        self.update_state_from_missing_param(u, idx)
+
+    # update state after asking user to provide a missing parameter
+    def update_state_from_missing_param(self, u, idx):
+        self.state.update_requested_user_turn()
+
+        # get n best parses for confirmation
+        n_best_parses = self.parser.parse_expression(u, n=self.parse_depth)
+
+        # try to digest parses to confirmation
+        success = False
+        for i in range(0, len(n_best_parses)):
+            g = self.grounder.groundSemanticNode(n_best_parses[i][0], [], [], [])
+            answer = self.grounder.grounding_to_answer_set(g)
+            if len(answer) == 1:
+                success = True
+                self.state.update_from_missing_param(answer[0], idx)
+        if not success:
+            self.state.update_from_failed_parse()
+
+    # confirm a (possibly partial) action
+    def confirm_action(self, args):
+        a = args[0]
+        # with reverse parsing, want to confirm(a.name(a.params))
+        # for now, just use a.name and a.params raw
+        self.output.say("I should take action " + a.name+" involving " +
+                        ','.join([str(p) for p in a.params if p is not None]) + "?")
+        c = self.input.get()
+        self.update_state_from_action_confirmation(c, a)
+
+    # update state after asking user to confirm a (possibly partial) action
+    def update_state_from_action_confirmation(self, c, a):
+        self.state.update_requested_user_turn()
+
+        # get n best parses for confirmation
+        n_best_parses = self.parser.parse_expression(c, n=self.parse_depth)
+
+        # try to digest parses to confirmation
+        success = False
+        for i in range(0, len(n_best_parses)):
+            if n_best_parses[i][0].idx == self.parser.ontology.preds.index('yes'):
+                success = True
+                self.state.update_from_action_confirmation(a, True)
+            elif n_best_parses[i][0].idx == self.parser.ontology.preds.index('no'):
+                success = True
+                self.state.update_from_action_confirmation(a, False)
+        if not success:
+            self.state.update_from_failed_parse()
 
     # update state after asking user-initiative (open-ended) question about user goal
     def update_state_from_user_initiative(self, u):
@@ -56,7 +121,7 @@ class DialogAgent:
         # get n best parses for utterance
         n_best_parses = self.parser.parse_expression(u, n=self.parse_depth)
 
-        # try to digest parses to action request to achieve an initial state
+        # try to digest parses to action request
         success = False
         for i in range(0, len(n_best_parses)):
             success = self.update_state_from_action_parse(n_best_parses[i][0])
