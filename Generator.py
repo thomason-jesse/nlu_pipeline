@@ -211,7 +211,7 @@ class Generator:
             bad = [False, False]
             for split_idx in range(1, 3):
                 if split[split_idx] in self.bad_nodes:
-                    bad[split_idx] = True
+                    bad[split_idx-1] = True
             if True in bad:
                 if bad[0] and bad[1]:
                     if partial[split[0]] not in self.bad_nodes:
@@ -246,6 +246,7 @@ class Generator:
             # print "expanded partial: "+str([self.print_parse(p) for p in expanded_partial])  # DEBUG
             expanded_partials.append([expanded_partial, expanded_tree])
         # print "num expanded partials: "+str(len(expanded_partials))  # DEBUG
+        # empty = raw_input()
         return expanded_partials
 
     # return N/N : lambda x.(pred(x)) lowered to DESC : pred
@@ -275,19 +276,26 @@ class Generator:
 
     # return A,B from A<>B; A<>B must be AND headed and its lambda headers will be distributed to A, B
     def perform_split(self, AB):
-        # print "performing Split with '"+self.print_parse(AB,True)+"'" #DEBUG
+        print "performing Split with '"+self.print_parse(AB,True)+"'" #DEBUG
 
+        curr = AB
+        while curr.is_lambda and curr.is_lambda_instantiation:
+            curr = curr.children[0]  # first non-lambda must be 'and' predicate
         to_return = []
         for idx in range(0, 2):
             to_return.append(copy.deepcopy(AB))
-            curr = to_return[idx]
-            while curr.is_lambda and curr.is_lambda_instantiation:
-                curr = curr.children[0]
-            # first non-lambda must be 'and' predicate
-            curr.parent.children[0] = curr.children[idx]  # replace 'and' with child, preserving lambda headers
-            curr.parent.children[0].set_return_type(self.ontology)
+            curr_t = to_return[-1]
+            parent = None
+            while curr_t.is_lambda and curr_t.is_lambda_instantiation:
+                parent = curr_t
+                curr_t = curr_t.children[0]
+            if parent is not None:
+                parent.children = [copy.deepcopy(curr.children[idx])]
+            else:
+                to_return[-1] = copy.deepcopy(curr.children[idx])
+            to_return[-1].set_return_type(self.ontology)
 
-        # print "performed Split with '"+self.print_parse(AB,True)+"' to form '"+self.print_parse(to_return[0],True)+"', '"+self.print_parse(to_return[1],True)+"'" #DEBUG
+        print "performed Split with '"+self.print_parse(AB,True)+"' to form '"+self.print_parse(to_return[0],True)+"', '"+self.print_parse(to_return[1],True)+"'" #DEBUG
         return to_return
 
     # return true if AB can be split
@@ -305,10 +313,14 @@ class Generator:
     def perform_reverse_fa(self, A):
         # print "performing reverse FA with '"+self.print_parse(A,True)+"'"
 
-        # TODO: if A is 'and', A1 can be 'and' with A1 applied to its children to form A
+        # TODO: when splitting predicate 'and', matching argument children of A2 (within 'and')
+        # TODO: can become children of the 'and' predicate abstraction in A1
 
         # for every predicate p in A of type q, generate candidates:
         # A1 = A with a new outermost lambda of type q, p replaced by an instance of q
+        # A2 = p with children stripped
+        # if p alone has no unbound variables, generate additional candidates:
+        # A1 = A with new outermost lambda of type q return type p, with p and children replaced by q
         # A2 = p with children preserved
 
         candidate_pairs = []
@@ -322,29 +334,52 @@ class Generator:
                 to_examine.extend(curr.children)
             if curr.is_lambda:
                 continue
-            pred = curr.idx
-            pred_type = curr.type
-            A1 = SemanticNode.SemanticNode(
-                None, pred_type, None, True, lambda_name=deepest_lambda+1, is_lambda_instantiation=True)
-            A1.children = [copy.deepcopy(A)]
-            to_replace = [[A1, 0, A1.children[0]]]
-            # TODO: this procedure replaces all instances of the identified predicate with lambdas
-            # TODO: in principle, however, should have candidates for all possible subsets of replacements
-            # TODO: eg. askperson(ray,ray) -> lambda x.askperson(x,x), lambda x.askperson(ray,x), etc
-            # TODO: additionally, allow abstracting predicate with children, eg speak_t(person(ray)) ->
-            # TODO: lambda x:t.(speak_t(x)) with person(ray)
-            while len(to_replace) > 0:
-                p, c_idx, r = to_replace.pop()
-                if not r.is_lambda and r.idx == pred:
-                    lambda_instance = SemanticNode.SemanticNode(
-                        p, pred_type, None, True, lambda_name=deepest_lambda+1, is_lambda_instantiation=False)
-                    p.children[c_idx].copy_attributes(lambda_instance, preserve_parent=True, preserve_children=True)
-                if r.children is not None:
-                    to_replace.extend([[r, idx, r.children[idx]] for idx in range(0, len(r.children))])
-            self.renumerate_lambdas(A1, [])
-            A2 = copy.deepcopy(curr)
-            A2.children = None
-            candidate_pairs.append([A1, A2])
+            pred = curr
+
+            # create A1, A2 with A2 the predicate without children, A1 abstracting A2 instances
+            pairs_to_create = [[curr.type, True]]  # for predicate only, use its type and preserve host children
+
+            # create A1, A2 with A2 the predicate and children preserved, A1 abstracting A2 return type
+            if pred.children is not None:
+                unbound_vars_in_pred = False
+                bound_lambda_in_pred = []
+                check_bound = [pred]
+                while len(check_bound) > 0:
+                    curr = check_bound.pop()
+                    if curr.is_lambda:
+                        if curr.is_lambda_instantiation:
+                            bound_lambda_in_pred.append(curr.lambda_name)
+                        elif curr.lambda_name not in bound_lambda_in_pred:
+                            unbound_vars_in_pred = True
+                            break
+                    if curr.children is not None:
+                        check_bound.extend(curr.children)
+                if not unbound_vars_in_pred:
+                    pred.set_return_type(self.ontology)
+                    pairs_to_create.append([pred.return_type, False])  # for pred children, use return type and keep
+
+            for lambda_type, preserve_host_children in pairs_to_create:
+                A1 = SemanticNode.SemanticNode(
+                    None, lambda_type, None, True, lambda_name=deepest_lambda+1, is_lambda_instantiation=True)
+                A1.children = [copy.deepcopy(A)]
+                to_replace = [[A1, 0, A1.children[0]]]
+                # TODO: this procedure replaces all instances of the identified predicate with lambdas
+                # TODO: in principle, however, should have candidates for all possible subsets of replacements
+                # TODO: eg. askperson(ray,ray) -> lambda x.askperson(x,x), lambda x.askperson(ray,x), etc
+                while len(to_replace) > 0:
+                    p, c_idx, r = to_replace.pop()
+                    if not r.is_lambda and r.idx == pred.idx:
+                        lambda_instance = SemanticNode.SemanticNode(
+                            p, lambda_type, None, True, lambda_name=deepest_lambda+1, is_lambda_instantiation=False)
+                        p.children[c_idx].copy_attributes(
+                            lambda_instance, preserve_parent=True, preserve_children=preserve_host_children)
+                    if r.children is not None:
+                        to_replace.extend([[r, idx, r.children[idx]] for idx in range(0, len(r.children))])
+                self.renumerate_lambdas(A1, [])
+                A2 = copy.deepcopy(pred)
+                if preserve_host_children:
+                    A2.children = None
+                candidate_pairs.append([A1, A2])
 
         # print "performed reverse FA with '"+self.print_parse(A,True)+"', producing:"  # DEBUG
         # for candidates in candidate_pairs:  # DEBUG

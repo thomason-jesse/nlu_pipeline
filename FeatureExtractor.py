@@ -21,9 +21,7 @@ class FeatureExtractor:
 
     def read_parse_structure_to_token_assignments(self, t, ta, ps):
         if len(ps) == 2 and type(ps[1]) is str:
-            needle_parts = ps[1].split(' ')
-            for np in needle_parts:
-                ta[t.index(np)] = ps[0]
+            ta[t.index(ps[1])] = ps[0]
         else:
             iterate_over = ps if ps[0] is not None and type(ps[0]) is not int else ps[1]
             for psc in iterate_over:
