@@ -54,7 +54,6 @@ class DialogAgent:
     def request_missing_param(self, args):
         idx = args[0]
         # not sure whether reverse parsing could frame this
-        theme = None
         if idx == 0:
             theme = "agent"
         elif idx == 1:

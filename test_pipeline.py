@@ -8,6 +8,7 @@ import FeatureExtractor
 import LinearLearner
 import KBGrounder
 import Parser
+import Generator
 import DialogAgent
 import StaticDialogPolicy
 
@@ -51,6 +52,17 @@ grounder = KBGrounder.KBGrounder(ont)
 
 print "instantiating Parser"
 parser = Parser.Parser(ont, lex, learner, grounder, beam_width=10)
+
+print "instantiating Generator"
+generator = Generator.Generator(ont, lex, learner, beam_width=10)
+print "testing Generator:"
+while True:
+    s = raw_input()
+    if s == 'stop':
+        break
+    form = lex.read_semantic_form_from_str(s, None, None, [])
+    token_responses = generator.reverse_parse_semantic_form(form, n=10)
+    print "token responses: "+str(token_responses)
 
 print "instantiating DialogAgent"
 u_in = InputFromKeyboard()

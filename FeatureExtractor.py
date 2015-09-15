@@ -27,7 +27,8 @@ class FeatureExtractor:
         else:
             iterate_over = ps if ps[0] is not None and type(ps[0]) is not int else ps[1]
             for psc in iterate_over:
-                self.read_parse_structure_to_token_assignments(t, ta, psc)
+                if psc is not False:  # in generation, can have None child that hasn't been expanded/matched yet
+                    self.read_parse_structure_to_token_assignments(t, ta, psc)
 
     def extract_feature_map(self, tokens, parse, action):
         partial = parse[0]

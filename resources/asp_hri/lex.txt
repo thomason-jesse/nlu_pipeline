@@ -18,14 +18,14 @@ no :- C : no
 office of :- N/N : lambda x:e.(lambda y:e.(hasoffice(x,y)))
 
 #other interrogatives
-is :- I/I : lambda x:t.(speak_t(x))
-is :- N/DESC/N : lambda x:e.(lambda P:<e,t>.(speak_t(P(x))))
-is :- N/(N/N)/N : lambda x:e.(lambda P:<e,t>.(speak_t(P(x))))
+is :- M/I : lambda x:t.(speak_t(x))
+is :- M/DESC/N : lambda x:e.(lambda P:<e,t>.(speak_t(P(x))))
+is :- M/(N/N)/N : lambda x:e.(lambda P:<e,t>.(speak_t(P(x))))
 in :- I/N\N : lambda p:e.(lambda r:e.(inroom(p,r)))
 in :- I\N : lambda p:e.(inoffice(p))
-where is :- I/N : lambda x:e.(speak_e(x))
-who is :- I/N : lambda x:e.(speak_e(x))
-which is :- I/N : lambda x:e.(speak_e(x))
+where is :- M/N : lambda x:e.(speak_e(x))
+who is :- M/N : lambda x:e.(speak_e(x))
+which is :- M/N : lambda x:e.(speak_e(x))
 
 #entity descriptor words
 #can be type-raised to N/N : lambda x:e.(pred(x))
