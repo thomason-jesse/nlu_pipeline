@@ -2,6 +2,7 @@ __author__ = 'jesse'
 
 import copy
 import sys
+import math
 import SemanticNode
 
 
@@ -109,6 +110,15 @@ class Generator:
             made_assignment = True
         return made_assignment
 
+    # in-house heuristic to guide search; rewards parses for node brevity and a high ratio of assignable leaves
+    def score_top_down_partial(self, partial):
+        token_score = 0
+        for p in partial:
+            num_t = len(self.get_tokens_for_semantic_node(p))
+            if num_t > 0:
+                token_score += 1/float(num_t)
+        return token_score/float(len(partial)) - math.sqrt(len(partial))
+
     # given semantic form, return a list of up to k [tokens,semantic parse tree,score] pairs;
     # less than k returned if fewer than k explanatory tokens could be found
     def reverse_parse_semantic_form(self, root, k=None, n=1):
@@ -122,19 +132,23 @@ class Generator:
             # print "num full parses: "+str(len(full_parses))  # DEBUG
 
             # find best scoring partial and expand it
-            scores = [self.learner.scoreParse([], pp) for pp in partial_parses]
+            # scores = [self.learner.scoreParse([], pp) for pp in partial_parses]  # use linear learner
+            scores = [self.score_top_down_partial(pp[0]) for pp in partial_parses]  # use in-house heuristic
             max_score_idx = scores.index(max(scores))
             # print "max scoring parse "+str([
-            #     self.print_parse(p) for p in partial_parses[max_score_idx][0]])  # DEBUG
+            #     self.print_parse(p) for p in partial_parses[max_score_idx][0]]) +\
+            #     ", " + str(scores[max_score_idx])  # DEBUG
 
             # if partial token sequence matches its size, the parse is finished
             possible_assignments = self.assign_tokens_to_partial(
                 partial_parses[max_score_idx][0], partial_parses[max_score_idx][1])
+            was_full_parse = False
             for pa in possible_assignments:
                 tpa = self.extract_token_sequence_from_bracketing(pa)
                 if len(tpa) == len(partial_parses[max_score_idx][0]):
                     full_parses.append([partial_parses[max_score_idx][0], pa])
-            else:
+                    was_full_parse = True
+            if not was_full_parse:
                 # else, expand the parse
                 new_partials = [[cpp, cpsp] for [cpp, cpsp] in
                                 self.expand_partial_parse(partial_parses[max_score_idx])]
@@ -251,18 +265,20 @@ class Generator:
 
     # return N/N : lambda x.(pred(x)) lowered to DESC : pred
     def perform_adjectival_type_lower(self, A):
-        # print "performing adjectival lower with '"+self.print_parse(A,True)+"'" #DEBUG
+        print "performing adjectival lower with '"+self.print_parse(A,True)+"'" #DEBUG
         pred = copy.deepcopy(A.children[0])
         pred.children = None
         pred.category = self.lexicon.categories.index('DESC')  # change from DESC return type
         pred.type = self.ontology.types([
             self.ontology.types.index('e'), self.ontology.types.index('t')])
         pred.set_return_type(self.ontology)
-        # print "performed adjectival lower with '"+self.print_parse(A,True)+"' to form '"+self.print_parse(pred,True)+"'" #DEBUG
+        print "performed adjectival lower with '"+self.print_parse(A,True)+"' to form '"+self.print_parse(pred,True)+"'" #DEBUG
         return pred
 
     # return true if A is a candidate for type-raising
     def can_perform_type_lowering(self, A):
+        # TODO: because we don't track categories, need to see whether DESC exists as lexical entry for predicate,
+        # TODO: rather than checking whether it is a N/N (because it's not without tracking)
         if 'DESC' not in self.lexicon.categories or A is None:
             return False
         # check for N/N : lambda x.(pred(x)) -> DESC : pred lower
@@ -276,7 +292,7 @@ class Generator:
 
     # return A,B from A<>B; A<>B must be AND headed and its lambda headers will be distributed to A, B
     def perform_split(self, AB):
-        print "performing Split with '"+self.print_parse(AB,True)+"'" #DEBUG
+        # print "performing Split with '"+self.print_parse(AB,True)+"'" #DEBUG
 
         curr = AB
         while curr.is_lambda and curr.is_lambda_instantiation:
@@ -295,7 +311,7 @@ class Generator:
                 to_return[-1] = copy.deepcopy(curr.children[idx])
             to_return[-1].set_return_type(self.ontology)
 
-        print "performed Split with '"+self.print_parse(AB,True)+"' to form '"+self.print_parse(to_return[0],True)+"', '"+self.print_parse(to_return[1],True)+"'" #DEBUG
+        # print "performed Split with '"+self.print_parse(AB,True)+"' to form '"+self.print_parse(to_return[0],True)+"', '"+self.print_parse(to_return[1],True)+"'" #DEBUG
         return to_return
 
     # return true if AB can be split
@@ -312,9 +328,6 @@ class Generator:
     # given A1(A2), attempt to determine an A1, A2 that satisfy and return them
     def perform_reverse_fa(self, A):
         # print "performing reverse FA with '"+self.print_parse(A,True)+"'"
-
-        # TODO: when splitting predicate 'and', matching argument children of A2 (within 'and')
-        # TODO: can become children of the 'and' predicate abstraction in A1
 
         # for every predicate p in A of type q, generate candidates:
         # A1 = A with a new outermost lambda of type q, p replaced by an instance of q
@@ -337,7 +350,30 @@ class Generator:
             pred = curr
 
             # create A1, A2 with A2 the predicate without children, A1 abstracting A2 instances
-            pairs_to_create = [[curr.type, True]]  # for predicate only, use its type and preserve host children
+            pairs_to_create = [[True, False]]
+
+            # check whether pred is 'and' and children arguments match, in which case additional abstraction
+            # is possible
+            add_and_abstraction = False
+            if pred.idx == self.ontology.preds.index('and') and pred.children is not None:
+                arg_children_match = True
+                if (pred.children[0].children is not None and pred.children[1].children is not None and
+                        len(pred.children[0].children) == len(pred.children[1].children)):
+                    ac_to_examine = [[pred.children[0].children[ac_idx],
+                                      pred.children[1].children[ac_idx]] for
+                                     ac_idx in range(0, len(pred.children[0].children))]
+                    while len(ac_to_examine) > 0:
+                        c1, c2 = ac_to_examine.pop()
+                        if not c1.equal_ignoring_syntax(c2):
+                            arg_children_match = False
+                            break
+                        if c1.children is not None:
+                            ac_to_examine.extend([[c1.children[ac_idx], c2.children[ac_idx]]
+                                                    for ac_idx in range(0, len(c1.children))])
+                else:
+                    arg_children_match = False
+                if arg_children_match:
+                    add_and_abstraction = True
 
             # create A1, A2 with A2 the predicate and children preserved, A1 abstracting A2 return type
             if pred.children is not None:
@@ -356,34 +392,58 @@ class Generator:
                         check_bound.extend(curr.children)
                 if not unbound_vars_in_pred:
                     pred.set_return_type(self.ontology)
-                    pairs_to_create.append([pred.return_type, False])  # for pred children, use return type and keep
+                    pairs_to_create.append([False, add_and_abstraction])
 
-            for lambda_type, preserve_host_children in pairs_to_create:
-                A1 = SemanticNode.SemanticNode(
-                    None, lambda_type, None, True, lambda_name=deepest_lambda+1, is_lambda_instantiation=True)
-                A1.children = [copy.deepcopy(A)]
-                to_replace = [[A1, 0, A1.children[0]]]
-                # TODO: this procedure replaces all instances of the identified predicate with lambdas
-                # TODO: in principle, however, should have candidates for all possible subsets of replacements
-                # TODO: eg. askperson(ray,ray) -> lambda x.askperson(x,x), lambda x.askperson(ray,x), etc
-                while len(to_replace) > 0:
-                    p, c_idx, r = to_replace.pop()
-                    if not r.is_lambda and r.idx == pred.idx:
-                        lambda_instance = SemanticNode.SemanticNode(
-                            p, lambda_type, None, True, lambda_name=deepest_lambda+1, is_lambda_instantiation=False)
-                        p.children[c_idx].copy_attributes(
-                            lambda_instance, preserve_parent=True, preserve_children=preserve_host_children)
-                    if r.children is not None:
-                        to_replace.extend([[r, idx, r.children[idx]] for idx in range(0, len(r.children))])
-                self.renumerate_lambdas(A1, [])
-                A2 = copy.deepcopy(pred)
-                if preserve_host_children:
-                    A2.children = None
-                candidate_pairs.append([A1, A2])
+            # create pairs given directives
+            for preserve_host_children, and_abstract in pairs_to_create:
 
-        # print "performed reverse FA with '"+self.print_parse(A,True)+"', producing:"  # DEBUG
-        # for candidates in candidate_pairs:  # DEBUG
-        #     print self.print_parse(candidates[0])+" consuming "+self.print_parse(candidates[1])  # DEBUG
+                and_abstracts = [False]
+                if and_abstract:
+                    and_abstracts.append(True)
+                for aa in and_abstracts:
+                    if preserve_host_children:
+                        lambda_type = pred.type
+                    elif aa:
+                        lambda_type = pred.children[0].type
+                    else:
+                        lambda_type = pred.return_type
+                    A1 = SemanticNode.SemanticNode(
+                        None, lambda_type, None, True, lambda_name=deepest_lambda+1, is_lambda_instantiation=True)
+                    A1.children = [copy.deepcopy(A)]
+                    to_replace = [[A1, 0, A1.children[0]]]
+                    # TODO: this procedure replaces all instances of the identified predicate with lambdas
+                    # TODO: in principle, however, should have candidates for all possible subsets of replacements
+                    # TODO: eg. askperson(ray,ray) -> lambda x.askperson(x,x), lambda x.askperson(ray,x), etc
+                    while len(to_replace) > 0:
+                        p, c_idx, r = to_replace.pop()
+                        if not r.is_lambda and r.idx == pred.idx:
+                            lambda_instance = SemanticNode.SemanticNode(
+                                p, lambda_type, None, True, lambda_name=deepest_lambda+1,
+                                is_lambda_instantiation=False)
+                            p.children[c_idx].copy_attributes(
+                                lambda_instance, preserve_parent=True, preserve_children=preserve_host_children)
+                            if aa:
+                                p.children[c_idx].children = copy.deepcopy(pred.children[0].children)
+                        if r.children is not None:
+                            to_replace.extend([[r, idx, r.children[idx]] for idx in range(0, len(r.children))])
+                    self.renumerate_lambdas(A1, [])
+                    A2 = copy.deepcopy(pred)
+                    if preserve_host_children:
+                        A2.children = None
+                    if aa:
+                        for c in A2.children:
+                            c.children = None
+                            c.set_return_type(self.ontology)
+                        input_type = [A2.children[0].return_type, A2.children[0].return_type]
+                        if input_type not in self.ontology.types:
+                            self.ontology.types.append(input_type)
+                        full_type = [A2.children[0].return_type, self.ontology.types.index(input_type)]
+                        if full_type not in self.ontology.types:
+                            self.ontology.types.append(full_type)
+                        A2.type = self.ontology.types.index(full_type)
+                        A2.set_return_type(self.ontology)
+                    candidate_pairs.append([A1, A2])
+                    # print "produced: "+self.print_parse(A1)+" consuming "+self.print_parse(A2)+" with params "+",".join([str(lambda_type),str(preserve_host_children),str(aa)])  # DEBUG
 
         return candidate_pairs
 

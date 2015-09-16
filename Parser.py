@@ -542,6 +542,7 @@ class Parser:
             A_B_merged = SemanticNode.SemanticNode(None, self.ontology.types.index(full_type),
                                                    A.category, False, idx=and_idx)
             A_B_merged.children = [A, B]
+            # print "performed Merge with '"+self.print_parse(A,True)+"' taking '"+self.print_parse(B,True)+"' to form '"+self.print_parse(A_B_merged,True)+"'" #DEBUG
             A_B_merged.set_return_type(self.ontology)
 
         # print "performed Merge with '"+self.print_parse(A,True)+"' taking '"+self.print_parse(B,True)+"' to form '"+self.print_parse(A_B_merged,True)+"'" #DEBUG
