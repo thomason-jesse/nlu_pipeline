@@ -7,10 +7,11 @@ import SemanticNode
 
 
 class Generator:
-    def __init__(self, ont, lex, learner, beam_width=10):
+    def __init__(self, ont, lex, learner, parser, beam_width=10):
         self.ontology = ont
         self.lexicon = lex
         self.learner = learner
+        self.parser = parser
         self.beam_width = beam_width
         self.bad_nodes = []  # nodes for which we know there are no tokens and no expansions
         self.known_terminals = []  # nodes that can't be further expanded
@@ -110,18 +111,41 @@ class Generator:
             made_assignment = True
         return made_assignment
 
-    # in-house heuristic to guide search; rewards parses for node brevity and a high ratio of assignable leaves
-    def score_top_down_partial(self, partial):
-        token_score = 0
-        for p in partial:
-            num_t = len(self.get_tokens_for_semantic_node(p))
-            if num_t > 0:
-                token_score += 1/float(num_t)
-        return token_score/float(len(partial)) - math.sqrt(len(partial))
-
-    # given semantic form, return a list of up to k [tokens,semantic parse tree,score] pairs;
-    # less than k returned if fewer than k explanatory tokens could be found
+    # given semantic form, return a list of up to n [tokens,semantic parse tree,score] pairs;
+    # fewer than k returned if fewer than k explanatory tokens could be found
+    # this function first reverse-parses the given root to come up with up to k sequences, then
+    # runs the parser on those sequences to generate and return up to n best according to parse scores
     def reverse_parse_semantic_form(self, root, k=None, n=1):
+        if k is None:
+            k = self.beam_width
+        candidate_sequences = self.get_token_sequences_for_semantic_form(root, n=k)
+        trees = []
+        scores = []
+        for tokens in candidate_sequences:
+            tree = None
+            score = None
+            parses = self.parser.parse_tokens(tokens)
+            # parses ordered by decreasing score, so first to match is best
+            for parse in parses:
+                if parse[0].equal_ignoring_syntax(root):
+                    tree = parse[1]
+                    score = parse[2]
+                    break
+            trees.append(tree)
+            scores.append(score)
+        n_best = []
+        while len(n_best) < n and len(candidate_sequences) > 0:
+            max_score_idx = scores.index(max(scores))
+            if trees[max_score_idx] is not None:
+                n_best.append([candidate_sequences[max_score_idx], trees[max_score_idx], scores[max_score_idx]])
+            del candidate_sequences[max_score_idx]
+            del trees[max_score_idx]
+            del scores[max_score_idx]
+        return n_best
+
+    # given semantic form, return a list of up to n token sequences;
+    # fewer than n returned if fewer than n explanatory tokens could be found
+    def get_token_sequences_for_semantic_form(self, root, k=None, n=1):
         if k is None:
             k = self.beam_width
 
@@ -132,7 +156,6 @@ class Generator:
             # print "num full parses: "+str(len(full_parses))  # DEBUG
 
             # find best scoring partial and expand it
-            # scores = [self.learner.scoreParse([], pp) for pp in partial_parses]  # use linear learner
             scores = [self.score_top_down_partial(pp[0]) for pp in partial_parses]  # use in-house heuristic
             max_score_idx = scores.index(max(scores))
             # print "max scoring parse "+str([
@@ -146,6 +169,10 @@ class Generator:
             for pa in possible_assignments:
                 tpa = self.extract_token_sequence_from_bracketing(pa)
                 if len(tpa) == len(partial_parses[max_score_idx][0]):
+                    if len(tpa) == 1 and pa[0] is None and type(pa[1]) is list:
+                        # this is the single-word case where our compositionality assumption is violated
+                        # so we need to make the bracketing the single idx,word pair
+                        pa = pa[1]
                     full_parses.append([partial_parses[max_score_idx][0], pa])
                     was_full_parse = True
             if not was_full_parse:
@@ -173,18 +200,24 @@ class Generator:
             del partial_parses[max_score_idx]
             del scores[max_score_idx]
 
-        # score full parses and return n best in order with scores
-        full_parse_scores = [self.learner.scoreParse(
-            self.extract_token_sequence_from_bracketing(fp[1]), fp) for fp in full_parses]
-        k_best = []
-        while len(k_best) < n and len(full_parses) > 0:
+        # score full parses and return n best in order according to in-house scoring heuristic
+        full_parse_scores = [self.score_top_down_partial(fp[0]) for fp in full_parses]
+        n_best = []
+        while len(n_best) < n and len(full_parses) > 0:
             max_score_idx = full_parse_scores.index(max(full_parse_scores))
-            k_best.append([
-                self.extract_token_sequence_from_bracketing(full_parses[max_score_idx][1]),
-                full_parses[max_score_idx][1], full_parse_scores[max_score_idx]])
+            n_best.append(self.extract_token_sequence_from_bracketing(full_parses[max_score_idx][1]))
             del full_parses[max_score_idx]
             del full_parse_scores[max_score_idx]
-        return k_best
+        return n_best
+
+    # in-house heuristic to guide search; rewards parses for node brevity and a high ratio of assignable leaves
+    def score_top_down_partial(self, partial):
+        token_score = 0
+        for p in partial:
+            num_t = len(self.get_tokens_for_semantic_node(p))
+            if num_t > 0:
+                token_score += 1/float(num_t)
+        return token_score/float(len(partial)) - math.sqrt(len(partial))
 
     # given partial parse
     # decompose via function application (forwards and backwards), type-raising, and merge operations
@@ -265,29 +298,32 @@ class Generator:
 
     # return N/N : lambda x.(pred(x)) lowered to DESC : pred
     def perform_adjectival_type_lower(self, A):
-        print "performing adjectival lower with '"+self.print_parse(A,True)+"'" #DEBUG
+        # print "performing adjectival lower with '"+self.print_parse(A,True)+"'" #DEBUG
         pred = copy.deepcopy(A.children[0])
         pred.children = None
         pred.category = self.lexicon.categories.index('DESC')  # change from DESC return type
-        pred.type = self.ontology.types([
+        pred.type = self.ontology.types.index([
             self.ontology.types.index('e'), self.ontology.types.index('t')])
         pred.set_return_type(self.ontology)
-        print "performed adjectival lower with '"+self.print_parse(A,True)+"' to form '"+self.print_parse(pred,True)+"'" #DEBUG
+        # print "performed adjectival lower with '"+self.print_parse(A,True)+"' to form '"+self.print_parse(pred,True)+"'" #DEBUG
         return pred
 
     # return true if A is a candidate for type-raising
     def can_perform_type_lowering(self, A):
-        # TODO: because we don't track categories, need to see whether DESC exists as lexical entry for predicate,
-        # TODO: rather than checking whether it is a N/N (because it's not without tracking)
         if 'DESC' not in self.lexicon.categories or A is None:
             return False
         # check for N/N : lambda x.(pred(x)) -> DESC : pred lower
-        if (A.is_lambda_instantiation and A.children is not None and
-                A.children[0].category == self.lexicon.categories.index([
-                self.lexicon.categories.index('N'), 1, self.lexicon.categories.index('N')])
-                and A.children[0].children is not None and
+        # because we don't track categories, must see whether DESC : pred is a leaf-level entry in lexicon
+        if (A.is_lambda_instantiation and A.children is not None and len(A.children) == 1 and
+                A.children[0].idx is not None and A.children[0].children is not None and
+                len(A.children[0].children) == 1 and
                 A.children[0].children[0].lambda_name == A.lambda_name):
-            return "N/N->DESC"
+            pred_idx = A.children[0].idx
+            for sur_idx in self.lexicon.pred_to_surface[pred_idx]:
+                for sem_idx in self.lexicon.entries[sur_idx]:
+                    sem = self.lexicon.semantic_forms[sem_idx]
+                    if sem.idx == pred_idx and sem.category == self.lexicon.categories.index('DESC'):
+                        return "N/N->DESC"
         return False
 
     # return A,B from A<>B; A<>B must be AND headed and its lambda headers will be distributed to A, B

@@ -54,14 +54,14 @@ print "instantiating Parser"
 parser = Parser.Parser(ont, lex, learner, grounder, beam_width=10)
 
 print "instantiating Generator"
-generator = Generator.Generator(ont, lex, learner, beam_width=100)
+generator = Generator.Generator(ont, lex, learner, parser, beam_width=100)
 print "testing Generator:"
 while True:
     s = raw_input()
     if s == 'stop':
         break
     form = lex.read_semantic_form_from_str(s, None, None, [])
-    token_responses = generator.reverse_parse_semantic_form(form, n=1)
+    token_responses = generator.reverse_parse_semantic_form(form, k=3, n=1)
     print "token responses: "+str(token_responses)
 
 print "instantiating DialogAgent"
@@ -83,3 +83,11 @@ while True:
     a = A.initiate_dialog_to_get_action(s)
     print "ACTION: "+str(a)
 
+print "testing Generator:"
+while True:
+    s = raw_input()
+    if s == 'stop':
+        break
+    form = lex.read_semantic_form_from_str(s, None, None, [])
+    token_responses = generator.reverse_parse_semantic_form(form, k=3, n=3)
+    print "token responses: "+str(token_responses)
