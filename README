@@ -1,4 +1,6 @@
-First, you need to launch the segbot simulator. Do this by sourcing your terminal from the catkin_ws root
+First, go into ros_dependencies/ and follow the instructions in the README there, then rebuild from catkin_ws/
+
+Second, you need to launch the segbot simulator. Do this by sourcing your terminal from the catkin_ws root
 
 $ source devel/setup.bash 
 
