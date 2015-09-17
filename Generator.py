@@ -20,25 +20,6 @@ class Generator:
     def flush_bad_nodes(self):
         self.bad_nodes = []
 
-    # print a SemanticNode as a string using the known ontology
-    # DEBUG use only
-    def print_parse(self, p, show_category=False):
-        if p is None: return "NONE"
-        elif show_category and p.category is not None:
-            s = self.lexicon.compose_str_from_category(p.category) + " : "
-        else:
-            s = ''
-        if p.is_lambda:
-            if p.is_lambda_instantiation:
-                s += "lambda " + str(p.lambda_name) + ":" + self.ontology.compose_str_from_type(p.type) + "."
-            else:
-                s += str(p.lambda_name)
-        else:
-            s += self.ontology.preds[p.idx]
-        if p.children is not None:
-            s += '(' + ','.join([self.print_parse(c) for c in p.children]) + ')'
-        return s
-
     # given bracketing, return sequence of tokens
     def extract_token_sequence_from_bracketing(self, b, preserve_False=False):
         t = []
@@ -111,6 +92,15 @@ class Generator:
             made_assignment = True
         return made_assignment
 
+    def count_preds_in_semantic_form(self, r):
+        n = 0
+        if not r.is_lambda:
+            n += 1
+        if r.children is not None:
+            for c in r.children:
+                n += self.count_preds_in_semantic_form(c)
+        return n
+
     # given semantic form, return a list of up to n [tokens,semantic parse tree,score] pairs;
     # fewer than k returned if fewer than k explanatory tokens could be found
     # this function first reverse-parses the given root to come up with up to k sequences, then
@@ -138,6 +128,9 @@ class Generator:
             max_score_idx = scores.index(max(scores))
             if trees[max_score_idx] is not None:
                 n_best.append([candidate_sequences[max_score_idx], trees[max_score_idx], scores[max_score_idx]])
+            else:
+                print "WARNING: sequence " + str(candidate_sequences[max_score_idx]) +\
+                      " was generated but does not parse into expected root"
             del candidate_sequences[max_score_idx]
             del trees[max_score_idx]
             del scores[max_score_idx]
@@ -148,10 +141,12 @@ class Generator:
     def get_token_sequences_for_semantic_form(self, root, k=None, n=1):
         if k is None:
             k = self.beam_width
+        num_preds = self.count_preds_in_semantic_form(root)
+        search_space_limit = max([100, int(math.factorial(num_preds))])
 
         full_parses = []
         partial_parses = [[[root], [None, False]]]  # set of partials, parse bracketing
-        while len(full_parses) < n and len(partial_parses) > 0:
+        while len(full_parses) < n and len(partial_parses) > 0 and len(partial_parses) < search_space_limit:
             # print "num partial parses: "+str(len(partial_parses))  # DEBUG
             # print "num full parses: "+str(len(full_parses))  # DEBUG
 
@@ -167,13 +162,15 @@ class Generator:
                 partial_parses[max_score_idx][0], partial_parses[max_score_idx][1])
             was_full_parse = False
             for pa in possible_assignments:
-                tpa = self.extract_token_sequence_from_bracketing(pa)
-                if len(tpa) == len(partial_parses[max_score_idx][0]):
+                tpa = self.extract_token_sequence_from_bracketing(pa, preserve_False=True)
+                if False not in tpa and len(tpa) == len(partial_parses[max_score_idx][0]):
                     if len(tpa) == 1 and pa[0] is None and type(pa[1]) is list:
                         # this is the single-word case where our compositionality assumption is violated
                         # so we need to make the bracketing the single idx,word pair
                         pa = pa[1]
-                    full_parses.append([partial_parses[max_score_idx][0], pa])
+                    candidate = [partial_parses[max_score_idx][0], pa]
+                    if candidate not in full_parses:
+                        full_parses.append(candidate)
                     was_full_parse = True
             if not was_full_parse:
                 # else, expand the parse
@@ -200,6 +197,9 @@ class Generator:
             del partial_parses[max_score_idx]
             del scores[max_score_idx]
 
+        if len(partial_parses) >= search_space_limit:
+            print "WARNING: potential parses exceeded search space limit "+str(search_space_limit)
+
         # score full parses and return n best in order according to in-house scoring heuristic
         full_parse_scores = [self.score_top_down_partial(fp[0]) for fp in full_parses]
         n_best = []
@@ -224,7 +224,7 @@ class Generator:
     def expand_partial_parse(self, p):
         partial = p[0]
         tree = p[1]
-        # print "splitting parse "+str([self.print_parse(p) for p in partial])
+        # print "splitting parse "+str([self.parser.print_parse(p) for p in partial])
         possible_splits = []
         for i in range(0, len(partial)):
             if partial[i] in self.known_terminals or partial[i] in self.bad_nodes:
@@ -290,7 +290,7 @@ class Generator:
                         curr[0] = split[3]
                         curr[1] = [False, False]
                     leaves_seen += 1
-            # print "expanded partial: "+str([self.print_parse(p) for p in expanded_partial])  # DEBUG
+            # print "expanded partial: "+str([self.parser.print_parse(p) for p in expanded_partial])  # DEBUG
             expanded_partials.append([expanded_partial, expanded_tree])
         # print "num expanded partials: "+str(len(expanded_partials))  # DEBUG
         # empty = raw_input()
@@ -298,14 +298,14 @@ class Generator:
 
     # return N/N : lambda x.(pred(x)) lowered to DESC : pred
     def perform_adjectival_type_lower(self, A):
-        # print "performing adjectival lower with '"+self.print_parse(A,True)+"'" #DEBUG
+        # print "performing adjectival lower with '"+self.parser.print_parse(A,True)+"'" #DEBUG
         pred = copy.deepcopy(A.children[0])
         pred.children = None
         pred.category = self.lexicon.categories.index('DESC')  # change from DESC return type
         pred.type = self.ontology.types.index([
             self.ontology.types.index('e'), self.ontology.types.index('t')])
         pred.set_return_type(self.ontology)
-        # print "performed adjectival lower with '"+self.print_parse(A,True)+"' to form '"+self.print_parse(pred,True)+"'" #DEBUG
+        # print "performed adjectival lower with '"+self.parser.print_parse(A,True)+"' to form '"+self.pasrer.print_parse(pred,True)+"'" #DEBUG
         return pred
 
     # return true if A is a candidate for type-raising
@@ -328,7 +328,7 @@ class Generator:
 
     # return A,B from A<>B; A<>B must be AND headed and its lambda headers will be distributed to A, B
     def perform_split(self, AB):
-        # print "performing Split with '"+self.print_parse(AB,True)+"'" #DEBUG
+        # print "performing Split with '"+self.parser.print_parse(AB,True)+"'" #DEBUG
 
         curr = AB
         while curr.is_lambda and curr.is_lambda_instantiation:
@@ -347,7 +347,7 @@ class Generator:
                 to_return[-1] = copy.deepcopy(curr.children[idx])
             to_return[-1].set_return_type(self.ontology)
 
-        # print "performed Split with '"+self.print_parse(AB,True)+"' to form '"+self.print_parse(to_return[0],True)+"', '"+self.print_parse(to_return[1],True)+"'" #DEBUG
+        # print "performed Split with '"+self.parser.print_parse(AB,True)+"' to form '"+self.parser.print_parse(to_return[0],True)+"', '"+self.parser.print_parse(to_return[1],True)+"'" #DEBUG
         return to_return
 
     # return true if AB can be split
@@ -363,7 +363,7 @@ class Generator:
 
     # given A1(A2), attempt to determine an A1, A2 that satisfy and return them
     def perform_reverse_fa(self, A):
-        # print "performing reverse FA with '"+self.print_parse(A,True)+"'"
+        # print "performing reverse FA with '"+self.parser.print_parse(A,True)+"'"
 
         # for every predicate p in A of type q, generate candidates:
         # A1 = A with a new outermost lambda of type q, p replaced by an instance of q
@@ -479,7 +479,7 @@ class Generator:
                         A2.type = self.ontology.types.index(full_type)
                         A2.set_return_type(self.ontology)
                     candidate_pairs.append([A1, A2])
-                    # print "produced: "+self.print_parse(A1)+" consuming "+self.print_parse(A2)+" with params "+",".join([str(lambda_type),str(preserve_host_children),str(aa)])  # DEBUG
+                    # print "produced: "+self.parser.print_parse(A1)+" consuming "+self.parser.print_parse(A2)+" with params "+",".join([str(lambda_type),str(preserve_host_children),str(aa)])  # DEBUG
 
         return candidate_pairs
 

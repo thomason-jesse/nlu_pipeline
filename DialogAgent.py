@@ -123,6 +123,8 @@ class DialogAgent:
         # try to digest parses to action request
         success = False
         for i in range(0, len(n_best_parses)):
+            # print self.parser.print_parse(n_best_parses[i][0])  # DEBUG
+            # print self.parser.print_semantic_parse_result(n_best_parses[i][1])  # DEBUG
             success = self.update_state_from_action_parse(n_best_parses[i][0])
             if success:
                 break
