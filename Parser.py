@@ -458,6 +458,7 @@ class Parser:
                 self.lexicon.expand_lex_from_strs(new_lex, self.lexicon.surface_forms,
                                                   self.lexicon.semantic_forms, self.lexicon.entries,
                                                   self.lexicon.pred_to_surface)
+                self.lexicon.update_support_structures()
                 print "surface forms: "+str(self.lexicon.surface_forms)  # DEBUG
                 print "entries: "+str(self.lexicon.entries)  # DEBUG
                 self.new_adjectives.append(token)

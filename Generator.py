@@ -205,7 +205,9 @@ class Generator:
         n_best = []
         while len(n_best) < n and len(full_parses) > 0:
             max_score_idx = full_parse_scores.index(max(full_parse_scores))
-            n_best.append(self.extract_token_sequence_from_bracketing(full_parses[max_score_idx][1]))
+            t = self.extract_token_sequence_from_bracketing(full_parses[max_score_idx][1])
+            if t not in n_best:
+                n_best.append(t)
             del full_parses[max_score_idx]
             del full_parse_scores[max_score_idx]
         return n_best

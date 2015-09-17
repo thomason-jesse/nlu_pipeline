@@ -10,13 +10,17 @@ class Lexicon:
         self.categories = []  # will grow on its own
         self.surface_forms, self.semantic_forms, self.entries, self.pred_to_surface = self.read_lex_from_file(
             lexicon_fname)
-        self.reverse_entries = self.compute_reverse_entries()
+        self.reverse_entries = {}
+        self.sem_form_expected_args = None
+        self.sem_form_return_cat = None
+        self.update_support_structures()
 
+    def update_support_structures(self):
+        self.compute_reverse_entries(self.reverse_entries)
         self.sem_form_expected_args = [self.calc_exp_args(i) for i in range(0, len(self.semantic_forms))]
         self.sem_form_return_cat = [self.calc_return_cat(i) for i in range(0, len(self.semantic_forms))]
 
-    def compute_reverse_entries(self):
-        r = {}
+    def compute_reverse_entries(self, r):
         for sur_idx in range(0, len(self.surface_forms)):
             for sem_idx in self.entries[sur_idx]:
                 if sem_idx in r:
