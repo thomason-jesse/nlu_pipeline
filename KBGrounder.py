@@ -95,7 +95,8 @@ class KBGrounder:
                             break
                 elif self.ontology.preds[root.idx] == 'the':
                     # print "'the' child grounds to inspect: " + str(child_grounds[0][child_ground_idx[0]])  # DEBUG
-                    if len(child_grounds[0]) == 1:
+                    if (len(child_grounds[0]) == 1 and
+                            len(lambda_assignments) < len(child_grounds[0][child_ground_idx[0]][0])):
                         # set satisfied to the satisfying lambda arg that heads child
                         satisfied = child_grounds[0][child_ground_idx[0]][0][len(lambda_assignments)]
                     else:

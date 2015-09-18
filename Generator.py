@@ -142,11 +142,14 @@ class Generator:
         if k is None:
             k = self.beam_width
         num_preds = self.count_preds_in_semantic_form(root)
-        search_space_limit = max([100, int(math.factorial(num_preds))])
+        iterations_limit = max([100, math.sqrt(int(math.factorial(num_preds)))])
 
         full_parses = []
         partial_parses = [[[root], [None, False]]]  # set of partials, parse bracketing
-        while len(full_parses) < n and len(partial_parses) > 0 and len(partial_parses) < search_space_limit:
+        iterations = 0
+        while (len(full_parses) < n and len(partial_parses) > 0 and
+                iterations < iterations_limit*(1+len(full_parses))):
+            iterations += 1
             # print "num partial parses: "+str(len(partial_parses))  # DEBUG
             # print "num full parses: "+str(len(full_parses))  # DEBUG
 
@@ -197,8 +200,8 @@ class Generator:
             del partial_parses[max_score_idx]
             del scores[max_score_idx]
 
-        if len(partial_parses) >= search_space_limit:
-            print "WARNING: potential parses exceeded search space limit "+str(search_space_limit)
+        if iterations >= iterations_limit:
+            print "WARNING: exceeded iterations limit "+str(iterations_limit)
 
         # score full parses and return n best in order according to in-house scoring heuristic
         full_parse_scores = [self.score_top_down_partial(fp[0]) for fp in full_parses]

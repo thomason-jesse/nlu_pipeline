@@ -4,7 +4,7 @@ import random
 import copy
 import sys
 import Action
-import DialogState
+import StaticDialogState
 
 
 class DialogAgent:
@@ -25,7 +25,7 @@ class DialogAgent:
     # initiate a new dialog with the agent with initial utterance u
     def initiate_dialog_to_get_action(self, u):
 
-        self.state = DialogState.DialogState()
+        self.state = StaticDialogState.StaticDialogState()
         self.update_state_from_user_initiative(u)
 
         # select next action from state
@@ -76,11 +76,14 @@ class DialogAgent:
         # try to digest parses to confirmation
         success = False
         for i in range(0, len(n_best_parses)):
+            # print self.parser.print_parse(n_best_parses[i][0])  # DEBUG
+            # print self.parser.print_semantic_parse_result(n_best_parses[i][1])  # DEBUG
             g = self.grounder.groundSemanticNode(n_best_parses[i][0], [], [], [])
             answer = self.grounder.grounding_to_answer_set(g)
             if len(answer) == 1:
                 success = True
                 self.state.update_from_missing_param(answer[0], idx)
+                break
         if not success:
             self.state.update_from_failed_parse()
 
@@ -104,6 +107,8 @@ class DialogAgent:
         # try to digest parses to confirmation
         success = False
         for i in range(0, len(n_best_parses)):
+            # print self.parser.print_parse(n_best_parses[i][0])  # DEBUG
+            # print self.parser.print_semantic_parse_result(n_best_parses[i][1])  # DEBUG
             if n_best_parses[i][0].idx == self.parser.ontology.preds.index('yes'):
                 success = True
                 self.state.update_from_action_confirmation(a, True)

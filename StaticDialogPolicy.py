@@ -40,7 +40,7 @@ class StaticDialogPolicy:
 
         return None
 
-    # select an action given DialogState
+    # select an action given StaticDialogState
     def select_dialog_action(self, s):
 
         # confirm action, then patient, then recipient, then extraneous arguments

@@ -1,6 +1,7 @@
 __author__ = 'jesse'
 
-class DialogState:
+
+class StaticDialogState:
 
     def __init__(self):
 

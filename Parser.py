@@ -513,7 +513,8 @@ class Parser:
             innermost_outer_lambda = A_B_merged
             A_child = A.children[0]
             B_child = B.children[0]
-            while innermost_outer_lambda.children != None and innermost_outer_lambda.children[0].is_lambda and innermost_outer_lambda.children[0].is_lambda_instantiation:
+            while (innermost_outer_lambda.children != None and innermost_outer_lambda.children[0].is_lambda
+                   and innermost_outer_lambda.children[0].is_lambda_instantiation):
                 innermost_outer_lambda = innermost_outer_lambda.children[0]
                 A_child = A.children[0]
                 B_child = B.children[0]
@@ -536,6 +537,11 @@ class Parser:
         else:
             A.set_return_type(self.ontology)
             B.set_return_type(self.ontology)
+            if A.return_type != B.return_type:
+                sys.exit("performing Merge with '"+self.print_parse(A,True)+"' taking '"+self.print_parse(B,True)+\
+                         "' to form '"+self.print_parse(A_B_merged,True)+"' generated mismatched return types"+\
+                         self.ontology.compose_str_from_type(A.return_type)+","+\
+                         self.ontology.compose_str_from_type(B.return_type))
             input_type = [A.return_type, A.return_type]
             if input_type not in self.ontology.types:
                 self.ontology.types.append(input_type)
@@ -545,8 +551,8 @@ class Parser:
             A_B_merged = SemanticNode.SemanticNode(None, self.ontology.types.index(full_type),
                                                    A.category, False, idx=and_idx)
             A_B_merged.children = [A, B]
-            A_B_merged.set_return_type(self.ontology)
 
+        A_B_merged.set_return_type(self.ontology)
         # print "performed Merge with '"+self.print_parse(A,True)+"' taking '"+self.print_parse(B,True)+"' to form '"+self.print_parse(A_B_merged,True)+"'" #DEBUG
         return A_B_merged
 
@@ -614,6 +620,7 @@ class Parser:
                     curr.copy_attributes(B)
                     curr.type = self.ontology.types.index([curr.children[0].return_type, self.ontology.types.index(
                         [curr.children[0].return_type, curr.children[0].return_type])])
+                    curr.set_return_type(self.ontology)
                 elif curr.parent is None:
                     if curr.children is None:
                         # print "...whole tree is instance" #DEBUG
@@ -625,6 +632,7 @@ class Parser:
                         sys.exit("Error: incompatible parentless, childed node A with childed node B")
                     entire_replacement = True
                     curr.category = self.lexicon.categories[A.category][0]  # take on return type of A
+                    curr.set_return_type(self.ontology)
                 else:
                     for curr_parent_matching_idx in range(0, len(curr.parent.children)):
                         if curr.parent.children[curr_parent_matching_idx] == curr: break
@@ -649,9 +657,11 @@ class Parser:
                                                                                           num_leading_lambdas,
                                                                                           preserve_parent=True,
                                                                                           preserve_children=False)
-                    curr.parent.children[curr_parent_matching_idx].set_return_type(self.ontology)  # not sure we need this
+                    # print "performing FA with '"+self.print_parse(A,True)+"' taking '"+self.print_parse(B,True)+"' to form '"+self.print_parse(A_FA_B,True)+"'" #DEBUG
+                    curr.parent.children[curr_parent_matching_idx].set_return_type(self.ontology)
             if not entire_replacement and curr.children is not None: to_traverse.extend([[c, deepest_lambda] for c in curr.children])
         self.renumerate_lambdas(A_FA_B, [])
+        A_FA_B.set_return_type(self.ontology)
         A_FA_B.category = self.lexicon.categories[A.category][0]
         # print "performed FA with '"+self.print_parse(A,True)+"' taking '"+self.print_parse(B,True)+"' to form '"+self.print_parse(A_FA_B,True)+"'" #DEBUG
         return A_FA_B
