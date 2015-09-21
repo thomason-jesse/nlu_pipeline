@@ -40,7 +40,7 @@ class DialogAgent:
             # if the state does not clearly define a user goal, take a dialog action to move towards it
             if action is None:
                 dialog_action, dialog_action_args = self.policy.select_dialog_action(self.state)
-                print "Going to take action: ", str(dialog_action.name)
+                print "Going to take action: ", str(dialog_action)
                 if dialog_action not in self.dialog_actions:
                     sys.exit("ERROR: unrecognized dialog action '"+dialog_action+"' returned by policy for state "+str(self.state))
                 self.state.previous_action = [dialog_action, dialog_action_args]
