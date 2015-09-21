@@ -69,7 +69,7 @@ class KBGrounder:
 
         # leaf predicate/atom
         elif root.children is None:
-            print "Root is leaf predicate. Will return ", str([self.ontology.preds[root.idx]])
+            print "Root is leaf predicate"
             return [self.ontology.preds[root.idx]]
 
         # if type is predicate, ground arguments and evaluate
