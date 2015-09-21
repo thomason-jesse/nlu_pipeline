@@ -14,6 +14,8 @@ In a new tab, you can launch the whole system from your catkin_ws root with
 
 $ rosrun bwi_dialog test_pipeline.py [ontology text file] [lexicon text file] [training text file]
 
+rosrun bwi_dialog test_pipeline.py src/bwi_common/bwi_dialog/src/resources/asp_hri/ont.txt src/bwi_common/bwi_dialog/src/resources/asp_hri/lex.txt src/bwi_common/bwi_dialog/src/resources/asp_hri/utterance_action_pairs.txt 
+
 This will read in the ontology and the lexicon, then instantiate a feature extractor and linear learner for the parser. The parser is instantiated with all of these components, and a knowledge base grounder that communicates with ROS is instantiated given the ontology. A dialog agent is instantiated with this parser and grounder, as well as a static dialog policy. The parser is then trained using pairs of utterances with actions to be taken provided by the [training text file] parameter.
 
 The system will ask 'How can I help?' and run through the static policy dialog until an action is decided on. This action is printed to the screen and the initial inquiry is repeated. Typing 'stop' during this inquiry will exit the program.
