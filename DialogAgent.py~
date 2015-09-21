@@ -262,10 +262,10 @@ class DialogAgent:
             for arg in root.children:
                 print "In loop"
                 g = self.grounder.groundSemanticNode(arg, [], [], [])
-                print "Grounded"
+                print "Created semantic node for grounding"
                 # print "arg: "+str(g)  # DEBUG
                 answer = self.grounder.grounding_to_answer_set(g)
-                print "Interpreted grounding"
+                print "Performed grounding"
                 if len(answer) == 0:
                     print "Single answer found"
                     if action == "speak_t":
