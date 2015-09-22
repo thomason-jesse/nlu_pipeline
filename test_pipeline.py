@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 __author__ = 'jesse'
 
+import rospy
 import sys
 import Ontology
 import Lexicon
@@ -11,6 +12,7 @@ import Parser
 import Generator
 import DialogAgent
 import StaticDialogPolicy
+import ActionSender
 
 
 class InputFromKeyboard:
@@ -27,6 +29,9 @@ class OutputToStdout:
 
     def say(self, s):
         print "SYSTEM: "+s
+
+print "calling ROSpy init"
+rospy.init_node('test_NLU_pipeline')
 
 print "reading in Ontology"
 ont = Ontology.Ontology(sys.argv[1])
@@ -70,6 +75,19 @@ u_out = OutputToStdout()
 static_policy = StaticDialogPolicy.StaticDialogPolicy()
 A = DialogAgent.DialogAgent(parser, grounder, static_policy, u_in, u_out)
 
+print "instantiating ActionSender"
+action_sender = ActionSender.ActionSender(lex, generator, u_out)
+
+while True:
+    u_out.say("How can I help?")
+    s = raw_input()
+    if s == 'stop':
+        break
+    a = A.initiate_dialog_to_get_action(s)
+    print "ACTION: "+str(a)
+    r = action_sender.take_action(a)
+    print "RESULT: "+str(r)
+
 print "reading in data and training parser from actions"
 D = A.read_in_utterance_action_pairs(sys.argv[3])
 converged = A.train_parser_from_utterance_action_pairs(D, epochs=10, parse_beam=30)
@@ -82,6 +100,8 @@ while True:
         break
     a = A.initiate_dialog_to_get_action(s)
     print "ACTION: "+str(a)
+    r = action_sender.take_action(a)
+    print "RESULT: "+str(r)
 
 print "testing Generator:"
 while True:

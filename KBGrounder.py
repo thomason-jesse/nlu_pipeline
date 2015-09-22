@@ -9,9 +9,9 @@ from bwi_kr_execution.msg import *
 
 
 class KBGrounder:
+
     def __init__(self, ontology):
         self.ontology = ontology
-        pass
 
     def static_fact_query_client(self, req):
         rospy.wait_for_service('static_fact_query')
@@ -81,7 +81,16 @@ class KBGrounder:
                 if min([len(cg) for cg in child_grounds]) == 0: break  # unsatisfiable child(ren)
 
                 # if special predicate, handle here
-                if self.ontology.preds[root.idx] == 'and':
+                if self.ontology.preds[root.idx] == 'equals':
+                    to_match = child_grounds[0][child_ground_idx[0]][1]
+                    satisfied = None
+                    for i in range(1, len(root.children)):
+                        if to_match != child_grounds[i][child_ground_idx[i]][1]:
+                            satisfied = False
+                            break
+                    if satisfied is None:
+                        satisfied = True
+                elif self.ontology.preds[root.idx] == 'and':
                     satisfied = child_grounds[0][child_ground_idx[0]][1]
                     for i in range(1, len(root.children)):
                         if satisfied != child_grounds[i][child_ground_idx[i]][1]:

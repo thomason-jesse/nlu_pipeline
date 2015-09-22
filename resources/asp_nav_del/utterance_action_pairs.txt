@@ -1,11 +1,26 @@
-peter's office
-[[], 'l3_508']
+which is peter's office
+speak_e(l3_508)
 
 is ray a person
-[[], True]
+speak_t(True)
 
-the group
-[[], 'bwi']
+bring peter to ray
+bring(peter,ray)
 
-is
-[['peter', 'person'], True]; [['ray', 'person'], True]; [['dana', 'person'], True]; [['kazunori', 'person'], True]; [['matteo', 'person'], True]; [['shiqi', 'person'], True]; [['jivko', 'person'], True]; [['stacy', 'person'], True]; [['yuqian', 'person'], True]; [['max', 'person'], True]; [['pato', 'person'], True]; [['bwi', 'group'], True]; [['l3_516', 'room'], True]; [['l3_508', 'room'], True]; [['l3_512', 'room'], True]; [['l3_510', 'room'], True]; [['l3_402', 'room'], True]; [['l3_418', 'room'], True]; [['l3_420', 'room'], True]; [['l3_432', 'room'], True]; [['l3_502', 'room'], True]; [['l3_414b', 'room'], True]
+bring ray to peter
+bring(ray,peter)
+
+bring peter ray
+bring(ray,peter)
+
+bring ray peter
+bring(peter,ray)
+
+bring peter to is noise ray
+bring(peter,ray)
+
+is 3512 ray's office
+speak_t(True)
+
+walk to 3512
+at(l3_512)

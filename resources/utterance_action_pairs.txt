@@ -27,3 +27,27 @@ searchroom(ray,l3_432)
 
 is peter a room person
 speak_t(False)
+
+which is peter's office
+speak_e(l3_508)
+
+bring peter to ray
+bring(peter,ray)
+
+bring ray to peter
+bring(ray,peter)
+
+bring peter ray
+bring(ray,peter)
+
+bring ray peter
+bring(peter,ray)
+
+bring peter to is noise ray
+bring(peter,ray)
+
+is 3512 ray's office
+speak_t(True)
+
+walk to 3512
+at(l3_512)

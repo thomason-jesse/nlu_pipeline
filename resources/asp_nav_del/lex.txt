@@ -1,45 +1,72 @@
 #imperative
 bring :- M/N/N : lambda y:e.(lambda x:e.(bring(x, y)))
 bring :- M/PP/N : lambda x:e.(lambda y:e.(bring(x, y)))
-walk :- M/PP : lambda x:e.(walk(x))
+walk :- M/PP : lambda x:e.(at(x))
 
-#'to' as recipient argument of a command (eg. ``bring coffee to peter'')
+#prepositional arguments to commands
+for :- PP/N : lambda x:e.(x)
+of :- PP/N : lambda x:e.(x)
+in :- PP/N : lambda x:e.(x)
+about :- PP/N : lambda x:e.(x)
 to :- PP/N : lambda x:e.(x)
-
-#basic declarative constructions
-is :- D/N\N : lambda x:e.(lambda y:e.(declare_equal(x, y)))
-is :- D/(N/N)\N : lambda x:e.(lambda P:<e,t>.(declare_satpred(x, P)))
-is :- D/(N/N)\(N/N) : lambda P:<e,t>.(lambda Q:<e,t>.(declare_predimp(P, Q)))
 
 #confirmations
 yes :- C : yes
 no :- C : no
 
-#for "bob 's office"; "office of the chair"
-'s :- N/(N/N)\N : lambda x:e.(lambda P:<e,t>.(the(lambda y:e.(and(P(y), possesses(x, y))))))
-of :- N\(N/N)/N : lambda x:e.(lambda P:<e,t>.(lambda y:e.(and(P(y), possesses(x, y)))))
+#these are weird now bc there's some implicit knowledge in hasoffice that the second arg is an office
+'s office :- N\N : lambda x:e.(the(lambda y:e.(hasoffice(x,y))))
+office of :- N/N : lambda x:e.(lambda y:e.(hasoffice(x,y)))
 
-#known atoms
-peter :- N : peter
-ray :- N : ray
-3506 :- N : 3506
+#other interrogatives
+is :- M/I : lambda x:t.(speak_t(x))
+is :- M/DESC/N : lambda x:e.(lambda P:<e,t>.(speak_t(P(x))))
+is :- M/(N/N)/N : lambda x:e.(lambda P:<e,t>.(speak_t(P(x))))
+in :- I/N\N : lambda p:e.(lambda r:e.(inroom(p,r)))
+in :- I\N : lambda p:e.(inoffice(p))
+where is :- M/N : lambda x:e.(speak_e(x))
+who is :- M/N : lambda x:e.(speak_e(x))
+which is :- M/N : lambda x:e.(speak_e(x))
 
-#identifier predicates
-office :- N/N : lambda x:e.(office(x))
-object :- N/N : lambda x:e.(object(x))
-
-#adjectival predicates
-blue :- N/N : lambda x:e.(blue(x))
-yellow :- N/N : lambda x:e.(yellow(x))
-heavy :- N/N : lambda x:e.(heavy(x))
-light :- N/N : lambda x:e.(light(x))
+#entity descriptor words
+#can be type-raised to N/N : lambda x:e.(pred(x))
+room :- DESC : room
+person :- DESC : person
 
 #closed category
 and :- I/I\I : lambda x:t.(lambda y:t.(and(x,y)))
 or :- I/I\I : lambda x:t.(lambda y:t.(or(x,y)))
-and :- D/D\D : lambda x:d.(lambda y:d.(and_dec(x,y)))
-or :- N/N\N : lambda x:e.(lambda y:e.(or_e(x,y)))
-is :- I/N/N : lambda x:e.(lambda y:e.(equals(x,y)))
-is :- I/(N/N)/N : lambda x:e.(lambda P:<e,t>.(satpred(x,P)))
-is :- I/(N/N)/(N/N) : lambda P:<e,t>.(lambda Q:<e,t>.(predimp(P,Q)))
-the :- N/(N/N) : lambda P:<e,t>.(the(lambda x:e.(P(x))))
+not :- I/I : lambda x:t.(not(x))
+the :- N/DESC : lambda P:<e,t>.(the(lambda x:e.(P(x))))
+the :- N/N : lambda P:<e,t>.(the(P))
+the :- N/N : lambda x:e.(x)
+a :- N/DESC : lambda P:<e,t>.(a(lambda x:e.(P(x))))
+a :- DESC/DESC : lambda P:<e,t>.(P)
+a :- (N/N)/(N/N) : lambda P:<e,t>.(P)
+a :- N/N : lambda x:e.(x)
+
+#atoms
+peter :- N : peter
+ray :- N : ray
+dana :- N : dana
+kazunori :- N : kazunori
+matteo :- N : matteo
+shiqi :- N : shiqi
+jivko :- N : jivko
+stacy :- N : stacy
+yuqian :- N : yuqian
+max :- N : max
+pato :- N : pato
+bwi :- N : bwi
+bwi meeting :- N : bwi_m
+3516 :- N : l3_516
+3508 :- N : l3_508
+3512 :- N : l3_512
+3510 :- N : l3_510
+3402 :- N : l3_402
+3418 :- N : l3_418
+3420 :- N : l3_420
+3432 :- N : l3_432
+3502 :- N : l3_502
+3414b :- N : l3_414b
+coffee :- N : coffee
