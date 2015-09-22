@@ -24,12 +24,12 @@ class DialogAgent:
 
     # initiate a new dialog with the agent with initial utterance u
     def initiate_dialog_to_get_action(self, u):
-        print "Function call succeeded"         
+        # print "Function call succeeded"         
 
         self.state = StaticDialogState.StaticDialogState()
-        print "Created state"
+        # print "Created state"
         self.update_state_from_user_initiative(u)
-        print "Updated state"
+        # print "Updated state"
 
         # select next action from state
         action = None
@@ -40,7 +40,7 @@ class DialogAgent:
             # if the state does not clearly define a user goal, take a dialog action to move towards it
             if action is None:
                 dialog_action, dialog_action_args = self.policy.select_dialog_action(self.state)
-                print "Going to take action: ", str(dialog_action)
+                # print "Going to take action: ", str(dialog_action)
                 if dialog_action not in self.dialog_actions:
                     sys.exit("ERROR: unrecognized dialog action '"+dialog_action+"' returned by policy for state "+str(self.state))
                 self.state.previous_action = [dialog_action, dialog_action_args]
@@ -124,46 +124,46 @@ class DialogAgent:
 
     # update state after asking user-initiative (open-ended) question about user goal
     def update_state_from_user_initiative(self, u):
-        print "Inside update_state_from_user_initiative"
+        # print "Inside update_state_from_user_initiative"
         self.state.update_requested_user_turn()
 
         # get n best parses for utterance
         n_best_parses = self.parser.parse_expression(u, n=self.parse_depth)
-        print "Obtained parses"
+        # print "Obtained parses"
 
         # try to digest parses to action request
         success = False
         for i in range(0, len(n_best_parses)):
-            print "Digesting parse ", i
+            # print "Digesting parse ", i
             # print self.parser.print_parse(n_best_parses[i][0])  # DEBUG
             # print self.parser.print_semantic_parse_result(n_best_parses[i][1])  # DEBUG
             success = self.update_state_from_action_parse(n_best_parses[i][0])
             if success:
                 break
-        print "Finished trying to digest parses" 
+        # print "Finished trying to digest parses" 
 
         # no parses could be resolved into actions for state update
         if not success:
-            print "Has to recover from failed parse"
+            # print "Has to recover from failed parse"
             self.state.update_from_failed_parse()
 
     # get dialog state under assumption that utterance is an action
     def update_state_from_action_parse(self, p):
-        print "Inside update_state_from_action_parse"         
+        # print "Inside update_state_from_action_parse"         
 
         # get action, if any, from the given parse
         try:
             p_action = self.get_action_from_parse(p)
         except SystemError:
             p_action = None
-        print "Tried getting action from parse"
+        # print "Tried getting action from parse"
         if p_action is not None:
-            print "Going to update state from action"
+            # print "Going to update state from action"
             self.state.update_from_action(p_action, p)
             return True
 
         # if this failed, try again allowing missing lambdas to become UNK without token ties
-        print "Going to retry parsing"
+        # print "Going to retry parsing"
         UNK_root = copy.deepcopy(p)
         curr = UNK_root
         heading_lambdas = []
@@ -245,7 +245,7 @@ class DialogAgent:
         return False
 
     def get_action_from_parse(self, root):
-	print "Inside get_action_from_parse"
+	# print "Inside get_action_from_parse"
 
         # print "parse to get action from: " + self.parser.print_parse(root)  # DEBUG
 
@@ -258,16 +258,16 @@ class DialogAgent:
             action = self.parser.ontology.preds[root.idx]
             # print "action: "+action  # DEBUG
             g_args = []
-            print "Going to enter loop"
+            # print "Going to enter loop"
             for arg in root.children:
-                print "In loop"
+                # print "In loop"
                 g = self.grounder.groundSemanticNode(arg, [], [], [])
-                print "Grounded"
+                # print "Grounded"
                 # print "arg: "+str(g)  # DEBUG
                 answer = self.grounder.grounding_to_answer_set(g)
-                print "Interpreted grounding"
+                # print "Interpreted grounding"
                 if len(answer) == 0:
-                    print "Single answer found"
+                    # print "Single answer found"
                     if action == "speak_t":
                         g_args.append(False)
                     elif action == "speak_e":
@@ -277,7 +277,7 @@ class DialogAgent:
                 elif len(answer) > 1:
                     raise SystemError("multiple interpretations of action argument renders command ambiguous. arg: '"+str(answer)+"'")
                 else:
-                    print "No answer found"
+                    # print "No answer found"
                     if action == "speak_t":
                         g_args.append(True)
                     else:

@@ -32,13 +32,13 @@ class KBGrounder:
 
     # returns possible groundings for given semantic node
     def groundSemanticNode(self, root, lambda_names, lambda_types, lambda_assignments):
-        print "Inside groundSemanticNode"
+        # print "Inside groundSemanticNode"
         groundings = []
         # print "grounding "+str(root)+" with "+str(lambda_names)+","+str(lambda_types)+","+str(lambda_assignments) #DEBUG
 
         # if lambda, index and try assignments on children
         if root.is_lambda and root.is_lambda_instantiation:
-            print "Root is lambda"
+            # print "Root is lambda"
             new_names = lambda_names[:]
             new_names.append(root.lambda_name)
             new_types = lambda_types[:]
@@ -55,7 +55,7 @@ class KBGrounder:
 
         # if lambda instance, make given assignment and return
         elif root.is_lambda and not root.is_lambda_instantiation:
-            print "Root is lambda instance"
+            # print "Root is lambda instance"
             if root.children is None:  # lambda leaf
                 return [self.ontology.preds[lambda_assignments[lambda_names.index(root.lambda_name)]]]
             else:  # lambda predicate
@@ -69,12 +69,12 @@ class KBGrounder:
 
         # leaf predicate/atom
         elif root.children is None:
-            print "Root is leaf predicate. Will return ", str([self.ontology.preds[root.idx]])
+            # print "Root is leaf predicate. Will return ", str([self.ontology.preds[root.idx]])
             return [self.ontology.preds[root.idx]]
 
         # if type is predicate, ground arguments and evaluate
         else:
-            print "Root is predicate"
+            # print "Root is predicate"
             child_grounds = []
             for c in root.children:
                 child_grounds.append(self.groundSemanticNode(c, lambda_names, lambda_types, lambda_assignments))
