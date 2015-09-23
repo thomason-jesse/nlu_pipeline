@@ -25,10 +25,15 @@ class KBGrounder:
     # take in a semantic grounding list and return an answer set
     def grounding_to_answer_set(self, g):
         if type(g) is list:
-            if len(g) == 0: return []
-            if type(g[0]) is str: return g
+            if len(g) == 0:
+                return []
+            if type(g[0]) is str:
+                return g
+            if len(g) == 2 and type(g[0]) is list and type(g[1]) is str:
+                return g[1]
             return [gr[1] for gr in g]
-        else: return g
+        else:
+            return g
 
     # returns possible groundings for given semantic node
     def groundSemanticNode(self, root, lambda_names, lambda_types, lambda_assignments):
@@ -78,29 +83,31 @@ class KBGrounder:
             child_ground_idx = [0 for i in range(0, len(child_grounds))]
             while True:
 
-                if min([len(cg) for cg in child_grounds]) == 0: break  # unsatisfiable child(ren)
+                if min([len(cg) for cg in child_grounds]) == 0:
+                    break  # unsatisfiable child(ren)
 
                 # if special predicate, handle here
                 if self.ontology.preds[root.idx] == 'equals':
-                    to_match = child_grounds[0][child_ground_idx[0]][1]
+                    to_match = self.grounding_to_answer_set(child_grounds[0][child_ground_idx[0]])
                     satisfied = None
                     for i in range(1, len(root.children)):
-                        if to_match != child_grounds[i][child_ground_idx[i]][1]:
+                        child_to_match = self.grounding_to_answer_set(child_grounds[i][child_ground_idx[i]])
+                        if to_match != child_to_match:
                             satisfied = False
                             break
                     if satisfied is None:
                         satisfied = True
                 elif self.ontology.preds[root.idx] == 'and':
-                    satisfied = child_grounds[0][child_ground_idx[0]][1]
+                    satisfied = self.grounding_to_answer_set(child_grounds[0][child_ground_idx[0]])
                     for i in range(1, len(root.children)):
-                        if satisfied != child_grounds[i][child_ground_idx[i]][1]:
+                        if satisfied != self.grounding_to_answer_set(child_grounds[i][child_ground_idx[i]]):
                             satisfied = False
                             break
                 elif self.ontology.preds[root.idx] == 'or':
                     satisfied = False
                     for i in range(0, len(root.children)):
-                        if child_grounds[i][child_ground_idx[i]][1] is not False:
-                            satisfied = child_grounds[i][child_ground_idx[i]][1]
+                        if self.grounding_to_answer_set(child_grounds[i][child_ground_idx[i]]) is not False:
+                            satisfied = self.grounding_to_answer_set(child_grounds[i][child_ground_idx[i]])
                             break
                 elif self.ontology.preds[root.idx] == 'the':
                     # print "'the' child grounds to inspect: " + str(child_grounds[0][child_ground_idx[0]])  # DEBUG
