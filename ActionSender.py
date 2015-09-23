@@ -44,10 +44,10 @@ class ActionSender:
             if type(action.params[0]) is str:
                 s = action.params[0]
             elif action.params[0]:
-                s = "yes"
+                s = "C : yes"
             else:
-                s = "no"
-            form = self.lexicon.read_semantic_form_from_str(s, None, None, [])
+                s = "C : no"
+            cat_idx, form = self.lexicon.read_syn_sem(s)
             to_say = self.generator.reverse_parse_semantic_form(form, k=3, n=1)
             if len(to_say) > 0:
                 self.output.say(" ".join(to_say[0][0]))

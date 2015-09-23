@@ -471,7 +471,7 @@ class Parser:
     def create_unk_node(self):
         unk = SemanticNode.SemanticNode(None, None, None, False, idx=self.ontology.preds.index('UNK_E'))
         unk.type = self.ontology.types.index('e')
-        unk.category = self.lexicon.categories.index('N')
+        unk.set_category(self.lexicon.categories.index('N'))
         unk.set_return_type(self.ontology)
         return unk
 
@@ -482,11 +482,11 @@ class Parser:
         child_pred.children = [
             SemanticNode.SemanticNode(child_pred, self.ontology.types.index('e'), self.lexicon.categories.index('N'),
                                       is_lambda=True, lambda_name=1, is_lambda_instantiation=False)]
-        child_pred.category = self.lexicon.categories.index('N')  # change from DESC return type
+        child_pred.set_category(self.lexicon.categories.index('N'))  # change from DESC return type
         raised = SemanticNode.SemanticNode(None, None, None, True, lambda_name=1, is_lambda_instantiation=True)
         raised.type = self.ontology.types.index('e')
-        raised.category = self.lexicon.categories.index(
-            [self.lexicon.categories.index('N'), 1, self.lexicon.categories.index('N')])
+        raised.set_category(self.lexicon.categories.index(
+            [self.lexicon.categories.index('N'), 1, self.lexicon.categories.index('N')]))
         raised.children = [child_pred]
         raised.set_return_type(self.ontology)
         # print "performed adjectival raise with '"+self.print_parse(A,True)+"' to form '"+self.print_parse(raised,True)+"'" #DEBUG
@@ -509,7 +509,7 @@ class Parser:
 
         if A.is_lambda_instantiation:
             A_B_merged = copy.deepcopy(A)
-            A_B_merged.category = A.category
+            A_B_merged.set_category(A.category)
             innermost_outer_lambda = A_B_merged
             A_child = A.children[0]
             B_child = B.children[0]
@@ -631,7 +631,7 @@ class Parser:
                     else:
                         sys.exit("Error: incompatible parentless, childed node A with childed node B")
                     entire_replacement = True
-                    curr.category = self.lexicon.categories[A.category][0]  # take on return type of A
+                    curr.set_category(self.lexicon.categories[A.category][0])  # take on return type of A
                     curr.set_return_type(self.ontology)
                 else:
                     for curr_parent_matching_idx in range(0, len(curr.parent.children)):
@@ -662,7 +662,7 @@ class Parser:
             if not entire_replacement and curr.children is not None: to_traverse.extend([[c, deepest_lambda] for c in curr.children])
         self.renumerate_lambdas(A_FA_B, [])
         A_FA_B.set_return_type(self.ontology)
-        A_FA_B.category = self.lexicon.categories[A.category][0]
+        A_FA_B.set_category(self.lexicon.categories[A.category][0])
         # print "performed FA with '"+self.print_parse(A,True)+"' taking '"+self.print_parse(B,True)+"' to form '"+self.print_parse(A_FA_B,True)+"'" #DEBUG
         return A_FA_B
 

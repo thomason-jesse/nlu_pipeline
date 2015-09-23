@@ -18,6 +18,15 @@ class SemanticNode:
         self.is_lambda_instantiation = is_lambda_instantiation
         self.children = children
         self.return_type = None
+        self.categories_used = []
+        if self.idx is not None:
+            self.categories_used.append(self.idx)
+
+    # set the category and update categories used structure
+    def set_category(self, idx):
+        self.category = idx
+        if idx not in self.categories_used:
+            self.categories_used.append(idx)
 
     # return own type if no children; output expected return value if children match; error out otherwise
     def set_return_type(self, ontology):

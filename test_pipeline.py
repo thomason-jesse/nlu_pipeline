@@ -65,7 +65,7 @@ while True:
     s = raw_input()
     if s == 'stop':
         break
-    form = lex.read_semantic_form_from_str(s, None, None, [])
+    _, form = lex.read_syn_sem(s)
     token_responses = generator.reverse_parse_semantic_form(form, k=3, n=1)
     print "token responses: "+str(token_responses)
 
@@ -108,6 +108,6 @@ while True:
     s = raw_input()
     if s == 'stop':
         break
-    form = lex.read_semantic_form_from_str(s, None, None, [])
-    token_responses = generator.reverse_parse_semantic_form(form, k=3, n=3)
+    _, form = lex.read_syn_sem(s)
+    token_responses = generator.reverse_parse_semantic_form(form, k=3, n=1)
     print "token responses: "+str(token_responses)

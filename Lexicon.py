@@ -13,12 +13,14 @@ class Lexicon:
         self.reverse_entries = {}
         self.sem_form_expected_args = None
         self.sem_form_return_cat = None
+        self.category_consumes = None
         self.update_support_structures()
 
     def update_support_structures(self):
         self.compute_reverse_entries(self.reverse_entries)
         self.sem_form_expected_args = [self.calc_exp_args(i) for i in range(0, len(self.semantic_forms))]
         self.sem_form_return_cat = [self.calc_return_cat(i) for i in range(0, len(self.semantic_forms))]
+        self.category_consumes = [self.find_consumables_for_cat(i) for i in range(0, len(self.categories))]
 
     def compute_reverse_entries(self, r):
         for sur_idx in range(0, len(self.surface_forms)):
@@ -49,6 +51,20 @@ class Lexicon:
             curr_cat = self.categories[curr_cat][0]
         return curr_cat
 
+    def find_consumables_for_cat(self, idx):
+        consumables = []
+        for sem_form in self.semantic_forms:
+            curr = self.categories[sem_form.category]
+            while type(curr) is list and type(self.categories[curr[0]]):
+                if curr[0] == idx:
+                    break
+                curr = self.categories[curr[0]]
+            if curr[0] == idx:
+                cons = [curr[1], curr[2]]
+                if cons not in consumables:
+                    consumables.append(cons)  # store both direction and consumable category
+        return consumables
+
     def get_or_add_category(self, c):
         if c in self.categories:
             return self.categories.index(c)
@@ -56,8 +72,10 @@ class Lexicon:
         return len(self.categories) - 1
 
     def compose_str_from_category(self, idx):
-        if idx is None: return "NONE IDX"
-        if type(self.categories[idx]) is str: return self.categories[idx]
+        if idx is None:
+            return "NONE IDX"
+        if type(self.categories[idx]) is str:
+            return self.categories[idx]
         s = self.compose_str_from_category(self.categories[idx][0])
         if type(self.categories[self.categories[idx][0]]) is not str: s = '(' + s + ')'
         if self.categories[idx][1] == 0:
@@ -118,9 +136,7 @@ class Lexicon:
                 surface_forms.append(surface_form)
                 entries.append([])
 
-            rlhs, rrhs = rhs.split(" : ")
-            cat_idx = self.read_category_from_str(rlhs.strip())
-            semantic_form = self.read_semantic_form_from_str(rrhs.strip(), cat_idx, None, [])
+            cat_idx, semantic_form = self.read_syn_sem(rhs)
             try:
                 sem_idx = semantic_forms.index(semantic_form)
             except ValueError:
@@ -133,6 +149,12 @@ class Lexicon:
                     pred_to_surface[pred].append(sur_idx)
                 else:
                     pred_to_surface[pred] = [sur_idx]
+
+    def read_syn_sem(self, s):
+        lhs, rhs = s.split(" : ")
+        cat_idx = self.read_category_from_str(lhs.strip())
+        semantic_form = self.read_semantic_form_from_str(rhs.strip(), cat_idx, None, [])
+        return cat_idx, semantic_form
 
     def get_all_preds_from_semantic_form(self, node):
         node_preds = []

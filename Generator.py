@@ -54,7 +54,7 @@ class Generator:
     def get_tokens_for_semantic_node(self, n):
         tokens = []
         for sem_idx in range(0, len(self.lexicon.semantic_forms)):
-            if n.equal_ignoring_syntax(self.lexicon.semantic_forms[sem_idx]):
+            if n.__eq__(self.lexicon.semantic_forms[sem_idx]):
                 tokens.extend([
                     [sem_idx, self.lexicon.surface_forms[i]]
                     for i in self.lexicon.reverse_entries[sem_idx]])
@@ -142,7 +142,7 @@ class Generator:
         if k is None:
             k = self.beam_width
         num_preds = self.count_preds_in_semantic_form(root)
-        iterations_limit = max([100, math.sqrt(int(math.factorial(num_preds)))])
+        iterations_limit = max([100, int(math.factorial(num_preds))])
 
         full_parses = []
         partial_parses = [[[root], [None, False]]]  # set of partials, parse bracketing
@@ -154,11 +154,11 @@ class Generator:
             # print "num full parses: "+str(len(full_parses))  # DEBUG
 
             # find best scoring partial and expand it
-            scores = [self.score_top_down_partial(pp[0]) for pp in partial_parses]  # use in-house heuristic
+            scores = [self.score_parse(pp) for pp in partial_parses]
             max_score_idx = scores.index(max(scores))
-            # print "max scoring parse "+str([
-            #     self.print_parse(p) for p in partial_parses[max_score_idx][0]]) +\
-            #     ", " + str(scores[max_score_idx])  # DEBUG
+            print "max scoring parse "+str([
+                self.parser.print_parse(p) for p in partial_parses[max_score_idx][0]]) +\
+                ", " + str(scores[max_score_idx])  # DEBUG
 
             # if partial token sequence matches its size, the parse is finished
             possible_assignments = self.assign_tokens_to_partial(
@@ -180,7 +180,7 @@ class Generator:
                 new_partials = [[cpp, cpsp] for [cpp, cpsp] in
                                 self.expand_partial_parse(partial_parses[max_score_idx])]
                 # score new parses and add to partials / full where appropriate
-                new_partials_scores = [self.learner.scoreParse([], npp) for npp in new_partials]
+                new_partials_scores = [self.score_parse(npp) for npp in new_partials]
                 new_partials_beam_size = 0
                 while new_partials_beam_size < k and len(new_partials) > 0:
                     max_new_score_idx = new_partials_scores.index(max(new_partials_scores))
@@ -200,11 +200,14 @@ class Generator:
             del partial_parses[max_score_idx]
             del scores[max_score_idx]
 
+            # print "bad nodes: "+str([self.parser.print_parse(bn) for bn in self.bad_nodes])  # DEBUG
+
         if iterations >= iterations_limit:
             print "WARNING: exceeded iterations limit "+str(iterations_limit)
 
-        # score full parses and return n best in order according to in-house scoring heuristic
-        full_parse_scores = [self.score_top_down_partial(fp[0]) for fp in full_parses]
+        # score full parses and return n best in order
+        full_parse_scores = [self.learner.scoreParse(
+            self.extract_token_sequence_from_bracketing(fp[1]), fp) for fp in full_parses]
         n_best = []
         while len(n_best) < n and len(full_parses) > 0:
             max_score_idx = full_parse_scores.index(max(full_parse_scores))
@@ -215,14 +218,15 @@ class Generator:
             del full_parse_scores[max_score_idx]
         return n_best
 
-    # in-house heuristic to guide search; rewards parses for node brevity and a high ratio of assignable leaves
-    def score_top_down_partial(self, partial):
-        token_score = 0
-        for p in partial:
-            num_t = len(self.get_tokens_for_semantic_node(p))
-            if num_t > 0:
-                token_score += 1/float(num_t)
-        return token_score/float(len(partial)) - math.sqrt(len(partial))
+    # score a partial parse as the average score of its possible token assignments
+    def score_parse(self, p):
+        possible_token_assignments = self.assign_tokens_to_partial(p[0], p[1])
+        sequences = []
+        for pta in possible_token_assignments:
+            sequences.append(self.extract_token_sequence_from_bracketing(pta, preserve_False=True))
+        if len(sequences) == 0:
+            sequences.append([])
+        return sum([self.learner.scoreParse(ts, p) for ts in sequences]) / float(len(sequences))
 
     # given partial parse
     # decompose via function application (forwards and backwards), type-raising, and merge operations
@@ -238,15 +242,15 @@ class Generator:
 
             # try reverse FA
             split_subtrees = self.perform_reverse_fa(partial[i])
-            possible_splits.extend([[i, ss[0], ss[1], None] for ss in split_subtrees])
+            possible_splits.extend([[i, ss[0], ss[2], None, ss[1]] for ss in split_subtrees])
             # try merge split
             if self.can_perform_split(partial[i]):
                 ss = self.perform_split(partial[i])
-                possible_splits.append([i, ss[0], ss[1], None])
+                possible_splits.append([i, ss[0], ss[1], None, 1])
             # try type lowering on i
             if self.can_perform_type_lowering(partial[i]) == "N/N->DESC":
                 ls = self.perform_adjectival_type_lower(partial[i])
-                possible_splits.append([i, ls, False, None])
+                possible_splits.append([i, ls, False, None, 1])
 
             # check whether this is a bad node
             if orig_num_splits == len(possible_splits):  # cannot be further expanded
@@ -262,7 +266,7 @@ class Generator:
             # add source of these nodes to bad nodes list if they are both bad
             bad = [False, False]
             for split_idx in range(1, 3):
-                if split[split_idx] in self.bad_nodes:
+                if split[split_idx] in self.bad_nodes or not split[split_idx]:
                     bad[split_idx-1] = True
             if True in bad:
                 if bad[0] and bad[1]:
@@ -273,7 +277,10 @@ class Generator:
             # perform splitting and add to return structure
             expanded_partial = partial[:split[0]]
             if split[2] is not False:
-                expanded_partial.extend([split[1], split[2]])
+                if split[4] == 1:
+                    expanded_partial.extend([split[1], split[2]])
+                elif split[4] == 0:
+                    expanded_partial.extend([split[2], split[1]])
             else:
                 expanded_partial.append(split[1])
             expanded_partial.extend(partial[split[0] + 1:])
@@ -295,10 +302,10 @@ class Generator:
                         curr[0] = split[3]
                         curr[1] = [False, False]
                     leaves_seen += 1
-            # print "expanded partial: "+str([self.parser.print_parse(p) for p in expanded_partial])  # DEBUG
+            # print "expanded partial: "+str([self.parser.print_parse(p,True) for p in expanded_partial])  # DEBUG
             expanded_partials.append([expanded_partial, expanded_tree])
         # print "num expanded partials: "+str(len(expanded_partials))  # DEBUG
-        # empty = raw_input()
+        # empty = raw_input()  # DEBUG
         return expanded_partials
 
     # return N/N : lambda x.(pred(x)) lowered to DESC : pred
@@ -306,11 +313,11 @@ class Generator:
         # print "performing adjectival lower with '"+self.parser.print_parse(A,True)+"'" #DEBUG
         pred = copy.deepcopy(A.children[0])
         pred.children = None
-        pred.category = self.lexicon.categories.index('DESC')  # change from DESC return type
+        pred.set_category(self.lexicon.categories.index('DESC'))  # change from DESC return type
         pred.type = self.ontology.types.index([
             self.ontology.types.index('e'), self.ontology.types.index('t')])
         pred.set_return_type(self.ontology)
-        # print "performed adjectival lower with '"+self.parser.print_parse(A,True)+"' to form '"+self.pasrer.print_parse(pred,True)+"'" #DEBUG
+        # print "performed adjectival lower with '"+self.parser.print_parse(A,True)+"' to form '"+self.parser.print_parse(pred,True)+"'" #DEBUG
         return pred
 
     # return true if A is a candidate for type-raising
@@ -318,7 +325,7 @@ class Generator:
         if 'DESC' not in self.lexicon.categories or A is None:
             return False
         # check for N/N : lambda x.(pred(x)) -> DESC : pred lower
-        # because we don't track categories, must see whether DESC : pred is a leaf-level entry in lexicon
+        # must see whether DESC : pred is a leaf-level entry in lexicon to know whether it can be raised
         if (A.is_lambda_instantiation and A.children is not None and len(A.children) == 1 and
                 A.children[0].idx is not None and A.children[0].children is not None and
                 len(A.children[0].children) == 1 and
@@ -350,6 +357,7 @@ class Generator:
                 parent.children = [copy.deepcopy(curr.children[idx])]
             else:
                 to_return[-1] = copy.deepcopy(curr.children[idx])
+            to_return[-1].set_category(AB.category)
             to_return[-1].set_return_type(self.ontology)
 
         # print "performed Split with '"+self.parser.print_parse(AB,True)+"' to form '"+self.parser.print_parse(to_return[0],True)+"', '"+self.parser.print_parse(to_return[1],True)+"'" #DEBUG
@@ -380,6 +388,11 @@ class Generator:
         candidate_pairs = []
         to_examine = [A]
         deepest_lambda = 0
+        consumables = self.lexicon.category_consumes[A.category]
+        # print "consumables "+self.lexicon.compose_str_from_category(A.category)+": "+\
+        #     str([self.lexicon.compose_str_from_category(c) for d, c in consumables])  # DEBUG
+        if len(consumables) == 0:
+            return []  # no known production yields this category, so it cannot be split
         while len(to_examine) > 0:
             curr = to_examine.pop()
             if curr.is_lambda_instantiation:
@@ -483,8 +496,13 @@ class Generator:
                             self.ontology.types.append(full_type)
                         A2.type = self.ontology.types.index(full_type)
                         A2.set_return_type(self.ontology)
-                    candidate_pairs.append([A1, A2])
-                    # print "produced: "+self.parser.print_parse(A1)+" consuming "+self.parser.print_parse(A2)+" with params "+",".join([str(lambda_type),str(preserve_host_children),str(aa)])  # DEBUG
+                    for dir, cat in consumables:
+                        A1_with_cat = copy.deepcopy(A1)
+                        A1_with_cat.set_category(self.lexicon.categories.index([A.category, dir, cat]))
+                        A2_with_cat = copy.deepcopy(A2)
+                        A2_with_cat.set_category(cat)
+                        candidate_pairs.append([A1_with_cat, dir, A2_with_cat])
+                        # print "produced: "+self.parser.print_parse(A1_with_cat,True)+" consuming "+self.parser.print_parse(A2_with_cat,True)+" in dir "+str(dir)+" with params "+",".join([str(lambda_type),str(preserve_host_children),str(aa)])  # DEBUG
 
         return candidate_pairs
 
