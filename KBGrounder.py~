@@ -132,7 +132,7 @@ class KBGrounder:
                     req.facts.append(a)
                     try:
                         res = self.static_fact_query_client(req)
-                        #print "KB request: "+str(req)+"\nsatisfied: "+str(res.satisfied)  # DEBUG
+                        print "KB request: "+str(req)+"\nsatisfied: "+str(res.satisfied)  # DEBUG
                     except genpy.message.SerializationError:
                         sys.exit("Invoked ROS KB with unknown predicate or parameters: \n" + str(req))
                         # + "\n"+"\n".join([str(child_grounds), str(child_ground_idx), str(root.children)]))

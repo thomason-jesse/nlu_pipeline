@@ -8,9 +8,6 @@ and launching the simulator
 
 $ roslaunch bwi_launch simulation.launch
 
-	You don't actually need the simulator. the KR node is enough. It can be launched using - 
-	roslaunch bwi_kr_execution bwi_kr_execution.launch --screen
-
 The simulator has to be launched to access the ASP knowledge base used to ground predicates such as person(ray)
 
 In a new tab, you can launch the whole system from your catkin_ws root with
