@@ -13,7 +13,8 @@ import Generator
 import DialogAgent
 import StaticDialogPolicy
 import ActionSender
-
+import pygame
+import threading
 
 class InputFromKeyboard:
     def __init__(self):
@@ -22,6 +23,86 @@ class InputFromKeyboard:
     def get(self):
         return raw_input()
 
+class InputFromSpeech:
+    def __init__(self):
+        import ctypes
+
+        if True: #TODO Allow path specification is None:
+            self.libHandle = ctypes.CDLL("./src/bwi_common/bwi_dialogue/src/nlu_pipeline/speech/speechRecognizer.so")
+        else:
+            self.libHandle = ctypes.CDLL(path)
+
+    def get(self):
+        result =  self.getHypString(self.getNBest(1)[0])
+
+        print result
+
+        return result
+
+    def record(self):
+        self.libHandle.record1600Hz("voice.raw"); 
+
+    def recordToggle(self):
+        #Initializes pygame window to read spacebar presses. 
+        pygame.init()
+        pygame.display.set_mode((1,1))
+
+        running = True
+
+        print "Press [SPACEBAR] to record"
+
+        while running:
+            pygame.event.pump()
+            keys = pygame.key.get_pressed()
+
+            if keys[pygame.K_SPACE]:
+                print "Recording"
+
+                #Starts recording from mic to file. 
+                self.libHandle.startRecord()
+
+                #Loops while user is holding space bar. 
+                while keys[pygame.K_SPACE]:
+                    pygame.event.pump()
+                    keys = pygame.key.get_pressed()
+
+                #Stops recording when they release it. 
+                self.libHandle.stopRecord()
+
+                running = False
+            
+        pygame.quit()
+
+    def getNBest(self, n):
+
+        #Creates threads for recording. 
+        thread1 = threading.Thread(target = self.record)
+        thread2 = threading.Thread(target = self.recordToggle)
+
+        #Starts thread execution. 
+        thread1.start()
+        thread2.start()
+
+        #Waits for recording threads to finish. 
+        thread1.join()
+        thread2.join()
+
+        print "Recognizing..."
+
+        #Attempts to recognize recording. 
+        self.libHandle.sphinx_n_best("voice.raw", n)
+
+        #Opens up results to begin reading from them. 
+        results = open("results.txt", "r")
+
+        #Makes a list of each hypothesis, containing string, confidence, etc.
+        resultList = [line.strip('\n') for line in results]
+        hypotheses = [result.split(":") for result in resultList]
+
+        return hypotheses
+
+    def getHypString(self, hypothesis):
+        return hypothesis[0]
 
 class OutputToStdout:
     def __init__(self):
@@ -70,7 +151,7 @@ while True:
     print "token responses: "+str(token_responses)
 
 print "instantiating DialogAgent"
-u_in = InputFromKeyboard()
+u_in = InputFromSpeech()
 u_out = OutputToStdout()
 static_policy = StaticDialogPolicy.StaticDialogPolicy()
 A = DialogAgent.DialogAgent(parser, grounder, static_policy, u_in, u_out)
@@ -80,7 +161,7 @@ action_sender = ActionSender.ActionSender(lex, generator, u_out)
 
 while True:
     u_out.say("How can I help?")
-    s = raw_input()
+    s = u_in.get()
     if s == 'stop':
         break
     a = A.initiate_dialog_to_get_action(s)
@@ -95,7 +176,7 @@ print "theta: "+str(parser.learner.theta)
 
 while True:
     u_out.say("How can I help?")
-    s = raw_input()
+    s = u_in.get()
     if s == 'stop':
         break
     a = A.initiate_dialog_to_get_action(s)
@@ -105,7 +186,7 @@ while True:
 
 print "testing Generator:"
 while True:
-    s = raw_input()
+    s = u_in.get()
     if s == 'stop':
         break
     _, form = lex.read_syn_sem(s)
