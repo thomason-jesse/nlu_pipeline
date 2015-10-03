@@ -45,7 +45,7 @@ while i < len(f_lines):
     k_best = parser.parse_expression(u, n=100)
     print "k_best = " + str(k_best)
     g = []
-    for [p, spr, s] in k_best:
+    for [p, spr, trace, s] in k_best:
         print str(s) + ":\nparse: " + parser.print_parse(p)
         print "Parse Tree:\n" + parser.print_semantic_parse_result(spr) + "\n"
         print "running grounder on parse..."

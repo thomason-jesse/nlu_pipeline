@@ -42,7 +42,7 @@ class ActionSender:
         # if action is speaking, use generator to reply
         if action.name == "speak_t" or action.name == "speak_e":
             if type(action.params[0]) is str:
-                s = action.params[0]
+                s = "N : "+str(action.params[0])
             elif action.params[0]:
                 s = "C : yes"
             else:

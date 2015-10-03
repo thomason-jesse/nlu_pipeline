@@ -7,17 +7,19 @@ import SemanticNode
 
 
 class Generator:
-    def __init__(self, ont, lex, learner, parser, beam_width=10):
+    def __init__(self, ont, lex, learner, parser, beam_width=10, linear_iter_adjust=1):
         self.ontology = ont
         self.lexicon = lex
         self.learner = learner
         self.parser = parser
         self.beam_width = beam_width
+        self.linear_iter_adjust = linear_iter_adjust
         self.bad_nodes = []  # nodes for which we know there are no tokens and no expansions
         self.known_terminals = []  # nodes that can't be further expanded
 
     # flush bad nodes structure whenever lexicon additions happen
     def flush_bad_nodes(self):
+        print "WARNING: FLUSHING BAD NODES"  # DEBUG
         self.bad_nodes = []
 
     # given bracketing, return sequence of tokens
@@ -105,29 +107,40 @@ class Generator:
     # fewer than k returned if fewer than k explanatory tokens could be found
     # this function first reverse-parses the given root to come up with up to k sequences, then
     # runs the parser on those sequences to generate and return up to n best according to parse scores
-    def reverse_parse_semantic_form(self, root, k=None, n=1):
+    def reverse_parse_semantic_form(self, root, k=None, c=10, n=1):
         if k is None:
             k = self.beam_width
-        candidate_sequences = self.get_token_sequences_for_semantic_form(root, n=k)
+        if self.lexicon.generator_should_flush:
+            self.flush_bad_nodes()
+            self.lexicon.generator_should_flush = False
+        candidate_sequences = self.get_token_sequences_for_semantic_form(root, k=k, n=c)
         trees = []
+        traces = []
         scores = []
-        for tokens in candidate_sequences:
+        for cand_idx in range(0, len(candidate_sequences)):
+            tokens = candidate_sequences[cand_idx]
             tree = None
-            score = None
-            parses = self.parser.parse_tokens(tokens)
+            trace = None
+            score = -sys.maxint
+            parses = self.parser.parse_expression(' '.join(tokens))
             # parses ordered by decreasing score, so first to match is best
             for parse in parses:
                 if parse[0].equal_ignoring_syntax(root):
                     tree = parse[1]
-                    score = parse[2]
+                    trace = parse[2]
+                    score = parse[3]
                     break
             trees.append(tree)
+            traces.append(trace)
             scores.append(score)
         n_best = []
         while len(n_best) < n and len(candidate_sequences) > 0:
             max_score_idx = scores.index(max(scores))
             if trees[max_score_idx] is not None:
-                n_best.append([candidate_sequences[max_score_idx], trees[max_score_idx], scores[max_score_idx]])
+                n_best.append([candidate_sequences[max_score_idx],      # the token sequence chosen
+                               trees[max_score_idx],                    # the parse tree by parser
+                               traces[max_score_idx],                   # the parse history by parser
+                               scores[max_score_idx]])                  # the score from the parser
             else:
                 print "WARNING: sequence " + str(candidate_sequences[max_score_idx]) +\
                       " was generated but does not parse into expected root"
@@ -141,11 +154,13 @@ class Generator:
     def get_token_sequences_for_semantic_form(self, root, k=None, n=1):
         if k is None:
             k = self.beam_width
+        print "generator k: "+str(k)  # DEBUG
         num_preds = self.count_preds_in_semantic_form(root)
-        iterations_limit = max([100, int(math.factorial(num_preds))])
+        iterations_limit = self.linear_iter_adjust * max([100, int(math.factorial(num_preds))])
 
         full_parses = []
-        partial_parses = [[[root], [None, False]]]  # set of partials, parse bracketing
+        partial_parses = [[[root], [None, False]]]  # set of partials, parse bracketing, idx of previous
+        scores = [self.score_parse(pp) for pp in partial_parses]
         iterations = 0
         while (len(full_parses) < n and len(partial_parses) > 0 and
                 iterations < iterations_limit*(1+len(full_parses))):
@@ -154,11 +169,11 @@ class Generator:
             # print "num full parses: "+str(len(full_parses))  # DEBUG
 
             # find best scoring partial and expand it
-            scores = [self.score_parse(pp) for pp in partial_parses]
             max_score_idx = scores.index(max(scores))
-            print "max scoring parse "+str([
-                self.parser.print_parse(p) for p in partial_parses[max_score_idx][0]]) +\
-                ", " + str(scores[max_score_idx])  # DEBUG
+            # print "max scoring parse "+str([
+            #     self.parser.print_parse(p, True) for p in partial_parses[max_score_idx][0]]) +\
+            #     ", " + str(scores[max_score_idx])  # DEBUG
+            # _ = raw_input()  # DEBUG
 
             # if partial token sequence matches its size, the parse is finished
             possible_assignments = self.assign_tokens_to_partial(
@@ -194,6 +209,8 @@ class Generator:
                         partial_parses.append(new_partials[max_new_score_idx])
                         scores.append(new_partials_scores[max_new_score_idx])
                         new_partials_beam_size += 1
+                    # print "chosen new partial: "+str([
+                    #     self.parser.print_parse(p,True) for p in new_partials[max_new_score_idx][0]])  # DEBUG
                     del new_partials[max_new_score_idx]
                     del new_partials_scores[max_new_score_idx]
             # remove from partials list so we don't waste time expanding again
@@ -202,12 +219,14 @@ class Generator:
 
             # print "bad nodes: "+str([self.parser.print_parse(bn) for bn in self.bad_nodes])  # DEBUG
 
-        if iterations >= iterations_limit:
-            print "WARNING: exceeded iterations limit "+str(iterations_limit)
+        # if len(full_parses) < n:
+        #     print "WARNING: exceeded generator iterations limit "+str(iterations_limit)+" for parse "+\
+        #         self.parser.print_parse(root)+" with only "+str(len(full_parses))+"/"+str(n)+" candidates"
 
         # score full parses and return n best in order
-        full_parse_scores = [self.learner.scoreParse(
-            self.extract_token_sequence_from_bracketing(fp[1]), fp) for fp in full_parses]
+        full_parse_scores = [self.learner.score_parse(
+            self.extract_token_sequence_from_bracketing(
+                fp[1]), [fp[0], fp[1], None]) for fp in full_parses]  # don't use history during generation
         n_best = []
         while len(n_best) < n and len(full_parses) > 0:
             max_score_idx = full_parse_scores.index(max(full_parse_scores))
@@ -219,6 +238,8 @@ class Generator:
         return n_best
 
     # score a partial parse as the average score of its possible token assignments
+    # linearly interpolate this score with an in-house metric that encourages expanding
+    # non-explosive parts of the space
     def score_parse(self, p):
         possible_token_assignments = self.assign_tokens_to_partial(p[0], p[1])
         sequences = []
@@ -226,7 +247,12 @@ class Generator:
             sequences.append(self.extract_token_sequence_from_bracketing(pta, preserve_False=True))
         if len(sequences) == 0:
             sequences.append([])
-        return sum([self.learner.scoreParse(ts, p) for ts in sequences]) / float(len(sequences))
+        avg_score = sum([self.learner.score_parse(
+            ts, [p[0], p[1], None]) for ts in sequences]) / float(len(sequences)) # don't use history during generation
+        return (0.5 * avg_score) + (0.5 * self.score_parse_size(p))
+
+    def score_parse_size(self, p):
+        return 1.0 / math.sqrt(len(p[0]))
 
     # given partial parse
     # decompose via function application (forwards and backwards), type-raising, and merge operations
@@ -272,6 +298,39 @@ class Generator:
                 if bad[0] and bad[1]:
                     if partial[split[0]] not in self.bad_nodes:
                         self.bad_nodes.append(partial[split[0]])
+                continue
+
+            # disallow forming triples
+            found_triple = False
+            offset_sets = [range(-2, 1), range(0, 3)]
+            for offset_set_idx in range(0, 2):
+                offset_set = offset_sets[offset_set_idx]
+                candidate = None
+                triple = True
+                for offset in offset_set:
+                    idx = split[0]+offset
+                    if idx < 0 or idx >= len(partial):
+                        triple = False
+                        break
+                    if offset == 0:
+                        if (split[4] == 1 and offset_set_idx == 0) or (split[4] == 0 and offset_set_idx == 1):
+                            to_match = split[1]
+                        elif (split[4] == 1 and offset_set_idx == 1) or (split[4] == 0 and offset_set_idx == 0):
+                            to_match = split[2]
+                    else:
+                        to_match = partial[idx]
+                    if to_match is None:
+                        triple = False
+                        break
+                    elif candidate is None:
+                        candidate = to_match
+                    elif not candidate.__eq__(to_match):
+                        triple = False
+                        break
+                if triple:
+                    found_triple = True
+                    break
+            if found_triple:
                 continue
 
             # perform splitting and add to return structure

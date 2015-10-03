@@ -10,6 +10,7 @@ import FeatureExtractor
 import LinearLearner
 import KBGrounder
 import Parser
+import Generator
 import DialogAgent
 
 print "reading in Ontology"
@@ -37,8 +38,11 @@ grounder = KBGrounder.KBGrounder(ont)
 print "instantiating Parser"
 parser = Parser.Parser(ont, lex, learner, grounder, beam_width=10)
 
+print "instantiating Generator"
+generator = Generator.Generator(ont, lex, learner, parser, beam_width=100)
+
 print "instantiating DialogAgent"
-A = DialogAgent.DialogAgent(parser, grounder, None, None, None)
+A = DialogAgent.DialogAgent(parser, generator, grounder, None, None, None)
 
 print "reading in data and training parser from actions"
 D = A.read_in_utterance_action_pairs(sys.argv[3])

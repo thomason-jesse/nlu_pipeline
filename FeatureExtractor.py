@@ -1,5 +1,7 @@
 __author__ = 'jesse'
 
+import sys
+
 
 class FeatureExtractor:
     def __init__(self, ont, lex):
@@ -34,71 +36,132 @@ class FeatureExtractor:
                     if psc is not False:  # in generation, can have None child that hasn't been expanded/matched yet
                         self.read_parse_structure_to_token_assignments(t, ta, psc)
 
+    # treats history as a bag of unordered partial trees, extracts and normalizes features over this whole bag
     def extract_feature_map(self, tokens, parse, action):
         partial = parse[0]
         parse_structure = parse[1]
+        history = parse[2]
         f_map = {}
 
-        # count features related to number of trees in partial and presence of None assignments
-        sf = {}
-        if len(tokens) != 0:
-            sf['trees_per_token'] = len(parse_structure) / float(len(tokens))
-            sf['prop_trees'] = 1.0 / len(parse_structure)
-            token_assignments = [None for i in range(0, len(tokens))]
-            self.read_parse_structure_to_token_assignments(tokens, token_assignments, parse_structure)
-            sf['None_per_token'] = sum([1 if p is None else 0 for p in token_assignments]) / float(len(tokens))
-        f_map['sf'] = sf
+        # calculate the total forms to be examined for normalization
+        total_forms = 0
+        hist_idx = 0
+        while True:
+            to_examine = partial[:] if type(partial) is list else [partial]
+            total_forms += len(to_examine)
+            if history is not None and hist_idx < len(history)-1:
+                partial = history[hist_idx][0]
+                parse_structure = history[hist_idx][1]
+                hist_idx += 1
+            else:
+                break
+        partial = parse[0]
+        parse_structure = parse[1]
 
-        # TODO: count of (token,lexical_entry) chosen at leaf level for ambiguous tokens
+        token_features = {}
+        token_form_features = {}
+        form_features = {}
+        action_form_features = {}
+        action_features = {}
+        hist_idx = 0
+        while True:
 
-        # TODO: do something with the high level action chosen, maybe, or stop passing it in
+            to_examine = partial[:] if type(partial) is list else [partial]
 
-        to_examine = partial[:] if type(partial) is list else [partial]
+            # extract token,form features
+            if tokens is not None:
+                for t_idx in range(0, len(tokens)):
+                    vocab_idx = self.lexicon.surface_forms.index(tokens[t_idx])
 
-        # count the liklihoods of categories appear in parses; roughly corresponds to production rule liklihood
-        category_uni = {}
-        for p in to_examine:
-            if p is None:
-                continue
-            if type(p) is int:
-                p = self.lexicon.semantic_forms[p]
-            for cat_idx in p.categories_used:
-                self.increment_dictionary(category_uni, [cat_idx], inc=1.0/len(to_examine))
-        f_map['category_uni'] = category_uni
+                    # token bigrams
+                    d = 'token_bigrams'
+                    inc = 1.0 / (len(tokens) * len(self.lexicon.surface_forms) * len(self.lexicon.surface_forms))
+                    if t_idx < len(tokens)-1:
+                        next_vocab_idx = self.lexicon.surface_forms.index(tokens[t_idx+1])
+                        self.increment_dictionary(token_features, [d, vocab_idx, next_vocab_idx], inc=inc)
 
-        token_surface_pred_co = {}
-        token_category_co = {}
-        for t in tokens:
-            vocab_idx = self.lexicon.surface_forms.index(t)
+                    # token,predicate bigrams
+                    stack_examine = to_examine[:]
+                    d = 'token_surface_pred_co'
+                    inc = 1.0 / (len(tokens) * len(self.lexicon.semantic_forms) * total_forms)
+                    while len(stack_examine) > 0:
+                        curr = stack_examine.pop()
+                        if curr is None:
+                            self.increment_dictionary(token_form_features, [d, vocab_idx, 'None'], inc=inc)
+                            continue
+                        if type(curr) is int:
+                            curr = self.lexicon.semantic_forms[curr]
+                        if type(curr) is str:  # DEBUG
+                            print tokens, parse, action  # DEBUG
+                            sys.exit()  # DEBUG
+                        if not curr.is_lambda:
+                            self.increment_dictionary(token_form_features, [d, vocab_idx, curr.idx], inc=inc)
+                        if curr.children is not None: stack_examine.extend(curr.children)
 
-            # count (token,predicate) pairs between tokens and surface semantic forms chosen for them
-            # TODO: the way this is implemented won't work with the generator so think about alternatives
-            stack_examine = to_examine[:]
-            while len(stack_examine) > 0:
-                curr = stack_examine.pop()
-                if curr is None:
-                    self.increment_dictionary(token_surface_pred_co, [vocab_idx, 'None'])
-                elif type(curr) is int:
-                    self.increment_dictionary(token_surface_pred_co, [vocab_idx, curr])
-                elif type(curr) is list and type(curr[0]) is int:
-                    self.increment_dictionary(token_surface_pred_co, [vocab_idx, curr[0]])
-                else:
-                    if not curr.is_lambda:
-                        self.increment_dictionary(token_surface_pred_co, [vocab_idx, curr.idx])
-                    if curr.children is not None: stack_examine.extend(curr.children)
+                    # token,category bigrams
+                    d = 'token_category_co'
+                    inc = 1.0 / (len(tokens) * len(self.lexicon.categories) * total_forms)
+                    for p in to_examine:
+                        if p is None:
+                            continue
+                        if type(p) is int:
+                            p = self.lexicon.semantic_forms[p]
+                        for cat_idx in p.categories_used:
+                            self.increment_dictionary(token_form_features, [d, vocab_idx, cat_idx], inc=inc)
 
-            # count (token,category) pairs
+            # TODO: extract form features
 
-            for p in to_examine:
-                if p is None:
-                    continue
-                if type(p) is int:
-                    p = self.lexicon.semantic_forms[p]
-                for cat_idx in p.categories_used:
-                    self.increment_dictionary(token_category_co, [vocab_idx, cat_idx],
-                                              inc=1.0/len(to_examine))
+            # extract form, action features
+            if action is not None and action.name is not None:
+                action_pieces = [action.name]
+                action_pieces.extend(action.params)
+                for a in action_pieces:
+                    if type(a) is bool:
+                        a_idx = a
+                    else:
+                        a_idx = self.ontology.preds.index(a)
 
-        f_map['token_surface_pred_co'] = token_surface_pred_co
-        f_map['token_category_co'] = token_category_co
+                    # action,predicate bigrams
+                    stack_examine = to_examine[:]
+                    d = 'action_surface_pred_co'
+                    inc = 1.0 / (len(tokens) * len(self.lexicon.semantic_forms) * total_forms)
+                    while len(stack_examine) > 0:
+                        curr = stack_examine.pop()
+                        if curr is None:
+                            self.increment_dictionary(token_form_features, [d, a_idx, 'None'], inc=inc)
+                        elif type(curr) is int:
+                            self.increment_dictionary(token_form_features, [d, a_idx, curr], inc=inc)
+                        elif type(curr) is list and type(curr[0]) is int:
+                            self.increment_dictionary(token_form_features, [d, a_idx, curr[0]], inc=inc)
+                        else:
+                            if not curr.is_lambda:
+                                self.increment_dictionary(token_form_features, [d, a_idx, curr.idx], inc=inc)
+                            if curr.children is not None: stack_examine.extend(curr.children)
+
+                    # action,category bigrams
+                    d = 'action_category_co'
+                    inc = 1.0 / (len(tokens) * len(self.lexicon.categories) * total_forms)
+                    for p in to_examine:
+                        if p is None:
+                            continue
+                        if type(p) is int:
+                            p = self.lexicon.semantic_forms[p]
+                        for cat_idx in p.categories_used:
+                            self.increment_dictionary(token_form_features, [d, a_idx, cat_idx], inc=inc)
+
+            # TODO: extract action features
+
+            if history is not None and hist_idx < len(history)-1:
+                partial = history[hist_idx][0]
+                parse_structure = history[hist_idx][1]
+                hist_idx += 1
+            else:
+                break
+
+        f_map['token_features'] = token_features
+        f_map['form_features'] = form_features
+        f_map['token_form_features'] = token_form_features
+        f_map['action_form_features'] = action_form_features
+        f_map['action_features'] = action_features
 
         return f_map

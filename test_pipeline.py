@@ -66,14 +66,14 @@ while True:
     if s == 'stop':
         break
     _, form = lex.read_syn_sem(s)
-    token_responses = generator.reverse_parse_semantic_form(form, k=3, n=1)
+    token_responses = generator.reverse_parse_semantic_form(form, n=1)
     print "token responses: "+str(token_responses)
 
 print "instantiating DialogAgent"
 u_in = InputFromKeyboard()
 u_out = OutputToStdout()
 static_policy = StaticDialogPolicy.StaticDialogPolicy()
-A = DialogAgent.DialogAgent(parser, grounder, static_policy, u_in, u_out)
+A = DialogAgent.DialogAgent(parser, generator, grounder, static_policy, u_in, u_out)
 
 print "instantiating ActionSender"
 action_sender = ActionSender.ActionSender(lex, generator, u_out)
@@ -88,9 +88,18 @@ while True:
     r = action_sender.take_action(a)
     print "RESULT: "+str(r)
 
-print "reading in data and training parser from actions"
+print "reading in training data"
 D = A.read_in_utterance_action_pairs(sys.argv[3])
-converged = A.train_parser_from_utterance_action_pairs(D, epochs=10, parse_beam=30)
+
+if len(sys.argv) > 4 and sys.argv[4] == "both":
+    print "training parser and generator jointly from actions"
+    converged = A.jointly_train_parser_and_generator_from_utterance_action_pairs(
+        D, epochs=10, parse_beam=30, generator_beam=10)
+else:
+    print "training parser from actions"
+    converged = A.train_parser_from_utterance_action_pairs(
+        D, epochs=10, parse_beam=30)
+
 print "theta: "+str(parser.learner.theta)
 
 while True:
@@ -109,5 +118,5 @@ while True:
     if s == 'stop':
         break
     _, form = lex.read_syn_sem(s)
-    token_responses = generator.reverse_parse_semantic_form(form, k=3, n=1)
+    token_responses = generator.reverse_parse_semantic_form(form, n=1)
     print "token responses: "+str(token_responses)
