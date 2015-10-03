@@ -1,6 +1,9 @@
+# WARNING: This is not really being used and is incomplete. I wanted to implement this 
+# but temporarily ditched it in favour of HIS because I actually understand that
+
 __author__ = 'aishwarya'
 
-class BeliefState:
+class BudsBeliefState:
 
     def __init__(self, knowledge):
 
@@ -8,31 +11,31 @@ class BeliefState:
         self.num_user_turns = 0
 
         # Number of possible actions the goal could be referring to
-		self.num_goal_actions = len(goal_actions) 
+        self.num_goal_actions = len(goal_actions) 
         self.num_utterance_actions = self.num_goal_actions + 1 # As action is utterance is allowed to be None  
 
         # n - Maximum possible number of parameters an action can have
-		self.max_goal_params = len(goal_params)     
+        self.max_goal_params = len(goal_params)     
 
         # Number of possible values each parameter can take
-		self.num_goal_param_values = len(goal_params_values) + 1 # +1 is to allow for None   
-		
-		# Initialize all belief variables to uniform distributions
-		
-		# g_a - Belief of the goal of (final action desired by) user
-		self.goal_action_belief = [1.0/self.num_goal_actions] * self.num_goal_actions
-		
-		# g_p_i - Belief of the value of each param. For now this is a list of lists 
-		# 		  but hopefully can be made a matrix later for efficient computation
-		self.goal_params_belief = [[1.0/self.num_goal_param_values for x in range(self.num_goal_param_values)] for x in range(num_goal_params)] 
-		
-		# u_a - Belief of things clarified in previous user utterance
-		self.utterance_action_belief = [1.0/self.num_goal_actions] * self.num_goal_actions
-		
-		# u_p_i - Belief of the value of each param clarified in previous user utterance. 
-		# 		  For now this is a list of lists but hopefully can be made a matrix 
-		#		  later for efficient computation
-		self.utterance_params_belief = [[1.0/self.num_goal_param_values for x in range(self.num_goal_param_values)] for x in range(num_goal_params)] 
+        self.num_goal_param_values = len(goal_params_values) 
+
+        # Initialize all belief variables to uniform distributions
+
+        # g_a - Belief of the goal of (final action desired by) user
+        self.goal_action_belief = [1.0/self.num_goal_actions] * self.num_goal_actions
+
+        # g_p_i - Belief of the value of each param. For now this is a list of lists 
+        # 		  but hopefully can be made a matrix later for efficient computation
+        self.goal_params_belief = [[1.0/self.num_goal_param_values for x in range(self.num_goal_param_values)] for x in range(num_goal_params)] 
+
+        # u_a - Belief of things clarified in previous user utterance
+        self.utterance_action_belief = [1.0/self.num_goal_actions] * self.num_goal_actions
+
+        # u_p_i - Belief of the value of each param clarified in previous user utterance. 
+        # 		  For now this is a list of lists but hopefully can be made a matrix 
+        #		  later for efficient computation
+        self.utterance_params_belief = [[1.0/self.num_goal_param_values for x in range(self.num_goal_param_values)] for x in range(num_goal_params)] 
 
         # Scores of best N parses (it doesn't matter what N is but having more values is better)
         self.best_n_parse_scores = []

@@ -1,0 +1,50 @@
+__author__ = 'aishwarya'
+
+from Utils import *
+
+class SystemAction:
+    # A system action has a name and a dict of params
+    # The dict is of the form referring_params[param_name] = param_value
+    # We need param values for the confirm_action action but not for request_missing_param
+    # In the latter case, we will create a dictionary entry for the param being requested 
+    # but with value None
+
+    def __init__(self, name, referring_goal=None, referring_params=None):
+        # Like repeat_goal, request_missing_param
+        self.name = other.name
+    
+        # What goal action is being confirmed. Relevant mainly for 'confirm_goal'
+        self.referring_goal = referring_goal   
+
+        # What params are being confirmed. Relevant mainly for 'confirm_goal'
+        self.referring_params = referring_params 
+
+    def __str__(self):
+        return str(self.name) + '(' + str(self.referring_goal) + ':' + ','.join([str(k) + ':' + str(v) for (k, v) in self.referring_params.items()]) + ')'
+
+    # assumes values of referring_params are atomic
+    def __eq__(self, other) :
+        if self.referring_goal != other.referring_goal :
+            return False
+        elif not checkDicts(self.referring_params, other.referring_params) :
+            return False
+        return True
+    
+# Simple tests to check syntax        
+if __name__ == '__main__' :
+    n = 'confirm_action'
+    g = 'SearchRoom'
+    p = dict()
+    p['Patient'] = 'ray'
+    p['Location'] = 'l3512'
+    m = SystemAction(n, g, p)
+    print str(m)
+    m2 = SystemAction(n, '', p)
+    m3 = SystemAction(n, g, {'Patient':'ray'})
+    m4 = SystemAction(n, g, {'Patient':'ray', 'Location':'l3512'})
+    m5 = SystemAction(n, g, {'Patient':'ray', 'Recipient':'peter'})    
+    print m == m2
+    print m == m3
+    print m == m4
+    print m == m5
+    
