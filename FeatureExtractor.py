@@ -109,7 +109,24 @@ class FeatureExtractor:
                         for cat_idx in p.categories_used:
                             self.increment_dictionary(token_form_features, [d, vocab_idx, cat_idx], inc=inc)
 
-            # TODO: extract form features
+            # extract form features
+            d = 'category_bigrams'
+            inc = 1.0 / (len(self.lexicon.categories) * len(to_examine))
+            for i in range(0, len(to_examine)):
+                if to_examine[i] is None:
+                    cat_i = None
+                elif type(to_examine[i]) is int:
+                    cat_i = self.lexicon.semantic_forms[to_examine[i]].category
+                else:
+                    cat_i = to_examine[i].category
+                for j in range(i+1, len(to_examine)):
+                    if to_examine[j] is None:
+                        cat_j = None
+                    elif type(to_examine[j]) is int:
+                        cat_j = self.lexicon.semantic_forms[to_examine[j]].category
+                    else:
+                        cat_j = to_examine[j].category
+                    self.increment_dictionary(form_features, [d, cat_i, cat_j], inc=inc)
 
             # extract form, action features
             if action is not None and action.name is not None:

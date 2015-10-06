@@ -36,10 +36,10 @@ print "instantiating KBGrounder"
 grounder = KBGrounder.KBGrounder(ont)
 
 print "instantiating Parser"
-parser = Parser.Parser(ont, lex, learner, grounder, beam_width=10)
+parser = Parser.Parser(ont, lex, learner, grounder, beam_width=10, safety=True)
 
 print "instantiating Generator"
-generator = Generator.Generator(ont, lex, learner, parser, beam_width=100)
+generator = Generator.Generator(ont, lex, learner, parser, beam_width=100, safety=True)
 
 print "instantiating DialogAgent"
 A = DialogAgent.DialogAgent(parser, generator, grounder, None, None, None)

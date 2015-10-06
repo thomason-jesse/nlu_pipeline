@@ -265,6 +265,9 @@ class DialogAgent:
                         break  # the action matches gold and this parse should be used in training
                 if correct_action_found:
                     if a_chosen != a_candidate:
+                        print "adding parsing training pair"  # DEBUG
+                        print "chosen: "+str(n_best_parses[0])  # DEBUG
+                        print "best: "+str(n_best_parses[i])  # DEBUG
                         train_data.append([t, n_best_parses[0], a_chosen, t, n_best_parses[i], a])
                     else:
                         num_actions_correct += 1

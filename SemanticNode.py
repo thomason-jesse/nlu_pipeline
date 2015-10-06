@@ -85,6 +85,17 @@ class SemanticNode:
                 s += str(c)
         return s
 
+    def renumerate_lambdas(self, lambdas):
+        if self.is_lambda:
+            if self.is_lambda_instantiation:
+                lambdas.append(self.lambda_name)
+                self.lambda_name = len(lambdas)
+            else:
+                self.lambda_name = lambdas.index(self.lambda_name) + 1
+        if self.children is not None:
+            for c in self.children:
+                c.renumerate_lambdas(lambdas[:])
+
     # these are a forward comparisons, so two trees are considered equal if their roots have different parents,
     # as long as the roots and children down are identical categories
 
@@ -117,7 +128,7 @@ class SemanticNode:
             return True
         for idx in range(0, len(self.children)):
             if self.children[idx].parent != self:
-                print "child "+str(idx)+" of "+str(self.children[idx])+ "has non-matching parent "+str(self.children[idx].parent)  # DEBUG
+                print "child "+str(idx)+" of "+str(self.children[idx]) + " has non-matching parent "+str(self.children[idx].parent)  # DEBUG
                 return False
             if not self.children[idx].validate_tree_structure():
                 return False
