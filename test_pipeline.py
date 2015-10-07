@@ -36,16 +36,32 @@ class InputFromSpeech:
         self.libHandle.sphinx_init()
         self.libHandle.initMic()
 
+        self.numbers = {"one": '1', "two": '2', "three": '3', "four": '4', "five": '5',
+                        "six": '6', "seven": '7', "eight": '8', "nine": '9'}
+
     def __del__(self):
         self.libHandle.closeMic()
         self.libHandle.sphinx_close()
 
+    def postProcess(self, words):
+        utterance = ""
+
+        for word in words:
+            if word in self.numbers:
+                utterance += self.numbers[word]
+            else:
+                utterance += ' ' + word + ' '
+
+        return utterance
+
     def get(self):
-        result =  self.getHypString(self.getNBest(1)[0])
+        result =  self.getHypString(self.getNBest(1)[0]).split()
 
-        print result
+        utterance = self.postProcess(result)
 
-        return result
+        print utterance
+
+        return utterance
 
     def record(self):
         self.libHandle.sphinx_n_best_m(1); 
