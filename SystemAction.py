@@ -11,7 +11,7 @@ class SystemAction:
 
     def __init__(self, name, referring_goal=None, referring_params=None):
         # Like repeat_goal, request_missing_param
-        self.name = other.name
+        self.name = name
     
         # What goal action is being confirmed. Relevant mainly for 'confirm_goal'
         self.referring_goal = referring_goal   
@@ -20,7 +20,12 @@ class SystemAction:
         self.referring_params = referring_params 
 
     def __str__(self):
-        return str(self.name) + '(' + str(self.referring_goal) + ':' + ','.join([str(k) + ':' + str(v) for (k, v) in self.referring_params.items()]) + ')'
+        str_form = 'SystemAction: ' + str(self.name) + '(' + str(self.referring_goal) + ';'
+        if self.referring_params is not None :
+            str_form = str_form + ','.join([str(k) + ':' + str(v) for (k, v) in self.referring_params.items()]) + ')'
+        else:
+            str_form = str_form + 'None' + ')'
+        return str_form
 
     # assumes values of referring_params are atomic
     def __eq__(self, other) :

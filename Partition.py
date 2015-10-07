@@ -3,28 +3,32 @@ __author__ = 'aishwarya'
 from Utils import *
 from Knowledge import Knowledge
 
+# For testing only
+from SystemAction import SystemAction
+from Utterance import Utterance
+
 class Partition:
 
-    def __init__(self, possible_actions, possible_param_values, belief=0.0):
+    def __init__(self, possible_goals, possible_param_values, belief=0.0):
         # This partition includes all belief states which are a tuple 
-        # of one action in this possible_actions and one value of each 
+        # of one action in this possible_goals and one value of each 
         # param in possible_param_values which is a dict
-        self.possible_actions = possible_actions
+        self.possible_goals = possible_goals
         self.possible_param_values = possible_param_values
         self.belief = belief
 
     def __str__(self):
-        strForm = 'States: {' + ','.join(self.possible_actions) + '}'
+        strForm = 'States: {' + ','.join(self.possible_goals) + '}'
         for param_name in self.possible_param_values :
             strParamValues = [str(v) for v in self.possible_param_values[param_name]]
             strForm = strForm + ' x {' + ','.join(strParamValues) + '}'
         strForm = strForm + ', Belief:' + str(self.belief)
         return strForm
         
-    # Assumes elements of possible_actions and possible_param_values[key] for all keys
+    # Assumes elements of possible_goals and possible_param_values[key] for all keys
     # are atomic
     def __eq__(self, other) :
-        if not checkLists(self.possible_actions, other.possible_actions) :
+        if not checkLists(self.possible_goals, other.possible_goals) :
             return False
         elif not checkDicts(self.possible_param_values, other.possible_param_values) :
             return False
@@ -37,9 +41,9 @@ class Partition:
     # only that value
     def match(self, system_action, utterance) :
         if system_action.name == 'confirm_action':
-            if Knowledge.yes in utterance.extra_data :
+            if utterance.extra_data is not None and Knowledge.yes in utterance.extra_data :
                # User confirmed the action. So partition must exactly match what the systema action says
-               if not len(self.possible_actions) == 1 or not system_action.referring_goal == self.possible_actions[0] :
+               if not len(self.possible_goals) == 1 or not system_action.referring_goal == self.possible_goals[0] :
                    return False          
                elif not system_action.referring_params == None :
                    for param_name in system_action.referring_params :
@@ -83,10 +87,23 @@ if __name__ == '__main__' :
     u1 = Utterance('searchroom', {'patient':'ray', 'location':'l3512'})
     u2 = Utterance(None, None, [Knowledge.yes])
     u3 = Utterance(None, None, [Knowledge.no])
-    p = [0,0,0,0,0,0,0,0]
+    p = [0,0,0,0,0,0]
     p[0] = Partition(['searchroom'], {'patient':['ray'], 'location':['l3512']})
-    p[1] = Partition(['searchroom'], {'patient':['ray'], 'location':['l3512']})    
-    p[2] = Partition(['searchroom', 'speak_t'], {'patient':['ray'], 'location':['l3512']})    
-    p[3] = Partition(['searchroom'], {'patient':['ray', 'peter'], 'location':['l3512']})    
-    p[4] = Partition(['searchroom'], {'patient':['ray'], 'location':['l3512', 'l3416']})        
-    # Complete this test for match function
+    p[1] = Partition(['searchroom'], {'patient':[], 'location':[]})    
+    p[2] = Partition(['searchroom'], {'patient':['ray'], 'location':['l3512']})    
+    p[3] = Partition(['searchroom', 'speak_t'], {'patient':['ray'], 'location':['l3512']})    
+    p[4] = Partition(['searchroom'], {'patient':['ray', 'peter'], 'location':['l3512']})    
+    p[5] = Partition(['searchroom'], {'patient':['ray'], 'location':['l3512', 'l3416']})        
+    
+    for pp in p :
+      print '\n'.join([str(pp), str(m1), str(u2)])
+      print pp.match(m1, u2)
+      print '\n'
+      print '\n'.join([str(pp), str(m1), str(u3)])
+      print pp.match(m1, u3)
+      print '\n'
+      print '\n'.join([str(pp), str(m2), str(u1)])
+      print pp.match(m1, u2)
+      print '\n'
+        
+    

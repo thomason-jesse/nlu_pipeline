@@ -16,7 +16,16 @@ class Utterance:
         self.referring_params = referring_params 
 
     def __str__(self):
-        return 'UserDialogAction: '+'('+','.join([str(self.referring_goal)] + [str(p) for p in self.referring_params] + [str(d) for d in self.extra_data])+')'
+        str_form = 'UserDialogAction: '+'(' + str(self.referring_goal) + ';'
+        if self.referring_params is not None :
+            str_form = str_form + ','.join([str(k) + ':' + str(v) for (k, v) in self.referring_params.items()]) + ';'
+        else:
+            str_form = str_form + 'None' + ';'
+        if self.extra_data is not None :
+            str_form = str_form + ','.join([str(d) for d in self.extra_data]) + ')'
+        else:
+            str_form = str_form + 'None' + ')'
+        return str_form        
 
     # assumes elements of referring_params list and extra_data list are atomic
     def __eq__(self, other) :
