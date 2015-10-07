@@ -40,7 +40,16 @@
 #include <string.h>
 #include <fcntl.h>
 
+//Initializes sphinx. 
+void sphinx_init();
+
+//Frees everything allocated by sphinx. 
+void sphinx_close(); 
+
 //Gets nbest hypothesis of utterance in file. 
-int sphinx_n_best(const char *file, int n);
+int sphinx_n_best_f(const char *file, int n);
+
+//Gets nbest hypothesis of utterance from mic. 
+int sphinx_n_best_m(int n); 
 
 #endif

@@ -5,8 +5,9 @@ Used for interacting with Sphinx.
 __author__ = 'rodolfo'
 
 import ctypes
-import pygame
 import threading
+import pygame
+import sys
 
 libHandle = None
 
@@ -18,61 +19,63 @@ def init(soPath = None):
     else:
         libHandle = ctypes.CDLL(path)
 
-def record():
-    libHandle.record1600Hz("voice.raw"); 
+    libHandle.sphinx_init()
+    libHandle.initMic(); 
 
-def recordToggle():
-    #Initializes pygame window to read spacebar presses. 
+def record():
+    libHandle.sphinx_n_best_m(1)
+
+def recordPress():
     pygame.init()
-    pygame.display.set_mode(1,1)
+    pygame.display.set_mode((1,1))
 
     running = True
+
+    print "\nPress [SPACEBAR] to record"
 
     while running:
         pygame.event.pump()
         keys = pygame.key.get_pressed()
 
         if keys[pygame.K_SPACE]:
-            print "Recording"
-
-            #Starts recording from mic to file. 
             libHandle.startRecord()
 
-            #Loops while user is holding space bar. 
+            print "Recording"
+
             while keys[pygame.K_SPACE]:
                 pygame.event.pump()
                 keys = pygame.key.get_pressed()
 
-            #Stops recording when they release it. 
             libHandle.stopRecord()
-
-            #Shuts down pygame and exits thread
             pygame.quit()
             running = False
 
+
 def getNBest(n):
+    t1 = threading.Thread(target = record)
+    t2 = threading.Thread(target = recordPress)
 
-    #Creates threads for recording. 
-    thread1 = threading.Thread(target = record)
-    thread2 = threading.Thread(target = recordToggle)
+    t1.start()
+    t2.start()
 
-    #Waits for recording threads to finish. 
-    thread1.join()
-    thread2.join()
+    t1.join()
+    t2.join()
 
     print "Recognizing..."
 
-    #Attempts to recognize recording. 
-    libHandle.sphinx_n_best("voice.raw", n)
-
-    #Opens up results to begin reading from them. 
+    #Opens file with recognition results. 
     results = open("results.txt", "r")
 
-    #Makes a list of each hypothesis, containing string, confidence, etc.
     resultList = [line.strip('\n') for line in results]
+
+    #Makes a list from each formatted hypothesis string. 
     hypotheses = [result.split(":") for result in resultList]
 
-    return hypothesis
+    return hypotheses
 
-def getHypString(hypothesis):
-    return hypothesis[0]
+init()
+
+for i in range(0,5):
+    print getNBest(1)
+
+libHandle.sphinx_close()

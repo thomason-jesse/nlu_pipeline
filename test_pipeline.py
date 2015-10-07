@@ -32,6 +32,14 @@ class InputFromSpeech:
         else:
             self.libHandle = ctypes.CDLL(path)
 
+        #Initialize Sphinx. 
+        self.libHandle.sphinx_init()
+        self.libHandle.initMic()
+
+    def __del__(self):
+        self.libHandle.closeMic()
+        self.libHandle.sphinx_close()
+
     def get(self):
         result =  self.getHypString(self.getNBest(1)[0])
 
@@ -40,7 +48,7 @@ class InputFromSpeech:
         return result
 
     def record(self):
-        self.libHandle.record1600Hz("voice.raw"); 
+        self.libHandle.sphinx_n_best_m(1); 
 
     def recordToggle(self):
         #Initializes pygame window to read spacebar presses. 
@@ -49,7 +57,7 @@ class InputFromSpeech:
 
         running = True
 
-        print "Press [SPACEBAR] to record"
+        print "\nPress [SPACEBAR] to record"
 
         while running:
             pygame.event.pump()
@@ -87,16 +95,12 @@ class InputFromSpeech:
         thread1.join()
         thread2.join()
 
-        print "Recognizing..."
-
-        #Attempts to recognize recording. 
-        self.libHandle.sphinx_n_best("voice.raw", n)
-
         #Opens up results to begin reading from them. 
         results = open("results.txt", "r")
 
         #Makes a list of each hypothesis, containing string, confidence, etc.
         resultList = [line.strip('\n') for line in results]
+
         hypotheses = [result.split(":") for result in resultList]
 
         return hypotheses
