@@ -9,7 +9,7 @@ from Utterance import Utterance
 
 class Partition:
 
-    def __init__(self, possible_goals, possible_param_values, belief=0.0):
+    def __init__(self, possible_goals=None, possible_param_values=None, belief=0.0):
         # This partition includes all belief states which are a tuple 
         # of one action in this possible_goals and one value of each 
         # param in possible_param_values which is a dict
@@ -63,7 +63,26 @@ class Partition:
                     if param_name not in self.possible_param_values or len(self.possible_param_values[param_name]) != 1 or self.possible_param_values[param_name][0] != utterance.referring_params[param_name] :
                         return False           
             return True
-            
+    
+    # Check whether this partition contains all states having some goal 
+    # and params        
+    def is_superset(self, required_goal, required_params) :
+        if required_goal != None and required_goal not in self.possible_goals :
+            # We want a specific goal and that is not in this partition
+            return False
+        elif required_params != None :
+            for param_name in required_params :
+                if param_name not in self.possible_param_values :
+                    # This should not ideally ever happen
+                    print "\nCheck partitions.py line 77 as this should not happen\n"
+                    return False
+                else :
+                    if not set(required_params[param_name]).issubset(set(self.possible_param_values[param_name])) :
+                        # The values we want for this param are not a subset 
+                        # of the values allowed by the partition
+                        return False
+        return True
+			
 # Simple tests to check syntax        
 if __name__ == '__main__' :
     pa = ['a', 'b']
