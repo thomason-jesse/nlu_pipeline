@@ -1,0 +1,70 @@
+1 ['States: {searchroom,speak_t,speak_e,remind,askperson}\nrecipient: {None,peter,ray,dana,kazunori,matteo,shiqi,jivko,stacy,yuqian,max,pato,bwi,bwi-meeting,3516,3508,3512,3510,3402,3418,3420,3432,3502,3414b}\npatient: {None,peter,ray,dana,kazunori,matteo,shiqi,jivko,stacy,yuqian,max,pato,bwi,bwi-meeting,3516,3508,3512,3510,3402,3418,3420,3432,3502,3414b}\nlocation: {None,peter,ray,dana,kazunori,matteo,shiqi,jivko,stacy,yuqian,max,pato,bwi,bwi-meeting,3516,3508,3512,3510,3402,3418,3420,3432,3502,3414b}\nBelief:1.0\nPartition prob:1.0\n'] 
+
+required_goal =  searchroom
+required_params =  {'patient': ['ray'], 'location': ['3512']}
+param_value_pairs =  [('patient', 'ray'), ('location', '3512')] 
+
+States: {searchroom}
+recipient: {None,peter,ray,dana,kazunori,matteo,shiqi,jivko,stacy,yuqian,max,pato,bwi,bwi-meeting,3516,3508,3512,3510,3402,3418,3420,3432,3502,3414b}
+patient: {ray}
+location: {3512}
+Belief:0.0
+Partition prob:0.000347222222222
+
+
+States: {searchroom}
+recipient: {None,peter,ray,dana,kazunori,matteo,shiqi,jivko,stacy,yuqian,max,pato,bwi,bwi-meeting,3516,3508,3512,3510,3402,3418,3420,3432,3502,3414b}
+patient: {ray}
+location: {None,peter,ray,dana,kazunori,matteo,shiqi,jivko,stacy,yuqian,max,pato,bwi,bwi-meeting,3516,3508,3510,3402,3418,3420,3432,3502,3414b}
+Belief:0.0
+Partition prob:0.00798611111111
+
+
+States: {searchroom}
+recipient: {None,peter,ray,dana,kazunori,matteo,shiqi,jivko,stacy,yuqian,max,pato,bwi,bwi-meeting,3516,3508,3512,3510,3402,3418,3420,3432,3502,3414b}
+patient: {None,peter,dana,kazunori,matteo,shiqi,jivko,stacy,yuqian,max,pato,bwi,bwi-meeting,3516,3508,3512,3510,3402,3418,3420,3432,3502,3414b}
+location: {3512}
+Belief:0.0
+Partition prob:0.00798611111111
+
+
+States: {searchroom}
+recipient: {None,peter,ray,dana,kazunori,matteo,shiqi,jivko,stacy,yuqian,max,pato,bwi,bwi-meeting,3516,3508,3512,3510,3402,3418,3420,3432,3502,3414b}
+patient: {None,peter,dana,kazunori,matteo,shiqi,jivko,stacy,yuqian,max,pato,bwi,bwi-meeting,3516,3508,3512,3510,3402,3418,3420,3432,3502,3414b}
+location: {None,peter,ray,dana,kazunori,matteo,shiqi,jivko,stacy,yuqian,max,pato,bwi,bwi-meeting,3516,3508,3510,3402,3418,3420,3432,3502,3414b}
+Belief:0.0
+Partition prob:0.183680555556
+
+
+States: {speak_t,speak_e,remind,askperson}
+recipient: {None,peter,ray,dana,kazunori,matteo,shiqi,jivko,stacy,yuqian,max,pato,bwi,bwi-meeting,3516,3508,3512,3510,3402,3418,3420,3432,3502,3414b}
+patient: {ray}
+location: {3512}
+Belief:0.0
+Partition prob:0.00138888888889
+
+
+States: {speak_t,speak_e,remind,askperson}
+recipient: {None,peter,ray,dana,kazunori,matteo,shiqi,jivko,stacy,yuqian,max,pato,bwi,bwi-meeting,3516,3508,3512,3510,3402,3418,3420,3432,3502,3414b}
+patient: {ray}
+location: {None,peter,ray,dana,kazunori,matteo,shiqi,jivko,stacy,yuqian,max,pato,bwi,bwi-meeting,3516,3508,3510,3402,3418,3420,3432,3502,3414b}
+Belief:0.0
+Partition prob:0.0319444444444
+
+
+States: {speak_t,speak_e,remind,askperson}
+recipient: {None,peter,ray,dana,kazunori,matteo,shiqi,jivko,stacy,yuqian,max,pato,bwi,bwi-meeting,3516,3508,3512,3510,3402,3418,3420,3432,3502,3414b}
+patient: {None,peter,dana,kazunori,matteo,shiqi,jivko,stacy,yuqian,max,pato,bwi,bwi-meeting,3516,3508,3512,3510,3402,3418,3420,3432,3502,3414b}
+location: {3512}
+Belief:0.0
+Partition prob:0.0319444444444
+
+
+States: {speak_t,speak_e,remind,askperson}
+recipient: {None,peter,ray,dana,kazunori,matteo,shiqi,jivko,stacy,yuqian,max,pato,bwi,bwi-meeting,3516,3508,3512,3510,3402,3418,3420,3432,3502,3414b}
+patient: {None,peter,dana,kazunori,matteo,shiqi,jivko,stacy,yuqian,max,pato,bwi,bwi-meeting,3516,3508,3512,3510,3402,3418,3420,3432,3502,3414b}
+location: {None,peter,ray,dana,kazunori,matteo,shiqi,jivko,stacy,yuqian,max,pato,bwi,bwi-meeting,3516,3508,3510,3402,3418,3420,3432,3502,3414b}
+Belief:0.0
+Partition prob:0.734722222222
+
+

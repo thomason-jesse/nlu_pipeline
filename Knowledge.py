@@ -12,9 +12,9 @@ class Knowledge:
         self.goal_params = ['patient', 'location', 'recipient']
 
         # This is kept as a single vector common to all values so that hopefully 
-        # some opearitons involving them can be made matrix operations and implemented
+        # some operaitons involving them can be made matrix operations and implemented
         # efficiently using numpy
-        self.goal_params_values = [None, 'peter', 'ray', 'dana', 'kazunori', 'matteo', 'shiqi', 'jivko', 'stacy' 'yuqian', 'max', 'pato', 'bwi', 'bwi-meeting', '3516', '3508', '3512', '3510', '3402', '3418', '3420', '3432', '3502', '3414b']
+        self.goal_params_values = [None, 'peter', 'ray', 'dana', 'kazunori', 'matteo', 'shiqi', 'jivko', 'stacy', 'yuqian', 'max', 'pato', 'bwi', 'bwi-meeting', '3516', '3508', '3512', '3510', '3402', '3418', '3420', '3432', '3502', '3414b']
         
         self.dialog_actions = ['repeat_goal', 'confirm_action', 'request_missing_param']
 
@@ -22,6 +22,10 @@ class Knowledge:
         
         self.param_relevance = dict()
         self.set_param_relevance()
+
+        self.partition_split_goal_probs = dict()
+        self.partition_split_param_probs = dict()
+        self.set_partition_split_probs()
 
     # This gives a 0-1 value for whether a param is relevant for an action. 
     # Assumes the following form of actions - 
@@ -48,7 +52,13 @@ class Knowledge:
         self.param_relevance['askperson']['patient'] = 1
         self.param_relevance['askperson']['recipient'] = 1
 
-        
+    def set_partition_split_probs(self) :
+        for goal in self.goal_actions :
+            self.partition_split_goal_probs[goal] = 1.0 / len(self.goal_actions)
+        for param_name in self.goal_params : 
+            self.partition_split_param_probs[param_name] = dict()
+            for param_value in self.goal_params_values :
+                self.partition_split_param_probs[param_name][param_value] = 1.0 / len(self.goal_params_values)
 
 
     
