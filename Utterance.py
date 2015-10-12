@@ -4,7 +4,7 @@ from Utils import *
 
 class Utterance:
 
-    def __init__(self, referring_goal=None, referring_params=None, extra_data=None):
+    def __init__(self, referring_goal=None, referring_params=None, extra_data=None, parse_prob=0.0):
         # This encodes any knowledge other than the goal action and params
         # Typically for yes and no
         self.extra_data = extra_data        
@@ -14,6 +14,9 @@ class Utterance:
 
         # Best guess of params indicated
         self.referring_params = referring_params 
+        
+        # Probability of the utterance given the most recent observation
+        self.parse_prob = parse_prob
 
     def __str__(self):
         str_form = 'UserDialogAction: '+'(' + str(self.referring_goal) + ';'
@@ -25,6 +28,7 @@ class Utterance:
             str_form = str_form + ','.join([str(d) for d in self.extra_data]) + ')'
         else:
             str_form = str_form + 'None' + ')'
+        str_form = str_form + ' Prob:' + str(self.parse_prob)
         return str_form        
 
     # assumes elements of referring_params list and extra_data list are atomic
@@ -34,6 +38,8 @@ class Utterance:
         if not checkDicts(self.referring_params, other.referring_params) :
             return False
         if not checkLists(self.extra_data, other.extra_data) :
+            return False
+        if self.parse_prob != other.parse_prob :
             return False
         return True
         
