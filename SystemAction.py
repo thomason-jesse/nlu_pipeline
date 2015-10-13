@@ -9,9 +9,9 @@ class SystemAction:
     # In the latter case, we will create a dictionary entry for the param being requested 
     # but with value None
 
-    def __init__(self, name, referring_goal=None, referring_params=None):
+    def __init__(self, action_type, referring_goal=None, referring_params=None):
         # Like repeat_goal, request_missing_param
-        self.name = name
+        self.action_type = action_type
     
         # What goal action is being confirmed. Relevant mainly for 'confirm_goal'
         self.referring_goal = referring_goal   
@@ -20,15 +20,18 @@ class SystemAction:
         self.referring_params = referring_params 
 
     def __str__(self):
-        str_form = 'SystemAction: ' + str(self.name) + '(' + str(self.referring_goal) + ';'
+        str_form = 'SystemAction: ' + str(self.action_type) + '\n' 
+        str_form = str_form + '\tGoal: ' + str(self.referring_goal) + '\n'
         if self.referring_params is not None :
-            str_form = str_form + ','.join([str(k) + ':' + str(v) for (k, v) in self.referring_params.items()]) + ')'
+            str_form = str_form + '\tParams:' + ','.join([str(k) + ':' + str(v) for (k, v) in self.referring_params.items()]) + '\n'
         else:
-            str_form = str_form + 'None' + ')'
+            str_form = str_form + '\tParams:None\n'
         return str_form
 
     # assumes values of referring_params are atomic
     def __eq__(self, other) :
+        if self.action_type != other.action_type :
+            return False
         if self.referring_goal != other.referring_goal :
             return False
         elif not checkDicts(self.referring_params, other.referring_params) :
@@ -38,16 +41,16 @@ class SystemAction:
 # Simple tests to check syntax        
 if __name__ == '__main__' :
     n = 'confirm_action'
-    g = 'SearchRoom'
+    g = 'searchRoom'
     p = dict()
-    p['Patient'] = 'ray'
-    p['Location'] = 'l3512'
+    p['patient'] = 'ray'
+    p['location'] = 'l3512'
     m = SystemAction(n, g, p)
     print str(m)
     m2 = SystemAction(n, '', p)
-    m3 = SystemAction(n, g, {'Patient':'ray'})
-    m4 = SystemAction(n, g, {'Patient':'ray', 'Location':'l3512'})
-    m5 = SystemAction(n, g, {'Patient':'ray', 'Recipient':'peter'})    
+    m3 = SystemAction(n, g, {'patient':'ray'})
+    m4 = SystemAction(n, g, {'patient':'ray', 'location':'l3512'})
+    m5 = SystemAction(n, g, {'patient':'ray', 'recipient':'peter'})    
     print m == m2
     print m == m3
     print m == m4

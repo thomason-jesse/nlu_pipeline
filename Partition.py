@@ -45,8 +45,8 @@ class Partition:
     # specified by them, including the action and its parameters, the partition allows 
     # only that value
     def match(self, system_action, utterance) :
-        if system_action.name == 'confirm_action':
-            if utterance.extra_data is not None and Knowledge.yes in utterance.extra_data :
+        if system_action.action_type == 'confirm_action':
+            if utterance.action_type == 'affirm' :
                # User confirmed the action. So partition must exactly match what the systema action says
                if not len(self.possible_goals) == 1 or not system_action.referring_goal == self.possible_goals[0] :
                    return False          
