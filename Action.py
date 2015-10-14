@@ -7,7 +7,11 @@ class Action:
         self.params = params
 
     def __str__(self):
-        return self.name+'('+','.join([str(p) for p in self.params])+')'
+        if self.name is None:
+            return "None"
+        if self.params is None:
+            return self.name
+        return str(self.name)+'('+','.join([str(p) for p in self.params])+')'
 
     # assumes elements of params list are atomic
     def __eq__(self, other):

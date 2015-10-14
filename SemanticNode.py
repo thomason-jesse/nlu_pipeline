@@ -33,7 +33,7 @@ class SemanticNode:
         # lambdas 'return' <type,child_return_type> if consumed by upper functions
         if self.is_lambda_instantiation:
             type_str = ontology.compose_str_from_type(self.type)
-            if self.children[0].return_type is None: self.children[0].set_return_type(ontology)
+            self.children[0].set_return_type(ontology)
             child_return_type_str = ontology.compose_str_from_type(self.children[0].return_type)
             self.return_type = ontology.read_type_from_str("<" + type_str + "," + child_return_type_str + ">")
         elif self.children is None:
@@ -52,7 +52,7 @@ class SemanticNode:
 
     # copy attributes of the given SemanticNode into this one (essentially, clone the second into this space)
     def copy_attributes(self, A, lambda_enumeration=0, preserve_parent=False, preserve_children=False):
-        self.category = A.category
+        self.set_category(A.category)
         self.type = A.type
         self.is_lambda = A.is_lambda
         self.idx = A.idx
@@ -64,7 +64,8 @@ class SemanticNode:
                 self.children = None
             else:
                 self.children = [SemanticNode(self, 0, 0, False, 0) for i in range(0, len(A.children))]
-                for i in range(0, len(A.children)): self.children[i].copy_attributes(A.children[i], lambda_enumeration)
+                for i in range(0, len(A.children)):
+                    self.children[i].copy_attributes(A.children[i], lambda_enumeration, preserve_parent=True)
         self.return_type = A.return_type
 
     def print_little(self):
@@ -83,6 +84,17 @@ class SemanticNode:
                     curr = curr.parent
                 s += str(c)
         return s
+
+    def renumerate_lambdas(self, lambdas):
+        if self.is_lambda:
+            if self.is_lambda_instantiation:
+                lambdas.append(self.lambda_name)
+                self.lambda_name = len(lambdas)
+            else:
+                self.lambda_name = lambdas.index(self.lambda_name) + 1
+        if self.children is not None:
+            for c in self.children:
+                c.renumerate_lambdas(lambdas[:])
 
     # these are a forward comparisons, so two trees are considered equal if their roots have different parents,
     # as long as the roots and children down are identical categories
@@ -108,4 +120,16 @@ class SemanticNode:
     def __eq__(self, other):
         if not self.equal_ignoring_syntax(other, ignore_syntax=False):
             return False
+        return True
+
+    # validate parent/child relationships
+    def validate_tree_structure(self):
+        if self.children is None:
+            return True
+        for idx in range(0, len(self.children)):
+            if self.children[idx].parent != self:
+                print "child "+str(idx)+" of "+str(self.children[idx]) + " has non-matching parent "+str(self.children[idx].parent)  # DEBUG
+                return False
+            if not self.children[idx].validate_tree_structure():
+                return False
         return True

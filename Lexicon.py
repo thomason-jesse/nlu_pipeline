@@ -14,6 +14,7 @@ class Lexicon:
         self.sem_form_expected_args = None
         self.sem_form_return_cat = None
         self.category_consumes = None
+        self.generator_should_flush = False
         self.update_support_structures()
 
     def update_support_structures(self):
@@ -21,6 +22,7 @@ class Lexicon:
         self.sem_form_expected_args = [self.calc_exp_args(i) for i in range(0, len(self.semantic_forms))]
         self.sem_form_return_cat = [self.calc_return_cat(i) for i in range(0, len(self.semantic_forms))]
         self.category_consumes = [self.find_consumables_for_cat(i) for i in range(0, len(self.categories))]
+        self.generator_should_flush = True
 
     def compute_reverse_entries(self, r):
         for sur_idx in range(0, len(self.surface_forms)):
@@ -292,4 +294,6 @@ class Lexicon:
             print e
             sys.exit("Offending string: '" + s + "'")
 
+        if not node.validate_tree_structure():
+            sys.exit("ERROR: read in invalidly linked semantic node from string '"+s+"'")  # DEBUG
         return node

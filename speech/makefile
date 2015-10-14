@@ -1,13 +1,13 @@
 SPHINX = -DMODELDIR=\"`pkg-config --variable=modeldir pocketsphinx`\" `pkg-config --cflags --libs pocketsphinx sphinxbase`
 
 all: record.o sphinx.o
-	gcc sphinx.o record.o -lasound -lpocketsphinx -lsphinxbase -shared -o speechRecognizer.so
+	gcc sphinx.o record.o -lpthread -lasound -lpocketsphinx -lsphinxbase -shared -o speechRecognizer.so
 
 sphinx.o: sphinx.c sphinx.h
 	gcc -c -fPIC $(SPHINX) sphinx.c -o sphinx.o
 
 record.o: record.c record.h
-	gcc -c -fPIC -lasound $(SPHINX) record.c -o record.o
+	gcc -c -fPIC -lasound -lpthread $(SPHINX) record.c -o record.o
 
 clean:
 	rm *.so

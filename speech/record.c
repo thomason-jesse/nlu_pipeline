@@ -169,6 +169,34 @@ int record1600Hz_f(const char *fout) {
 	return 0;
 }
 
+void* decodeRecording(void *ps) {
+	FILE *file = fopen("voice.raw", "r"); 
+	int16 *buffer = (int16*) malloc(mp.frames * sizeof(int16));
+	int rc = 0;
+	
+	//Decodes data while still recording. 
+	while (recording) {
+		rc = fread(buffer, sizeof(int16), mp.frames, file); 
+
+		if (rc > 0)
+			ps_process_raw((ps_decoder_t *)ps, buffer, rc, TRUE, FALSE);
+
+		//Waits for more data to be written to file. 
+		while (feof(file) && recording)
+			fseek(file, 0, SEEK_CUR); 
+	}
+
+	//Reads one last time to get any remaining data. 
+	rc = fread(buffer, sizeof(int16), mp.frames, file); 
+
+	if (rc > 0)
+		ps_process_raw((ps_decoder_t *)ps, buffer, rc, TRUE, FALSE); 
+
+	//Cleans up resources. 
+	fclose(file); 
+	free(buffer); 
+}
+
 int record1600Hz_s(ps_decoder_t *ps) {
 	int rc = 0; 
 	FILE *file = fopen("voice.raw", "w");
@@ -176,8 +204,14 @@ int record1600Hz_s(ps_decoder_t *ps) {
 	ps_start_stream(ps); 
 	ps_start_utt(ps); 
 
+	//Thread for decoding recording. 
+	pthread_t decodeThread; 
+
 	//Waits for recording to start. 
 	while (!recording);
+
+	//Creates other thread. 
+	pthread_create(&decodeThread, NULL, decodeRecording, (void *)ps); 
 
  	while (recording) {
     	rc = snd_pcm_readi(mp.handle, (char *)mp.buffer, mp.frames);
@@ -196,14 +230,17 @@ int record1600Hz_s(ps_decoder_t *ps) {
       		fprintf(stderr, "short read, read %d frames\n", rc);
     	}
 
-		ps_process_raw(ps, mp.buffer, rc, TRUE, FALSE); 
-   		//rc = write(fileno(file), (char *)mp.buffer, mp.frames * 2);
+		//ps_process_raw(ps, mp.buffer, rc, TRUE, FALSE); 
+   		rc = write(fileno(file), (char *)mp.buffer, mp.frames * sizeof(int16));
 
 		if (rc != mp.size)
       		fprintf(stderr, "short write: wrote %d bytes\n", rc);
   	}
 
-	ps_process_raw(ps, mp.buffer, mp.frames, FALSE, FALSE); 
+	//ps_process_raw(ps, mp.buffer, mp.frames, FALSE, FALSE); 
+
+	//Waits for decoding to end. 
+	pthread_join(decodeThread, NULL); 
 
 	ps_end_utt(ps); 
 

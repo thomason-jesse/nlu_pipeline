@@ -6,6 +6,7 @@
 
 #include <alsa/asoundlib.h>
 #include <pocketsphinx.h>
+#include <pthread.h>
 
 //Structure for microphone parameters. 
 struct micParams {
