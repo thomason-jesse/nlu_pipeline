@@ -26,6 +26,7 @@ class InputFromKeyboard:
 
 class InputFromSpeechNode:
     def __init__(self):
+        #Subscribes to speech node. 
         rospy.Subscriber('speech', String, self.callback)
         self.utterance = ""
         self.waiting = True

@@ -117,6 +117,7 @@ if __name__ == '__main__':
     pub = rospy.Publisher('speech', String, queue_size=1)
     rospy.init_node('recognizer', anonymous=True)
 
+    #Continuously records utterances until interrupted. 
     while not rospy.is_shutdown():
         utterance = recognizer.get()
         rospy.loginfo(utterance)
