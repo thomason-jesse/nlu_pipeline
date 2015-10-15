@@ -31,6 +31,9 @@ class HISBeliefState:
         # Hypotheses currently being tracked
         self.hypothesis_beliefs = None
         
+    def __str__(self) :
+        return 'Partitions:\n\t' + '\n\t'.join([str(partition) for partition in self.partitions])
+        
     def get_matching_partitions(self, system_action, utterance) :
         matching_partitions = []
         for partition in self.partitions :

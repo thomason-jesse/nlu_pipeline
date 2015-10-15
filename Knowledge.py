@@ -9,7 +9,7 @@ class Knowledge:
 
     def __init__(self):
         self.goal_actions = ['searchroom', 'speak_t', 'speak_e', 'remind', 'askperson']
-        self.goal_params = ['patient', 'location', 'recipient']
+        self.goal_params = ['patient', 'recipient', 'location']
 
         # This is kept as a single vector common to all values so that hopefully 
         # some operaitons involving them can be made matrix operations and implemented
@@ -56,6 +56,13 @@ class Knowledge:
         # the partition and system_action - This can probably be 
         # calculated exactly but it will be hard to do so.
         self.non_n_best_match_prob = 0.01
+        
+        self.param_order = dict()
+        self.param_order['searchroom'] = ['patient', 'location']
+        self.param_order['speak_t'] = ['patient']
+        self.param_order['speak_e'] = ['patient']
+        self.param_order['remind'] = ['recipient', 'patient', 'location']
+        self.param_order['askperson'] = ['patient', 'recipient']
 
     # This gives a 0-1 value for whether a param is relevant for an action. 
     # Assumes the following form of actions - 
