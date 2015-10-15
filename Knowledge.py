@@ -47,6 +47,15 @@ class Knowledge:
         self.action_type_probs = dict()
         
         self.set_action_type_probs()
+        
+        # Probability that the obs is due to an utterance not in the 
+        # N-best list
+        self.obs_by_non_n_best_prob = 0.01
+        
+        # Probability that an utterance not in the N-best list matches 
+        # the partition and system_action - This can probably be 
+        # calculated exactly but it will be hard to do so.
+        self.non_n_best_match_prob = 0.01
 
     # This gives a 0-1 value for whether a param is relevant for an action. 
     # Assumes the following form of actions - 

@@ -7,8 +7,7 @@ class Utterance:
     def __init__(self, action_type, referring_goal=None, referring_params=None, parse_prob=0.0):
         # This gives the type of dialog action
         # Possible types - inform, affirm, deny
-        # In case of affirm and deny, the goal and params will be taken
-        # from the system sction that caused the user to affirm or deny
+        # In case of affirm and deny, the goal and params will be None
         self.action_type = action_type
         
         # Best guess of goal action indicated
@@ -42,19 +41,41 @@ class Utterance:
             return False
         return True
         
-# Simple tests to check syntax    
-if __name__ == '__main__' :
-    u = [0,0,0,0,0,0,0,0,0,0]
-    u[0] = Utterance('affirm', 'searchRoom', {'Patient':'ray', 'Location':'l3512'})
-    u[1] = Utterance('affirm', 'searchRoom', {'Patient':'ray', 'Location':'l3512'})
-    u[2] = Utterance('deny', 'searchRoom', {'Patient':'ray', 'Location':'l3512'})
-    u[3] = Utterance('inform', 'searchRoom', {'Patient':'ray', 'Location':'l3512'})
-    u[4] = Utterance('affirm', 'SearchRoom', {'Patient':'ray'})
-    u[5] = Utterance('affirm', 'searchRoom', {'Patient':'ray', 'Recipient':'peter'})
-    u[6] = Utterance('affirm', 'SearchRoom', {})
-    u[7] = Utterance('inform', 'SearchRoom')
-    u[8] = Utterance('affirm', 'remind', {'Patient':'ray', 'Location':'l3512'})
-    print str(u[0])
-    for i in xrange(1,9) :
-        print u[0] == u[i]
-    
+    def match(self, partition, system_action) :
+        if self.action_type == 'deny' :
+            return True # Deny matches anything
+        elif self.action_type == 'affirm' :
+            # Goal and param values will be in the system action. These 
+            # should be compatible with the partition
+            if system_action.referring_goal != None and system_action.referring_goal not in partition.possible_goals :
+                return False
+            if system_action.referring_params != None :
+                for param_name in system_action.referring_params :
+                    if param_name not in partition.possible_param_values or system_action.referring_params[param_name] not in partition.possible_param_values[param_name] :
+                        return False
+            return True
+            
+        # Control comes here if the utterance is information providing (not affirm/deny)
+        if self.referring_goal != None :
+            if system_action.referring_goal != None and self.referring_goal != system_action.referring_goal :
+                # Normally utterance and system_action will not both have
+                # a goal but if they do, they should match
+                return False
+            if partition.possible_goals == None or self.referring_goal not in partition.possible_goals :
+                # The partition does not allow the desired goal
+                return False
+        if self.referring_params != None :
+            for param_name in self.referring_params :
+                if system_action.referring_params != None :
+                    if param_name not in system_action.referring_params or system_action.referring_params[param_name] != self.referring_params[param_name] :
+                        # Any param present in both the system action and the 
+                        # utterance must match. Note that a param need not and 
+                        # generally doesn't exist in both
+                        return False
+                if param_name not in partition.possible_param_values or self.referring_params[param_name] not in partition.possible_param_values[param_name] :
+                    # Typically all partitions have some set of values 
+                    # for all param names. The partition must allow 
+                    # the values specified in the utterance
+                    return False
+        return True
+        

@@ -1,13 +1,8 @@
 __author__ = 'aishwarya'
 
-from Partition import Partition
-from Knowledge import Knowledge     # Only needed for testing
-from SystemAction import SystemAction
-from Utterance import Utterance
-
 import itertools
 
-class HisBeliefState:
+class HISBeliefState:
 
     def __init__(self, knowledge):
 
@@ -32,6 +27,9 @@ class HisBeliefState:
         possible_param_values['recipient'] = knowledge.goal_params_values
         complete_partition = Partition(possible_actions, possible_param_values, 1.0)
         self.partitions = [complete_partition]	
+        
+        # Hypotheses currently being tracked
+        self.hypothesis_beliefs = None
         
     def get_matching_partitions(self, system_action, utterance) :
         matching_partitions = []
@@ -125,29 +123,36 @@ class HisBeliefState:
                 # pair to obtain matching partitions
                 self.make_all_matching_partitions(system_action, utterance)
         
-        # Obtain all hypotheses - partition-utterance pairs
-        hypotheses = list(itertools.product(self.partitions, n_best_utterances))
-        
         hypothesis_beliefs = dict()
         sum_hypothesis_beliefs = 0.0
         
-        #print len(hypotheses), " hypotheses - "
-        #for (partition, utterance) in hypotheses :
-            #print str(partition)
-            #print str(utterance)
-            #print "\n\n"
-        
-# Simple tests to check for syntax errors
-if __name__ == '__main__' :
-    knowledge = Knowledge()
-    b = HisBeliefState(knowledge)
-    #print 1, [str(p) for p in b.partitions], '\n'
-    m1 = SystemAction('confirm_action', 'searchroom', {'patient':'ray', 'location':'3512'})
-    m2 = SystemAction('repeat_goal')    
-    u1 = Utterance('searchroom', {'patient':'ray', 'location':'3512'})
-    u2 = Utterance(None, None, [Knowledge.yes])
-    u3 = Utterance(None, None, [Knowledge.no])
-    b.make_all_matching_partitions(m1, u2)
-    #for p in b.partitions :
-        #print str(p), '\n'
-    b.update_state(m1, [u1, u2, u3])
+        for partition in self.partitions :
+            for utterance in n_best_utterances :
+                hypothesis = (partition, utterance)
+                obs_prob = utterance.parse_prob # Pr(o'/u)
+                type_prob = self.knowledge.action_type_probs[system_action.action_type][utterance.action_type] # Pr(T(u)/T(m))
+                param_match_prob = int(utterance.match(partition, system_action)) # Pr(M(u)/p,m)
+                hypothesis_beliefs[hypothesis] = obs_prob * type_prob * param_match_prob * partition.belief 
+                    # b(p',u') = k * Pr(o'/u) * Pr(T(u)/T(m)) * Pr(M(u)/p,m) * b(p)
+                sum_hypothesis_beliefs += hypothesis_beliefs[hypothesis] # For normalization
+            hypothesis = (partition, '-OTHER-')
+            obs_prob = self.knowledge.obs_by_non_n_best_prob
+            match_prob = self.knowledge.non_n_best_match_prob
+            hypothesis_beliefs[hypothesis] = obs_prob * match_prob * partition.belief 
+            sum_hypothesis_beliefs += hypothesis_beliefs[hypothesis]
+            
+        partitionwise_sum = dict()
+        for (partition, utterance) in hypothesis_beliefs.keys() :
+           # Normalize beliefs
+           hypothesis_beliefs[(partition, utterance)] /= sum_hypothesis_beliefs
+           if partition not in partitionwise_sum :
+               partitionwise_sum[partition] = hypothesis_beliefs[(partition, utterance)]
+           else : 
+               partitionwise_sum[partition] += hypothesis_beliefs[(partition, utterance)]
+           
+        # Reset partition beliefs for next round
+        # b(p) = \sum_u b(p,u)
+        for partition in partitionwise_sum.keys() :
+            partition.belief = partitionwise_sum[partition]
+
+        self.hypothesis_beliefs = hypothesis_beliefs

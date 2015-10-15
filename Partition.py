@@ -1,11 +1,6 @@
 __author__ = 'aishwarya'
 
 from Utils import *
-from Knowledge import Knowledge
-
-# For testing only
-from SystemAction import SystemAction
-from Utterance import Utterance
 
 class Partition:
 
@@ -124,9 +119,11 @@ class Partition:
             p1 = Partition([new_goal], self.possible_param_values)
             split_prob = knowledge.partition_split_goal_probs[new_goal]
             p1.reaching_prob = self.reaching_prob * split_prob
+            p1.belief = self.belief * split_prob
             other_goals = [goal for goal in self.possible_goals if goal != new_goal]
             p2 = Partition(other_goals, self.possible_param_values)
             p2.reaching_prob = self.reaching_prob * (1 - split_prob)
+            p2.belief = self.belief * (1 - split_prob)
             return [p1, p2]
 
     def split_by_param(self, split_param_name, split_param_value, knowledge) :
@@ -146,57 +143,8 @@ class Partition:
             p2 = Partition(self.possible_goals, p2_param_values)
             split_prob = knowledge.partition_split_param_probs[split_param_name][split_param_value]
             p1.reaching_prob = self.reaching_prob * split_prob
+            p1.belief = self.belief * split_prob
             p2.reaching_prob = self.reaching_prob * (1 - split_prob)
+            p2.belief = self.belief * (1 - split_prob)
             return [p1, p2]
             
-# Simple tests to check syntax        
-if __name__ == '__main__' :
-    pa = ['searchroom', 'remind', 'askperson']
-    pv = dict()
-    pv['location'] = ['3502', '3414b']
-    pv['patient'] = ['peter', 'ray']
-    p = Partition(pa, pv)
-    knowledge = Knowledge()
-    print 1, [str(pp) for pp in p.split_by_goal('c', knowledge)], '\n'
-    l = p.split_by_goal('remind', knowledge)
-    print 2, [str(pp) for pp in l], '\n'
-    print 3, [str(pp) for pp in l[0].split_by_param('abc', '3502', knowledge)], '\n'
-    print 4, [str(pp) for pp in l[0].split_by_param('location', 'xyz', knowledge)], '\n'
-    print 5, [str(pp) for pp in l[0].split_by_param('location', '3502', knowledge)], '\n'
-    
-    #q = Partition(pa, pv, 0)
-    #r = Partition(pa, pv, 1)
-    #s = Partition([], pv, 0)
-    #t = Partition(pa, dict(), 0)
-    #print str(p)
-    #print p == q
-    #print p == r
-    #print p == s
-    #print p == t        
-    #print "\n\n"
-    
-    #m1 = SystemAction('confirm_action', 'searchroom', {'patient':'ray', 'location':'l3512'})
-    #m2 = SystemAction('repeat_goal')    
-    #u1 = Utterance('searchroom', {'patient':'ray', 'location':'l3512'})
-    #u2 = Utterance(None, None, [Knowledge.yes])
-    #u3 = Utterance(None, None, [Knowledge.no])
-    #p = [0,0,0,0,0,0]
-    #p[0] = Partition(['searchroom'], {'patient':['ray'], 'location':['l3512']})
-    #p[1] = Partition(['searchroom'], {'patient':[], 'location':[]})    
-    #p[2] = Partition(['searchroom'], {'patient':['ray'], 'location':['l3512']})    
-    #p[3] = Partition(['searchroom', 'speak_t'], {'patient':['ray'], 'location':['l3512']})    
-    #p[4] = Partition(['searchroom'], {'patient':['ray', 'peter'], 'location':['l3512']})    
-    #p[5] = Partition(['searchroom'], {'patient':['ray'], 'location':['l3512', 'l3416']})        
-    
-    #for pp in p :
-      #print '\n'.join([str(pp), str(m1), str(u2)])
-      #print pp.match(m1, u2)
-      #print '\n'
-      #print '\n'.join([str(pp), str(m1), str(u3)])
-      #print pp.match(m1, u3)
-      #print '\n'
-      #print '\n'.join([str(pp), str(m2), str(u1)])
-      #print pp.match(m1, u2)
-      #print '\n'
-        
-    

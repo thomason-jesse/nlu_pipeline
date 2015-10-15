@@ -38,21 +38,5 @@ class SystemAction:
             return False
         return True
     
-# Simple tests to check syntax        
-if __name__ == '__main__' :
-    n = 'confirm_action'
-    g = 'searchRoom'
-    p = dict()
-    p['patient'] = 'ray'
-    p['location'] = 'l3512'
-    m = SystemAction(n, g, p)
-    print str(m)
-    m2 = SystemAction(n, '', p)
-    m3 = SystemAction(n, g, {'patient':'ray'})
-    m4 = SystemAction(n, g, {'patient':'ray', 'location':'l3512'})
-    m5 = SystemAction(n, g, {'patient':'ray', 'recipient':'peter'})    
-    print m == m2
-    print m == m3
-    print m == m4
-    print m == m5
+
     
