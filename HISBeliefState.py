@@ -1,6 +1,7 @@
 __author__ = 'aishwarya'
 
 import itertools
+from Partition import Partition
 
 class HISBeliefState:
 
@@ -115,7 +116,7 @@ class HISBeliefState:
 
     # Perform belief monitoring update using the system action and n best 
     # parses
-    def update_state(self, system_action, n_best_utterances) :
+    def update(self, system_action, n_best_utterances) :
         for utterance in n_best_utterances :
             # Check whether there are partitions that exactly match the 
             # system action-utterance pair

@@ -20,7 +20,7 @@ class Utterance:
         self.parse_prob = parse_prob
 
     def __str__(self):
-        str_form = 'UserDialogAction: '+ str(self.action_type) + '\n'
+        str_form = 'Utterance: '+ str(self.action_type) + '\n'
         str_form = str_form + '\tGoal: ' + str(self.referring_goal) + '\n'
         if self.referring_params is not None :
             str_form = str_form + '\tParams: ' + ','.join([str(k) + ':' + str(v) for (k, v) in self.referring_params.items()]) + '\n'
@@ -40,6 +40,9 @@ class Utterance:
         if self.parse_prob != other.parse_prob :
             return False
         return True
+      
+    def __hash__(self):
+        return hash((self.action_type, self.referring_goal, tuple(self.referring_params.items()), self.parse_prob))
         
     def match(self, partition, system_action) :
         if self.action_type == 'deny' :

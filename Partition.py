@@ -23,6 +23,10 @@ class Partition:
         strForm = strForm + 'Partition prob:' + str(self.reaching_prob) + '\n'
         return strForm
         
+    def __hash__(self):
+        dict_tuple = tuple([(k, tuple(v)) for (k, v) in self.possible_param_values.items()])
+        return hash((tuple(self.possible_goals), dict_tuple, self.belief, self.reaching_prob))
+        
     # Assumes elements of possible_goals and possible_param_values[key] for all keys
     # are atomic
     def __eq__(self, other) :

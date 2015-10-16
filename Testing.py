@@ -17,7 +17,7 @@ if __name__ == '__main__' :
     #b.make_all_matching_partitions(m1, u2)
     ##for p in b.partitions :
         ##print str(p), '\n'
-    #b.update_state(m1, [u1, u2, u3])
+    #b.update(m1, [u1, u2, u3])
 
     #-------------------------------------------------------------------------------------
 
