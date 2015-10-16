@@ -40,29 +40,27 @@ class Partition:
     # specified by them, including the action and its parameters, the partition allows 
     # only that value
     def match(self, system_action, utterance) :
-        if system_action.action_type == 'confirm_action':
-            if utterance.action_type == 'affirm' :
-               # User confirmed the action. So partition must exactly match what the systema action says
-               if not len(self.possible_goals) == 1 or not system_action.referring_goal == self.possible_goals[0] :
-                   return False          
-               elif not system_action.referring_params == None :
-                   for param_name in system_action.referring_params :
-                       if param_name not in self.possible_param_values or len(self.possible_param_values[param_name]) != 1 or self.possible_param_values[param_name][0] != system_action.referring_params[param_name] :
-                           return False
-               return True
-            else :                           
-               # User did not confirm the action. So any partiton matches
-               return True
-        else :
-            # All other system actions are information seeking. So partition has to match info in utterance
-            if utterance.referring_goal != None :
-                if len(self.possible_goals) != 1 or self.possible_goals[0] != utterance.referring_goal :
-                    return False 
-            if utterance.referring_params != None :
-                for param_name in utterance.referring_params :
-                    if param_name not in self.possible_param_values or len(self.possible_param_values[param_name]) != 1 or self.possible_param_values[param_name][0] != utterance.referring_params[param_name] :
-                        return False           
+        if system_action.action_type == 'confirm_action' and utterance.action_type == 'deny' :
             return True
+            
+        # Partition should match info in system action
+        if not len(self.possible_goals) == 1 or not system_action.referring_goal == self.possible_goals[0] :
+            return False          
+        elif not system_action.referring_params == None :
+            for param_name in system_action.referring_params :
+                if param_name not in self.possible_param_values or len(self.possible_param_values[param_name]) != 1 or self.possible_param_values[param_name][0] != system_action.referring_params[param_name] :
+                    return False
+        return True
+            
+        # Partition has to match info in utterance
+        if utterance.referring_goal != None :
+            if len(self.possible_goals) != 1 or self.possible_goals[0] != utterance.referring_goal :
+                return False 
+        if utterance.referring_params != None :
+            for param_name in utterance.referring_params :
+                if param_name not in self.possible_param_values or len(self.possible_param_values[param_name]) != 1 or self.possible_param_values[param_name][0] != utterance.referring_params[param_name] :
+                    return False           
+        return True
     
     # Check whether this partition contains all states having some goal 
     # and params        
