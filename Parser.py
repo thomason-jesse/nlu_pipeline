@@ -8,7 +8,7 @@ import SemanticNode
 
 
 class Parser:
-    def __init__(self, ont, lex, learner, grounder, beam_width=10, safety=False):
+    def __init__(self, ont, lex, learner, grounder, beam_width=10, safety=False, allow_UNK_E=True):
         self.ontology = ont
         self.lexicon = lex
         self.learner = learner
@@ -16,6 +16,7 @@ class Parser:
         self.beam_width = beam_width
         self.new_adjectives = []  # cleared before every parsing job
         self.safety = safety
+        self.allow_UNK_E = allow_UNK_E
 
     # print a SemanticNode as a string using the known ontology
     def print_parse(self, p, show_category=False):
@@ -139,48 +140,78 @@ class Parser:
             self.learner.learn_from_denotations(T, epochs)
 
     # read in data set of form utterance\nsemantic_form\n\n...
-    def read_in_paired_utterance_semantics(self, fname):
+    def read_in_paired_utterance_semantics(self, fname, allow_expanding_ont=False):
         D = []
         f = open(fname, 'r')
         f_lines = f.readlines()
         f.close()
         i = 0
         while i < len(f_lines):
+            if len(f_lines[i].strip()) == 0:
+                i += 1
+                continue
             tokens = self.tokenize(f_lines[i].strip())
-            form = self.lexicon.read_semantic_form_from_str(f_lines[i + 1].strip(), None, None, [])
+            form = self.lexicon.read_semantic_form_from_str(
+                f_lines[i + 1].strip(), None, None, [], allow_expanding_ont=allow_expanding_ont)
             D.append([tokens, form])
             i += 3
         return D
 
     # take in a data set D=(x,y) for x tokens and y correct semantic form and update the learner's parameters
     def train_learner_on_semantic_forms(self, D, reset_learner=False, epochs=10, k=None, n=10):
-        if k is None: k = self.beam_width
+        if k is None:
+            k = self.beam_width
+        commutative_idxs = [self.ontology.preds.index('and'), self.ontology.preds.index('or')]
         for e in range(0, epochs):
             print "epoch " + str(e)  # DEBUG
             T = []
             all_matches = True
+            num_matches = 0
+            num_fails = 0
             for [x, y] in D:
-                print x  # DEBUG
+                # print x  # DEBUG
+                # DEBUG
+                # comm_raised = copy.deepcopy(y)
+                # comm_raised.commutative_raise_node(commutative_idxs)
+                # print "raised target: "+self.print_parse(comm_raised)
+                # /DEBUG
                 n_best = self.parse_tokens(x, k, n)
-                highest_scoring_parse = n_best[0]
-                for i in range(1, len(n_best)):
-                    if not y.__eq__(n_best[i][0]) and n_best[i][2] + 1 >= n_best[i - 1][2]:
-                        highest_scoring_parse = n_best[i]
-                        break
-                T.append([x, [highest_scoring_parse[0]],
-                          [y]])  # nest parses because feature extractor expects partials (list of partial parse trees)
-                if not y.__eq__(highest_scoring_parse[0]):
-                    print "mismatch: " + self.print_parse(y) + " != " + self.print_parse(
-                        highest_scoring_parse[0])  # DEBUG
-                    print self.print_semantic_parse_result(highest_scoring_parse[1])  # DEBUG
-                    all_matches = False
+                if len(n_best) > 0:
+                    highest_scoring_parse = n_best[0]
+                    correct_parse = None
+                    match = False
+                    for i in range(0, len(n_best)):
+                        # DEBUG
+                        # comm_raised = copy.deepcopy(n_best[i][0])
+                        # comm_raised.commutative_raise_node(commutative_idxs)
+                        # print "raised candidate: "+self.print_parse(comm_raised)
+                        # /DEBUG
+                        if y.equal_allowing_commutativity(n_best[i][0], commutative_idxs):
+                            correct_parse = n_best[i]
+                            if i == 0:
+                                match = True
+                                num_matches += 1
+                            break
+                    if correct_parse is None:
+                        print "WARNING: could not find correct parse for input sequence "+str(x)
+                        continue
+                    if not match:
+                        T.append([x, highest_scoring_parse, None,
+                                  x, correct_parse, None])
+                        # print "mismatch: " + self.print_parse(correct_parse[0]) + " != " + self.print_parse(
+                        #     highest_scoring_parse[0])  # DEBUG
+                        # print self.print_semantic_parse_result(highest_scoring_parse[1])  # DEBUG
+                        all_matches = False
                 else:
-                    "WARNING: could not find valid parse for '" + " ".join(x) + "' during training; ignoring example"
-            if all_matches == True:
+                    print "WARNING: could not find valid parse for '" + " ".join(x) + "' during training"
+                    num_fails += 1
+            print "matched "+str(num_matches)+"/"+str(len(D))  # DEBUG
+            print "failed "+str(num_fails)+"/"+str(len(D))  # DEBUG
+            if all_matches:
                 print "WARNING: training converged at epoch " + str(e)
                 break
             random.shuffle(T)
-            self.learner.learnFromSemanticForms(T, reset_learner, epochs)
+            self.learner.learn_from_actions(T)
 
     # iterate over partials and add genlex entries to lexicon
     def add_genlex_entries_to_lexicon_from_partial(self, partial_bracketing):
@@ -450,7 +481,7 @@ class Parser:
         if (type(n_cat) is list
                 and ((i < idx and n_cat[1] == 1) or (i > idx and n_cat[1] == 0))):
             # if neighbor is looking for an N, treat as UNK due to ambiguity
-            if n_cat[2] == self.lexicon.categories.index('N'):
+            if self.allow_UNK_E and n_cat[2] == self.lexicon.categories.index('N'):
                 # 'N' is a candidate to receive UNK token
                 unk = self.create_unk_node()
                 candidates.append([unk, None])
@@ -472,17 +503,17 @@ class Parser:
             if token not in self.new_adjectives:
                 self.ontology.preds.append(token)
                 self.ontology.entries.append(self.ontology.read_type_from_str("<e,t>"))
-                print self.ontology.preds  # DEBUG
-                print self.ontology.entries  # DEBUG
+                # print self.ontology.preds  # DEBUG
+                # print self.ontology.entries  # DEBUG
                 self.ontology.num_args.append(1)
                 new_lex = [token + " :- DESC : " + token]
-                print "adding adjective " + str(new_lex)  # DEBUG
+                # print "adding adjective " + str(new_lex)  # DEBUG
                 self.lexicon.expand_lex_from_strs(new_lex, self.lexicon.surface_forms,
                                                   self.lexicon.semantic_forms, self.lexicon.entries,
-                                                  self.lexicon.pred_to_surface)
+                                                  self.lexicon.pred_to_surface, False)
                 self.lexicon.update_support_structures()
-                print "surface forms: "+str(self.lexicon.surface_forms)  # DEBUG
-                print "entries: "+str(self.lexicon.entries)  # DEBUG
+                # print "surface forms: "+str(self.lexicon.surface_forms)  # DEBUG
+                # print "entries: "+str(self.lexicon.entries)  # DEBUG
                 self.new_adjectives.append(token)
             adj_idx = self.lexicon.entries[self.lexicon.surface_forms.index(token)][0]
             candidates.append([self.lexicon.semantic_forms[adj_idx], adj_idx])
@@ -681,6 +712,7 @@ class Parser:
                             c_obj = self.perform_adjectival_type_raise(c_obj)
                             raised = True
                         B_new.children[i] = self.perform_fa(c_obj, curr.children[0])
+                        B_new.children[i].increment_lambdas(inc=deepest_lambda)
                         B_new.children[i].parent = curr
                         B_new.children[i].set_return_type(self.ontology)
                     if raised:
@@ -736,7 +768,11 @@ class Parser:
                     curr.parent.children[curr_parent_matching_idx].set_return_type(self.ontology)
             if not entire_replacement and curr.children is not None: to_traverse.extend([[c, deepest_lambda] for c in curr.children])
         A_FA_B.renumerate_lambdas([])
-        A_FA_B.set_return_type(self.ontology)
+        try:
+            A_FA_B.set_return_type(self.ontology)
+        except TypeError as e:
+            print e
+            sys.exit("ERROR in form '"+self.print_parse(A_FA_B)+"'")
         A_FA_B.set_category(self.lexicon.categories[A.category][0])
         # print "performed FA with '"+self.print_parse(A,True)+"' taking '"+self.print_parse(B,True)+"' to form '"+self.print_parse(A_FA_B,True)+"'" #DEBUG
         if self.safety and not A_FA_B.validate_tree_structure():
@@ -823,6 +859,7 @@ class Parser:
     # turn a string into a sequence of tokens to be assigned semantic meanings
     def tokenize(self, s):
         s = s.replace('?', '')
+        s = s.replace("it's", "it is")
         s = s.replace("'s", " 's")
         str_parts = s.split()
         for i in range(0, len(str_parts)):

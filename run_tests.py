@@ -68,7 +68,8 @@ for t in tests_info:
         f.write(",".join([t, tests_info[t][0], tests_info[t][1]])+"\n")
 for t in tests:
     if t[0] not in written:
-        f.write(",".join([t[0],
-                          str(completion_times[t[0]]),
-                          "1"])+"\n")
+        if t[0] in completion_times:
+            f.write(",".join([t[0],
+                              str(completion_times[t[0]]),
+                              "1"])+"\n")
 f.close()

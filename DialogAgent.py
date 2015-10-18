@@ -160,7 +160,8 @@ class DialogAgent:
             curr = curr.children[0]
         if curr.children is not None:
             for i in range(0, len(curr.children)):
-                if curr.children[i].is_lambda and curr.children[i].lambda_name in heading_lambdas:
+                if (curr.children[i].is_lambda and curr.children[i].lambda_name in heading_lambdas
+                        and curr.type == self.parser.ontology.types.index('e')):
                     curr.children[i] = self.parser.create_unk_node()
         try:
             p_unk_action = self.get_action_from_parse(UNK_root)

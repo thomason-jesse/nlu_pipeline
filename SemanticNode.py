@@ -1,7 +1,7 @@
 __author__ = 'jesse'
 
 import sys
-
+import copy
 
 class SemanticNode:
     def __init__(self, parent, type, category, is_lambda, idx=None, lambda_name=None, is_lambda_instantiation=None,
@@ -96,8 +96,57 @@ class SemanticNode:
             for c in self.children:
                 c.renumerate_lambdas(lambdas[:])
 
+    # validate parent/child relationships
+    def validate_tree_structure(self):
+        if self.children is None:
+            return True
+        for idx in range(0, len(self.children)):
+            if self.children[idx].parent != self:
+                print "child "+str(idx)+" of "+str(self.children[idx]) + " has non-matching parent "+str(self.children[idx].parent)  # DEBUG
+                return False
+            if not self.children[idx].validate_tree_structure():
+                return False
+        return True
+
+    # increment lambda values by given num
+    def increment_lambdas(self, inc=1):
+        if self.is_lambda:
+            self.lambda_name += inc
+        if self.children is not None:
+            for c in self.children:
+                c.increment_lambdas(inc)
+
     # these are a forward comparisons, so two trees are considered equal if their roots have different parents,
     # as long as the roots and children down are identical categories
+
+    def equal_allowing_commutativity(self, other, commutative_idxs):
+        A = copy.deepcopy(self)
+        B = copy.deepcopy(other)
+        A.commutative_raise_node(commutative_idxs)
+        B.commutative_raise_node(commutative_idxs)
+        return A.equal_ignoring_syntax(B, ignore_syntax=True)
+
+    def commutative_raise_node(self, commutative_idxs):  # support function
+        to_expand = [self]
+        while len(to_expand) > 0:
+            curr = to_expand.pop()
+            if curr.idx in commutative_idxs:
+                new_c = []
+                for c in curr.children:
+                    new_c.extend(self.commutative_raise(c, curr.idx))
+                new_c = sorted(new_c, key=lambda node: node.idx)
+                curr.children = new_c
+            if curr.children is not None:
+                to_expand.extend(curr.children)
+
+    def commutative_raise(self, node, idx):  # support function
+        if node.idx == idx:
+            new_c = []
+            for c in node.children:
+                new_c.extend(self.commutative_raise(c, idx))
+            return new_c
+        else:
+            return [node]
 
     def equal_ignoring_syntax(self, other, ignore_syntax=True):
         if type(self) != type(other): return False  # ie no casting
@@ -120,16 +169,4 @@ class SemanticNode:
     def __eq__(self, other):
         if not self.equal_ignoring_syntax(other, ignore_syntax=False):
             return False
-        return True
-
-    # validate parent/child relationships
-    def validate_tree_structure(self):
-        if self.children is None:
-            return True
-        for idx in range(0, len(self.children)):
-            if self.children[idx].parent != self:
-                print "child "+str(idx)+" of "+str(self.children[idx]) + " has non-matching parent "+str(self.children[idx].parent)  # DEBUG
-                return False
-            if not self.children[idx].validate_tree_structure():
-                return False
         return True

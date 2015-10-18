@@ -2,8 +2,8 @@
 search :- M/PP/N : lambda r:e.(lambda p:e.(searchroom(p,r)))
 ask :- M/PP/N : lambda p1:e.(lambda p2:e.(askperson(p1,p2)))
 remind :- M/PP/PP/N : lambda p:e.(lambda m:e.(lambda r:e.(remind(p,m,r))))
-bring :- M/N/N : lambda y:e.(lambda x:e.(bring(x, y)))
-bring :- M/PP/N : lambda x:e.(lambda y:e.(bring(x, y)))
+bring :- M/N/N : lambda y:e.(lambda x:e.(bring(x,y)))
+bring :- M/PP/N : lambda x:e.(lambda y:e.(bring(x,y)))
 walk :- M/PP : lambda x:e.(at(x))
 
 #prepositional arguments to commands

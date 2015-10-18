@@ -18,7 +18,7 @@ class LinearLearner:
         full_feature_map = copy.deepcopy(self.theta)
         self.copy_dict(zero_m_map, self.theta)  # expanded theta now zero'd at all m locations
         self.copy_dict(full_feature_map,
-                      self.theta)  # restore theta values at m locations; theta now expanded with 0s at new features
+                       self.theta)  # restore theta values at m locations; theta now expanded with 0s at new features
         self.zero_dict(full_feature_map)
         self.copy_dict(m, full_feature_map)  # now full_feature_map has 0s except at m locations
         return full_feature_map
@@ -66,7 +66,8 @@ class LinearLearner:
     def learn_from_actions(self, t, learning_rate=None):
         if len(t) == 0:
             return
-        if learning_rate is None: learning_rate = 1 / math.sqrt(float(len(t)))
+        if learning_rate is None:
+            learning_rate = 1 / math.sqrt(float(len(t)))
         for [ct, cp, ca, gt, gp, ga] in t:
             f = self.extract_feature_map(ct, cp, ca)
             g = self.extract_feature_map(gt, gp, ga)
