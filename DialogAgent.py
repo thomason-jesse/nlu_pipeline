@@ -129,7 +129,7 @@ class DialogAgent:
 
         # get n best parses for utterance
         n_best_parses = self.parser.parse_expression(u, n=self.parse_depth)
-        # print "Obtained parses"
+        print 'n_best_parses - ', n_best_parses
 
         # try to digest parses to action request
         success = False

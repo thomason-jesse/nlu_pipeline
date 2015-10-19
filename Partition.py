@@ -20,11 +20,13 @@ class Partition:
             strParamValues = [str(v) for v in self.possible_param_values[param_name]]
             strForm = strForm + param_name + ': {' + ','.join(strParamValues) + '}\n'
         strForm = strForm + 'Belief:' + str(self.belief) + '\n'
-        strForm = strForm + 'Partition prob:' + str(self.reaching_prob) + '\n'
+        #strForm = strForm + 'Partition prob:' + str(self.reaching_prob) + '\n'
         return strForm
         
     def __hash__(self):
-        dict_tuple = tuple([(k, tuple(v)) for (k, v) in self.possible_param_values.items()])
+        dict_tuple = ()
+        if self.possible_param_values is not None :
+            dict_tuple = tuple([(k, tuple(v)) for (k, v) in self.possible_param_values.items()])
         return hash((tuple(self.possible_goals), dict_tuple, self.belief, self.reaching_prob))
         
     # Assumes elements of possible_goals and possible_param_values[key] for all keys

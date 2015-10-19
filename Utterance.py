@@ -42,7 +42,12 @@ class Utterance:
         return True
       
     def __hash__(self):
-        return hash((self.action_type, self.referring_goal, tuple(self.referring_params.items()), self.parse_prob))
+        hash_tuple = ()
+        if self.referring_params is not None :
+            hash_tuple = (self.action_type, self.referring_goal, tuple(self.referring_params.items()), self.parse_prob)
+        else :
+            hash_tuple = (self.action_type, self.referring_goal, (), self.parse_prob)
+        return hash(hash_tuple)
         
     def match(self, partition, system_action) :
         if self.action_type == 'deny' :

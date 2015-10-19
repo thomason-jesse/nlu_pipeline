@@ -79,7 +79,7 @@ class HISBeliefState:
                 # This is a partition to be split
                 goal_split_partitions = list()
                 if required_goal != None :  # Split based on goal
-                    goal_split_partitions = partition.split_by_goal(required_goal, knowledge)
+                    goal_split_partitions = partition.split_by_goal(required_goal, self.knowledge)
                 else :
                     goal_split_partitions = [partition]
 
@@ -94,12 +94,12 @@ class HISBeliefState:
                     partitions_to_split = goal_split_partitions
                     resultant_partitions = list()
                     # For each (param_name, param_value), take all the splits
-                    # you ahve already made for the current partition and
+                    # you have already made for the current partition and
                     # split each one of them acc to this pair
                     for (param_name, param_value) in param_value_pairs :
                         resultant_partitions = list()
                         for partition in partitions_to_split :
-                            resultant_partitions = resultant_partitions + partition.split_by_param(param_name, param_value, knowledge)
+                            resultant_partitions = resultant_partitions + partition.split_by_param(param_name, param_value, self.knowledge)
                         partitions_to_split = resultant_partitions
                         
                     new_partitions = new_partitions + resultant_partitions
@@ -130,12 +130,21 @@ class HISBeliefState:
         hypothesis_beliefs = dict()
         sum_hypothesis_beliefs = 0.0
         
+        print 'Updation'
         for partition in self.partitions :
             for utterance in n_best_utterances :
+                print '---------------------------------'
+                print str(partition)
+                print str(utterance)
+               
                 hypothesis = (partition, utterance)
                 obs_prob = utterance.parse_prob # Pr(o'/u)
+                print 'obs_prob = ', obs_prob
                 type_prob = self.knowledge.action_type_probs[system_action.action_type][utterance.action_type] # Pr(T(u)/T(m))
+                print 'type_prob = ', type_prob 
                 param_match_prob = int(utterance.match(partition, system_action)) # Pr(M(u)/p,m)
+                print 'param_match_prob = ', param_match_prob 
+                print '---------------------------------'
                 hypothesis_beliefs[hypothesis] = obs_prob * type_prob * param_match_prob * partition.belief 
                     # b(p',u') = k * Pr(o'/u) * Pr(T(u)/T(m)) * Pr(M(u)/p,m) * b(p)
                 sum_hypothesis_beliefs += hypothesis_beliefs[hypothesis] # For normalization
@@ -146,9 +155,15 @@ class HISBeliefState:
             sum_hypothesis_beliefs += hypothesis_beliefs[hypothesis]
             
         partitionwise_sum = dict()
+        print 'Hypotheses - '
         for (partition, utterance) in hypothesis_beliefs.keys() :
            # Normalize beliefs
            hypothesis_beliefs[(partition, utterance)] /= sum_hypothesis_beliefs
+           #print '---------------------------------'
+           #print str(partition)
+           #print str(utterance)
+           #print 'Belief = ', hypothesis_beliefs[(partition, utterance)]
+           #print '---------------------------------'
            if partition not in partitionwise_sum :
                partitionwise_sum[partition] = hypothesis_beliefs[(partition, utterance)]
            else : 
@@ -156,7 +171,7 @@ class HISBeliefState:
            
         # Reset partition beliefs for next round
         # b(p) = \sum_u b(p,u)
-        for partition in partitionwise_sum.keys() :
+        for partition in self.partitions :
             partition.belief = partitionwise_sum[partition]
 
         self.hypothesis_beliefs = hypothesis_beliefs

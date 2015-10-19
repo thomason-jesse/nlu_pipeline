@@ -11,6 +11,7 @@ from bwi_kr_execution.msg import *
 class KBGrounder:
     def __init__(self, ontology):
         self.ontology = ontology
+        self.parser = None
         pass
 
     def static_fact_query_client(self, req):
@@ -34,7 +35,7 @@ class KBGrounder:
     def groundSemanticNode(self, root, lambda_names, lambda_types, lambda_assignments):
         # print "Inside groundSemanticNode"
         groundings = []
-        # print "grounding "+str(root)+" with "+str(lambda_names)+","+str(lambda_types)+","+str(lambda_assignments) #DEBUG
+        #print "grounding "+self.parser.print_parse(root,True)+" with "+str(lambda_names)+","+str(lambda_types)+","+str(lambda_assignments) #DEBUG
 
         # if lambda, index and try assignments on children
         if root.is_lambda and root.is_lambda_instantiation:
@@ -134,7 +135,7 @@ class KBGrounder:
                         res = self.static_fact_query_client(req)
                         #print "KB request: "+str(req)+"\nsatisfied: "+str(res.satisfied)  # DEBUG
                     except genpy.message.SerializationError:
-                        sys.exit("Invoked ROS KB with unknown predicate or parameters: \n" + str(req))
+                        raise TypeError("Invoked ROS KB with unknown predicate or parameters: \n" + str(req))
                         # + "\n"+"\n".join([str(child_grounds), str(child_ground_idx), str(root.children)]))
                     satisfied = res.satisfied
 

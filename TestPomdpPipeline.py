@@ -53,7 +53,8 @@ print "instantiating KBGrounder"
 grounder = KBGrounder.KBGrounder(ont)
 
 print "instantiating Parser"
-parser = Parser.Parser(ont, lex, learner, grounder, beam_width=5)
+parser = Parser.Parser(ont, lex, learner, grounder, beam_width=10)
+grounder.parser = parser
 
 print "instantiating Generator"
 generator = Generator.Generator(ont, lex, learner, parser, beam_width=100)
@@ -74,10 +75,10 @@ u_out = OutputToStdout()
 static_policy = PomdpStaticDialogPolicy()
 A = PomdpDialogAgent(parser, grounder, static_policy, u_in, u_out)
 
-#print "reading in data and training parser from actions"
-#D = A.read_in_utterance_action_pairs(sys.argv[3])
-#converged = A.train_parser_from_utterance_action_pairs(D, epochs=10, parse_beam=30)
-#print "theta: "+str(parser.learner.theta)
+print "reading in data and training parser from actions"
+D = A.read_in_utterance_action_pairs(sys.argv[3])
+converged = A.train_parser_from_utterance_action_pairs(D, epochs=10, parse_beam=30)
+print "theta: "+str(parser.learner.theta)
 
 while True:
     u_out.say("How can I help?")

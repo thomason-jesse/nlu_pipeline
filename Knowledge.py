@@ -14,7 +14,7 @@ class Knowledge:
         # This is kept as a single vector common to all values so that hopefully 
         # some operaitons involving them can be made matrix operations and implemented
         # efficiently using numpy
-        self.goal_params_values = [None, 'peter', 'ray', 'dana', 'kazunori', 'matteo', 'shiqi', 'jivko', 'stacy', 'yuqian', 'max', 'pato', 'bwi', 'bwi-meeting', '3516', '3508', '3512', '3510', '3402', '3418', '3420', '3432', '3502', '3414b']
+        self.goal_params_values = [None, 'peter', 'ray', 'dana', 'kazunori', 'matteo', 'shiqi', 'jivko', 'stacy', 'yuqian', 'max', 'pato', 'bwi', 'bwi-meeting', '3516', '3508', '3512', '3510', '3402', '3418', '3420', '3432', '3502', '3414b', True, False]
         
         self.system_dialog_actions = ['repeat_goal', 'confirm_action', 'request_missing_param']
         self.user_dialog_actions = ['inform', 'affirm', 'deny']

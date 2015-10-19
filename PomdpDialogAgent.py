@@ -7,6 +7,7 @@ import copy
 import sys
 import Action
 import StaticDialogState
+import math
 
 from HISBeliefState import HISBeliefState
 from SystemAction import SystemAction
@@ -65,13 +66,13 @@ class PomdpDialogAgent:
                 if user_goal_object is not None and user_goal_object.name is not None :
                     self.previous_system_action.referring_goal = user_goal_object.name
                 num_known_args = 0
-                if dialog_action is not None and user_goal_object is not None and user_goal_object.params is not None :
+                if dialog_action is not None and user_goal_object is not None and user_goal_object.name is not None and user_goal_object.params is not None :
                     num_known_args = len([arg for arg in user_goal_object.params if arg is not None])
                 if num_known_args > 0 :
                     system_action_params = dict()
                     for (idx, param_val) in enumerate(user_goal_object.params) :
                         if param_val is not None :
-                            param_name = self.knowledge.param_order[dialog_action][idx]
+                            param_name = self.knowledge.param_order[user_goal_object.name][idx]
                             system_action_params[param_name] = param_val
                     self.previous_system_action.referring_params = system_action_params
                 
@@ -223,21 +224,21 @@ class PomdpDialogAgent:
     def create_utterances_of_parse(self, parse) :
         # First check if it is a confirmation or denial
         if parse.idx == self.parser.ontology.preds.index('yes'):
-            print 'Is affirm'
+            #print 'Is affirm'
             return [Utterance('affirm')]
         elif parse.idx == self.parser.ontology.preds.index('no'):
-            print 'Is deny'
+            #print 'Is deny'
             return [Utterance('deny')]
         
         # Now check if it a full inform - mentions goal and params
         try:
-            print 'Trying to get an action'
+            #print 'Trying to get an action'
             p_action = self.get_action_from_parse(parse)
         except SystemError:
             p_action = None
 
         if p_action is not None :
-            print 'Got an action. Will convert and return'
+            #print 'Got an action. Will convert and return'
             return [self.convert_action_to_utterance(p_action)]
 
         # if this failed, try again allowing missing lambdas to become UNK without token ties
@@ -253,53 +254,58 @@ class PomdpDialogAgent:
                 if curr.children[i].is_lambda and curr.children[i].lambda_name in heading_lambdas:
                     curr.children[i] = self.parser.create_unk_node()
         try:
-            print 'Trying to get UNK action'
+            #print 'Trying to get UNK action'
             p_unk_action = self.get_action_from_parse(UNK_root)
         except SystemError:
             p_unk_action = None
             
         if p_unk_action is not None :
-            print 'Got UNK action. Going to convert and return'
+            #print 'Got UNK action. Going to convert and return'
             return [self.convert_action_to_utterance(p_unk_action)]
             
         # Getting a complete action failed so assume this is a param  
-        print 'Trying to ground as param value'
-        g = self.grounder.groundSemanticNode(parse, [], [], [])
-        answers = self.grounder.grounding_to_answer_set(g)
-        utterances = []
-        if type(answers) == 'str' :
-            answers = [answers]
-        for answer in answers :
-            goal = self.previous_system_action.referring_goal
-            params = dict()
-            param_name = 'patient' # TODO: Something more intelligent than
-                                   # defaulting when we don't know the goal
-            if goal is not None :
-                param_name = self.knowledge.param_order[goal][idx] 
-            params[param_name] = answer
-            utterance = Utterance('inform', goal, params)      
-            utterances.append(utterance)
-        return utterances
+        #print 'Trying to ground as param value'
+        #print "\nGrounding ", self.parser.print_parse(parse)
+        try :
+            g = self.grounder.groundSemanticNode(parse, [], [], [])
+            answers = self.grounder.grounding_to_answer_set(g)
+            utterances = []
+            if type(answers) == 'str' :
+                answers = [answers]
+            for answer in answers :
+                goal = self.previous_system_action.referring_goal
+                params = dict()
+                param_name = 'patient' # TODO: Something more intelligent than
+                                       # defaulting when we don't know the goal
+                if goal is not None :
+                    param_name = self.knowledge.param_order[goal][idx] 
+                params[param_name] = answer
+                utterance = Utterance('inform', goal, params)      
+                utterances.append(utterance)
+            return utterances
+        except TypeError as e :
+            print e.message
             
     def get_n_best_utterances_from_parses(self, n_best_parses) :
         print "In get_n_best_utterances_from_parses"
         print "No of parses = ", len(n_best_parses)
-        sum_conf = 0.0
+        sum_exp_conf = 0.0
         self.n_best_utterances = []
         for (parse, parse_list, conf) in n_best_parses :
-            print "\nParsing ", self.parser.print_parse(parse)
+            #print "\nParsing ", self.parser.print_parse(parse)
+            #print 'conf = ', conf
             utterances = self.create_utterances_of_parse(parse)
-            print "Returned"
+            #print "Returned"
             if utterances is not None and len(utterances) > 0:
-                print "Got ", len(utterances), " utterances"
+                #print "Got ", len(utterances), " utterances"
                 for utterance in utterances :
-                    print str(utterance)
-                    utterance.parse_prob = conf / len(utterances)
+                    #print str(utterance)
+                    utterance.parse_prob = math.exp(conf) / len(utterances)
                     self.n_best_utterances.append(utterance)
-                    sum_conf += utterance.parse_prob
-        sum_conf += self.knowledge.obs_by_non_n_best_prob
+                    sum_exp_conf += utterance.parse_prob
+        sum_exp_conf += self.knowledge.obs_by_non_n_best_prob
         for utterance in self.n_best_utterances :
-            utterance.parse_prob /= sum_conf
+            utterance.parse_prob /= sum_exp_conf
             
         print "N-best utterances: "
         for utterance in self.n_best_utterances :
