@@ -4,20 +4,23 @@ from HISBeliefState import HISBeliefState
 from Partition import Partition
 from Utterance import Utterance
 from SystemAction import SystemAction
+from SummaryState import SummaryState
+from Knowledge import Knowledge
 
 if __name__ == '__main__' :
-    #knowledge = Knowledge()
-    #b = HisBeliefState(knowledge)
-    ##print 1, [str(p) for p in b.partitions], '\n'
-    #m1 = SystemAction('confirm_action', 'searchroom', {'patient':'ray', 'location':'3512'})
-    #m2 = SystemAction('repeat_goal')    
-    #u1 = Utterance('searchroom', {'patient':'ray', 'location':'3512'})
-    #u2 = Utterance(None, None, [Knowledge.yes])
-    #u3 = Utterance(None, None, [Knowledge.no])
-    #b.make_all_matching_partitions(m1, u2)
-    ##for p in b.partitions :
-        ##print str(p), '\n'
-    #b.update(m1, [u1, u2, u3])
+    knowledge = Knowledge()
+    b = HISBeliefState(knowledge)
+    print str(b)
+    m1 = SystemAction('confirm_action', 'searchroom', {'patient':'ray', 'location':'3512'})
+    m2 = SystemAction('repeat_goal')    
+    u1 = Utterance('inform', 'searchroom', {'patient':'ray', 'location':'3512'})
+    u2 = Utterance('affirm', None, None)
+    u3 = Utterance('deny', None, None)
+    b.update(m1, [u1, u2, u3])
+    print str(b)
+    
+    s = SummaryState(b)
+    print s.get_feature_vector()
 
     #-------------------------------------------------------------------------------------
 
@@ -85,38 +88,38 @@ if __name__ == '__main__' :
     #for i in xrange(1,9) :
         #print u[0] == u[i]
     
-    u = [0,0,0]
-    u[0] = Utterance('inform', 'searchroom', {'patient':'ray', 'location':'3512'})
-    u[1] = Utterance('affirm')
-    u[2] = Utterance('deny')
+    #u = [0,0,0]
+    #u[0] = Utterance('inform', 'searchroom', {'patient':'ray', 'location':'3512'})
+    #u[1] = Utterance('affirm')
+    #u[2] = Utterance('deny')
     
-    p = [0,0,0,0,0,0,0]
-    p[0] = Partition(['searchroom'], {'patient':['ray'], 'location':['3512', '3416']})        
-    p[1] = Partition(['remind', 'searchroom'], {'patient':['ray'], 'location':['3512', '3416']})        
-    p[2] = Partition(['remind'], {'patient':['ray'], 'location':['3512', '3416']})        
-    p[3] = Partition(['searchroom'], {'patient':['peter', 'ray'], 'location':['3512', '3416']})        
-    p[4] = Partition(['searchroom'], {'patient':['peter'], 'location':['3512', '3416']})        
-    p[5] = Partition(['searchroom'], {'patient':['peter', 'ray'], 'location':['3512']})        
-    p[6] = Partition(['searchroom'], {'patient':['peter', 'ray'], 'location':['3416']})        
+    #p = [0,0,0,0,0,0,0]
+    #p[0] = Partition(['searchroom'], {'patient':['ray'], 'location':['3512', '3416']})        
+    #p[1] = Partition(['remind', 'searchroom'], {'patient':['ray'], 'location':['3512', '3416']})        
+    #p[2] = Partition(['remind'], {'patient':['ray'], 'location':['3512', '3416']})        
+    #p[3] = Partition(['searchroom'], {'patient':['peter', 'ray'], 'location':['3512', '3416']})        
+    #p[4] = Partition(['searchroom'], {'patient':['peter'], 'location':['3512', '3416']})        
+    #p[5] = Partition(['searchroom'], {'patient':['peter', 'ray'], 'location':['3512']})        
+    #p[6] = Partition(['searchroom'], {'patient':['peter', 'ray'], 'location':['3416']})        
     
-    m1 = SystemAction('confirm_action', 'searchroom', {'patient':'ray', 'location':'3512'})
-    m2 = SystemAction('repeat_goal')
+    #m1 = SystemAction('confirm_action', 'searchroom', {'patient':'ray', 'location':'3512'})
+    #m2 = SystemAction('repeat_goal')
     
-    for i in xrange(0, 3) :
-        for j in xrange(0, 7) :
-            print str(u[i])
-            print str(p[j])
-            print str(m1)
-            print u[i].match(p[j], m1)
+    #for i in xrange(0, 3) :
+        #for j in xrange(0, 7) :
+            #print str(u[i])
+            #print str(p[j])
+            #print str(m1)
+            #print u[i].match(p[j], m1)
             
-            print '\n-------------------------------\n'
+            #print '\n-------------------------------\n'
             
-            print str(u[i])
-            print str(p[j])
-            print str(m2)
-            print u[i].match(p[j], m2)
+            #print str(u[i])
+            #print str(p[j])
+            #print str(m2)
+            #print u[i].match(p[j], m2)
             
-            print '\n-------------------------------\n'
+            #print '\n-------------------------------\n'
             
     #---------------------------------------------------------------------
     

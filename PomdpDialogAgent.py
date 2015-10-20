@@ -42,6 +42,7 @@ class PomdpDialogAgent:
         # select next action from state
         action = None
         while action is None:
+            self.belief_state.increment_dialog_turns()
             print "dialog state: "+str(self.state)  # DEBUG
             action = self.policy.resolve_state_to_action(self.state)
 
