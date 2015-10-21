@@ -1,5 +1,18 @@
 __author__ = 'aishwarya'
 
+import pickle
+
+def save_model(obj, name):
+    with open('models/'+ str(name) + '.pkl', 'wb') as f:
+        pickle.dump(obj, f, pickle.HIGHEST_PROTOCOL)
+
+def load_model(name):
+    try :
+        with open('models/' + str(name) + '.pkl', 'r') as f:
+            return pickle.load(f)
+    except :
+        return None
+        
 def checkLists(list1, list2) :
     if list1 == None and list2 == None :
         return True

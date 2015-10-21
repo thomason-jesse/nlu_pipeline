@@ -1,10 +1,12 @@
 __author__ = 'aishwarya'
 
-import sys
+import sys, math
 
 class SummaryState :
     
     def __init__(self, hisBeliefState) :
+        self.discrete_features = []
+        
         # TODO: These default values don't make sense. Think about them
         self.top_hypothesis_prob = 0.0      
         self.second_hypothesis_prob = 0.0
@@ -32,6 +34,9 @@ class SummaryState :
     #     - Do the top and second hypothesis use the same partition: yes/no  
     #     - Type of last user utterance - inform/affirm/deny
     def get_feature_vector(self) :
+        # Store indices of discrete features
+        self.discrete_features = [5, 6]
+        
         # Probability of top hypothesis; Probability of second hypothesis
         feature = [self.top_hypothesis_prob, self.second_hypothesis_prob]
         
@@ -61,6 +66,30 @@ class SummaryState :
             feature.append('no')
             
         # Type of last user utterance
-        feature.append(self.top_hypothesis[1].action_type)
+        if type(self.top_hypothesis[1]) == str :
+            feature.append(self.top_hypothesis[1])
+        else :
+            feature.append(self.top_hypothesis[1].action_type)
         
         return feature
+        
+    # Calculate the distance between this summary state and the other
+    # summary state
+    def distance_to(self, other_summary_state) :
+        distance = 0.0
+        cts_distance = 0.0
+        self_feature_vector = self.get_feature_vector()
+        other_feature_vector = other_summary_state.get_feature_vector()
+        weights = self.knowledge.summary_space_distance_weights
+        for i in xrange(0, len(self_feature_vector)) :
+            if i in self.discrete_features :
+                distance += weights[i] * (1.0 - float(self_feature_vector[i] == other_feature_vector[i]))
+            else :
+                cts_distance += weights[i] * (self_feature_vector[i] - other_feature_vector[i]) * (self_feature_vector[i] - other_feature_vector[i])
+        distance += math.sqrt(cts_distance)        
+        return distance
+        
+    def calc_kernel(self, other_summary_state) :
+        std_dev = self.knowledge.kernel_std_dev
+        degree = self.knowledge.kernel_degree
+        return (self.distance_to(other_summary_state) + std_dev*std_dev) ** degree

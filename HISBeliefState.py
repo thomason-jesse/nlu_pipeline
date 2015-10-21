@@ -160,7 +160,7 @@ class HISBeliefState:
             sum_hypothesis_beliefs += hypothesis_beliefs[hypothesis]
             
         partitionwise_sum = dict()
-        print 'Hypotheses - '
+        #print 'Hypotheses - '
         for (partition, utterance) in hypothesis_beliefs.keys() :
            # Normalize beliefs
            hypothesis_beliefs[(partition, utterance)] /= sum_hypothesis_beliefs

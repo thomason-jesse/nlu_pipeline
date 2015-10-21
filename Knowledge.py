@@ -57,12 +57,46 @@ class Knowledge:
         # calculated exactly but it will be hard to do so.
         self.non_n_best_match_prob = 0.01
         
+        # The system requires arguments to be passed to ASP in specific
+        # orders for each action. This is not an obviously generalizable
+        # order so it is hard-coded here
         self.param_order = dict()
         self.param_order['searchroom'] = ['patient', 'location']
         self.param_order['speak_t'] = ['patient']
         self.param_order['speak_e'] = ['patient']
         self.param_order['remind'] = ['recipient', 'patient', 'location']
         self.param_order['askperson'] = ['patient', 'recipient']
+
+        # Component-wise weights for distance metric in summary space
+        # When calculating the distance, a sum of the weighted L2 norm
+        # of the continuous components and weighted misclassification
+        # distance of discrete components is used. If the weight vector
+        # is smaller than the number of features, remaining weights will 
+        # be taken as 0
+        self.summary_space_distance_weights = [1.0, 1.0, 0.1, 0.1, 0.1, 0.1, 0.1]
+
+        # Weight for summary action agreement in GP-SARSA kernel
+        # State feature weights in this kernel are the summary space
+        # distance weights
+        self.summary_action_distance_weight = 0.1
+        
+        # Distance range in which summary belief points are mapped to
+        # the same grid point
+        self.summary_space_grid_threshold = 0.2
+        
+        self.summary_system_actions = self.system_dialog_actions + ['take_action']
+        
+        # Sparsification param nu for GP-SARSA
+        self.sparsification_param = 0.1
+        
+        # Hyperparameters for polynomial kernel
+        self.kernel_std_dev = 0.01
+        self.kernel_degree = 1
+        
+        # Parameters for the RL problem and GP-SARSA
+        self.gamma = 0.1
+        self.gp_sarsa_std_dev = 0.01
+        
 
     # This gives a 0-1 value for whether a param is relevant for an action. 
     # Assumes the following form of actions - 

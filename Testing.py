@@ -1,26 +1,40 @@
 __author__ = 'aishwarya'
 
+import copy
+
 from HISBeliefState import HISBeliefState
 from Partition import Partition
 from Utterance import Utterance
 from SystemAction import SystemAction
 from SummaryState import SummaryState
 from Knowledge import Knowledge
+from PomdpGpSarsaPolicy import PomdpGpSarsaPolicy
 
 if __name__ == '__main__' :
     knowledge = Knowledge()
     b = HISBeliefState(knowledge)
-    print str(b)
+    #print str(b)
     m1 = SystemAction('confirm_action', 'searchroom', {'patient':'ray', 'location':'3512'})
     m2 = SystemAction('repeat_goal')    
     u1 = Utterance('inform', 'searchroom', {'patient':'ray', 'location':'3512'})
     u2 = Utterance('affirm', None, None)
     u3 = Utterance('deny', None, None)
     b.update(m1, [u1, u2, u3])
-    print str(b)
+    #print str(b)
     
     s = SummaryState(b)
-    print s.get_feature_vector()
+    print 's = ', s.get_feature_vector()
+    s2 = copy.deepcopy(s)
+    s2.top_hypothesis_prob = 0.5
+    print 's2 = ', s2.get_feature_vector()
+    #print s.distance_to(s2)
+    
+    p = PomdpGpSarsaPolicy(knowledge)
+    #print p.calc_k((s, 'repeat_goal'), (s, 'repeat_goal'))
+    #p.D = [(s, 'repeat_goal'), (s2, 'repeat_goal')]
+    #print p.calc_k_vector(s, 'repeat_goal')
+    print p.get_initial_action(s)
+    p.print_vars()
 
     #-------------------------------------------------------------------------------------
 
