@@ -10,7 +10,7 @@ class Lexicon:
         self.categories = []  # will grow on its own
         self.surface_forms, self.semantic_forms, self.entries, self.pred_to_surface = self.read_lex_from_file(
             lexicon_fname, allow_expanding_ont)
-        self.reverse_entries = {}
+        self.reverse_entries = []
         self.sem_form_expected_args = None
         self.sem_form_return_cat = None
         self.category_consumes = None
@@ -18,16 +18,32 @@ class Lexicon:
         self.update_support_structures()
 
     def update_support_structures(self):
-        self.compute_reverse_entries(self.reverse_entries)
+        self.compute_pred_to_surface(self.pred_to_surface)
+        self.reverse_entries = self.compute_reverse_entries()
         self.sem_form_expected_args = [self.calc_exp_args(i) for i in range(0, len(self.semantic_forms))]
         self.sem_form_return_cat = [self.calc_return_cat(i) for i in range(0, len(self.semantic_forms))]
         self.category_consumes = [self.find_consumables_for_cat(i) for i in range(0, len(self.categories))]
         self.generator_should_flush = True
 
-    def compute_reverse_entries(self, r):
+    def compute_pred_to_surface(self, pts):
+        for sur_idx in range(0, len(self.entries)):
+            for sem_idx in self.entries[sur_idx]:
+                to_examine = [self.semantic_forms[sem_idx]]
+                while len(to_examine) > 0:
+                    curr = to_examine.pop()
+                    if not curr.is_lambda:
+                        if curr.idx in pts and sur_idx not in pts[curr.idx]:
+                            pts[curr.idx].append(sur_idx)
+                        elif curr.idx not in pts:
+                            pts[curr.idx] = [sur_idx]
+                    if curr.children is not None:
+                        to_examine.extend(curr.children)
+
+    def compute_reverse_entries(self):
+        r = {}
         for sur_idx in range(0, len(self.surface_forms)):
             for sem_idx in self.entries[sur_idx]:
-                if sem_idx in r:
+                if sem_idx in r and sur_idx not in r[sem_idx]:
                     r[sem_idx].append(sur_idx)
                 else:
                     r[sem_idx] = [sur_idx]
@@ -167,6 +183,17 @@ class Lexicon:
         for c in node.children:
             node_preds.extend(self.get_all_preds_from_semantic_form(c))
         return node_preds
+
+    def form_contains_DESC_predicate(self, node):
+        if not node.is_lambda:
+            for sem in self.semantic_forms:
+                if not sem.is_lambda and sem.idx == node.idx and sem.category == self.categories.index('DESC'):
+                    return True
+        if node.children is not None:
+            for c in node.children:
+                if self.form_contains_DESC_predicate(c):
+                    return True
+        return False
 
     def read_category_from_str(self, s):
         # detect whether (,) surrounding s and pop it out of them

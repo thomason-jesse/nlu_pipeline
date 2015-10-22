@@ -8,7 +8,7 @@ import SemanticNode
 
 
 class Parser:
-    def __init__(self, ont, lex, learner, grounder, beam_width=10, safety=False, allow_UNK_E=True):
+    def __init__(self, ont, lex, learner, grounder, beam_width=10, safety=False):
         self.ontology = ont
         self.lexicon = lex
         self.learner = learner
@@ -16,7 +16,6 @@ class Parser:
         self.beam_width = beam_width
         self.new_adjectives = []  # cleared before every parsing job
         self.safety = safety
-        self.allow_UNK_E = allow_UNK_E
 
     # print a SemanticNode as a string using the known ontology
     def print_parse(self, p, show_category=False):
@@ -61,11 +60,36 @@ class Parser:
                 s += self.print_parse(self.lexicon.semantic_forms[sp[0]]) + " -: " + sp[1]
         return s
 
-    def tokens_of_parse_tree(self, sp):
-        if type(sp[1]) is str:
-            return sp[1]
+    def tokens_of_parse_tree(self, sp, allow_None=False, collapse_adj=False, disallow_None_adj=False):
+        if collapse_adj and type(sp) is list and type(sp[1]) is list and sp[1][0] == sp[1][1]:
+            return self.tokens_of_parse_tree(sp[1][0], allow_None=allow_None, collapse_adj=collapse_adj)
+        elif type(sp[1]) is str:
+            if type(sp[0]) is int:
+                return sp[1]
+            elif allow_None and sp[0] is None:
+                # and len(self.lexicon.entries[self.lexicon.surface_forms.index(sp[1])]) == 0):
+                # the second part of this conditional means we can't learn any new meanings for existing words
+                is_adj = False
+                if disallow_None_adj:
+                    for sem_idx in self.lexicon.entries[self.lexicon.surface_forms.index(sp[1])]:
+                        if self.lexicon.semantic_forms[sem_idx].category == self.lexicon.categories.index('DESC'):
+                            is_adj = True
+                if not is_adj or not disallow_None_adj:
+                    return None
+        elif type(sp[1]) is list:
+            return [self.tokens_of_parse_tree(
+              m, allow_None=allow_None, collapse_adj=collapse_adj, disallow_None_adj=disallow_None_adj) for m in sp[1]]
         else:
-            return [self.tokens_of_parse_tree(m) for m in sp[1]]
+            sys.exit("Unhandled input in tokens_of_parse_tree: "+str(sp))
+        return False
+
+    def flatten(self, l):
+        if type(l) is not list:
+            return [l]
+        r = []
+        for li in l:
+            r.extend(self.flatten(li))
+        return r
 
     # read in data set of form utterance/denotation\n\n...
     def read_in_paired_utterance_denotation(self, fname):
@@ -158,7 +182,8 @@ class Parser:
         return D
 
     # take in a data set D=(x,y) for x tokens and y correct semantic form and update the learner's parameters
-    def train_learner_on_semantic_forms(self, D, reset_learner=False, epochs=10, k=None, n=10):
+    def train_learner_on_semantic_forms(
+            self, D, epochs=10, k=None, n=10, allow_UNK_E=True, generator=None):
         if k is None:
             k = self.beam_width
         commutative_idxs = [self.ontology.preds.index('and'), self.ontology.preds.index('or')]
@@ -169,23 +194,13 @@ class Parser:
             num_matches = 0
             num_fails = 0
             for [x, y] in D:
-                # print x  # DEBUG
-                # DEBUG
-                # comm_raised = copy.deepcopy(y)
-                # comm_raised.commutative_raise_node(commutative_idxs)
-                # print "raised target: "+self.print_parse(comm_raised)
-                # /DEBUG
-                n_best = self.parse_tokens(x, k, n)
+                generator_genlex = None if generator is None else [generator, x, y]
+                n_best = self.parse_tokens(x, k, n, allow_UNK_E=allow_UNK_E, generator_genlex=generator_genlex)
                 if len(n_best) > 0:
                     highest_scoring_parse = n_best[0]
                     correct_parse = None
                     match = False
                     for i in range(0, len(n_best)):
-                        # DEBUG
-                        # comm_raised = copy.deepcopy(n_best[i][0])
-                        # comm_raised.commutative_raise_node(commutative_idxs)
-                        # print "raised candidate: "+self.print_parse(comm_raised)
-                        # /DEBUG
                         if y.equal_allowing_commutativity(n_best[i][0], commutative_idxs):
                             correct_parse = n_best[i]
                             if i == 0:
@@ -198,9 +213,6 @@ class Parser:
                     if not match:
                         T.append([x, highest_scoring_parse, None,
                                   x, correct_parse, None])
-                        # print "mismatch: " + self.print_parse(correct_parse[0]) + " != " + self.print_parse(
-                        #     highest_scoring_parse[0])  # DEBUG
-                        # print self.print_semantic_parse_result(highest_scoring_parse[1])  # DEBUG
                         all_matches = False
                 else:
                     print "WARNING: could not find valid parse for '" + " ".join(x) + "' during training"
@@ -250,13 +262,13 @@ class Parser:
                 self.add_genlex_entries_to_lexicon_from_bracketing(bracketing[1][i])
 
     # tokenizes str and passes it to a function to parse tokens
-    def parse_expression(self, s, k=None, n=1):
+    def parse_expression(self, s, k=None, n=1, allow_UNK_E=True, generator_genlex=None):
         tokens = self.tokenize(s)
-        return self.parse_tokens(tokens, k=k, n=n)
+        return self.parse_tokens(tokens, k=k, n=n, allow_UNK_E=allow_UNK_E, generator_genlex=generator_genlex)
 
     # given tokens, returns list of up to k [parse,semantic parse tree,score] pairs;
     # less than k returned if fewer than k full parses could be found
-    def parse_tokens(self, tokens, k=None, n=1):
+    def parse_tokens(self, tokens, k=None, n=1, allow_UNK_E=True, generator_genlex=None):
         if k is None: k = self.beam_width
         self.new_adjectives = []
         iterations_limit = max([10000, int(sum([math.pow(2, t) for t in range(0, len(tokens))]))])
@@ -327,7 +339,9 @@ class Parser:
                     #     print self.print_parse(self.lexicon.semantic_forms[p] if type(p) is int else p, True)
                     # print self.print_semantic_parse_result(partial_parses[max_score_idx][1])  # DEBUG
                     new_partials = [[cpp, cpsp, max_score_idx] for [cpp, cpsp] in
-                                self.expand_partial_parse(partial_parses[max_score_idx]) if
+                                self.expand_partial_parse(
+                                    partial_parses[max_score_idx], allow_UNK_E=allow_UNK_E,
+                                    generator_genlex=generator_genlex) if
                                 cpp not in bad_partial_parses]
                     if len(new_partials) == 0:  # then this parse is a bad partial
                         bad_partial_parses.append(partial_parses[max_score_idx])
@@ -378,7 +392,10 @@ class Parser:
     # given partial parse
     # expand via function application (forwards and backwards), type-raising, and merge operations
     # attempt to escape un-parsable situations through `parsing with unknowns'
-    def expand_partial_parse(self, p):
+    def expand_partial_parse(self, p, allow_UNK_E, generator_genlex):
+        generator = None if generator_genlex is None else generator_genlex[0]
+        known_tokens = None if generator_genlex is None else generator_genlex[1]
+        known_root = None if generator_genlex is None else generator_genlex[2]
         partial = p[0]
         tree = p[1]
         possible_joins = []
@@ -414,7 +431,8 @@ class Parser:
                 raised_subtrees = self.perform_adjectival_type_raise(ref)
                 possible_joins.append([i, i, raised_subtrees, tree[i], tree[i], None])
 
-        # try parsing with unknowns if no pairwise connections remain
+        # try parsing with unknowns if no pairwise connections remain (eg. adjectives and UNK_E)
+        simple_genlex_fired = False
         if not pairwise_joins:
             for i in range(0, len(partial)):
                 if partial[i] is not None: continue
@@ -422,11 +440,71 @@ class Parser:
                 if (len(self.lexicon.entries[self.lexicon.surface_forms.index(tree[i][1])]) == 0
                         or tree[i][1] in self.new_adjectives):
                     for d in [-1, 1]:
-                        candidate_assignments = self.genlex_for_missing_entry(partial, i, d, tree[i][1])
+                        candidate_assignments = self.genlex_for_missing_entry(
+                            partial, i, d, tree[i][1], allow_UNK_E=allow_UNK_E)
                         for candidate_assignment, syn_idx in candidate_assignments:
                             possible_joins.append([i, i, candidate_assignment, tree[i], tree[i], syn_idx])
+                            simple_genlex_fired = True
 
-        expanded_partials = []
+        # use generator to do soft alignment and add new lexical entries if no simple unknowns were found
+        generator_genlex_succeeded = False
+        if not pairwise_joins and not simple_genlex_fired and generator is not None:
+            pt = []
+            skip_generator_genlex = False
+            for tree_part in tree:
+                toks = self.tokens_of_parse_tree(tree_part, allow_None=True, collapse_adj=True, disallow_None_adj=True)
+                if type(toks) is bool and not toks:  # found a known adjective assigned None
+                    skip_generator_genlex = True
+                pt.append(toks)
+            if None in pt and not skip_generator_genlex:
+                if len(known_tokens) != len(
+                        self.flatten([t.split() if type(t) is str else t for t in self.flatten(pt)])):
+                    sys.exit("ERROR: extracted bracketing sequence "+str(pt)+" of length "+str(self.flatten(pt)) +
+                             " for token sequence "+str(known_tokens)+" of length "+str(len(known_tokens)) +
+                             " from trees\n"+self.print_semantic_parse_result(tree))
+                target_forms_idx = [partial[i] if partial[i] is not None else False for i in range(0, len(partial))]
+                target_forms = [self.lexicon.semantic_forms[target_forms_idx[i]]
+                                if type(target_forms_idx[i]) is int else target_forms_idx[i]
+                                for i in range(0, len(target_forms_idx))]
+                # print "using generator to search for gap-filling entry in "+str(pt)+" with tree " +\
+                #     self.print_semantic_parse_result(tree)  # DEBUG
+                gen_result = generator.get_token_sequences_for_semantic_form(
+                    known_root, target_forms=target_forms, n=sys.maxint)
+                # print "\tgenerated candidate "+str(gen_result)  # DEBUG
+                if len(gen_result) > 0:
+                    if len(gen_result) != len(pt):
+                        sys.exit("ERROR: generated sequence of "+str(len(gen_result))+" partials for " +
+                                 "known bracketing sequence "+str(len(pt)))
+                    tok_idx = 0
+                    for i in range(0, len(pt)):
+                        if pt[i] is None:
+                            tok_forms = [self.lexicon.semantic_forms[j] for j in
+                                         self.lexicon.entries[self.lexicon.surface_forms.index(known_tokens[tok_idx])]]
+                            if (gen_result[i] not in tok_forms and  # entry does not already exist
+                                    # it is not the case that there is a DESC in the form and the word in question
+                                    # already has a lexical entry (ie. can't learn synonyms of DESC that are already
+                                    # words in the lexicon)
+                                    not (self.lexicon.form_contains_DESC_predicate(gen_result[i]) and
+                                         len(self.lexicon.entries[
+                                             self.lexicon.surface_forms.index(known_tokens[tok_idx])]) > 0)):
+                                new_lex = [known_tokens[tok_idx]+" :- "+self.print_parse(gen_result[i], True)]
+                                print "new lexicon entry: "+new_lex[0]  # DEBUG
+                                self.lexicon.expand_lex_from_strs(new_lex, self.lexicon.surface_forms,
+                                                                  self.lexicon.semantic_forms, self.lexicon.entries,
+                                                                  self.lexicon.pred_to_surface, False)
+                                self.lexicon.update_support_structures()
+                                generator_genlex_succeeded = True
+                            tok_idx += 1
+                        elif type(pt[i]) is str:
+                            tok_idx += 1
+                        else:
+                            tok_idx += len(pt[i])
+
+        if generator_genlex_succeeded:  # if we added to lexicon, get those additions
+            expanded_partials = self.expand_partial_parse(p, allow_UNK_E, generator_genlex)
+        else:
+            expanded_partials = []
+
         for join in possible_joins:
             f = True if join[0] < join[1] else False
             ordered_break = [join[0], join[1]] if f else [join[1], join[0]]
@@ -444,7 +522,7 @@ class Parser:
     # return set of candidate entries for idx of given partial with respect to its neighbor in direction d
     # performs exact syntax/semantics match against lexicon; can only learn perfect synonyms
     # has special allowances for UNK assignments to tokens for certain syntactic categories
-    def genlex_for_missing_entry(self, partial, idx, d, token):
+    def genlex_for_missing_entry(self, partial, idx, d, token, allow_UNK_E):
 
         # ensure the given parameters are candidates for generating new lexical entries
         if partial[idx] is not None: return []
@@ -481,7 +559,7 @@ class Parser:
         if (type(n_cat) is list
                 and ((i < idx and n_cat[1] == 1) or (i > idx and n_cat[1] == 0))):
             # if neighbor is looking for an N, treat as UNK due to ambiguity
-            if self.allow_UNK_E and n_cat[2] == self.lexicon.categories.index('N'):
+            if allow_UNK_E and n_cat[2] == self.lexicon.categories.index('N'):
                 # 'N' is a candidate to receive UNK token
                 unk = self.create_unk_node()
                 candidates.append([unk, None])

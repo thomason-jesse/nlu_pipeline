@@ -119,7 +119,7 @@ class Generator:
         traces = []
         scores = []
         for cand_idx in range(0, len(candidate_sequences)):
-            tokens = candidate_sequences[cand_idx]
+            tokens = candidate_sequences[cand_idx][0]
             tree = None
             trace = None
             score = -sys.maxint
@@ -138,12 +138,12 @@ class Generator:
         while len(n_best) < n and len(candidate_sequences) > 0:
             max_score_idx = scores.index(max(scores))
             if trees[max_score_idx] is not None:
-                n_best.append([candidate_sequences[max_score_idx],      # the token sequence chosen
+                n_best.append([candidate_sequences[max_score_idx][0],   # the token sequence chosen
                                trees[max_score_idx],                    # the parse tree by parser
                                traces[max_score_idx],                   # the parse history by parser
                                scores[max_score_idx]])                  # the score from the parser
             else:
-                print "WARNING: sequence " + str(candidate_sequences[max_score_idx]) +\
+                print "WARNING: sequence " + str(candidate_sequences[max_score_idx][0]) +\
                       " was generated but does not parse into expected root"
             del candidate_sequences[max_score_idx]
             del trees[max_score_idx]
@@ -152,7 +152,7 @@ class Generator:
 
     # given semantic form, return a list of up to n token sequences;
     # fewer than n returned if fewer than n explanatory tokens could be found
-    def get_token_sequences_for_semantic_form(self, root, k=None, n=1):
+    def get_token_sequences_for_semantic_form(self, root, k=None, n=1, target_forms=None):
         if k is None:
             k = self.beam_width
         num_preds = self.count_preds_in_semantic_form(root)
@@ -169,16 +169,36 @@ class Generator:
             # print "num full parses: "+str(len(full_parses))  # DEBUG
 
             # find best scoring partial and expand it
-            max_score_idx = scores.index(max(scores))
-            # print "max scoring parse "+str([
-            #     self.parser.print_parse(p, True) for p in partial_parses[max_score_idx][0]]) +\
-            #     ", " + str(scores[max_score_idx])  # DEBUG
-            # _ = raw_input()  # DEBUG
+            max_score_idx = None
+            while max_score_idx is None:
+                max_score_idx = scores.index(max(scores))
+                # print "max scoring parse "+str([
+                #     self.parser.print_parse(p, True) for p in partial_parses[max_score_idx][0]]) +\
+                #     ", " + str(scores[max_score_idx])  # DEBUG
+                # _ = raw_input()  # DEBUG
+
+                # if max scoring parse has exceeded target form size, we know we can drop it
+                if target_forms is not None and len(target_forms) < len(partial_parses[max_score_idx][0]):
+                    del partial_parses[max_score_idx]
+                    del scores[max_score_idx]
+                    if len(partial_parses) == 0:
+                        # print "WARNING: could not find partial matching target forms during generation"
+                        return []
+
+            # if max scoring parse matches target forms, we're finished with the special use of this function
+            if target_forms is not None and len(target_forms) == len(partial_parses[max_score_idx][0]):
+                match = True
+                for i in range(0, len(target_forms)):
+                    if target_forms and not target_forms.__eq__(partial_parses[max_score_idx][0][i]):
+                        match = False
+                if match:
+                    # print "generator found match "  # DEBUG
+                    return partial_parses[max_score_idx][0]
 
             # if partial token sequence matches its size, the parse is finished
+            was_full_parse = False
             possible_assignments = self.assign_tokens_to_partial(
                 partial_parses[max_score_idx][0], partial_parses[max_score_idx][1])
-            was_full_parse = False
             for pa in possible_assignments:
                 tpa = self.extract_token_sequence_from_bracketing(pa, preserve_False=True)
                 if False not in tpa and len(tpa) == len(partial_parses[max_score_idx][0]):
@@ -195,22 +215,18 @@ class Generator:
                 new_partials = [[cpp, cpsp] for [cpp, cpsp] in
                                 self.expand_partial_parse(partial_parses[max_score_idx])]
                 # score new parses and add to partials / full where appropriate
+                # print "scoring new partials"  # DEBUG
                 new_partials_scores = [self.score_parse(npp) for npp in new_partials]
                 new_partials_beam_size = 0
+                # print "selecting new partials in beam k="+str(k)  # DEBUG
                 while new_partials_beam_size < k and len(new_partials) > 0:
                     max_new_score_idx = new_partials_scores.index(max(new_partials_scores))
-                    num_internal_trees = sum([1 if p is not None else 0 for p
-                                              in new_partials[max_new_score_idx][0]])
-                    if num_internal_trees == 1:
-                        if new_partials[max_new_score_idx] not in full_parses:
-                            full_parses.append(new_partials[max_new_score_idx])
-                        new_partials_beam_size += 1
-                    elif new_partials[max_new_score_idx] not in partial_parses:
+                    # print "chosen new partial: "+str([
+                    #     self.parser.print_parse(p,True) for p in new_partials[max_new_score_idx][0]])  # DEBUG
+                    if new_partials[max_new_score_idx] not in partial_parses:
                         partial_parses.append(new_partials[max_new_score_idx])
                         scores.append(new_partials_scores[max_new_score_idx])
                         new_partials_beam_size += 1
-                    # print "chosen new partial: "+str([
-                    #     self.parser.print_parse(p,True) for p in new_partials[max_new_score_idx][0]])  # DEBUG
                     del new_partials[max_new_score_idx]
                     del new_partials_scores[max_new_score_idx]
             # remove from partials list so we don't waste time expanding again
@@ -219,9 +235,15 @@ class Generator:
 
             # print "bad nodes: "+str([self.parser.print_parse(bn) for bn in self.bad_nodes])  # DEBUG
 
+        if target_forms is not None:
+            # print "WARNING: could not find partial matching target forms during generation"
+            return []
         if len(full_parses) < n:
-            print "WARNING: exceeded generator iterations limit "+str(iterations_limit)+" for parse "+\
-                self.parser.print_parse(root)+" with only "+str(len(full_parses))+"/"+str(n)+" candidates"
+            if len(partial_parses) == 0:
+                print "WARNING: exhausted partial parses and found only "+str(len(full_parses))+"/"+str(n)+" candidates"
+            else:
+                print "WARNING: exceeded generator iterations limit "+str(iterations_limit)+" for parse "+ \
+                    self.parser.print_parse(root)+" with only "+str(len(full_parses))+"/"+str(n)+" candidates"
 
         # score full parses and return n best in order
         full_parse_scores = [self.learner.score_parse(
@@ -232,7 +254,7 @@ class Generator:
             max_score_idx = full_parse_scores.index(max(full_parse_scores))
             t = self.extract_token_sequence_from_bracketing(full_parses[max_score_idx][1])
             if t not in n_best:
-                n_best.append(t)
+                n_best.append([t, full_parses[max_score_idx]])
             del full_parses[max_score_idx]
             del full_parse_scores[max_score_idx]
         return n_best
@@ -292,7 +314,7 @@ class Generator:
             # add source of these nodes to bad nodes list if they are both bad
             bad = [False, False]
             for split_idx in range(1, 3):
-                if split[split_idx] in self.bad_nodes or not split[split_idx]:
+                if split[split_idx] in self.bad_nodes:
                     bad[split_idx-1] = True
             if True in bad:
                 if bad[0] and bad[1]:
@@ -313,7 +335,10 @@ class Generator:
                         triple = False
                         break
                     if offset == 0:
-                        if (split[4] == 1 and offset_set_idx == 0) or (split[4] == 0 and offset_set_idx == 1):
+                        if not split[1] or not split[2]:
+                            triple = False
+                            break
+                        elif (split[4] == 1 and offset_set_idx == 0) or (split[4] == 0 and offset_set_idx == 1):
                             to_match = split[1]
                         elif (split[4] == 1 and offset_set_idx == 1) or (split[4] == 0 and offset_set_idx == 0):
                             to_match = split[2]
@@ -335,7 +360,7 @@ class Generator:
 
             # perform splitting and add to return structure
             expanded_partial = partial[:split[0]]
-            if split[2] is not False:
+            if split[2]:
                 if split[4] == 1:
                     expanded_partial.extend([split[1], split[2]])
                 elif split[4] == 0:
@@ -361,7 +386,6 @@ class Generator:
                         curr[0] = split[3]
                         curr[1] = [False, False]
                     leaves_seen += 1
-            # print "expanded partial: "+str([self.parser.print_parse(p,True) for p in expanded_partial])  # DEBUG
             expanded_partials.append([expanded_partial, expanded_tree])
         # print "num expanded partials: "+str(len(expanded_partials))  # DEBUG
         # empty = raw_input()  # DEBUG
@@ -443,7 +467,7 @@ class Generator:
 
     # given A1(A2), attempt to determine an A1, A2 that satisfy and return them
     def perform_reverse_fa(self, A):
-        # print "performing reverse FA with '"+self.parser.print_parse(A,True)+"'"
+        # print "performing reverse FA with '"+self.parser.print_parse(A, True)+"'"  # DEBUG
 
         # for every predicate p in A of type q, generate candidates:
         # A1 = A with a new outermost lambda of type q, p replaced by an instance of q

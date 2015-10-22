@@ -71,19 +71,19 @@ class FeatureExtractor:
             # extract token,form features
             if tokens is not None:
                 for t_idx in range(0, len(tokens)):
-                    vocab_idx = self.lexicon.surface_forms.index(tokens[t_idx])
+                    vocab_idx = False if tokens[t_idx] is False else self.lexicon.surface_forms.index(tokens[t_idx])
 
                     # token bigrams
                     d = 'token_bigrams'
-                    inc = 1.0 / (len(tokens) * len(self.lexicon.surface_forms) * len(self.lexicon.surface_forms))
+                    inc = 1.0 / ((len(tokens)+1) * len(self.lexicon.surface_forms) * len(self.lexicon.surface_forms))
                     if t_idx < len(tokens)-1:
-                        next_vocab_idx = self.lexicon.surface_forms.index(tokens[t_idx+1])
+                        next_vocab_idx = False if tokens[t_idx+1] is False else self.lexicon.surface_forms.index(tokens[t_idx+1])
                         self.increment_dictionary(token_features, [d, vocab_idx, next_vocab_idx], inc=inc)
 
                     # token,predicate bigrams
                     stack_examine = to_examine[:]
                     d = 'token_surface_pred_co'
-                    inc = 1.0 / (len(tokens) * len(self.lexicon.semantic_forms) * total_forms)
+                    inc = 1.0 / ((len(tokens)+1) * len(self.lexicon.semantic_forms) * total_forms)
                     while len(stack_examine) > 0:
                         curr = stack_examine.pop()
                         if curr is None:
@@ -100,7 +100,7 @@ class FeatureExtractor:
 
                     # token,category bigrams
                     d = 'token_category_co'
-                    inc = 1.0 / (len(tokens) * len(self.lexicon.categories) * total_forms)
+                    inc = 1.0 / ((len(tokens)+1) * len(self.lexicon.categories) * total_forms)
                     for p in to_examine:
                         if p is None:
                             continue
