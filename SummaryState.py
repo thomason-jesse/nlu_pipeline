@@ -5,6 +5,7 @@ import sys, math
 class SummaryState :
     
     def __init__(self, hisBeliefState) :
+        self.knowledge = hisBeliefState.knowledge
         self.discrete_features = []
         
         # TODO: These default values don't make sense. Think about them
@@ -90,6 +91,17 @@ class SummaryState :
         return distance
         
     def calc_kernel(self, other_summary_state) :
-        std_dev = self.knowledge.kernel_std_dev
-        degree = self.knowledge.kernel_degree
-        return (self.distance_to(other_summary_state) + std_dev*std_dev) ** degree
+        p = self.knowledge.kernel_degree
+        sigma_k = self.knowledge.kernel_std_dev
+        k_disc = 0.0
+        norm_cts = 0.0
+        self_feature_vector = self.get_feature_vector()
+        other_feature_vector = other_summary_state.get_feature_vector()
+        for i in xrange(0, len(self_feature_vector)) :
+            if i in self.discrete_features :
+                k_disc += float(self_feature_vector[i] == other_feature_vector[i])
+            else :
+                norm_cts += (self_feature_vector[i] - other_feature_vector[i]) ** 2
+        k_cts = p * p * math.exp( - norm_cts / (2 * sigma_k * sigma_k))
+        return k_disc + k_cts
+        

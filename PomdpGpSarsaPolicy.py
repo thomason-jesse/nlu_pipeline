@@ -50,8 +50,9 @@ class PomdpGpSarsaPolicy :
     
     # b and b_prime are summary states
     def calc_k(self, (b, a), (b_prime, a_prime)) :
-        action_weight = self.knowledge.summary_action_distance_weight
-        return b.calc_kernel(b_prime) + action_weight * (1.0 - float(a == a_prime))
+        action_kernel_value = float(a == a_prime)
+        state_kernel_value = b.calc_kernel(b_prime)
+        return state_kernel_value * action_kernel_value
     
     def calc_k_vector(self, b, a) :
         replicas = [(b, a)] * len(self.D)

@@ -89,13 +89,13 @@ class Knowledge:
         # Sparsification param nu for GP-SARSA
         self.sparsification_param = 0.1
         
-        # Hyperparameters for polynomial kernel
-        self.kernel_std_dev = 0.01
-        self.kernel_degree = 1
+        # Hyperparameters for polynomial kernel - values set from the paper
+        self.kernel_std_dev = 5     # sigma_k in the paper
+        self.kernel_degree = 4      # p in the paper
         
         # Parameters for the RL problem and GP-SARSA
         self.gamma = 0.1
-        self.gp_sarsa_std_dev = 0.01
+        self.gp_sarsa_std_dev = 5
         
 
     # This gives a 0-1 value for whether a param is relevant for an action. 
