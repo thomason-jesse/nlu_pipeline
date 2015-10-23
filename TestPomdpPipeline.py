@@ -81,12 +81,7 @@ converged = A.train_parser_from_utterance_action_pairs(D, epochs=10, parse_beam=
 print "theta: "+str(parser.learner.theta)
 
 while True:
-    u_out.say("How can I help?")
-    s = raw_input()
-    if s == 'stop':
-        break
-    a = A.initiate_dialog_to_get_action(s)
-    print "ACTION: "+str(a)
+    A.run_dialog()
 
 #print "testing Generator:"
 #while True:

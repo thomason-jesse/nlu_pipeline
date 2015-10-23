@@ -1,18 +1,19 @@
 __author__ = 'aishwarya'
 
+import sys
+
 class PomdpDialogAgent :
 
     def __init__(self, parser, grounder, policy, u_input, output, parse_depth=10):
         self.parser = parser
         self.grounder = grounder
         self.parse_depth = parse_depth
-        self.state = None
-        self.policy = policy
         self.input = u_input
         self.output = output
 
         self.knowledge = Knowledge()    
-        self.belief_state = HISBeliefState(self.knowledge)  
+        self.state = HISBeliefState(self.knowledge)  
+        self.policy = PomdpGpSarsaPolicy(self.knowledge)
         self.previous_system_action = SystemAction('repeat_goal')  
         self.n_best_utterances = None
 
@@ -20,79 +21,61 @@ class PomdpDialogAgent :
         self.dialog_actions = self.knowledge.system_dialog_actions
         self.dialog_action_functions = [self.request_user_initiative, self.confirm_action, self.request_missing_param]
 
-    # initiate a new dialog with the agent with initial utterance u
-    def initiate_dialog_to_get_action(self, u):
-        self.state = StaticDialogState.StaticDialogState()
-        self.update_state_from_user_initiative(u)
+        self.first_turn = True
 
-        # select next action from state
-        action = None
-        while action is None:
-            self.belief_state.increment_dialog_turns()
-            print "dialog state: "+str(self.state)  # DEBUG
-            action = self.policy.resolve_state_to_action(self.state)
-
-            print 'Belief state: ', str(self.belief_state) 
-
-            # if the state does not clearly define a user goal, take a dialog action to move towards it
-            if action is None:
-                dialog_action, dialog_action_args, user_goal_object = self.policy.select_dialog_action(self.state)
-                if dialog_action not in self.dialog_actions:
-                    sys.exit("ERROR: unrecognized dialog action '"+dialog_action+"' returned by policy for state "+str(self.state))
-                self.state.previous_action = [dialog_action, dialog_action_args]
-
-                # Create an object encapsulating the system action you
-                # are about to perform
-                # dialog_action - Name/type of system action
-                self.previous_system_action = SystemAction(dialog_action)
-                print '\nCreated system action\n'
-                # The third value returned by self.policy.select_dialog_action()
-                # is an Action object which encapsulates what the user wants
-                # to be done. Action.name is the goal and Action.params has
-                # the list of parameters
-                if user_goal_object is not None and user_goal_object.name is not None :
-                    self.previous_system_action.referring_goal = user_goal_object.name
-                num_known_args = 0
-                if dialog_action is not None and user_goal_object is not None and user_goal_object.name is not None and user_goal_object.params is not None :
-                    num_known_args = len([arg for arg in user_goal_object.params if arg is not None])
-                if num_known_args > 0 :
-                    system_action_params = dict()
-                    for (idx, param_val) in enumerate(user_goal_object.params) :
-                        if param_val is not None :
-                            param_name = self.knowledge.param_order[user_goal_object.name][idx]
-                            system_action_params[param_name] = param_val
-                    self.previous_system_action.referring_params = system_action_params
-                
-                # Take the appropriate dialog action
-                self.dialog_action_functions[self.dialog_actions.index(dialog_action)](dialog_action_args)
-        return action
-
-    # request the user repeat their original goal
+    def run_dialog(self) :
+        self.state = HISBeliefState(self.knowledge)
+        print 'Belief state: ', str(self.belief_state) 
+        summary_state = SummaryState(self.state)
+        (dialog_action, dialog_action_args) = self.policy.get_initial_action(summary_state)    
+        
+        while True :
+            self.state.increment_dialog_turns()
+            if dialog_action == 'take_action' :
+                # Submit the action given by the policy
+                action = dialog_action_args[0]
+                self.output.say("Action: ", str(action))
+                self.output.say("Was this the correct action? (y/n) : ")
+                response = self.input.get()    
+                if response.lower() == 'y' or response.lower() == 'yes' :
+                    self.policy.update_final_reward(self.knowledge.correct_action_reward)
+                else :
+                    self.policy.update_final_reward(self.knowledge.wrong_action_reward)
+                return
+            else :
+                previous_system_action = dialog_action_args[0]
+                # Take the dialog action
+                response = self.dialog_action_functions[self.dialog_actions.index(dialog_action)](dialog_action_args)
+                if response == 'stop' :
+                    sys.exit(1)
+                # Belief monitoring - update belief based on the response
+                update_state(response)
+                reward = self.knowledge.per_turn_reward
+                summary_state = SummaryState(self.state)
+                # Get the next action from the policy
+                (dialog_action, dialog_action_args) = self.policy.get_next_action(reward, summary_state)
+            self.first_turn = False
+        
+    # Request the user to state/repeat their goal
     def request_user_initiative(self, args):
-        self.output.say("Can you restate your question or command?")
-        u = self.input.get()
-        self.update_state_from_user_initiative(u)
-
-    # request a missing action parameter
-    def request_missing_param(self, args):
-        idx = args[0]
-        # not sure whether reverse parsing could frame this
-        goal = self.previous_system_action.referring_goal
-        if idx >= len(self.knowledge.param_order[goal]) :
-            sys.exit("ERROR: unrecognized theme idx "+str(idx))
+        if self.first_turn :
+            self.output.say("How can I help?")
         else :
-            theme = self.knowledge.param_order[goal][idx]
-            
+            self.output.say("Can you restate your question or command?")
+        response = self.input.get()
+        return response
+
+    # Request a missing action parameter
+    def request_missing_param(self, args):
+        theme = args[1]
         self.output.say("What is the " + theme + " of the action you'd like me to take?")
-        u = self.input.get()
-        self.update_state_from_missing_param(u, idx)
+        response = self.input.get()
+        return response
 
-    # update state after asking user to provide a missing parameter
-    def update_state_from_missing_param(self, u, idx):
-        self.state.update_requested_user_turn()
-
+    # Parse the user response and update belief state
+    def update_state(response) :
         # get n best parses for confirmation
-        n_best_parses = self.parser.parse_expression(u, n=self.parse_depth)
+        n_best_parses = self.parser.parse_expression(response, n=self.parse_depth)
 
         # Create an n-best list of Utterance objects along with probabiltiies 
         # obtained fromt ehir confidences
@@ -101,95 +84,23 @@ class PomdpDialogAgent :
         print '\nGoing to update belief state'
         print 'Previous system action - ', str(self.previous_system_action)
         print 'Utterances - ', '\n'.join([str(utterance) for utterance in self.n_best_utterances])
-        self.belief_state.update(self.previous_system_action, self.n_best_utterances)
+        self.state.update(self.previous_system_action, self.n_best_utterances)
 
-        # try to digest parses to confirmation
-        success = False
-        for i in range(0, len(n_best_parses)):
-            # print self.parser.print_parse(n_best_parses[i][0])  # DEBUG
-            # print self.parser.print_semantic_parse_result(n_best_parses[i][1])  # DEBUG
-            g = self.grounder.groundSemanticNode(n_best_parses[i][0], [], [], [])
-            answer = self.grounder.grounding_to_answer_set(g)
-            if type(answer) == 'str' :
-                success = True
-                self.state.update_from_missing_param(answer, idx)
-                break
-            elif len(answer) == 1:
-                success = True
-                self.state.update_from_missing_param(answer[0], idx)
-                break
-        if not success:
-            self.state.update_from_failed_parse()
-
-    # confirm a (possibly partial) action
+    # Confirm a (possibly partial) action
     def confirm_action(self, args):
-        a = args[0]
         # with reverse parsing, want to confirm(a.name(a.params))
         # for now, just use a.name and a.params raw
-        self.output.say("I should take action " + a.name+" involving " +
-                        ','.join([str(p) for p in a.params if p is not None]) + "?")
-        c = self.input.get()
-        self.update_state_from_action_confirmation(c, a)
-
-    # update state after asking user to confirm a (possibly partial) action
-    def update_state_from_action_confirmation(self, c, a):
-        self.state.update_requested_user_turn()
-
-        # get n best parses for confirmation
-        n_best_parses = self.parser.parse_expression(c, n=self.parse_depth)
-        
-        # Create an n-best list of Utterance objects along with probabiltiies 
-        # obtained fromt ehir confidences
-        self.get_n_best_utterances_from_parses(n_best_parses)
-        # Update the belief state
-        print '\nGoing to update belief state'
-        print 'Previous system action - ', str(self.previous_system_action)
-        print 'Utterances - ', '\n'.join([str(utterance) for utterance in self.n_best_utterances])
-        self.belief_state.update(self.previous_system_action, self.n_best_utterances)
-
-        # try to digest parses to confirmation
-        success = False
-        for i in range(0, len(n_best_parses)):
-            # print self.parser.print_parse(n_best_parses[i][0])  # DEBUG
-            # print self.parser.print_semantic_parse_result(n_best_parses[i][1])  # DEBUG
-            if n_best_parses[i][0].idx == self.parser.ontology.preds.index('yes'):
-                success = True
-                self.state.update_from_action_confirmation(a, True)
-            elif n_best_parses[i][0].idx == self.parser.ontology.preds.index('no'):
-                success = True
-                self.state.update_from_action_confirmation(a, False)
-        if not success:
-            self.state.update_from_failed_parse()
-
-    # update state after asking user-initiative (open-ended) question about user goal
-    def update_state_from_user_initiative(self, u):
-        # print "Inside update_state_from_user_initiative"
-        self.state.update_requested_user_turn()
-
-        # get n best parses for utterance
-        n_best_parses = self.parser.parse_expression(u, n=self.parse_depth)
-        
-        # Create an n-best list of Utterance objects along with probabiltiies 
-        # obtained fromt ehir confidences
-        self.get_n_best_utterances_from_parses(n_best_parses)
-        # Update the belief state
-        print '\nGoing to update belief state'
-        print 'Previous system action - ', str(self.previous_system_action)
-        print 'Utterances - ', '\n'.join([str(utterance) for utterance in self.n_best_utterances])
-        self.belief_state.update(self.previous_system_action, self.n_best_utterances)
-        
-        # try to digest parses to action request
-        success = False
-        for i in range(0, len(n_best_parses)):
-            #print self.parser.print_parse(n_best_parses[i][0])  # DEBUG
-            #print self.parser.print_semantic_parse_result(n_best_parses[i][1])  # DEBUG
-            success = self.update_state_from_action_parse(n_best_parses[i][0])
-            if success:
-                break
-
-        # no parses could be resolved into actions for state update
-        if not success:
-            self.state.update_from_failed_parse()
+        system_action = args[0]
+        params = []
+        goal = system_action.referring_goal
+        param_order = self.knowledge.param_order[goal]
+        for param_name in param_order :
+            if param_name in system_action.referring_params :
+                params.append[system_action.referring_params[param_name]]
+        self.output.say("I should take action " + goal +" involving " +
+                        ','.join([str(p) for p in params if p is not None]) + "?")
+        response = self.input.get()
+        return response
 
     # Converts an object of type Action to type Utterance assuming it is
     # informing the system of goal and param details
@@ -297,40 +208,6 @@ class PomdpDialogAgent :
         print "N-best utterances: "
         for utterance in self.n_best_utterances :
             print str(utterance)
-            
-    # get dialog state under assumption that utterance is an action
-    def update_state_from_action_parse(self, p):
-        # get action, if any, from the given parse
-        try:
-            p_action = self.get_action_from_parse(p)
-        except SystemError:
-            p_action = None
-        if p_action is not None:
-            self.state.update_from_action(p_action, p)
-            return True
-
-        # if this failed, try again allowing missing lambdas to become UNK without token ties
-        # print "Going to retry parsing"
-        UNK_root = copy.deepcopy(p)
-        curr = UNK_root
-        heading_lambdas = []
-        if curr.is_lambda and curr.is_lambda_instantiation:
-            heading_lambdas.append(curr.lambda_name)
-            curr = curr.children[0]
-        if curr.children is not None:
-            for i in range(0, len(curr.children)):
-                if curr.children[i].is_lambda and curr.children[i].lambda_name in heading_lambdas:
-                    curr.children[i] = self.parser.create_unk_node()
-        try:
-            p_unk_action = self.get_action_from_parse(UNK_root)
-        except SystemError:
-            p_unk_action = None
-        if p_unk_action is not None:
-            self.state.update_from_action(p_unk_action, UNK_root)
-            return True
-
-        # parse could not be resolved into an action with which to update state
-        return False
 
     def read_in_utterance_action_pairs(self, fname):
         f = open(fname,'r')

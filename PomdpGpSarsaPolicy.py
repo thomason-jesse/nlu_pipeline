@@ -157,7 +157,7 @@ class PomdpGpSarsaPolicy :
         print 'End of get_initial_action'   # DEBUG   
         self.print_vars()                   # DEBUG
         print '-------------------------'   # DEBUG
-        return self.a
+        return (self.a, get_system_action_requirements(self.a, self.b))
     
     def get_next_action(self, reward, current_state) :
         print '\nIn get_next_action'        # DEBUG
@@ -239,7 +239,7 @@ class PomdpGpSarsaPolicy :
         self.print_vars()                   # DEBUG
         print '-------------------------'   # DEBUG
         
-        return self.a
+        return (self.a, get_system_action_requirements(self.a, self.b))
         
     def update_final_reward(self, reward) :
         print '\nIn update_final_reward'    # DEBUG

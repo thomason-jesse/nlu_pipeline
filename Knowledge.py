@@ -97,6 +97,10 @@ class Knowledge:
         self.gamma = 0.1
         self.gp_sarsa_std_dev = 5
         
+        # Rewards
+        self.correct_action_reward = 20
+        self.wrong_action_reward = -20
+        self.per_turn_reward = -1
 
     # This gives a 0-1 value for whether a param is relevant for an action. 
     # Assumes the following form of actions - 
