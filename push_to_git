@@ -5,4 +5,4 @@ rm -f *~
 rm -f models/*
 git add -A
 git commit -m "$*"
-git push origin master
+git push origin dialog-policy-dev
