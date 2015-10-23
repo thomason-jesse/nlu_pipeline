@@ -1,6 +1,20 @@
 __author__ = 'aishwarya'
+# Currently this is essentially DialogAgent with belief monitoring and 
+# some changes to enable belief monitoring
 
-class PomdpDialogAgent :
+import random
+import copy
+import sys
+import Action
+import StaticDialogState
+import math
+
+from HISBeliefState import HISBeliefState
+from SystemAction import SystemAction
+from Knowledge import Knowledge
+from Utterance import Utterance
+
+class PomdpStaticDialogAgent:
 
     def __init__(self, parser, grounder, policy, u_input, output, parse_depth=10):
         self.parser = parser

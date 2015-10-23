@@ -10,31 +10,101 @@ from SummaryState import SummaryState
 from Knowledge import Knowledge
 from PomdpGpSarsaPolicy import PomdpGpSarsaPolicy
 
-if __name__ == '__main__' :
+def test_gp_sarsa_funcs() :
     knowledge = Knowledge()
     b = HISBeliefState(knowledge)
-    #print str(b)
-    m1 = SystemAction('confirm_action', 'searchroom', {'patient':'ray', 'location':'3512'})
-    m2 = SystemAction('repeat_goal')    
-    u1 = Utterance('inform', 'searchroom', {'patient':'ray', 'location':'3512'})
-    u2 = Utterance('affirm', None, None)
-    u3 = Utterance('deny', None, None)
-    b.update(m1, [u1, u2, u3])
-    #print str(b)
-    
-    s = SummaryState(b)
-    print 's = ', s.get_feature_vector()
-    s2 = copy.deepcopy(s)
-    s2.top_hypothesis_prob = 0.5
-    print 's2 = ', s2.get_feature_vector()
-    #print s.distance_to(s2)
-    
+    print '--------------------------------------'    
+    print str(b)
+    print '--------------------------------------'    
     p = PomdpGpSarsaPolicy(knowledge)
+    s = SummaryState(b)
+    a = p.get_initial_action(s)
+    print '--------------------------------------'    
+    print str(a)
+    print '--------------------------------------'    
+
+    if a == 'confirm_action' : 
+        m = SystemAction('confirm_action', 'searchroom', {'patient':'ray', 'location':'3512'})
+        u = Utterance('affirm', None, None)
+    elif a == 'request_missing_param' :
+        m = SystemAction('request_missing_param', 'searchroom')
+        u = Utterance('inform', 'searchroom', {'patient':'ray', 'location':'3512'})
+    else :
+        m = SystemAction('repeat_goal')    
+        u = Utterance('inform', 'searchroom', {'patient':'ray', 'location':'3512'})
+    
+    print '--------------------------------------'    
+    print str(m)
+    print str(u)
+    print '--------------------------------------'    
+    
+    b.update(m, [u])
+    print '--------------------------------------'    
+    print str(b)
+    print '--------------------------------------'    
+    s = SummaryState(b)
+    a = p.get_next_action(-1, s)
+    print '--------------------------------------'    
+    print str(a)
+    print '--------------------------------------'    
+    
+    p.update_final_reward(10)
+    
+    b = HISBeliefState(knowledge)
+    print '--------------------------------------'    
+    print str(b)
+    print '--------------------------------------'    
+    s = SummaryState(b)
+    a = p.get_initial_action(s)
+    print '--------------------------------------'    
+    print str(a)
+    print '--------------------------------------'    
+
+def test_gp_sarsa_resolving_summary_action() :
+    knowledge = Knowledge()
+    b = HISBeliefState(knowledge)
+    m = SystemAction('repeat_goal')    
+    u = Utterance('inform', 'searchroom', {'patient':'ray', 'location':'3512'})
+    b.update(m, [u])
+    print str(b)
+    s = SummaryState(b)
+    p = PomdpGpSarsaPolicy(knowledge)
+    for a in ['repeat_goal', 'request_missing_param', 'confirm_action', 'take_action'] :
+        print 'a = ', a
+        l = p.get_system_action_requirements(a, s)
+        if l is None :
+            print 'None'
+        else :
+            for e in l :
+                print str(e)
+        print '------------------------'
+    
+if __name__ == '__main__' :
+    #test_gp_sarsa_funcs()
+    test_gp_sarsa_resolving_summary_action() 
+    
+    #print str(b)
+    #m1 = SystemAction('confirm_action', 'searchroom', {'patient':'ray', 'location':'3512'})
+    #m2 = SystemAction('repeat_goal')    
+    #u1 = Utterance('inform', 'searchroom', {'patient':'ray', 'location':'3512'})
+    #u2 = Utterance('affirm', None, None)
+    #u3 = Utterance('deny', None, None)
+    #b.update(m1, [u1, u2, u3])
+    ##print str(b)
+    
+    #s = SummaryState(b)
+    #print 's = ', s.get_feature_vector()
+    #s2 = copy.deepcopy(s)
+    #s2.top_hypothesis_prob = 0.5
+    #print 's2 = ', s2.get_feature_vector()
+    ##print s.distance_to(s2)
+    
+    #p = PomdpGpSarsaPolicy(knowledge)
     #print p.calc_k((s, 'repeat_goal'), (s, 'repeat_goal'))
     #p.D = [(s, 'repeat_goal'), (s2, 'repeat_goal')]
     #print p.calc_k_vector(s, 'repeat_goal')
-    print p.get_initial_action(s)
-    p.print_vars()
+    #print p.get_initial_action(s)
+    #p.print_vars()
 
     #-------------------------------------------------------------------------------------
 

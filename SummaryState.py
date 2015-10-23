@@ -42,7 +42,9 @@ class SummaryState :
         feature = [self.top_hypothesis_prob, self.second_hypothesis_prob]
         
         # No of goals allowed by the top partition 
-        num_goals_allowed = len(self.top_hypothesis[0].possible_goals)
+        num_goals_allowed = len(self.knowledge.goal_actions)
+        if self.top_hypothesis is not None :
+            num_goals_allowed = len(self.top_hypothesis[0].possible_goals)
         feature.append(num_goals_allowed)
         
         # No of params in the top partition required by its action that are uncertain
@@ -60,14 +62,24 @@ class SummaryState :
         # Number of dialog turns used so far
         feature.append(self.num_dialog_turns)
         
-        # Do the top and second hypothesis use the same partition: Yes/No  
-        if self.top_hypothesis[0] == self.second_hypothesis[0] :
-            feature.append('yes')
+        # Do the top and second hypothesis use the same partition: Yes/No 
+        if self.top_hypothesis is None :
+            if self.second_hypothesis is None :
+                feature.append('yes')
+            else :
+                feature.append('no')
         else :
-            feature.append('no')
+            if self.second_hypothesis is None :
+                feature.append('no')
+            elif self.top_hypothesis[0] == self.second_hypothesis[0] :
+                feature.append('yes')
+            else :
+                feature.append('no')
             
         # Type of last user utterance
-        if type(self.top_hypothesis[1]) == str :
+        if self.top_hypothesis is None :
+            feature.append(None)
+        elif type(self.top_hypothesis[1]) == str :
             feature.append(self.top_hypothesis[1])
         else :
             feature.append(self.top_hypothesis[1].action_type)

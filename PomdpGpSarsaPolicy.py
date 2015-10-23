@@ -14,6 +14,7 @@ __author__ = 'aishwarya'
 
 import numpy as np, sys, math
 from Utils import *
+from SystemAction import SystemAction
 
 class PomdpGpSarsaPolicy :
     def __init__(self, knowledge, load_from_file=False) :
@@ -40,7 +41,6 @@ class PomdpGpSarsaPolicy :
             self.D = list()
             self.K_inv = np.matrix([[]])
             self.first_episode = True
-        self.first_turn = True
         self.a = None
         self.b = None
         self.g = np.matrix([[]])
@@ -83,28 +83,34 @@ class PomdpGpSarsaPolicy :
         for a in self.knowledge.summary_system_actions :
             (idx, closest_dict_point) = self.get_closest_dictionary_point(b, a)
             mean = self.mu[idx]
-            cov = self.C[idx][idx]
-            q = np.random.normal(mean, cov)
+            std_dev = math.sqrt(self.C[idx, idx])
+            if std_dev < 0.0000001 :
+                q = mean
+            else :
+                q = np.random.normal(mean, std_dev)
             if q > max_q_val :
                 max_q_val = q
                 best_action = a
         return best_action
     
     def get_initial_action(self, initial_state) :
+        print '\nIn get_initial_action'     # DEBUG
+        self.print_vars()                   # DEBUG
+        
         self.b = initial_state
         
         if self.first_episode :
+            print 'self.first_episode'
             self.first_episode = False
             self.a = self.get_random_action()
             self.D = [(self.b, self.a)]
             self.mu = self.get_zero_vector(1)
             self.C = self.get_zero_vector(1)
-            self.c = self.get_zero_vector(1)
             
             # K^{-1} = 1 / k((b, a), (b, a))
             self.K_inv = np.matrix([[1.0 / self.calc_k((self.b, self.a), (self.b, self.a))]])
         else :
-            self.a = pi(self.b)
+            self.a = self.pi(self.b)
         
         self.c = self.get_zero_vector(len(self.D))
         self.d = 0.0
@@ -131,8 +137,8 @@ class PomdpGpSarsaPolicy :
             self.K_inv = (1.0 / self.delta) * self.K_inv 
             
             # g = [0, 0, ... 1]^T
-            self.g = get_zero_vector(len(D))
-            self.g[0, len(D) - 1] = 1
+            self.g = self.get_zero_vector(len(self.D))
+            self.g[len(self.D) - 1, 0] = 1
             
             # mu = [ mu ]
             #      [ 0  ] 
@@ -141,34 +147,41 @@ class PomdpGpSarsaPolicy :
             # C = [  C   0 ]
             #     [ 0^T  0 ]
             orig_C_size = len(self.C)
-            self.C = np.append(self.C, get_zero_vector(orig_C_size), 1)
-            self.C = np.append(self.C, get_zero_vector(orig_C_size + 1), 0)
+            self.C = np.append(self.C, self.get_zero_vector(orig_C_size), 1)
+            self.C = np.append(self.C, self.get_zero_vector(orig_C_size + 1).T, 0)
             
             # c = [ c ]
             #      [ 0  ] 
             self.c = np.append(self.c, np.matrix([[0]]), 0)
+        
+        print 'End of get_initial_action'   # DEBUG   
+        self.print_vars()                   # DEBUG
+        print '-------------------------'   # DEBUG
         return self.a
     
-    def get_next_action(reward, current_state) :
+    def get_next_action(self, reward, current_state) :
+        print '\nIn get_next_action'        # DEBUG
+        self.print_vars()                   # DEBUG
+        
         b_prime = current_state
         r_prime = reward
         
-        a_prime = self.pi(self.b_prime)
-        k_b_prime_a_prime = calc_k_vector(self.b_prime, self.a_prime)
+        a_prime = self.pi(b_prime)
+        k_b_prime_a_prime = self.calc_k_vector(b_prime, a_prime)
         
         # g' = K^{-1}k(b',a')
-        g_prime = self.K_inv * self.k_b_prime_a_prime
+        g_prime = self.K_inv * k_b_prime_a_prime
         
         # delta = k((b',a'), (b',a')) - (k(b',a')^T * g)
-        k = self.calc_k((self.b_prime, self.a_prime), (self.b_prime, self.a_prime))
-        self.delta = k - (k_vector.T * self.g_prime).item(0,0)
+        k = self.calc_k((b_prime, a_prime), (b_prime, a_prime))
+        self.delta = k - (k_b_prime_a_prime.T * g_prime).item(0,0)
         
-        delta_k = self.k_b_a - self.gamma * self.k_b_prime_a_prime
+        delta_k = self.k_b_a - self.gamma * k_b_prime_a_prime
         
-        self.d = (self.gamma * self.sigma * self.sigma / self.v) * d + self.r_prime - (self.delta_k.T * self.mu).item(0,0)
+        self.d = (self.gamma * self.sigma * self.sigma / self.v) * self.d + r_prime - (delta_k.T * self.mu).item(0,0)
     
         if self.delta > self.nu :
-            self.D.append((self.b_prime, self.a_prime))
+            self.D.append((b_prime, a_prime))
             
             # K^{-1} = (1/delta) * [delta * K^{-1} + gg^T   -g ]
             #                      [    -g^T                 1 ]
@@ -179,20 +192,20 @@ class PomdpGpSarsaPolicy :
             self.K_inv = (1.0 / self.delta) * self.K_inv 
             
             # g' = [0, 0, ... 1]^T
-            g_prime = get_zero_vector(len(D))
-            g_prime[0, len(D) - 1] = 1
+            g_prime = self.get_zero_vector(len(self.D))
+            g_prime[len(self.D) - 1, 0] = 1
             
-            h = np.append(self.g, np.matrix([[-gamma]]), 0)
+            h = np.append(self.g, np.matrix([[-self.gamma]]), 0)
             
             # delta_k_tt = g^T(k(b,a) - 2*gamma*k(b',a')) + (gamma^2)k((b',a'),(b',a'))
-            delta_k_tt = (self.g * (self.k_b_a - 2 * gamma * k_b_prime_a_prime)).item(0,0) + gamma * gamma * k
+            delta_k_tt = (self.g * (self.k_b_a - 2 * self.gamma * k_b_prime_a_prime)).item(0,0) + self.gamma * self.gamma * k
             
             # c' = (gamma * sigma^2 / v)[ c ]  + h - [ C * delta_k ]
             #                           [ 0 ]        [     0       ]
             c_prime = ((self.gamma * self.sigma * self.sigma / self.v) * np.append(self.c, np.matrix([[0]]), 0)) + h - np.append(self.C * delta_k, np.matrix([[0]]), 0)
         
             # v = (1 + gamma^2)sigma^2 + delta_k_tt - (delta_k^T)(C)(delta_k) + (2*gamma*sigma^2/v)(c^T delta_k) - (gamma^2 * sigma^4 / v)
-            self.v = (1 + self.gamma * self.gamma) * self.sigma * self.sigma + delta_k_tt - (delta_k.T * self.C * delta_k) + (2 * self.gamma * self.sigma * self.sigma / self.v) * (self.c.T * delta_k).item(0,0) - ((self.gamma ** 2) * (self.sigma ** 4) / self.v)
+            self.v = (1 + self.gamma * self.gamma) * self.sigma * self.sigma + delta_k_tt - (delta_k.T * self.C * delta_k).item(0,0) + (2 * self.gamma * self.sigma * self.sigma / self.v) * (self.c.T * delta_k).item(0,0) - ((self.gamma ** 2) * (self.sigma ** 4) / self.v)
             
             # mu = [ mu ]
             #      [ 0  ] 
@@ -201,53 +214,162 @@ class PomdpGpSarsaPolicy :
             # C = [  C   0 ]
             #     [ 0^T  0 ]
             orig_C_size = len(self.C)
-            self.C = np.append(self.C, get_zero_vector(orig_C_size), 1)
-            self.C = np.append(self.C, get_zero_vector(orig_C_size + 1), 0)
+            self.C = np.append(self.C, self.get_zero_vector(orig_C_size), 1)
+            self.C = np.append(self.C, self.get_zero_vector(orig_C_size + 1).T, 0)
         
         else :
             h = g - self.gamma * g_prime
-            c_prime = ((self.gamma * self.sigma * self.sigma / self.v) * self.c + h - self.C * delta_k
-            
+            c_prime = (self.gamma * self.sigma * self.sigma / self.v) * self.c + h - self.C * delta_k
             self.v = (1 + self.gamma * self.gamma) * self.sigma * self.sigma + (delta_k.T * (c_prime + (self.gamma * self.sigma * self.sigma / self.v) * self.c)).item(0,0) - ((self.gamma ** 2) * (self.sigma ** 4) / self.v)
         
-        self.mu = self.mu + self.c * (d/v)
-        self.C = self.C + (1.0 / v) * (self.c * self.c.T)
+        self.mu = self.mu + self.c * (self.d / self.v)
+        self.C = self.C + (1.0 / self.v) * (self.c * self.c.T)
         
         self.c = c_prime
         self.g = g_prime
         self.b = b_prime
         self.a = a_prime
         
-        # TODO: Check this. You might need to calculate it again if D has changed
-        self.k_b_a = k_b_prime_a_prime
+        if self.delta > self.nu :
+            self.k_b_a = self.calc_k_vector(self.b, self.a)
+        else :
+            self.k_b_a = k_b_prime_a_prime
+        
+        print 'End of get_next_action'      # DEBUG   
+        self.print_vars()                   # DEBUG
+        print '-------------------------'   # DEBUG
         
         return self.a
         
-    def update_final_reward(reward) :
+    def update_final_reward(self, reward) :
+        print '\nIn update_final_reward'    # DEBUG
+        self.print_vars()                   # DEBUG
+        
         r_prime = reward
-        g_prime = get_zero_vector(len(self.D))
+        g_prime = self.get_zero_vector(len(self.D))
         self.delta = 0
         delta_k = self.k_b_a
 
-        self.d = (self.gamma * self.sigma * self.sigma / self.v) * d + self.r_prime - (self.delta_k.T * self.mu).item(0,0)
+        self.d = (self.gamma * self.sigma * self.sigma / self.v) * self.d + r_prime - (delta_k.T * self.mu).item(0,0)
     
-        h = g - self.gamma * g_prime
-        c_prime = ((self.gamma * self.sigma * self.sigma / self.v) * self.c + h - self.C * delta_k
+        h = self.g - self.gamma * g_prime
+        c_prime = (self.gamma * self.sigma * self.sigma / self.v) * self.c + h - self.C * delta_k
         
         self.v = self.sigma * self.sigma + (delta_k.T * (c_prime + (self.gamma * self.sigma * self.sigma / self.v) * self.c)).item(0,0) - ((self.gamma ** 2) * (self.sigma ** 4) / self.v)
         
-        self.mu = self.mu + self.c * (d/v)
-        self.C = self.C + (1.0 / v) * (self.c * self.c.T)
+        self.mu = self.mu + self.c * (self.d / self.v)
+        self.C = self.C + (1.0 / self.v) * (self.c * self.c.T)
         
         self.c = c_prime
         self.g = g_prime
         
         self.save_vars()
-        
+
+        print 'End of update_final_reward'  # DEBUG   
+        self.print_vars()                   # DEBUG
+        print '-------------------------'   # DEBUG
+
     # A util to get a zero vector because the command is non-intuitive        
     def get_zero_vector(self, size) :
-        return np.matrix(np.zeros(size)).T    
+        return np.matrix(np.zeros(size)).T 
+        
+    # Converts a state to a single Action object if possible
+    # If the partition either allows more than one goal or more than one
+    # value for any param that action needs, then return None
+    def resolve_state_to_goal(self, state) :
+        if state is None or state.top_hypothesis is None :
+            return None
+        partition = state.top_hypothesis[0]   
+        if partition.possible_goals is None or len(partition.possible_goals) != 1 :
+            return None
+        goal = partition.possible_goals[0]
+        action = Action(goal)
+        param_order = state.knowledge.param_order[goal]
+        params = []
+        if partition.possible_param_values is None :
+            return None
+        for param_name in param_order :
+            if param_name not in partition.possible_param_values or len(partition.possible_param_values[param_name]) != 1 :
+                return None
+            else :
+                params.append(partition.possible_param_values[param_name][0])
+        action.params = params    
+        return action
+    
+    def get_system_action_requirements(self, action_type, state) :
+        if action_type == 'repeat_goal' :
+            return [SystemAction(action_type)]
+        elif action_type == 'take_action' :
+            return [self.resolve_state_to_goal(state)]
             
+        elif action_type == 'confirm_action' :
+            if state.top_hypothesis is None :
+                goal_idx = int(np.random.uniform(0, len(state.knowledge.goal_actions)))
+                return SystemAction(action_type, state.knowledge.goal_actions[goal_idx])    
+            goal = state.top_hypothesis[0].possible_goals[0]
+            system_action = SystemAction(action_type, goal)
+            param_order = state.knowledge.param_order[goal]
+            params = dict()
+            partition_params = state.top_hypothesis[0].possible_param_values
+            if partition_params is None :
+                return [system_action]
+            for param_name in param_order :
+                if param_name in partition_params and len(partition_params) == 1 :
+                    params[param_name] = partition_params[param_name][0]
+            system_action.referring_params = params
+            return [system_action]
+            
+        elif action_type == 'request_missing_param' :
+            if state.top_hypothesis is None :
+                goal = None
+                system_action = SystemAction(action_type)
+                param_idx = int(np.random.uniform(0, len(state.knowledge.goal_params)))
+                return [system_action, state.knowledge.goal_params[param_idx]]
+                    
+            goal = state.top_hypothesis[0].possible_goals[0]
+            system_action = SystemAction(action_type, goal)
+            param_order = state.knowledge.param_order[goal]
+            params = dict()
+            param_to_request = None
+            partition_params = state.top_hypothesis[0].possible_param_values
+            if partition_params is None :
+                return [system_action, param_order[0]]
+            for param_name in param_order :
+                if param_name not in partition_params or len(partition_params) != 1 :
+                    if param_to_request is None :
+                        param_to_request = param_name
+                else :
+                    params[param_name] = partition_params[param_name][0]
+            system_action.referring_params = params
+            
+            if param_to_request is None :
+                # The top hypothesis partition doesn't have uncertain 
+                # params but it is possible it is not of high enough 
+                # confidence
+                
+                # If there is no second hypothesis, just confirm any value
+                # This param si chosen at random so that you don't get 
+                # stuck in a loop here
+                if state.second_hypothesis is None or state.second_hypothesis.partition.possible_param_values is None :
+                    param_idx = int(np.random.uniform(0, len(param_order)))
+                    return [system_action, param_order[param_idx]]
+                
+                # A good heuristic is to see in what params the first 
+                # and second hypotheses differ. Any one of these is 
+                # likely to help. 
+                second_params = state.second_hypothesis.partition.possible_param_values
+                for param_name in param_order :
+                    top_param_value = partition_params[param_name][0]
+                    if param_name not in second_params or top_param_value not in second_params[param_name] or len(second_params[param_name]) != 1 :
+                        return [system_action, param_name]
+                
+                # If you reached here, this is probably an inappropriate 
+                # action so just verify a random param. 
+                param_idx = int(np.random.uniform(0, len(param_order)))
+                return [system_action, param_order[param_idx]]
+                
+            return [system_action, param_to_request]
+                    
     def save_vars(self) :
         save_model(self.mu, 'mu')
         save_model(self.C, 'C')
