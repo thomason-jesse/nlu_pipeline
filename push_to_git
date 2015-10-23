@@ -4,6 +4,5 @@ rm -f *.pyc
 rm -f *~
 rm -f models/*
 git add -A
-echo git commit -m "$*"
 git commit -m "$*"
 git push origin master
