@@ -1,6 +1,12 @@
 __author__ = 'aishwarya'
 
-import sys
+import sys, random
+from Knowledge import Knowledge
+from HISBeliefState import HISBeliefState
+from SummaryState import SummaryState
+from PomdpGpSarsaPolicy import PomdpGpSarsaPolicy
+from SystemAction import SystemAction
+from Action import Action
 
 class PomdpDialogAgent :
 
@@ -223,7 +229,7 @@ class PomdpDialogAgent :
                     a_params[j] = True
                 elif a_params[j] == "False":
                     a_params[j] = False
-            pairs.append([t, Action.Action(a_name, a_params)])
+            pairs.append([t, Action(a_name, a_params)])
         f.close()
         return pairs
 
@@ -248,7 +254,7 @@ class PomdpDialogAgent :
                         a_candidate = self.get_action_from_parse(n_best_parses[i][0])
                         # print "candidate: "+str(a_candidate)  # DEBUG
                     except SystemError:
-                        a_candidate = Action.Action()
+                        a_candidate = Action()
                     if i == 0:
                         a_chosen = a_candidate
                     if a_candidate.__eq__(a):
@@ -298,7 +304,7 @@ class PomdpDialogAgent :
                     else:
                         g_args.append(answer[0])
             # print "args: "+str(g_args)  # DEBUG
-            return Action.Action(action, g_args)
+            return Action(action, g_args)
 
         else:
             raise SystemError("cannot get action from return type "+str(self.parser.ontology.types[root.return_type]))
