@@ -31,7 +31,7 @@ class PomdpDialogAgent :
 
     def run_dialog(self) :
         self.state = HISBeliefState(self.knowledge)
-        print 'Belief state: ', str(self.belief_state) 
+        print 'Belief state: ', str(self.state) 
         summary_state = SummaryState(self.state)
         (dialog_action, dialog_action_args) = self.policy.get_initial_action(summary_state)    
         
@@ -40,7 +40,7 @@ class PomdpDialogAgent :
             if dialog_action == 'take_action' :
                 # Submit the action given by the policy
                 action = dialog_action_args[0]
-                self.output.say("Action: ", str(action))
+                self.output.say("Action: " + str(action))
                 self.output.say("Was this the correct action? (y/n) : ")
                 response = self.input.get()    
                 if response.lower() == 'y' or response.lower() == 'yes' :
@@ -55,7 +55,7 @@ class PomdpDialogAgent :
                 if response == 'stop' :
                     sys.exit(1)
                 # Belief monitoring - update belief based on the response
-                update_state(response)
+                self.update_state(response)
                 reward = self.knowledge.per_turn_reward
                 summary_state = SummaryState(self.state)
                 # Get the next action from the policy
@@ -79,7 +79,7 @@ class PomdpDialogAgent :
         return response
 
     # Parse the user response and update belief state
-    def update_state(response) :
+    def update_state(self, response) :
         # get n best parses for confirmation
         n_best_parses = self.parser.parse_expression(response, n=self.parse_depth)
 
