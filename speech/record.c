@@ -129,7 +129,7 @@ void closeMic() {
 }
 
 int record1600Hz_f(const char *fout) {
-	FILE *file = fopen(fout, "w"); 
+	FILE *file = fopen(fout, "w");
 	int rc = 0; 
 
 	if (!file) {
@@ -207,8 +207,15 @@ int record1600Hz_s(ps_decoder_t *ps) {
 	//Thread for decoding recording. 
 	pthread_t decodeThread; 
 
+	//Clears buffer in case there is any data left over from last recording. 
+	memset((void *)mp.buffer, 0, mp.frames * sizeof(int16)); 
+
 	//Waits for recording to start. 
 	while (!recording);
+
+	//Readys for recording. 
+	if (snd_pcm_state(mp.handle) == SND_PCM_STATE_SETUP)
+		snd_pcm_prepare(mp.handle);
 
 	//Creates other thread. 
 	pthread_create(&decodeThread, NULL, decodeRecording, (void *)ps); 
@@ -237,7 +244,12 @@ int record1600Hz_s(ps_decoder_t *ps) {
       		fprintf(stderr, "short write: wrote %d bytes\n", rc);
   	}
 
-	//ps_process_raw(ps, mp.buffer, mp.frames, FALSE, FALSE); 
+	//Stops mic from recording and gathers remaining data. 
+	if ((rc = snd_pcm_drain(mp.handle)) != 0)
+		fprintf(stderr, "Error draining PCM: %d\n", rc);  
+
+	while ((rc = snd_pcm_readi(mp.handle, (char *)mp.buffer, mp.frames)) > 0)
+		write(fileno(file), (char *)mp.buffer, mp.frames * sizeof(int16)); 
 
 	//Waits for decoding to end. 
 	pthread_join(decodeThread, NULL); 
