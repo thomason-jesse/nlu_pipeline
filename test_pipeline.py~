@@ -78,6 +78,7 @@ A = DialogAgent.DialogAgent(parser, generator, grounder, static_policy, u_in, u_
 print "instantiating ActionSender"
 action_sender = ActionSender.ActionSender(lex, generator, u_out)
 
+<<<<<<< HEAD
 while True:
     u_out.say("How can I help?")
     s = raw_input()
@@ -101,6 +102,12 @@ else:
         D, epochs=10, parse_beam=30)
 
 print "theta: "+str(parser.learner.theta)
+=======
+#print "reading in data and training parser from actions"
+#D = A.read_in_utterance_action_pairs(sys.argv[3])
+#converged = A.train_parser_from_utterance_action_pairs(D, epochs=10, parse_beam=30)
+#print "theta: "+str(parser.learner.theta)
+>>>>>>> dialog-policy-dev
 
 while True:
     u_out.say("How can I help?")
@@ -112,6 +119,7 @@ while True:
     r = action_sender.take_action(a)
     print "RESULT: "+str(r)
 
+<<<<<<< HEAD
 print "testing Generator:"
 while True:
     s = raw_input()
@@ -120,4 +128,13 @@ while True:
     _, form = lex.read_syn_sem(s)
     token_responses = generator.reverse_parse_semantic_form(form, n=1)
     print "token responses: "+str(token_responses)
-
+=======
+#print "testing Generator:"
+#while True:
+#    s = raw_input()
+#    if s == 'stop':
+#        break
+#    form = lex.read_semantic_form_from_str(s, None, None, [])
+#    token_responses = generator.reverse_parse_semantic_form(form, k=3, n=3)
+#    print "token responses: "+str(token_responses)
+>>>>>>> dialog-policy-dev
