@@ -117,7 +117,7 @@ class Partition:
         return True
             
     def split_by_goal(self, new_goal, knowledge) :
-        if new_goal not in self.possible_goals :
+        if new_goal not in self.possible_goals or len(self.possible_goals) == 1 :
             return [self]
         else :
             p1 = Partition([new_goal], self.possible_param_values)
@@ -131,7 +131,10 @@ class Partition:
             return [p1, p2]
 
     def split_by_param(self, split_param_name, split_param_value, knowledge) :
-        if self.possible_param_values == None or split_param_name not in self.possible_param_values or split_param_value not in self.possible_param_values[split_param_name] :
+        if self.possible_param_values == None or \
+        split_param_name not in self.possible_param_values or \
+        split_param_value not in self.possible_param_values[split_param_name] or \
+        len(self.possible_param_values[split_param_name]) == 1 :
             return [self]
         else :
             p1_param_values = dict()

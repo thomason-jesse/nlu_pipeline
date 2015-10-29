@@ -23,8 +23,9 @@ class SummaryState :
             self.top_hypothesis_prob = max(inverse)[0]
             self.top_hypothesis = max(inverse)[1]
             inverse.remove(max(inverse))
-            self.second_hypothesis_prob = max(inverse)[0]
-            self.second_hypothesis = max(inverse)[1]
+            if len(inverse) > 0 :
+                self.second_hypothesis_prob = max(inverse)[0]
+                self.second_hypothesis = max(inverse)[1]
 
     # Ordered list of features
     #     - Probability of top hypothesis

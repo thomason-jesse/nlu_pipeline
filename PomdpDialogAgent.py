@@ -1,11 +1,12 @@
 __author__ = 'aishwarya'
 
-import sys, random
+import sys, random, math, copy
 from Knowledge import Knowledge
 from HISBeliefState import HISBeliefState
 from SummaryState import SummaryState
 from PomdpGpSarsaPolicy import PomdpGpSarsaPolicy
 from SystemAction import SystemAction
+from Utterance import Utterance
 from Action import Action
 
 class PomdpDialogAgent :
@@ -19,7 +20,7 @@ class PomdpDialogAgent :
 
         self.knowledge = Knowledge()    
         self.state = HISBeliefState(self.knowledge)  
-        self.policy = PomdpGpSarsaPolicy(self.knowledge)
+        self.policy = PomdpGpSarsaPolicy(self.knowledge, True)
         self.previous_system_action = SystemAction('repeat_goal')  
         self.n_best_utterances = None
 
@@ -29,6 +30,8 @@ class PomdpDialogAgent :
 
         self.first_turn = True
 
+    # Returns True if the dialog terminates on its own and False if the u
+    # user entered stop
     def run_dialog(self) :
         self.state = HISBeliefState(self.knowledge)
         print 'Belief state: ', str(self.state) 
@@ -47,15 +50,18 @@ class PomdpDialogAgent :
                     self.policy.update_final_reward(self.knowledge.correct_action_reward)
                 else :
                     self.policy.update_final_reward(self.knowledge.wrong_action_reward)
-                return
+                return True
             else :
                 previous_system_action = dialog_action_args[0]
                 # Take the dialog action
                 response = self.dialog_action_functions[self.dialog_actions.index(dialog_action)](dialog_action_args)
                 if response == 'stop' :
-                    sys.exit(1)
+                    self.policy.update_final_reward(self.knowledge.wrong_action_reward)
+                    return False
                 # Belief monitoring - update belief based on the response
                 self.update_state(response)
+                print 'Belief state: ', str(self.state) 
+                
                 reward = self.knowledge.per_turn_reward
                 summary_state = SummaryState(self.state)
                 # Get the next action from the policy
@@ -99,10 +105,11 @@ class PomdpDialogAgent :
         system_action = args[0]
         params = []
         goal = system_action.referring_goal
-        param_order = self.knowledge.param_order[goal]
-        for param_name in param_order :
-            if param_name in system_action.referring_params :
-                params.append[system_action.referring_params[param_name]]
+        if system_action.referring_params is not None :
+            param_order = self.knowledge.param_order[goal]
+            for param_name in param_order :
+                if param_name in system_action.referring_params :
+                    params.append[system_action.referring_params[param_name]]
         self.output.say("I should take action " + goal +" involving " +
                         ','.join([str(p) for p in params if p is not None]) + "?")
         response = self.input.get()

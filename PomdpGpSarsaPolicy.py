@@ -15,6 +15,7 @@ __author__ = 'aishwarya'
 import numpy as np, sys, math
 from Utils import *
 from SystemAction import SystemAction
+from Action import Action
 
 class PomdpGpSarsaPolicy :
     def __init__(self, knowledge, load_from_file=False) :
@@ -94,13 +95,12 @@ class PomdpGpSarsaPolicy :
         return best_action
     
     def get_initial_action(self, initial_state) :
-        print '\nIn get_initial_action'     # DEBUG
-        self.print_vars()                   # DEBUG
+        #print '\nIn get_initial_action'     # DEBUG
+        #self.print_vars()                   # DEBUG
         
         self.b = initial_state
         
         if self.first_episode :
-            print 'self.first_episode'
             self.first_episode = False
             self.a = self.get_random_action()
             self.D = [(self.b, self.a)]
@@ -154,14 +154,14 @@ class PomdpGpSarsaPolicy :
             #      [ 0  ] 
             self.c = np.append(self.c, np.matrix([[0]]), 0)
         
-        print 'End of get_initial_action'   # DEBUG   
-        self.print_vars()                   # DEBUG
-        print '-------------------------'   # DEBUG
+        #print 'End of get_initial_action'   # DEBUG   
+        #self.print_vars()                   # DEBUG
+        #print '-------------------------'   # DEBUG
         return (self.a, self.get_system_action_requirements(self.a, self.b))
     
     def get_next_action(self, reward, current_state) :
-        print '\nIn get_next_action'        # DEBUG
-        self.print_vars()                   # DEBUG
+        #print '\nIn get_next_action'        # DEBUG
+        #self.print_vars()                   # DEBUG
         
         b_prime = current_state
         r_prime = reward
@@ -198,7 +198,7 @@ class PomdpGpSarsaPolicy :
             h = np.append(self.g, np.matrix([[-self.gamma]]), 0)
             
             # delta_k_tt = g^T(k(b,a) - 2*gamma*k(b',a')) + (gamma^2)k((b',a'),(b',a'))
-            delta_k_tt = (self.g * (self.k_b_a - 2 * self.gamma * k_b_prime_a_prime)).item(0,0) + self.gamma * self.gamma * k
+            delta_k_tt = (self.g.T * (self.k_b_a - 2 * self.gamma * k_b_prime_a_prime)).item(0,0) + self.gamma * self.gamma * k
             
             # c' = (gamma * sigma^2 / v)[ c ]  + h - [ C * delta_k ]
             #                           [ 0 ]        [     0       ]
@@ -218,14 +218,18 @@ class PomdpGpSarsaPolicy :
             self.C = np.append(self.C, self.get_zero_vector(orig_C_size + 1).T, 0)
         
         else :
-            h = g - self.gamma * g_prime
+            h = self.g - self.gamma * g_prime
             c_prime = (self.gamma * self.sigma * self.sigma / self.v) * self.c + h - self.C * delta_k
             self.v = (1 + self.gamma * self.gamma) * self.sigma * self.sigma + (delta_k.T * (c_prime + (self.gamma * self.sigma * self.sigma / self.v) * self.c)).item(0,0) - ((self.gamma ** 2) * (self.sigma ** 4) / self.v)
+        
+        # According to the paper, this should be after the mu and C updates
+        # but then the matrix sizes don't match
+        self.c = c_prime
         
         self.mu = self.mu + self.c * (self.d / self.v)
         self.C = self.C + (1.0 / self.v) * (self.c * self.c.T)
         
-        self.c = c_prime
+        #self.c = c_prime
         self.g = g_prime
         self.b = b_prime
         self.a = a_prime
@@ -235,19 +239,20 @@ class PomdpGpSarsaPolicy :
         else :
             self.k_b_a = k_b_prime_a_prime
         
-        print 'End of get_next_action'      # DEBUG   
-        self.print_vars()                   # DEBUG
-        print '-------------------------'   # DEBUG
+        #print 'End of get_next_action'      # DEBUG   
+        #self.print_vars()                   # DEBUG
+        #print '-------------------------'   # DEBUG
         
         return (self.a, self.get_system_action_requirements(self.a, self.b))
         
     def update_final_reward(self, reward) :
-        print '\nIn update_final_reward'    # DEBUG
-        self.print_vars()                   # DEBUG
+        #print '\nIn update_final_reward'    # DEBUG
+        #self.print_vars()                   # DEBUG
         
         r_prime = reward
         g_prime = self.get_zero_vector(len(self.D))
         self.delta = 0
+        self.k_b_a = self.calc_k_vector(self.b, self.a)
         delta_k = self.k_b_a
 
         self.d = (self.gamma * self.sigma * self.sigma / self.v) * self.d + r_prime - (delta_k.T * self.mu).item(0,0)
@@ -265,9 +270,9 @@ class PomdpGpSarsaPolicy :
         
         self.save_vars()
 
-        print 'End of update_final_reward'  # DEBUG   
-        self.print_vars()                   # DEBUG
-        print '-------------------------'   # DEBUG
+        #print 'End of update_final_reward'  # DEBUG   
+        #self.print_vars()                   # DEBUG
+        #print '-------------------------'   # DEBUG
 
     # A util to get a zero vector because the command is non-intuitive        
     def get_zero_vector(self, size) :
@@ -305,7 +310,7 @@ class PomdpGpSarsaPolicy :
         elif action_type == 'confirm_action' :
             if state.top_hypothesis is None :
                 goal_idx = int(np.random.uniform(0, len(state.knowledge.goal_actions)))
-                return SystemAction(action_type, state.knowledge.goal_actions[goal_idx])    
+                return [SystemAction(action_type, state.knowledge.goal_actions[goal_idx])]
             goal = state.top_hypothesis[0].possible_goals[0]
             system_action = SystemAction(action_type, goal)
             param_order = state.knowledge.param_order[goal]
