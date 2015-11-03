@@ -3,6 +3,7 @@ __author__ = 'jesse'
 import sys
 import copy
 
+
 class SemanticNode:
     def __init__(self, parent, type, category, is_lambda, idx=None, lambda_name=None, is_lambda_instantiation=None,
                  children=None):
@@ -12,7 +13,8 @@ class SemanticNode:
         self.is_lambda = is_lambda
         if ((self.is_lambda and (lambda_name is None or is_lambda_instantiation is None)) or
             (not self.is_lambda and idx is None)):
-                sys.exit("Invalid SemanticNode instantiation (" + str([self.is_lambda, lambda_name, is_lambda_instantiation, idx]) + ")")
+                sys.exit("Invalid SemanticNode instantiation (" +
+                         str([self.is_lambda, lambda_name, is_lambda_instantiation, idx]) + ")")
         self.idx = idx
         self.lambda_name = lambda_name
         self.is_lambda_instantiation = is_lambda_instantiation
@@ -46,8 +48,9 @@ class SemanticNode:
                     candidate_type = ontology.types[candidate_type][1]
                 else:
                     raise TypeError("Non-matching child type " +
-                        ontology.compose_str_from_type(c.return_type) + " (" + c.print_little() + ") for parent " +
-                        ontology.compose_str_from_type(candidate_type) + " (" + self.print_little() + ")")
+                                    ontology.compose_str_from_type(c.return_type) + " (" + c.print_little() +
+                                    ") for parent " + ontology.compose_str_from_type(candidate_type) + " (" +
+                                    self.print_little() + ")")
             self.return_type = candidate_type
 
     # copy attributes of the given SemanticNode into this one (essentially, clone the second into this space)
@@ -58,7 +61,8 @@ class SemanticNode:
         self.idx = A.idx
         self.lambda_name = None if A.lambda_name is None else A.lambda_name + lambda_enumeration
         self.is_lambda_instantiation = A.is_lambda_instantiation
-        if not preserve_parent: self.parent = A.parent
+        if not preserve_parent:
+            self.parent = A.parent
         if not preserve_children:
             if A.children is None:
                 self.children = None
@@ -74,7 +78,8 @@ class SemanticNode:
 
     def __str__(self):
         s = "(" + ",".join(
-            [str(self.is_lambda), str(self.category), str(self.type), str(self.lambda_name) if self.is_lambda else str(self.idx)]) + ")"
+            [str(self.is_lambda), str(self.category), str(self.type), str(self.lambda_name)
+                if self.is_lambda else str(self.idx)]) + ")"
         if self.children is not None:
             for c in self.children:
                 s += "\n"
@@ -102,7 +107,8 @@ class SemanticNode:
             return True
         for idx in range(0, len(self.children)):
             if self.children[idx].parent != self:
-                print "child "+str(idx)+" of "+str(self.children[idx]) + " has non-matching parent "+str(self.children[idx].parent)  # DEBUG
+                print "child "+str(idx)+" of "+str(self.children[idx]) + \
+                      " has non-matching parent "+str(self.children[idx].parent)  # DEBUG
                 return False
             if not self.children[idx].validate_tree_structure():
                 return False
@@ -119,28 +125,42 @@ class SemanticNode:
     # these are a forward comparisons, so two trees are considered equal if their roots have different parents,
     # as long as the roots and children down are identical categories
 
-    def equal_allowing_commutativity(self, other, commutative_idxs):
+    def equal_allowing_commutativity(self, other, commutative_idxs, ignore_syntax=True, ontology=None):
         A = copy.deepcopy(self)
         B = copy.deepcopy(other)
-        A.commutative_raise_node(commutative_idxs)
-        B.commutative_raise_node(commutative_idxs)
-        return A.equal_ignoring_syntax(B, ignore_syntax=True)
+        A.commutative_raise_node(commutative_idxs, ontology=ontology)
+        B.commutative_raise_node(commutative_idxs, ontology=ontology)
+        return A.equal_ignoring_syntax(B, ignore_syntax=ignore_syntax)
 
-    def commutative_raise_node(self, commutative_idxs):  # support function
+    def commutative_raise_node(self, commutative_idxs, ontology=None):  # support function
         to_expand = [self]
         while len(to_expand) > 0:
             curr = to_expand.pop()
             if curr.idx in commutative_idxs:
                 new_c = []
-                for c in curr.children:
-                    new_c.extend(self.commutative_raise(c, curr.idx))
-                new_c = sorted(new_c, key=lambda node: node.idx)
-                curr.children = new_c
-            if curr.children is not None:
-                to_expand.extend(curr.children)
+                if curr.children is not None:
+                    for c in curr.children:
+                        new_c.extend(self.commutative_raise(c, curr.idx))
+                    for nc in new_c:
+                        nc.parent = curr
+                    new_c = sorted(new_c, key=lambda node: node.idx)
+                    curr.children = new_c
+                    if ontology is not None:
+                        curr.set_type_from_children_return_types(curr.children[0].return_type, ontology)
+                    to_expand.extend(curr.children)
+
+    # given children, add types as necessary to make func take them and return r
+    def set_type_from_children_return_types(self, r, ontology):
+        new_type = r
+        for idx in range(0, len(self.children)):
+            new_type_form = [self.children[idx].return_type, new_type]
+            if new_type_form not in ontology.types:
+                ontology.types.append(new_type_form)
+            new_type = ontology.types.index(new_type_form)
+        self.type = new_type
 
     def commutative_raise(self, node, idx):  # support function
-        if node.idx == idx:
+        if node.idx == idx and node.children is not None:
             new_c = []
             for c in node.children:
                 new_c.extend(self.commutative_raise(c, idx))
@@ -149,21 +169,29 @@ class SemanticNode:
             return [node]
 
     def equal_ignoring_syntax(self, other, ignore_syntax=True):
-        if type(self) != type(other): return False  # ie no casting
+        if type(self) != type(other):
+            # print "type mismatch"  # DEBUG
+            return False  # ie no casting
         if (self.type == other.type and self.is_lambda == other.is_lambda and self.idx == other.idx and
                 self.lambda_name == other.lambda_name and
                 (ignore_syntax or self.category == other.category)):
-            if self.children is None and other.children is None: return True
-            if self.children is None and other.children is not None: return False
-            if self.children is not None and other.children is None: return False
+            if self.children is None and other.children is None:
+                return True
+            if ((self.children is None and other.children is not None) or
+                    (self.children is not None and other.children is None)):
+                # print "presence of children mismatch"  # DEBUG
+                return False
             if len(self.children) == len(other.children):
                 for i in range(0, len(self.children)):
                     if not (self.children[i].equal_ignoring_syntax(other.children[i], ignore_syntax=ignore_syntax)):
+                        # print "child mismatch at idx "+str(i)  # DEBUG
                         return False
                 return True
             else:
+                # print "size of children vectors mismatch"  # DEBUG
                 return False
         else:
+            # print "type, lambda, idx, or lambda name mismatch"  # DEBUG
             return False
 
     def __eq__(self, other):

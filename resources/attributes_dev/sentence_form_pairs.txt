@@ -11,7 +11,7 @@ the light brown cup
 lambda x:e.(and(cup(x),and(brown(x),light(x))))
 
 a dark chocolate colored mug with a small window
-lambda x:e.(and(window(x),and(small(x),and(mug(x),and(colored(x),and(chocolate(x),dark(x)))))))
+lambda x:e.(and(window(x),and(small(x),and(mug(x),and(chocolate(x),dark(x))))))
 
 the ceramic cup
 lambda x:e.(and(cup(x),ceramic(x)))
@@ -61,13 +61,13 @@ the blue tumbler
 lambda x:e.(and(tumbler(x),blue(x)))
 
 the glass is made of plastic and it's blue
-lambda x:e.(and(blue(x),and(plastic(x),and(made(x),glass(x)))))
+lambda x:e.(and(blue(x),and(plastic(x),glass(x))))
 
 a blue cup
 lambda x:e.(and(cup(x),blue(x)))
 
 it's a blue colored small cup and plastic
-lambda x:e.(and(plastic(x),and(cup(x),and(small(x),and(colored(x),blue(x))))))
+lambda x:e.(and(plastic(x),and(cup(x),and(small(x),blue(x)))))
 
 the blue beer cup
 lambda x:e.(and(cup(x),and(beer(x),blue(x))))
@@ -95,7 +95,7 @@ the green marker
 lambda x:e.(and(marker(x),green(x)))
 
 it's a green colored marker
-lambda x:e.(and(marker(x),and(colored(x),green(x))))
+lambda x:e.(and(marker(x),green(x)))
 
 the green marker
 lambda x:e.(and(marker(x),green(x)))
@@ -114,7 +114,7 @@ the brown wooden tray
 lambda x:e.(and(tray(x),and(wooden(x),brown(x))))
 
 the bowl is long rectangular and made of wood
-lambda x:e.(and(wood(x),and(made(x),and(rectangular(x),and(long(x),bowl(x))))))
+lambda x:e.(and(wood(x),and(rectangular(x),and(long(x),bowl(x)))))
 
 the wooden tray is rectangular with smooth edges and is broken
 lambda x:e.(and(broken(x),and(edges(x),and(smooth(x),and(rectangular(x),and(tray(x),wooden(x)))))))
@@ -132,7 +132,7 @@ the wooden appetizer tray
 lambda x:e.(and(tray(x),and(appetizer(x),wooden(x))))
 
 the salad dish is brown and made out of fake wood
-lambda x:e.(and(wood(x),and(fake(x),and(made(x),and(brown(x),and(dish(x),salad(x)))))))
+lambda x:e.(and(wood(x),and(fake(x),and(brown(x),and(dish(x),salad(x))))))
 
 the large chipped oval bowl
 lambda x:e.(and(bowl(x),and(oval(x),and(chipped(x),large(x)))))
@@ -254,7 +254,7 @@ the baroque-styled hand-crafted mug
 lambda x:e.(and(mug(x),and(hand-crafted(x),baroque-styled(x))))
 
 the wood colored mug
-lambda x:e.(and(mug(x),and(colored(x),wood(x))))
+lambda x:e.(and(mug(x),wood(x)))
 
 the coffee mug
 lambda x:e.(and(mug(x),coffee(x)))
@@ -272,7 +272,7 @@ the ceramic coffee mug
 lambda x:e.(and(mug(x),and(coffee(x),ceramic(x))))
 
 the cup is dark mustard colored with a handle
-lambda x:e.(and(handle(x),and(colored(x),and(mustard(x),and(dark(x),cup(x))))))
+lambda x:e.(and(handle(x),and(mustard(x),and(dark(x),cup(x)))))
 
 the mug is small and tan
 lambda x:e.(and(tan(x),and(small(x),mug(x))))
@@ -300,7 +300,7 @@ the wooden coaster
 lambda x:e.(and(coaster(x),wooden(x)))
 
 this thing is brown circular and made out of wood
-lambda x:e.(and(wood(x),and(made(x),and(circular(x),and(brown(x),thing(x))))))
+lambda x:e.(and(wood(x),and(circular(x),brown(x))))
 
 the large wooden coaster
 lambda x:e.(and(coaster(x),and(wooden(x),large(x))))
@@ -356,7 +356,7 @@ the pink ceramic plate
 lambda x:e.(and(plate(x),and(ceramic(x),pink(x))))
 
 this plate is mauve colored
-lambda x:e.(and(colored(x),and(mauve(x),plate(x))))
+lambda x:e.(and(mauve(x),plate(x)))
 
 the pink porcelain dish
 lambda x:e.(and(dish(x),and(porcelain(x),pink(x))))
@@ -580,7 +580,7 @@ the hard orange ball
 lambda x:e.(and(ball(x),and(orange(x),hard(x))))
 
 the ball is orange and made of hard plastic
-lambda x:e.(and(plastic(x),and(hard(x),and(made(x),and(orange(x),ball(x))))))
+lambda x:e.(and(plastic(x),and(hard(x),and(orange(x),ball(x)))))
 
 the ball is orange hard and plastic
 lambda x:e.(and(plastic(x),and(hard(x),and(orange(x),ball(x)))))

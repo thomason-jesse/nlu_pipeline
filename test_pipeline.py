@@ -59,7 +59,7 @@ print "instantiating Parser"
 parser = Parser.Parser(ont, lex, learner, grounder, beam_width=10, safety=True)
 
 print "instantiating Generator"
-generator = Generator.Generator(ont, lex, learner, parser, beam_width=sys.maxint, safety=True, linear_iter_adjust=10)
+generator = Generator.Generator(ont, lex, learner, parser, beam_width=sys.maxint, safety=True)
 print "testing Generator:"
 while True:
     s = raw_input()
@@ -68,6 +68,7 @@ while True:
     _, form = lex.read_syn_sem(s)
     token_responses = generator.reverse_parse_semantic_form(form, n=1, c=1)
     print "token responses: "+str(token_responses)
+generator.flush_seen_nodes()
 
 print "instantiating DialogAgent"
 u_in = InputFromKeyboard()

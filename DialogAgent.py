@@ -243,7 +243,9 @@ class DialogAgent:
             num_actions_correct = 0
             num_tokens_correct = 0
             for t, r, a in pairs:
-                n_best_parses = self.parser.parse_tokens(t, n=parse_beam)
+                generator_genlex = [self.generator, t, r]
+                self.generator.flush_seen_nodes()
+                n_best_parses = self.parser.parse_tokens(t, n=parse_beam, generator_genlex=generator_genlex)
                 if len(n_best_parses) == 0:
                     print "WARNING: no parses found for tokens "+str(t)
                     continue

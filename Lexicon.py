@@ -47,6 +47,9 @@ class Lexicon:
                     r[sem_idx].append(sur_idx)
                 else:
                     r[sem_idx] = [sur_idx]
+        for sem_idx in range(0, len(self.semantic_forms)):
+            if sem_idx not in r:
+                r[sem_idx] = []
         r_list = []
         for i in range(0, len(r)):
             if i in r:
