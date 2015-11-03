@@ -42,7 +42,7 @@ void sphinx_init() {
 	//TODO Check for and return errors. 
 	config = cmd_ln_init(NULL, ps_args(), TRUE,
 				"-hmm", MODELDIR "/en-us/en-us",
-				"-lm", MODELDIR "/en-us/data.lm.bin",
+				"-lm", MODELDIR "/custom/fifty_fifty.lm.bin",
 				//"-lm", MODELDIR "/en-us/en-us.lm.bin",
 				"-dict", MODELDIR "/en-us/cmudict-en-us.dict",
 				"-fwdtree", "yes",
