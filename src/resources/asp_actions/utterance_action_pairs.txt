@@ -1,0 +1,55 @@
+where is peter's office
+M : speak_e(the(lambda x:e.(hasoffice(peter,x))))
+speak_e(l3_508)
+
+search ray's office for peter
+M : searchroom(peter,the(lambda x:e.(hasoffice(ray,x))))
+searchroom(peter,l3_512)
+
+ask peter about ray
+M : askperson(peter,ray)
+askperson(peter,ray)
+
+remind peter about the bwi meeting in jivko's office
+M : remind(peter,bwi_m,the(lambda x:e.(hasoffice(jivko,x))))
+remind(peter,bwi_m,l3_432)
+
+is ray a person
+M : speak_t(person(ray))
+speak_t(True)
+
+which is the group
+M : speak_e(the(lambda x:e.(group(x))))
+speak_e(bwi)
+
+is shiqi a room
+M : speak_t(room(shiqi))
+speak_t(False)
+
+check jivko's office for ray
+M : searchroom(ray,the(lambda x:e.(hasoffice(jivko,x))))
+searchroom(ray,l3_432)
+
+is peter a room person
+M : speak_t(and(room(peter),person(peter)))
+speak_t(False)
+
+which is peter's office
+M : speak_e(the(lambda x:e.(hasoffice(peter,x))))
+speak_e(l3_508)
+
+bring peter to ray
+M : bring(peter,ray)
+bring(peter,ray)
+
+bring peter ray
+M : bring(ray,peter)
+bring(ray,peter)
+
+is 3512 ray's office
+M : speak_t(equals(l3_512,the(lambda x:e.(hasoffice(peter,x)))))
+speak_t(True)
+
+walk to 3512
+M : at(l3_512)
+at(l3_512)

@@ -1,0 +1,26 @@
+which is peter's office
+speak_e(l3_508)
+
+is ray a person
+speak_t(True)
+
+bring peter to ray
+bring(peter,ray)
+
+bring ray to peter
+bring(ray,peter)
+
+bring peter ray
+bring(ray,peter)
+
+bring ray peter
+bring(peter,ray)
+
+bring peter to is noise ray
+bring(peter,ray)
+
+is 3512 ray's office
+speak_t(True)
+
+walk to 3512
+at(l3_512)
