@@ -11,10 +11,11 @@ Next, set up the nlu_pipeline by navigating to catkin_ws/src and cloning this re
 $ cd ../
 $ git clone https://github.com/thomason-jesse/nlu_pipeline.git
 
-Finally, source the terminal
+Finally, source the terminal and make the package
 
 $ cd ../
 $ source devel/setup.bash
+$ catkin_make
 
 Running the pipeline is a little different between simulation and the segbot.
 
