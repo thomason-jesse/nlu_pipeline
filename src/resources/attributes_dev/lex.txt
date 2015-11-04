@@ -1,0 +1,16 @@
+#prepositions
+with :- DESC/DESC : lambda P:<e,t>.(P)
+is :- DESC/DESC : lambda P:<e,t>.(P)
+
+#logical statements
+and :- N/N : lambda x:e.(x)
+not :- I/I : lambda x:t.(not(x))
+no :- I/I : lambda x:t.(not(x))
+
+#determiners
+the :- N/N : lambda x:e.(x)
+the :- N/DESC : lambda P:<e,t>.(lambda x:e.(P(x)))
+a :- N/N : lambda x:e.(x)
+a :- N/DESC : lambda P:<e,t>.(lambda x:e.(P(x)))
+it is :- N/N : lambda x:e.(x)
+it is :- N/DESC : lambda P:<e,t>.(lambda x:e.(P(x)))
