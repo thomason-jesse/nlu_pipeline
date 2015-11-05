@@ -84,9 +84,9 @@ class Partition:
                     return False
                 else :
                     if not set(required_params[param_name]).issubset(set(self.possible_param_values[param_name])) :
-                        print param_name, " values not a subset"
-                        print "Available values: ", self.possible_param_values[param_name]
-                        print "Queried value: ", required_params[param_name]
+                        #print param_name, " values not a subset"
+                        #print "Available values: ", self.possible_param_values[param_name]
+                        #print "Queried value: ", required_params[param_name]
                         # The values we want for this param are not a subset 
                         # of the values allowed by the partition
                         return False

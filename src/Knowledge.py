@@ -8,21 +8,18 @@ class Knowledge:
     unk = '-UNK-'
 
     def __init__(self):
-        self.goal_actions = ['searchroom', 'speak_t', 'speak_e', 'remind', 'askperson']
+        self.goal_actions = ['searchroom', 'speak_t', 'speak_e', 'remind', 'askperson', 'bring', 'at']
         self.goal_params = ['patient', 'recipient', 'location']
 
         # This is kept as a single vector common to all values so that hopefully 
         # some operaitons involving them can be made matrix operations and implemented
         # efficiently using numpy
-        self.goal_params_values = [None, 'peter', 'ray', 'dana', 'kazunori', 'matteo', 'shiqi', 'jivko', 'stacy', 'yuqian', 'max', 'pato', 'bwi', 'bwi-meeting', '3516', '3508', '3512', '3510', '3402', '3418', '3420', '3432', '3502', '3414b', True, False]
+        self.goal_params_values = [None, 'peter', 'ray', 'dana', 'kazunori', 'matteo', 'shiqi', 'jivko', 'stacy', 'yuqian', 'max', 'pato', 'bwi', 'bwi_m', 'l3_516', 'l3_508', 'l3_512', 'l3_510', 'l3_402', 'l3_418', 'l3_420', 'l3_432', 'l3_502', 'l3_414b', True, False]
         
         self.system_dialog_actions = ['repeat_goal', 'confirm_action', 'request_missing_param']
         self.user_dialog_actions = ['inform', 'affirm', 'deny']
 
         self.goal_change_prob = 0.0
-        
-        self.param_relevance = dict()
-        self.set_param_relevance()
 
         # Prob of splitting a partition by specifying a goal
         # partition_split_goal_probs[goal_value] gives the probability
@@ -59,13 +56,27 @@ class Knowledge:
         
         # The system requires arguments to be passed to ASP in specific
         # orders for each action. This is not an obviously generalizable
-        # order so it is hard-coded here
+        # order so it is hard-coded here. The following is the intended
+        # interpretation of the parameters
+        #   searchroom - patient (who/what to search for), location (where to search)
+        #   speak_t - patient (what to say)
+        #   speak_e - patient (what to say)
+        #   remind - patient (event you are reminding someone of), location (where is the 
+        #            event), recipient (the person you are reminding)
+        #   askperson - patient (the person you ask), recipient (the person you ask about)
+        #   bring - patient (what to bring), recipient (whom to bring it to)
+        #   walk - location (where to go)
         self.param_order = dict()
         self.param_order['searchroom'] = ['patient', 'location']
         self.param_order['speak_t'] = ['patient']
         self.param_order['speak_e'] = ['patient']
         self.param_order['remind'] = ['recipient', 'patient', 'location']
         self.param_order['askperson'] = ['patient', 'recipient']
+        self.param_order['bring'] = ['patient', 'recipient']
+        self.param_order['at'] = ['location']
+
+        self.param_relevance = dict()
+        self.set_param_relevance()
 
         # Component-wise weights for distance metric in summary space
         # When calculating the distance, a sum of the weighted L2 norm
@@ -103,30 +114,17 @@ class Knowledge:
         self.per_turn_reward = -1
 
     # This gives a 0-1 value for whether a param is relevant for an action. 
-    # Assumes the following form of actions - 
-    #   searchroom - patient (who/what to search for), location (where to search)
-    #   speak_t - patient (what to say)
-    #   speak_e - patient (what to say)
-    #   remind - patient (event you are reminding someone of), location (where is the 
-    #            event), recipient (the person you are reminding)
-    #   askperson - patient (the person you ask), recipient (the person you ask about)
+    # Values are taken from param_order
     def set_param_relevance(self) :
         self.param_relevance = dict()
         for action in self.goal_actions :
             self.param_relevance[action] = dict()
             for param in self.goal_params :
-                self.param_relevance[action][param] = 0
-        
-        self.param_relevance['searchroom']['patient'] = 1
-        self.param_relevance['searchroom']['location'] = 1     
-        self.param_relevance['speak_t']['patient'] = 1
-        self.param_relevance['speak_e']['patient'] = 1
-        self.param_relevance['remind']['patient'] = 1
-        self.param_relevance['remind']['location'] = 1
-        self.param_relevance['remind']['recipient'] = 1
-        self.param_relevance['askperson']['patient'] = 1
-        self.param_relevance['askperson']['recipient'] = 1
-
+                if action in self.param_order and param in self.param_order[action] :
+                    self.param_relevance[action][param] = 1
+                else :
+                    self.param_relevance[action][param] = 0
+            
     def set_partition_split_probs(self) :
         for goal in self.goal_actions :
             self.partition_split_goal_probs[goal] = 1.0 / len(self.goal_actions)

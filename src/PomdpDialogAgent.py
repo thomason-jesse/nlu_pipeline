@@ -20,7 +20,7 @@ class PomdpDialogAgent :
 
         self.knowledge = Knowledge()    
         self.state = HISBeliefState(self.knowledge)  
-        self.policy = PomdpGpSarsaPolicy(self.knowledge, True)
+        self.policy = PomdpGpSarsaPolicy(self.knowledge)
         self.previous_system_action = SystemAction('repeat_goal')  
         self.n_best_utterances = None
 
@@ -36,13 +36,13 @@ class PomdpDialogAgent :
         self.state = HISBeliefState(self.knowledge)
         print 'Belief state: ', str(self.state) 
         summary_state = SummaryState(self.state)
-        (dialog_action, dialog_action_args) = self.policy.get_initial_action(summary_state)    
+        (dialog_action, dialog_action_arg) = self.policy.get_initial_action(summary_state)    
         
         while True :
             self.state.increment_dialog_turns()
             if dialog_action == 'take_action' :
                 # Submit the action given by the policy
-                action = dialog_action_args[0]
+                action = dialog_action_arg
                 self.output.say("Action: " + str(action))
                 self.output.say("Was this the correct action? (y/n) : ")
                 response = self.input.get()    
@@ -52,9 +52,11 @@ class PomdpDialogAgent :
                     self.policy.update_final_reward(self.knowledge.wrong_action_reward)
                 return True
             else :
-                previous_system_action = dialog_action_args[0]
+                self.previous_system_action = dialog_action_arg
+                #print 'System action - '
+                #print str(self.previous_system_action)
                 # Take the dialog action
-                response = self.dialog_action_functions[self.dialog_actions.index(dialog_action)](dialog_action_args)
+                response = self.dialog_action_functions[self.dialog_actions.index(dialog_action)]()
                 if response == 'stop' :
                     self.policy.update_final_reward(self.knowledge.wrong_action_reward)
                     return False
@@ -65,11 +67,13 @@ class PomdpDialogAgent :
                 reward = self.knowledge.per_turn_reward
                 summary_state = SummaryState(self.state)
                 # Get the next action from the policy
-                (dialog_action, dialog_action_args) = self.policy.get_next_action(reward, summary_state)
+                (dialog_action, dialog_action_arg) = self.policy.get_next_action(reward, summary_state)
+                print 'dialog_action = ', dialog_action
+                print str(dialog_action_arg)
             self.first_turn = False
         
     # Request the user to state/repeat their goal
-    def request_user_initiative(self, args):
+    def request_user_initiative(self):
         if self.first_turn :
             self.output.say("How can I help?")
         else :
@@ -78,8 +82,8 @@ class PomdpDialogAgent :
         return response
 
     # Request a missing action parameter
-    def request_missing_param(self, args):
-        theme = args[1]
+    def request_missing_param(self):
+        theme = self.previous_system_action.extra_data[0]
         self.output.say("What is the " + theme + " of the action you'd like me to take?")
         response = self.input.get()
         return response
@@ -92,17 +96,19 @@ class PomdpDialogAgent :
         # Create an n-best list of Utterance objects along with probabiltiies 
         # obtained fromt ehir confidences
         self.get_n_best_utterances_from_parses(n_best_parses)
-        # Update the belief state
-        print '\nGoing to update belief state'
-        print 'Previous system action - ', str(self.previous_system_action)
-        print 'Utterances - ', '\n'.join([str(utterance) for utterance in self.n_best_utterances])
-        self.state.update(self.previous_system_action, self.n_best_utterances)
+        
+        if len(self.n_best_utterances) > 0 :
+            # Update the belief state
+            #print '\nGoing to update belief state'
+            #print 'Previous system action - ', str(self.previous_system_action)
+            #print 'Utterances - ', '\n'.join([str(utterance) for utterance in self.n_best_utterances])
+            self.state.update(self.previous_system_action, self.n_best_utterances)
 
     # Confirm a (possibly partial) action
-    def confirm_action(self, args):
+    def confirm_action(self):
         # with reverse parsing, want to confirm(a.name(a.params))
         # for now, just use a.name and a.params raw
-        system_action = args[0]
+        system_action = self.previous_system_action
         params = []
         goal = system_action.referring_goal
         if system_action.referring_params is not None :
@@ -110,7 +116,11 @@ class PomdpDialogAgent :
             for param_name in param_order :
                 if param_name in system_action.referring_params :
                     params.append[system_action.referring_params[param_name]]
-        self.output.say("I should take action " + goal +" involving " +
+        if goal is None :
+            self.output.say("I should take action involving " +
+                        ','.join([str(p) for p in params if p is not None]) + "?")
+        else :
+            self.output.say("I should take action " + goal +" involving " +
                         ','.join([str(p) for p in params if p is not None]) + "?")
         response = self.input.get()
         return response
@@ -140,6 +150,9 @@ class PomdpDialogAgent :
         elif parse.idx == self.parser.ontology.preds.index('no'):
             #print 'Is deny'
             return [Utterance('deny')]
+        elif parse.idx == self.parser.ontology.preds.index('none'):
+            goal = self.previous_system_action.referring_goal
+            return [Utterance('deny')]
         
         # Now check if it a full inform - mentions goal and params
         try:
@@ -154,6 +167,19 @@ class PomdpDialogAgent :
 
         # if this failed, try again allowing missing lambdas to become UNK without token ties
         # print "Going to retry parsing"
+        
+        if parse.idx == self.parser.ontology.preds.index('speak_e') or parse.idx == self.parser.ontology.preds.index('speak_t'):
+            # Don't want UNK parses for speak actions
+            return []
+        
+        if parse.idx != None and self.parser.ontology.preds[parse.idx] in ['speak_e', 'speak_t'] :
+            # Don't want UNK parses for speak actions
+            return []
+        if parse.children is not None and len(parse.children) >= 1 :
+            if parse.children[0].idx is not None and self.parser.ontology.preds[parse.children[0].idx] in ['speak_e', 'speak_t'] :
+                # Don't want UNK parses for speak actions
+                return []
+
         UNK_root = copy.deepcopy(parse)
         curr = UNK_root
         heading_lambdas = []
@@ -169,6 +195,25 @@ class PomdpDialogAgent :
             p_unk_action = self.get_action_from_parse(UNK_root)
         except SystemError:
             p_unk_action = None
+        except TypeError as e:
+            return []
+            print '--------------------------------'
+            print e.message
+            print '--------------------------------'
+            print self.parser.print_parse(parse)
+            print '--------------------------------'
+            print 'parse.idx = ', parse.idx
+            if parse.idx != None :
+                print 'self.parser.ontology.preds[parse.idx] = ', self.parser.ontology.preds[parse.idx]
+            if parse.children is not None and len(parse.children) >= 1 :
+                print 'parse.children[0].idx = ', parse.children[0].idx
+                if parse.children[0].idx is not None :
+                    print 'self.parser.ontology.preds[parse.children[0].idx] = ', self.parser.ontology.preds[parse.children[0].idx]
+            #print 'parse.children = '
+            #for c in parse.children :
+                #print self.parser.print_parse(c)
+                #print '\n'
+            print '--------------------------------'
             
         if p_unk_action is not None :
             #print 'Got UNK action. Going to convert and return'
@@ -184,12 +229,12 @@ class PomdpDialogAgent :
             if type(answers) == 'str' :
                 answers = [answers]
             for answer in answers :
+                if self.previous_system_action.extra_data is not None and len(self.previous_system_action.extra_data) > 1:
+                    param_name = self.previous_system_action.extra_data[0]
+                else :
+                    param_name = 'patient'
                 goal = self.previous_system_action.referring_goal
                 params = dict()
-                param_name = 'patient' # TODO: Something more intelligent than
-                                       # defaulting when we don't know the goal
-                if goal is not None :
-                    param_name = self.knowledge.param_order[goal][idx] 
                 params[param_name] = answer
                 utterance = Utterance('inform', goal, params)      
                 utterances.append(utterance)
@@ -202,10 +247,13 @@ class PomdpDialogAgent :
         print "No of parses = ", len(n_best_parses)
         sum_exp_conf = 0.0
         self.n_best_utterances = []
-        for (parse, parse_list, conf) in n_best_parses :
+        N = self.parser.beam_width
+        for [parse, parse_tree, parse_trace, conf] in n_best_parses :
             #print "\nParsing ", self.parser.print_parse(parse)
             #print 'conf = ', conf
             utterances = self.create_utterances_of_parse(parse)
+            if utterances is not None and len(utterances) >= N :
+                continue
             #print "Returned"
             if utterances is not None and len(utterances) > 0:
                 #print "Got ", len(utterances), " utterances"
@@ -214,6 +262,7 @@ class PomdpDialogAgent :
                     utterance.parse_prob = math.exp(conf) / len(utterances)
                     self.n_best_utterances.append(utterance)
                     sum_exp_conf += utterance.parse_prob
+            
         sum_exp_conf += self.knowledge.obs_by_non_n_best_prob
         for utterance in self.n_best_utterances :
             utterance.parse_prob /= sum_exp_conf
@@ -222,13 +271,33 @@ class PomdpDialogAgent :
         for utterance in self.n_best_utterances :
             print str(utterance)
 
+    #def read_in_utterance_action_pairs(self, fname):
+        #f = open(fname,'r')
+        #f_lines = f.readlines()
+        #pairs = []
+        #for i in range(0,len(f_lines),3):
+            #print i
+            #t = self.parser.tokenize(f_lines[i].strip())
+            #a_str = f_lines[i+1].strip()
+            #a_name, a_params_str = a_str.strip(')').split('(')
+            #a_params = a_params_str.split(',')
+            #for j in range(0, len(a_params)):
+                #if a_params[j] == "True":
+                    #a_params[j] = True
+                #elif a_params[j] == "False":
+                    #a_params[j] = False
+            #pairs.append([t, Action(a_name, a_params)])
+        #f.close()
+        #return pairs
+        
     def read_in_utterance_action_pairs(self, fname):
-        f = open(fname,'r')
+        f = open(fname, 'r')
         f_lines = f.readlines()
         pairs = []
-        for i in range(0,len(f_lines),3):
+        for i in range(0,len(f_lines), 4):
             t = self.parser.tokenize(f_lines[i].strip())
-            a_str = f_lines[i+1].strip()
+            cat, r = self.parser.lexicon.read_syn_sem(f_lines[i+1].strip())
+            a_str = f_lines[i+2].strip()
             a_name, a_params_str = a_str.strip(')').split('(')
             a_params = a_params_str.split(',')
             for j in range(0, len(a_params)):
@@ -236,9 +305,50 @@ class PomdpDialogAgent :
                     a_params[j] = True
                 elif a_params[j] == "False":
                     a_params[j] = False
-            pairs.append([t, Action(a_name, a_params)])
+            pairs.append([t, r, Action(a_name, a_params)])
         f.close()
         return pairs
+
+    #def train_parser_from_utterance_action_pairs(self, pairs, epochs=10, parse_beam=10):
+        #for e in range(0, epochs):
+            #print "training epoch "+str(e)
+            #random.shuffle(pairs)
+            #train_data = []
+            #num_correct = 0
+            #for t, a in pairs:
+                #n_best_parses = self.parser.parse_tokens(t, n=parse_beam)
+                #if len(n_best_parses) == 0:
+                    #print "WARNING: no parses found for tokens "+str(t)
+                    #continue
+                #a_chosen = None
+                #a_candidate = None
+                #correct_found = False
+                #for i in range(0, len(n_best_parses)):
+                    #try:
+                        ## print "parse: " + self.parser.print_parse(n_best_parses[i][0])  # DEBUG
+                        ## print self.parser.print_semantic_parse_result(n_best_parses[i][1])  # DEBUG
+                        #a_candidate = self.get_action_from_parse(n_best_parses[i][0])
+                        ## print "candidate: "+str(a_candidate)  # DEBUG
+                    #except SystemError:
+                        #a_candidate = Action()
+                    #if i == 0:
+                        #a_chosen = a_candidate
+                    #if a_candidate.__eq__(a):
+                        #correct_found = True
+                        #self.parser.add_genlex_entries_to_lexicon_from_partial(n_best_parses[i][1])
+                        #break  # the action matches gold and this parse should be used in training
+                #if not correct_found:
+                    #print "WARNING: could not find correct action '"+str(a)+"' for tokens "+str(t)
+                #if a_chosen != a_candidate:
+                    #train_data.append([t, n_best_parses[0], a_chosen, n_best_parses[i], a])
+                #else:
+                    #num_correct += 1
+            #print "\t"+str(num_correct)+"/"+str(len(pairs))+" top choices"
+            #if num_correct == len(pairs):
+                #print "WARNING: training converged at epoch "+str(e)+"/"+str(epochs)
+                #return True
+            #self.parser.learner.learn_from_actions(train_data)
+        #return False
 
     def train_parser_from_utterance_action_pairs(self, pairs, epochs=10, parse_beam=10):
         for e in range(0, epochs):
@@ -246,7 +356,7 @@ class PomdpDialogAgent :
             random.shuffle(pairs)
             train_data = []
             num_correct = 0
-            for t, a in pairs:
+            for t, r, a in pairs:
                 n_best_parses = self.parser.parse_tokens(t, n=parse_beam)
                 if len(n_best_parses) == 0:
                     print "WARNING: no parses found for tokens "+str(t)
@@ -271,7 +381,7 @@ class PomdpDialogAgent :
                 if not correct_found:
                     print "WARNING: could not find correct action '"+str(a)+"' for tokens "+str(t)
                 if a_chosen != a_candidate:
-                    train_data.append([t, n_best_parses[0], a_chosen, n_best_parses[i], a])
+                    train_data.append([t, n_best_parses[0], a_chosen, t, n_best_parses[i], a])
                 else:
                     num_correct += 1
             print "\t"+str(num_correct)+"/"+str(len(pairs))+" top choices"
@@ -282,7 +392,10 @@ class PomdpDialogAgent :
         return False
 
     def get_action_from_parse(self, root):
+	# print "Inside get_action_from_parse"
+
         # print "parse to get action from: " + self.parser.print_parse(root)  # DEBUG
+
         root.set_return_type(self.parser.ontology)  # in case this was not calculated during parsing
 
         # execute action from imperative utterance
@@ -292,11 +405,16 @@ class PomdpDialogAgent :
             action = self.parser.ontology.preds[root.idx]
             # print "action: "+action  # DEBUG
             g_args = []
+            # print "Going to enter loop"
             for arg in root.children:
+                # print "In loop"
                 g = self.grounder.groundSemanticNode(arg, [], [], [])
+                # print "Grounded"
                 # print "arg: "+str(g)  # DEBUG
                 answer = self.grounder.grounding_to_answer_set(g)
+                # print "Interpreted grounding"
                 if len(answer) == 0:
+                    # print "Single answer found"
                     if action == "speak_t":
                         g_args.append(False)
                     elif action == "speak_e":
@@ -306,6 +424,7 @@ class PomdpDialogAgent :
                 elif len(answer) > 1:
                     raise SystemError("multiple interpretations of action argument renders command ambiguous. arg: '"+str(answer)+"'")
                 else:
+                    # print "No answer found"
                     if action == "speak_t":
                         g_args.append(True)
                     else:
@@ -315,3 +434,39 @@ class PomdpDialogAgent :
 
         else:
             raise SystemError("cannot get action from return type "+str(self.parser.ontology.types[root.return_type]))
+
+
+    #def get_action_from_parse(self, root):
+        ## print "parse to get action from: " + self.parser.print_parse(root)  # DEBUG
+        #root.set_return_type(self.parser.ontology)  # in case this was not calculated during parsing
+
+        ## execute action from imperative utterance
+        #if root.return_type == self.parser.ontology.types.index('a'):
+            ## assume for now that logical connectives do not operate over actions (eg. no (do action a and action b))
+            ## ground action arguments
+            #action = self.parser.ontology.preds[root.idx]
+            ## print "action: "+action  # DEBUG
+            #g_args = []
+            #for arg in root.children:
+                #g = self.grounder.groundSemanticNode(arg, [], [], [])
+                ## print "arg: "+str(g)  # DEBUG
+                #answer = self.grounder.grounding_to_answer_set(g)
+                #if len(answer) == 0:
+                    #if action == "speak_t":
+                        #g_args.append(False)
+                    #elif action == "speak_e":
+                        #g_args.append(None)
+                    #else:
+                        #raise SystemError("action argument unrecognized. arg: '"+str(answer)+"'")
+                #elif len(answer) > 1:
+                    #raise SystemError("multiple interpretations of action argument renders command ambiguous. arg: '"+str(answer)+"'")
+                #else:
+                    #if action == "speak_t":
+                        #g_args.append(True)
+                    #else:
+                        #g_args.append(answer[0])
+            ## print "args: "+str(g_args)  # DEBUG
+            #return Action(action, g_args)
+
+        #else:
+            #raise SystemError("cannot get action from return type "+str(self.parser.ontology.types[root.return_type]))

@@ -44,11 +44,11 @@ TESTING PIPELINE:
 
 In a new tab for catkin_ws/, you can test the pipeline with
 
-$ rosrun bwi_dialog test_pipeline.py [ontology text file] [lexicon text file] [training text file]
+$ rosrun nlu_pipeline test_pipeline.py [ontology text file] [lexicon text file] [training text file]
 
 TESTING POMDP:
 
-rosrun bwi_dialog TestPomdpPipeline.py src/bwi_common/bwi_dialog/src/resources/asp_hri/ont.txt src/bwi_common/bwi_dialog/src/resources/asp_hri/lex.txt src/bwi_common/bwi_dialog/src/resources/asp_hri/utterance_action_pairs.txt
+rosrun nlu_pipeline TestPomdpPipeline.py src/nlu_pipeline/src/resources/asp_actions/ont.txt src/nlu_pipeline/src/resources/asp_actions/lex.txt src/nlu_pipeline/src/resources/asp_actions/utterance_action_pairs.txt
 
 NOTE:
   Right now there will be an initial "testing Generator" prompt. You can skip this by typing "stop".

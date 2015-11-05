@@ -12,7 +12,9 @@ __author__ = 'aishwarya'
 # in the hope that it scales better. I always use numpy matrices not 
 # arrays because arrays don't do vector math in an intuitive way
 
-import numpy as np, sys, math
+# TODO: Make candidate action sets which are sensible
+
+import numpy as np, sys, math, copy
 from Utils import *
 from SystemAction import SystemAction
 from Action import Action
@@ -71,17 +73,33 @@ class PomdpGpSarsaPolicy :
                 min_idx = idx
         return (min_idx, min_dist_point)
     
-    def get_random_action(self) :
-        num_actions = len(self.knowledge.summary_system_actions)
+    def get_random_action(self, current_state) :
+        candidate_actions = self.get_candidate_actions(current_state)
+        num_actions = len(candidate_actions)
         sample = int(np.random.uniform(0, num_actions))
-        return self.knowledge.summary_system_actions[sample]
+        return candidate_actions[sample]
+    
+    def get_candidate_actions(self, current_state) :
+        if current_state is None or current_state.top_hypothesis is None :
+            return self.knowledge.summary_system_actions
+        elif current_state.top_hypothesis[0] is None or current_state.top_hypothesis[0].possible_goals is None :
+            return self.knowledge.summary_system_actions
+        elif len(current_state.top_hypothesis[0].possible_goals) != 1 :
+            return self.knowledge.summary_system_actions
+        else :
+            unique_goal = current_state.top_hypothesis[0].possible_goals[0]
+            candidate_actions = copy.deepcopy(self.knowledge.summary_system_actions)
+            if unique_goal == 'speak_t' or unique_goal == 'speak_e' :
+                candidate_actions.remove('request_missing_param')
+            return candidate_actions
     
     def pi(self, b) :
         if self.D is None or len(self.D) == 0 :
-            return self.get_random_action()
+            return self.get_random_action(b)
         max_q_val = -sys.maxint
         best_action = None
-        for a in self.knowledge.summary_system_actions :
+        candidate_actions = self.get_candidate_actions(b)
+        for a in candidate_actions :
             (idx, closest_dict_point) = self.get_closest_dictionary_point(b, a)
             mean = self.mu[idx]
             std_dev = math.sqrt(self.C[idx, idx])
@@ -100,17 +118,18 @@ class PomdpGpSarsaPolicy :
         
         self.b = initial_state
         
+        # Forcing the initial action to be repeat_goal
+        # Not sure if thsi is correct from the RL perspective
+        self.a = 'repeat_goal'
+        
         if self.first_episode :
             self.first_episode = False
-            self.a = self.get_random_action()
             self.D = [(self.b, self.a)]
             self.mu = self.get_zero_vector(1)
             self.C = self.get_zero_vector(1)
             
             # K^{-1} = 1 / k((b, a), (b, a))
             self.K_inv = np.matrix([[1.0 / self.calc_k((self.b, self.a), (self.b, self.a))]])
-        else :
-            self.a = self.pi(self.b)
         
         self.c = self.get_zero_vector(len(self.D))
         self.d = 0.0
@@ -303,33 +322,34 @@ class PomdpGpSarsaPolicy :
     
     def get_system_action_requirements(self, action_type, state) :
         if action_type == 'repeat_goal' :
-            return [SystemAction(action_type)]
+            return SystemAction(action_type)
         elif action_type == 'take_action' :
-            return [self.resolve_state_to_goal(state)]
+            return self.resolve_state_to_goal(state)
             
         elif action_type == 'confirm_action' :
             if state.top_hypothesis is None :
                 goal_idx = int(np.random.uniform(0, len(state.knowledge.goal_actions)))
-                return [SystemAction(action_type, state.knowledge.goal_actions[goal_idx])]
+                return SystemAction(action_type, state.knowledge.goal_actions[goal_idx])
             goal = state.top_hypothesis[0].possible_goals[0]
             system_action = SystemAction(action_type, goal)
             param_order = state.knowledge.param_order[goal]
             params = dict()
             partition_params = state.top_hypothesis[0].possible_param_values
             if partition_params is None :
-                return [system_action]
+                return system_action
             for param_name in param_order :
                 if param_name in partition_params and len(partition_params) == 1 :
                     params[param_name] = partition_params[param_name][0]
             system_action.referring_params = params
-            return [system_action]
+            return system_action
             
         elif action_type == 'request_missing_param' :
             if state.top_hypothesis is None :
                 goal = None
                 system_action = SystemAction(action_type)
                 param_idx = int(np.random.uniform(0, len(state.knowledge.goal_params)))
-                return [system_action, state.knowledge.goal_params[param_idx]]
+                system_action.extra_data = [state.knowledge.goal_params[param_idx]]
+                return system_action
                     
             goal = state.top_hypothesis[0].possible_goals[0]
             system_action = SystemAction(action_type, goal)
@@ -338,7 +358,7 @@ class PomdpGpSarsaPolicy :
             param_to_request = None
             partition_params = state.top_hypothesis[0].possible_param_values
             if partition_params is None :
-                return [system_action, param_order[0]]
+                return system_action
             for param_name in param_order :
                 if param_name not in partition_params or len(partition_params) != 1 :
                     if param_to_request is None :
@@ -346,6 +366,7 @@ class PomdpGpSarsaPolicy :
                 else :
                     params[param_name] = partition_params[param_name][0]
             system_action.referring_params = params
+            system_action.extra_data = [param_to_request]
             
             if param_to_request is None :
                 # The top hypothesis partition doesn't have uncertain 
@@ -357,7 +378,8 @@ class PomdpGpSarsaPolicy :
                 # stuck in a loop here
                 if state.second_hypothesis is None or state.second_hypothesis.partition.possible_param_values is None :
                     param_idx = int(np.random.uniform(0, len(param_order)))
-                    return [system_action, param_order[param_idx]]
+                    system_action.extra_data = [param_order[param_idx]]
+                    return system_action
                 
                 # A good heuristic is to see in what params the first 
                 # and second hypotheses differ. Any one of these is 
@@ -366,14 +388,16 @@ class PomdpGpSarsaPolicy :
                 for param_name in param_order :
                     top_param_value = partition_params[param_name][0]
                     if param_name not in second_params or top_param_value not in second_params[param_name] or len(second_params[param_name]) != 1 :
-                        return [system_action, param_name]
+                        system_action.extra_data = [param_name]
+                        return system_action
                 
                 # If you reached here, this is probably an inappropriate 
                 # action so just verify a random param. 
                 param_idx = int(np.random.uniform(0, len(param_order)))
-                return [system_action, param_order[param_idx]]
+                system_action.extra_data = [param_order[param_idx]]
+                return system_action
                 
-            return [system_action, param_to_request]
+            return system_action
                     
     def save_vars(self) :
         save_model(self.mu, 'mu')
