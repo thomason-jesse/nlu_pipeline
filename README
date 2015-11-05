@@ -44,7 +44,7 @@ TESTING PIPELINE:
 
 In a new tab for catkin_ws/, you can test the pipeline with
 
-$ rosrun bwi_dialog test_pipeline.py [ontology text file] [lexicon text file] [training text file]
+$ rosrun nlu_pipeline test_pipeline.py [ontology text file] [lexicon text file] [training text file]
 
 TESTING POMDP:
 

@@ -1,0 +1,36 @@
+1. The system is currently not very good at dealing with upper case or punctuation. Avoid both. 
+
+2. If all queries (such as "is ray a person") return false, try the following
+
+        - Check that you have either the simulator or the kr_execution node up (they might have crashed)
+
+        - Check your Clingo version. Currently, if you followed all the instructions on the README of this repo, it should work with Clingo 4. For 
+          other versions, consult someone who knows Clingo to make appropriate modifications
+
+        - Check the file bwi_kr_execution/src/StaticFacts.cpp. Search for the line "boost::replace_all(line, "%#hide", "#show");" (line 30 or 
+          thereabouts). If you don't have it but have "boost::replace_all(line, "#hide", "#show");", add the extra '%' character. 
+
+        - Check the file bwi_kr_execution/launch/bwi_kr_execution.launch. Look for the line 
+          "<arg name="domain" default="$(find bwi_kr_execution)/domain/" />" (line 4 or thereabouts). It will either end with domain or 
+          domain_simulation. Open bwi_kr_execution/domain/hri_facts.asp and bwi_kr_execution/domain_simulation/hri_facts.asp. They must both have 
+          some lines starting with '%#' in the end. If only one of them does, copy these lines into the end of the other.
+
+        - If none of the above steps help, try running the ros service to Clingo by running 
+                rosservice call static_fact_query "[{name: hasoffice, params: [ray, l3_512]}]"
+          in a terminal (with either the simulator or the bwi_kr_execution node running). You probably still need to talk to someone who has used 
+          the project but the output of this is useful
+
+        - If the previous step failed, ask someone who knows Clingo to create a direct Clingo query and test if your Clingo is working. Again, in 
+          this case, there is probably an actual bug to be fixed by someone who knows the code to some extent.>
+
+3. If the system hangs after displaying 'ACTION:<something>', it is trying to execute the action. This will work only if you have the simulator 
+   running.
+
+4. If you get one or more occurrences of an error whose stack trace ends with "rospy.exceptions.ROSInterruptException: rospy shutdown", this would 
+   most likely have occurred in the dialog after one where you terminated the execution of an action using a Ctrl+C. You should not terminate 
+   actions prematurely this way and if they are not running, either the simulator is not up or there is a bug and you need to talk to someone who 
+   knows the code.
+
+
+
+         
