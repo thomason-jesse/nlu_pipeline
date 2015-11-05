@@ -3,12 +3,12 @@ __author__ = 'aishwarya'
 import pickle
 
 def save_model(obj, name):
-    with open('src/nlu_pipeline/src/models/'+ str(name) + '.pkl', 'wb') as f:
+    with open('src/bwi_common/bwi_dialog/src/models/'+ str(name) + '.pkl', 'wb') as f:
         pickle.dump(obj, f, pickle.HIGHEST_PROTOCOL)
 
 def load_model(name):
     try :
-        with open('src/nlu_pipeline/src/models/' + str(name) + '.pkl', 'r') as f:
+        with open('src/bwi_common/bwi_dialog/src/models/' + str(name) + '.pkl', 'r') as f:
             return pickle.load(f)
     except :
         return None
