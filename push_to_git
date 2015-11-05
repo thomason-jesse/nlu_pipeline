@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+rm -f *.pyc
+rm -f *~
+rm -f src/*.pyc
+rm -f src/*~
+rm -f src/Parser_test.txt
+rm -f src/run_tests_data.txt
+rm -f src/Testing.txt
+git add -A
+git commit -m "$*"
+git push origin aishwarya
