@@ -12,7 +12,6 @@ import Generator
 import DialogAgent
 import StaticDialogPolicy
 
-from PomdpStaticDialogPolicy import PomdpStaticDialogPolicy
 from PomdpDialogAgent import PomdpDialogAgent
 
 class InputFromKeyboard:
@@ -21,7 +20,6 @@ class InputFromKeyboard:
 
     def get(self):
         return raw_input()
-
 
 class OutputToStdout:
     def __init__(self):
@@ -70,10 +68,7 @@ generator = Generator.Generator(ont, lex, learner, parser, beam_width=100)
 print "instantiating DialogAgent"
 u_in = InputFromKeyboard()
 u_out = OutputToStdout()
-#static_policy = StaticDialogPolicy.StaticDialogPolicy()
-#A = DialogAgent.DialogAgent(parser, grounder, static_policy, u_in, u_out)
-static_policy = PomdpStaticDialogPolicy()
-A = PomdpDialogAgent(parser, grounder, static_policy, u_in, u_out)
+A = PomdpDialogAgent(parser, grounder, u_in, u_out)
 
 print "reading in data and training parser from actions"
 D = A.read_in_utterance_action_pairs(sys.argv[3])

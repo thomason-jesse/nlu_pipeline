@@ -11,7 +11,7 @@ from Action import Action
 
 class PomdpDialogAgent :
 
-    def __init__(self, parser, grounder, policy, u_input, output, parse_depth=10):
+    def __init__(self, parser, grounder, u_input, output, parse_depth=10):
         self.parser = parser
         self.grounder = grounder
         self.parse_depth = parse_depth
