@@ -81,6 +81,7 @@ converged = A.train_parser_from_utterance_action_pairs(D, epochs=10, parse_beam=
 print "theta: "+str(parser.learner.theta)
 
 while True:
+    A.first_turn = True
     success = A.run_dialog()
     if not success :
         u_out.say("Are you sure you want to exit? (y/n) : ")
