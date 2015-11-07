@@ -9,6 +9,7 @@ and writes to standard output for 5 seconds of data.
 
 //Used to determine when to record. 
 static int recording = 0;
+static int interrupted = 0; 
 static struct micParams mp; 
 
 void startRecord() {
@@ -17,6 +18,10 @@ void startRecord() {
 
 void stopRecord() {
 	recording = 0; 
+}
+
+void interruptRecord() {
+	interrupted = 1; 
 }
 
 int initMic(){
@@ -211,7 +216,13 @@ int record1600Hz_s(ps_decoder_t *ps) {
 	memset((void *)mp.buffer, 0, mp.frames * sizeof(int16)); 
 
 	//Waits for recording to start. 
-	while (!recording);
+	while (!recording && !interrupted);
+
+	if (interrupted) {
+		fclose(file); 
+
+		return 0; 
+	}
 
 	//Readys for recording. 
 	if (snd_pcm_state(mp.handle) == SND_PCM_STATE_SETUP)
@@ -254,7 +265,8 @@ int record1600Hz_s(ps_decoder_t *ps) {
 	//Waits for decoding to end. 
 	pthread_join(decodeThread, NULL); 
 
-	ps_end_utt(ps); 
+	ps_end_utt(ps);
+	fclose(file);
 
 	return 0;
 }

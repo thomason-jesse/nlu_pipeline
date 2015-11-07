@@ -32,7 +32,7 @@ class InputFromSpeechNode:
         self.waiting = True
 
     def callback(self, data):
-        self.utterance = data.data
+        self.utterance = data.data.split(";")[0]
 
         self.waiting = False
 

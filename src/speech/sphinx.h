@@ -46,6 +46,9 @@ void sphinx_init();
 //Frees everything allocated by sphinx. 
 void sphinx_close(); 
 
+//Interrupts sphinx to exit program. 
+void sphinx_interrupt(); 
+
 //Gets nbest hypothesis of utterance in file. 
 int sphinx_n_best_f(const char *file, int n);
 

@@ -16,6 +16,8 @@ class InputFromSpeech:
     def __init__(self):
         import ctypes
 
+        self.n = 5
+
         if True: #TODO Allow path specification is None:
             self.libHandle = ctypes.CDLL("./src/bwi_common/bwi_dialogue/src/nlu_pipeline/src/speech/speechRecognizer.so")
         else:
@@ -32,6 +34,9 @@ class InputFromSpeech:
         self.libHandle.closeMic()
         self.libHandle.sphinx_close()
 
+    def setN(self, n):
+        self.n = n
+
     def postProcess(self, words):
         utterance = ""
 
@@ -44,14 +49,10 @@ class InputFromSpeech:
         return utterance
 
     def get(self):
-        result =  self.getHypString(self.getNBest(1)[0]).split()
-
-        utterance = self.postProcess(result)
-
-        return utterance
+        return self.getNBest(self.n)
 
     def record(self):
-        self.libHandle.sphinx_n_best_m(1); 
+        self.libHandle.sphinx_n_best_m(self.n); 
 
     def recordToggle(self):
         #Initializes pygame window to read spacebar presses. 
@@ -81,6 +82,14 @@ class InputFromSpeech:
                 self.libHandle.stopRecord()
 
                 running = False
+
+            if (keys[pygame.K_RCTRL] or keys[pygame.K_LCTRL]) and keys[pygame.K_c]:
+                running = False
+
+                self.libHandle.interruptRecord()
+                self.libHandle.sphinx_interrupt()
+
+                rospy.signal_shutdown("Interrupted")
             
         pygame.quit()
 
@@ -98,6 +107,10 @@ class InputFromSpeech:
         thread1.join()
         thread2.join()
 
+        #Checks to see if system was interrupted. 
+        if __name__ == '__main__' and rospy.is_shutdown():
+            sys.exit()
+
         #Opens up results to begin reading from them. 
         results = open("results.txt", "r")
 
@@ -114,13 +127,21 @@ class InputFromSpeech:
 if __name__ == '__main__':
     recognizer = InputFromSpeech()
     
+    if len(sys.argv) > 1:
+        recognizer.setN(int(sys.argv[1]))
+
     pub = rospy.Publisher('speech', String, queue_size=1)
     rospy.init_node('recognizer', anonymous=True)
 
     #Continuously records utterances until interrupted. 
     while not rospy.is_shutdown():
-        utterance = recognizer.get()
-        rospy.loginfo(utterance)
-        pub.publish(utterance)
+        results = recognizer.get()
+
+        result_strings = [recognizer.postProcess(result[1].split()) for result in results]
+
+        result = ';'.join(result_strings)
+
+        rospy.loginfo(results)
+        pub.publish(result)
  
 

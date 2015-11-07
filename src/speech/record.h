@@ -38,4 +38,6 @@ void startRecord();
 
 void stopRecord(); 
 
+void interruptRecord(); 
+
 #endif

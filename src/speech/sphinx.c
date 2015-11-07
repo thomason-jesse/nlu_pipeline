@@ -35,8 +35,13 @@
 #include "sphinx.h"
 #include "record.h"
 
+static int interrupted = 0; 
 static ps_decoder_t *ps = 0;
 static cmd_ln_t *config = 0;
+
+void sphinx_interrupt() {
+	interrupted = 1; 
+}
 
 void sphinx_init() {
 	//TODO Check for and return errors. 
@@ -162,34 +167,36 @@ int sphinx_n_best_m(int n) {
 	//ps_decode_raw(ps, rawfh, -1); 
 	//fclose(rawfh); 
 
-	hyp = ps_get_hyp(ps, &score);
-	int32 prob = ps_get_prob(ps);
-	float conf = logmath_exp(ps_get_logmath(ps), prob); 
+	if (!interrupted) {
+		//hyp = ps_get_hyp(ps, &score);
+		//int32 prob = ps_get_prob(ps);
+		//float conf = logmath_exp(ps_get_logmath(ps), prob); 
 
-	fprintf(results, "%s:%d:%d:%g\n", hyp, score, prob, conf);
-
-	nbest = ps_nbest(ps, 0, -1, NULL, NULL);
+		nbest = ps_nbest(ps, 0, -1, NULL, NULL);
 	
-	int num = 1; 
+		int num = 1; 
 
-	while ((num < n) && nbest && (nbest = ps_nbest_next(nbest))) {
-		ps_seg_t *seg;
-		hyp = ps_nbest_hyp(nbest, &score);
+		while ((num <= n) && nbest && (nbest = ps_nbest_next(nbest))) {
+			ps_seg_t *seg;
+			hyp = ps_nbest_hyp(nbest, &score);
 
-		fprintf(results, "NBEST %d: %s (%d)\n", n, hyp, score); 
+			fprintf(results, "Result %d: %s\n", num, hyp); 
 
-		/* GETS individual word scores */
-		/*
-		for (seg = ps_nbest_seg(nbest, &score); seg;
-		     seg = ps_seg_next(seg)) {
-			char const *word;
-			int sf, ef;
+			/* GETS individual word scores */
+			/*
+			for (seg = ps_nbest_seg(nbest, &score); seg;
+		    	seg = ps_seg_next(seg)) {
+				char const *word;
+				int sf, ef;
 
-			word = ps_seg_word(seg);
-			ps_seg_frames(seg, &sf, &ef);
-			printf("%s %d %d\n", word, sf, ef);
+				word = ps_seg_word(seg);
+				ps_seg_frames(seg, &sf, &ef);
+				printf("%s %d %d\n", word, sf, ef);
+			}
+			*/
+
+			num++;
 		}
-		*/
 	}
 
 	if (nbest)
