@@ -78,10 +78,14 @@ def test_gp_sarsa_resolving_summary_action() :
             for e in l :
                 print str(e)
         print '------------------------'
+
+def test_gp_sarsa_init() :
+    knowledge = Knowledge()
+    p = PomdpGpSarsaPolicy(knowledge)
+    p.create_initial_policy()
     
 if __name__ == '__main__' :
-    #test_gp_sarsa_funcs()
-    test_gp_sarsa_resolving_summary_action() 
+    test_gp_sarsa_init()
     
     #print str(b)
     #m1 = SystemAction('confirm_action', 'searchroom', {'patient':'ray', 'location':'3512'})

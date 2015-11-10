@@ -14,10 +14,13 @@ __author__ = 'aishwarya'
 
 # TODO: Make candidate action sets which are sensible
 
-import numpy as np, sys, math, copy
+import numpy as np, sys, math, copy, itertools
 from Utils import *
 from SystemAction import SystemAction
 from Action import Action
+from SummaryState import SummaryState
+from Partition import Partition
+from Utterance import Utterance
 
 class PomdpGpSarsaPolicy :
     def __init__(self, knowledge, load_from_file=False) :
@@ -421,3 +424,122 @@ class PomdpGpSarsaPolicy :
         print 'self.b = ', self.b
         print 'self.g = ', self.g
         print 'self.delta = ', self.delta
+        
+    def create_initial_policy(self) :
+        probs = [x * 0.1 for x in xrange(0, 10)]
+        num_goals = range(0, len(self.knowledge.goal_actions))
+        num_uncertain_params = range(0, len(self.knowledge.goal_params)) + [sys.maxint]
+        num_dialog_turns = range(0, 10)
+        yes_no = ['yes', 'no']
+        utterance_type = [None, 'inform', 'affirm', 'deny']
+        values = list(itertools.product(*[probs, probs, num_goals, num_uncertain_params, num_dialog_turns, yes_no, utterance_type]))
+
+        # Warning: Make sure you have a default value for every param in 
+        # Knowledge.goal_params
+        default_param_values = dict()
+        default_param_values['patient'] = ['ray']
+        default_param_values['recipient'] = ['peter']
+        default_param_values['location'] = ['l3_512']
+
+        examples = list()
+        for (top_prob, sec_prob, num_goals, num_uncertain_params, num_dialog_turns, match, utterance_type) in values :
+            if num_goals != 1 and num_uncertain_params != sys.maxint :
+                continue
+            elif num_goals == 1 and num_uncertain_params == sys.maxint :
+                continue
+            elif num_goals != len(self.knowledge.goal_actions) and utterance_type is None :
+                continue
+            s = SummaryState()
+            s.knowledge = self.knowledge
+            s.top_hypothesis_prob = top_prob
+            s.second_hypothesis_prob = sec_prob
+            s.num_dialog_turns = num_dialog_turns
+        
+            if num_goals != 1 :
+                if utterance_type is not None :
+                    utterance = Utterance(utterance_type)
+                    s.top_hypothesis = (Partition(self.knowledge.goal_actions[0:num_goals]), utterance)
+                    if match == 'yes' :
+                        s.second_hypothesis = (Partition(self.knowledge.goal_actions[0:num_goals]), utterance)
+            
+                if s.get_feature_vector() != [top_prob, sec_prob, num_goals, num_uncertain_params, num_dialog_turns, match, utterance_type] :
+                    print 'Problem!'
+                    print s.get_feature_vector()
+                    print (top_prob, sec_prob, num_goals, num_uncertain_params, num_dialog_turns, match, utterance_type)
+                    print '\n'
+                    
+                examples.append((s, 'repeat_goal'))
+            else :
+                #for goal in self.knowledge.goal_actions :
+                goal = 'remind'
+                params = dict()
+                
+                param_order = self.knowledge.param_order[goal]
+                if num_uncertain_params > len(param_order) :
+                    continue
+                num_certain_params = len(param_order) - num_uncertain_params  
+                #print 'len(param_order) = ', len(param_order)
+                #print 'num_uncertain_params = ', num_uncertain_params          
+                #print 'num_certain_params = ', num_certain_params
+                for (idx, param_name) in enumerate(param_order) :
+                    if idx < num_certain_params :
+                        params[param_name] = default_param_values[param_name]
+                    else :
+                        params[param_name] = self.knowledge.goal_params_values
+                
+                s = SummaryState()
+                s.knowledge = self.knowledge
+                s.top_hypothesis_prob = top_prob
+                s.second_hypothesis_prob = sec_prob
+                s.num_dialog_turns = num_dialog_turns        
+                
+                if utterance_type is not None :
+                    utterance = Utterance(utterance_type)
+                    s.top_hypothesis = (Partition([goal], params), utterance)
+                    if match == 'yes' :
+                        s.second_hypothesis = (Partition([goal], params), utterance)                    
+            
+                if s.get_feature_vector() != [top_prob, sec_prob, num_goals, num_uncertain_params, num_dialog_turns, match, utterance_type] :
+                    print 'Problem!'
+                    print s.get_feature_vector()
+                    print (top_prob, sec_prob, num_goals, num_uncertain_params, num_dialog_turns, match, utterance_type)
+                    print s.top_hypothesis[0].possible_param_values
+                    print '\n'
+                                
+                if num_uncertain_params == 0 :
+                    if top_prob < 0.3 :
+                        action = 'request_missing_param'
+                    elif top_prob < 0.9 :
+                        action = 'confirm_action'
+                    else :
+                        action = 'take_action'
+                else :
+                    if num_uncertain_params > 0 :
+                        action = 'request_missing_param'
+                examples.append((s, action))
+                    
+        print len(examples), 'examples'        
+        D = list()
+        mean = []
+        cov = []
+        actions = self.knowledge.summary_system_actions
+        for (b, a) in examples :
+            for a_prime in actions :
+                D.append((b, a_prime))
+                if a == a_prime :
+                    mean.append(1.0)
+                else :
+                    mean.append(0.0)
+        print 'len(D) = ', len(D)
+        cov = numpy.matrix(numpy.zeros((len(D), len(D))))
+        for i in range(0, len(D)) :
+            cov[(i,i)] = 0.1
+        self.D = D
+        self.mu = numpy.matrix([[x] for x in mean])
+        self.C = cov
+        
+        # TODO: Calculate K^-1
+                    
+        
+    
+        
