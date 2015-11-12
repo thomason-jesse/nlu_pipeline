@@ -68,11 +68,25 @@ class Partition:
                     return False           
         return True
     
+    def is_terminal(self, knowledge) :
+        if self.possible_goals is None or len(self.possible_goals) != 1 :
+            return False
+        goal = self.possible_goals[0]
+        param_order = knowledge.param_order[goal]
+        for param in param_order :
+            if param not in self.possible_param_values :
+                print 'Warning: All partitions must have at least one value for every param but', param, 'not present here'
+                return False
+            elif len(self.possible_param_values[param]) != 1 :
+                return False
+        return True
+                
+    
     # Check whether this partition contains all states having some goal 
     # and params        
     def is_superset(self, required_goal, required_params) :
         if required_goal != None and required_goal not in self.possible_goals :
-            print "Goal not present"
+            #print "Goal not present"
             # We want a specific goal and that is not in this partition
             return False
         elif required_params != None :
@@ -124,10 +138,16 @@ class Partition:
             split_prob = knowledge.partition_split_goal_probs[new_goal]
             p1.reaching_prob = self.reaching_prob * split_prob
             p1.belief = self.belief * split_prob
+            if p1.is_terminal(knowledge) :
+                #p1.belief = min(p1.belief + 0.5, 1)    
+                pass
             other_goals = [goal for goal in self.possible_goals if goal != new_goal]
             p2 = Partition(other_goals, self.possible_param_values)
             p2.reaching_prob = self.reaching_prob * (1 - split_prob)
             p2.belief = self.belief * (1 - split_prob)
+            if p2.is_terminal(knowledge) :
+                #p2.belief = min(p2.belief + 0.5, 1)    
+                pass
             return [p1, p2]
 
     def split_by_param(self, split_param_name, split_param_value, knowledge) :
@@ -151,7 +171,13 @@ class Partition:
             split_prob = knowledge.partition_split_param_probs[split_param_name][split_param_value]
             p1.reaching_prob = self.reaching_prob * split_prob
             p1.belief = self.belief * split_prob
+            if p1.is_terminal(knowledge) :
+                p1.belief = min(p1.belief + 0.1, 1)    
+                pass
             p2.reaching_prob = self.reaching_prob * (1 - split_prob)
             p2.belief = self.belief * (1 - split_prob)
+            if p2.is_terminal(knowledge) :
+                p2.belief = min(p2.belief + 0.1, 1)    
+                pass
             return [p1, p2]
             

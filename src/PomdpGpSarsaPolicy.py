@@ -27,6 +27,7 @@ class PomdpGpSarsaPolicy :
         self.knowledge = knowledge
         self.gamma = self.knowledge.gamma
         self.sigma = self.knowledge.gp_sarsa_std_dev
+        self.dist_threshold = 0.2
         
         if load_from_file :
             self.mu = load_model('mu')
@@ -56,8 +57,14 @@ class PomdpGpSarsaPolicy :
     
     # b and b_prime are summary states
     def calc_k(self, (b, a), (b_prime, a_prime)) :
-        action_kernel_value = float(a == a_prime)
+        #print 'b = ', b.get_feature_vector()
+        #print 'b\' = ', b_prime.get_feature_vector()
+        #print 'a = ', a, 'a_prime = ', a_prime
+        
+        action_kernel_value = 3 * float(a == a_prime)
+        #print 'action_kernel_value = ', action_kernel_value
         state_kernel_value = b.calc_kernel(b_prime)
+        #print 'state_kernel_value = ', state_kernel_value
         return state_kernel_value * action_kernel_value
     
     def calc_k_vector(self, b, a) :
@@ -65,16 +72,16 @@ class PomdpGpSarsaPolicy :
         return np.matrix([map(self.calc_k, replicas, self.D)]).T
     
     def get_closest_dictionary_point(self, target_b, target_a) :
-        min_dist = sys.maxint
-        min_dist_point = None
-        min_idx = None
+        max_sim = -sys.maxint
+        max_sim_point = None
+        max_idx = None
         for (idx, (b, a)) in enumerate(self.D) :
-            dist = self.calc_k((target_b, target_a), (b, a))
-            if dist < min_dist :
-                min_dist = dist
-                min_dist_point = (b, a)
-                min_idx = idx
-        return (min_idx, min_dist_point)
+            sim = self.calc_k((target_b, target_a), (b, a))
+            if sim > max_sim :
+                max_sim = sim
+                max_sim_point = (b, a)
+                max_idx = idx
+        return (max_idx, max_sim_point)
     
     def get_random_action(self, current_state) :
         candidate_actions = self.get_candidate_actions(current_state)
@@ -98,14 +105,35 @@ class PomdpGpSarsaPolicy :
     
     def pi(self, b) :
         if self.D is None or len(self.D) == 0 :
-            return self.get_random_action(b)
+            #return self.get_random_action(b)
+            return self.get_action_from_hand_coded_policy(b)
+            
         max_q_val = -sys.maxint
         best_action = None
         candidate_actions = self.get_candidate_actions(b)
+        print b.get_feature_vector()
         for a in candidate_actions :
             (idx, closest_dict_point) = self.get_closest_dictionary_point(b, a)
-            mean = self.mu[idx]
-            std_dev = math.sqrt(self.C[idx, idx])
+            
+            sim_to_dict_point = self.calc_k((b, a), closest_dict_point)
+            #print 'sim_to_dict_point = ', sim_to_dict_point
+            #print 'closest_dict_point : ', closest_dict_point[0].get_feature_vector(), ', action = ', closest_dict_point[1] 
+            if sim_to_dict_point < self.dist_threshold :
+                print 'Using hand coded policy because sim = ', sim_to_dict_point
+                hand_coded_policy_a = self.get_action_from_hand_coded_policy(b)
+                #print 'hand_coded_policy_a = ', hand_coded_policy_a
+                if a == hand_coded_policy_a :
+                    mean = 1
+                    std_dev = 0.1
+                else :
+                    mean = 0
+                    std_dev = 0.1
+            else :
+                mean = self.mu[idx]
+                std_dev = math.sqrt(self.C[idx, idx])
+            
+            #print 'action = ', a, 'mean = ', mean, ', std_dev = ', std_dev
+            
             if std_dev < 0.0000001 :
                 q = mean
             else :
@@ -244,14 +272,12 @@ class PomdpGpSarsaPolicy :
             c_prime = (self.gamma * self.sigma * self.sigma / self.v) * self.c + h - self.C * delta_k
             self.v = (1 + self.gamma * self.gamma) * self.sigma * self.sigma + (delta_k.T * (c_prime + (self.gamma * self.sigma * self.sigma / self.v) * self.c)).item(0,0) - ((self.gamma ** 2) * (self.sigma ** 4) / self.v)
         
-        # According to the paper, this should be after the mu and C updates
-        # but then the matrix sizes don't match
-        self.c = c_prime
-        
+        if self.c.shape != self.mu.shape :        
+            self.c = np.append(self.c, np.matrix([[0]]), 0)
         self.mu = self.mu + self.c * (self.d / self.v)
         self.C = self.C + (1.0 / self.v) * (self.c * self.c.T)
-        
-        #self.c = c_prime
+
+        self.c = c_prime
         self.g = g_prime
         self.b = b_prime
         self.a = a_prime
@@ -341,8 +367,10 @@ class PomdpGpSarsaPolicy :
             if partition_params is None :
                 return system_action
             for param_name in param_order :
-                if param_name in partition_params and len(partition_params) == 1 :
+                if param_name in partition_params and len(partition_params[param_name]) == 1 :
                     params[param_name] = partition_params[param_name][0]
+                else :
+                    print 'Uncertain about ', param_name, ' : ', partition_params[param_name]
             system_action.referring_params = params
             return system_action
             
@@ -424,6 +452,25 @@ class PomdpGpSarsaPolicy :
         print 'self.b = ', self.b
         print 'self.g = ', self.g
         print 'self.delta = ', self.delta
+       
+    def get_action_from_hand_coded_policy(self, state) :
+        if state.num_dialog_turns > 10 :
+            return 'take_action'
+        feature_vector = state.get_feature_vector()
+        num_goals = feature_vector[2]
+        num_uncertain_params = feature_vector[3]
+        if num_goals == 1 :
+            if num_uncertain_params == 0 :
+                if state.top_hypothesis_prob < 0.3 :
+                    return 'request_missing_param'
+                elif state.top_hypothesis_prob < 0.9 :
+                    return 'confirm_action'
+                else :
+                    return 'take_action'
+            else :
+                return 'request_missing_param'
+        else :
+            return 'repeat_goal'      
         
     def create_initial_policy(self) :
         probs = [x * 0.1 for x in xrange(0, 10)]

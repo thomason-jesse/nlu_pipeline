@@ -40,7 +40,15 @@ class Utterance:
         if self.parse_prob != other.parse_prob :
             return False
         return True
-      
+        
+    def is_like(self, other) :
+        if self.action_type != other.action_type :
+            return False
+        if self.referring_goal != other.referring_goal :
+            return False
+        if not checkDicts(self.referring_params, other.referring_params) :
+            return False
+        return True
     def __hash__(self):
         hash_tuple = ()
         if self.referring_params is not None :

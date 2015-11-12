@@ -105,8 +105,18 @@ class SummaryState :
         return distance
         
     def calc_kernel(self, other_summary_state) :
+        p = self.knowledge.kernel_degree
+        sigma_k = self.knowledge.kernel_std_dev
+        k_disc = 0.0
+        norm_cts = 0.0
         self_feature_vector = self.get_feature_vector()
         other_feature_vector = other_summary_state.get_feature_vector()
-        return self.calc_kernel_for_vectors(self.knowledge, self_feature_vector, other_feature_vector)
+        for i in xrange(0, len(self_feature_vector)) :
+            if i in self.discrete_features :
+                k_disc += float(self_feature_vector[i] == other_feature_vector[i])
+            else :
+                norm_cts += (self_feature_vector[i] - other_feature_vector[i]) ** 2
+        k_cts = p * p * math.exp( - norm_cts / (2 * sigma_k * sigma_k))
+        return k_disc + k_cts
      
         

@@ -115,7 +115,7 @@ class PomdpDialogAgent :
             param_order = self.knowledge.param_order[goal]
             for param_name in param_order :
                 if param_name in system_action.referring_params :
-                    params.append[system_action.referring_params[param_name]]
+                    params.append(system_action.referring_params[param_name])
         if goal is None :
             self.output.say("I should take action involving " +
                         ','.join([str(p) for p in params if p is not None]) + "?")
@@ -242,6 +242,32 @@ class PomdpDialogAgent :
         except TypeError as e :
             print e.message
             
+    def merge_duplicate_utterances(self, utterances) :
+        n = len(utterances)
+        merged_utterances = list()
+        
+        i = 0
+        while i < n :
+            #print 'n = ', n, ', i = ', i
+            u = utterances[i]
+            n = len(utterances)
+            j = i
+            while j < n :
+                #print 'n = ', n, ', j = ', j
+                u2 = utterances[j]
+                if u2.is_like(u) :
+                    u.parse_prob += u2.parse_prob
+                    utterances.remove(u2)
+                    n -= 1
+                else :
+                    j += 1
+                #print 'n = ', n, ', j = ', j
+                #print
+            merged_utterances.append(u)
+            i += 1
+        
+        return merged_utterances    
+            
     def get_n_best_utterances_from_parses(self, n_best_parses) :
         print "In get_n_best_utterances_from_parses"
         print "No of parses = ", len(n_best_parses)
@@ -261,7 +287,13 @@ class PomdpDialogAgent :
                     #print str(utterance)
                     utterance.parse_prob = math.exp(conf) / len(utterances)
                     self.n_best_utterances.append(utterance)
-                    sum_exp_conf += utterance.parse_prob
+                    #sum_exp_conf += utterance.parse_prob
+            
+        self.n_best_utterances = self.merge_duplicate_utterances(self.n_best_utterances)    
+        
+        sum_exp_conf = 0
+        for utterance in self.n_best_utterances :
+            sum_exp_conf += utterance.parse_prob
             
         sum_exp_conf += self.knowledge.obs_by_non_n_best_prob
         for utterance in self.n_best_utterances :
