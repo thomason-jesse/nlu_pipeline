@@ -184,7 +184,7 @@ void* decodeRecording(void *ps) {
 		rc = fread(buffer, sizeof(int16), mp.frames, file); 
 
 		if (rc > 0)
-			ps_process_raw((ps_decoder_t *)ps, buffer, rc, TRUE, FALSE);
+			ps_process_raw((ps_decoder_t *)ps, buffer, rc, FALSE, FALSE);
 
 		//Waits for more data to be written to file. 
 		while (feof(file) && recording)
@@ -216,7 +216,8 @@ int record1600Hz_s(ps_decoder_t *ps) {
 	memset((void *)mp.buffer, 0, mp.frames * sizeof(int16)); 
 
 	//Waits for recording to start. 
-	while (!recording && !interrupted);
+	while (!recording && !interrupted)
+		usleep(100000);
 
 	if (interrupted) {
 		fclose(file); 

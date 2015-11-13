@@ -57,7 +57,27 @@ class InputFromSpeech:
     def recordToggle(self):
         #Initializes pygame window to read spacebar presses. 
         pygame.init()
-        pygame.display.set_mode((1,1))
+       
+        #Sets up screen size and background color. 
+        screen = pygame.display.set_mode((375,90))
+        screen.fill((105,105,105))    
+
+        #Initializes font for on-screen instructions. 
+        pygame.display.set_caption('Recorder')
+        font = pygame.font.SysFont("monospace", 15)
+        
+        #Writes instructions. 
+        text1 = font.render("Click this window to activate recorder", 1, (255,255,255))
+        text2 = font.render("Press [SPACEBAR] to record", 1, (255,255,255))
+        text3 = font.render("Press [Ctrl-C] to interrupt", 1, (255,255,255))
+        
+
+        #Renders instructions on screen. 
+        screen.blit(text1, (0,0))
+        screen.blit(text2, (0,30))
+        screen.blit(text3, (0,60))
+
+        pygame.display.update()
 
         running = True
 
@@ -90,7 +110,10 @@ class InputFromSpeech:
                 self.libHandle.sphinx_interrupt()
 
                 rospy.signal_shutdown("Interrupted")
-            
+        
+            #Sleeps to free up come CPU
+            pygame.time.wait(100)
+
         pygame.quit()
 
     def getNBest(self, n):
