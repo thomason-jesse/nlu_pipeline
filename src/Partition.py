@@ -56,7 +56,6 @@ class Partition:
             for param_name in system_action.referring_params :
                 if param_name not in self.possible_param_values or len(self.possible_param_values[param_name]) != 1 or self.possible_param_values[param_name][0] != system_action.referring_params[param_name] :
                     return False
-        return True
             
         # Partition has to match info in utterance
         if utterance.referring_goal != None :
@@ -85,8 +84,11 @@ class Partition:
     # Check whether this partition contains all states having some goal 
     # and params        
     def is_superset(self, required_goal, required_params) :
+        print '^^^^^^^^^^^^^^^^^^^^^'
+        print str(self)
         if required_goal != None and required_goal not in self.possible_goals :
-            #print "Goal not present"
+            print "Goal not present"
+            print '^^^^^^^^^^^^^^^^^^^^^'
             # We want a specific goal and that is not in this partition
             return False
         elif required_params != None :
@@ -95,15 +97,19 @@ class Partition:
                     print param_name, " not present in call to is_superset"
                     # This should not ideally ever happen
                     print "\nCheck partitions.py for this line as this should not happen\n"
+                    print '^^^^^^^^^^^^^^^^^^^^^'
                     return False
                 else :
                     if not set(required_params[param_name]).issubset(set(self.possible_param_values[param_name])) :
-                        #print param_name, " values not a subset"
-                        #print "Available values: ", self.possible_param_values[param_name]
-                        #print "Queried value: ", required_params[param_name]
+                        print param_name, " values not a subset"
+                        print "Available values: ", self.possible_param_values[param_name]
+                        print "Queried value: ", required_params[param_name]
+                        print '^^^^^^^^^^^^^^^^^^^^^'
                         # The values we want for this param are not a subset 
                         # of the values allowed by the partition
                         return False
+        print 'Superset!'
+        print '^^^^^^^^^^^^^^^^^^^^^'
         return True
     
     # Check whether this partition has only the goal and param values indicated

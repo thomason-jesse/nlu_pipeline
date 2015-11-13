@@ -270,7 +270,9 @@ class PomdpGpSarsaPolicy :
         else :
             h = self.g - self.gamma * g_prime
             c_prime = (self.gamma * self.sigma * self.sigma / self.v) * self.c + h - self.C * delta_k
+            print 'self.v = ', self.v
             self.v = (1 + self.gamma * self.gamma) * self.sigma * self.sigma + (delta_k.T * (c_prime + (self.gamma * self.sigma * self.sigma / self.v) * self.c)).item(0,0) - ((self.gamma ** 2) * (self.sigma ** 4) / self.v)
+            print 'self.v = ', self.v
         
         if self.c.shape != self.mu.shape :        
             self.c = np.append(self.c, np.matrix([[0]]), 0)
@@ -287,9 +289,9 @@ class PomdpGpSarsaPolicy :
         else :
             self.k_b_a = k_b_prime_a_prime
         
-        #print 'End of get_next_action'      # DEBUG   
-        #self.print_vars()                   # DEBUG
-        #print '-------------------------'   # DEBUG
+        print 'End of get_next_action'      # DEBUG   
+        self.print_vars()                   # DEBUG
+        print '-------------------------'   # DEBUG
         
         return (self.a, self.get_system_action_requirements(self.a, self.b))
         
