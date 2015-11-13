@@ -30,9 +30,6 @@ class OutputToStdout:
     def say(self, s):
         print "SYSTEM: "+s
 
-print "calling ROSpy init"
-rospy.init_node('test_NLU_pipeline')
-
 print "reading in Ontology"
 ont = Ontology.Ontology(sys.argv[1])
 print "predicates: " + str(ont.preds)
@@ -60,6 +57,10 @@ parser = Parser.Parser(ont, lex, learner, grounder, beam_width=10, safety=True)
 
 print "instantiating Generator"
 generator = Generator.Generator(ont, lex, learner, parser, beam_width=sys.maxint, safety=True)
+
+u_in = InputFromKeyboard()
+u_out = OutputToStdout()
+
 print "testing Generator:"
 while True:
     s = raw_input()
@@ -70,36 +71,25 @@ while True:
     print "token responses: "+str(token_responses)
 generator.flush_seen_nodes()
 
-print "instantiating DialogAgent"
-u_in = InputFromKeyboard()
-u_out = OutputToStdout()
-static_policy = StaticDialogPolicy.StaticDialogPolicy()
-A = DialogAgent.DialogAgent(parser, generator, grounder, static_policy, u_in, u_out)
-
-print "instantiating ActionSender"
-action_sender = ActionSender.ActionSender(lex, generator, u_out)
-
 while True:
     u_out.say("How can I help?")
     s = raw_input()
     if s == 'stop':
         break
-    a = A.initiate_dialog_to_get_action(s)
-    print "ACTION: "+str(a)
-    r = action_sender.take_action(a)
-    print "RESULT: "+str(r)
+    top_n = parser.parse_expression(s, k=10, n=3, allow_UNK_E=False)
+    print "num parses: "+str(len(top_n))
+    for r, ps, ph, sc in top_n:
+        parser.print_parse(r, True)
 
 print "reading in training data"
-D = A.read_in_utterance_action_pairs(sys.argv[3])
+D = parser.read_in_paired_utterance_semantics(sys.argv[3])
 
 if len(sys.argv) > 4 and sys.argv[4] == "both":
-    print "training parser and generator jointly from actions"
-    converged = A.jointly_train_parser_and_generator_from_utterance_action_pairs(
-        D, epochs=10, parse_beam=30, generator_beam=10)
+    print "training parser and generator jointly from semantics"
+    parser.train_learner_on_semantic_forms(D, k=10, generator=generator)
 else:
-    print "training parser from actions"
-    converged = A.train_parser_from_utterance_action_pairs(
-        D, epochs=10, parse_beam=30)
+    print "training parser from semantics"
+    parser.train_learner_on_semantic_forms(D, k=10)
 
 print "theta: "+str(parser.learner.theta)
 
@@ -108,10 +98,10 @@ while True:
     s = raw_input()
     if s == 'stop':
         break
-    a = A.initiate_dialog_to_get_action(s)
-    print "ACTION: "+str(a)
-    r = action_sender.take_action(a)
-    print "RESULT: "+str(r)
+    top_n = parser.parse_expression(s, k=10, n=3, allow_UNK_E=False)
+    print "num parses: "+str(len(top_n))
+    for r, ps, ph, sc in top_n:
+        parser.print_parse(r, True)
 
 print "testing Generator:"
 while True:

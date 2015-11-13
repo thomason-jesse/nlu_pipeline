@@ -179,8 +179,16 @@ class Parser:
                 i += 1
                 continue
             tokens = self.tokenize(f_lines[i].strip())
+            form_line = f_lines[i + 1].strip()
+            try:
+                cat_str, form_str = form_line.split(" : ")
+                cat = self.lexicon.read_category_from_str(cat_str)
+            except ValueError:
+                cat = None
+                form_str = form_line
             form = self.lexicon.read_semantic_form_from_str(
-                f_lines[i + 1].strip(), None, None, [], allow_expanding_ont=allow_expanding_ont)
+                form_str.strip(), None, None, [], allow_expanding_ont=allow_expanding_ont)
+            form.category = cat
             D.append([tokens, form])
             i += 3
         return D
@@ -527,12 +535,15 @@ class Parser:
                                 self.lexicon.expand_lex_from_strs(new_lex, self.lexicon.surface_forms,
                                                                   self.lexicon.semantic_forms, self.lexicon.entries,
                                                                   self.lexicon.pred_to_surface, False)
-                                generator_genlex_entries.append(
-                                    [self.lexicon.surface_forms.index(known_tokens[tok_idx]),
-                                     self.lexicon.semantic_forms.index(gen_result[i])])
-                                print "\texpanded lexicon"  # DEBUG
+                                if gen_result[i] not in self.lexicon.semantic_forms:  # DEBUG
+                                    print "WARNING: somehow generated result isn't in lexicon semantic forms"  # DEBUG
+                                else:  # DEBUG
+                                    generator_genlex_entries.append(
+                                        [self.lexicon.surface_forms.index(known_tokens[tok_idx]),
+                                         self.lexicon.semantic_forms.index(gen_result[i])])
+                                # print "\texpanded lexicon"  # DEBUG
                                 self.lexicon.update_support_structures()
-                                print "\tupdated support structures"  # DEBUG
+                                # print "\tupdated support structures"  # DEBUG
                                 generator_genlex_succeeded = True
                             tok_idx += 1
                         elif type(pt[i]) is str:
@@ -541,11 +552,11 @@ class Parser:
                             tok_idx += len(pt[i])
 
         if generator_genlex_succeeded:  # if we added to lexicon, get those additions
-            print "\tre-expanding partials with new genlex addition"  # DEBUG
+            # print "\tre-expanding partials with new genlex addition"  # DEBUG
             expanded_partials = self.expand_partial_parse(p, allow_UNK_E, None)
-            print "\tdone; got "+str(len(expanded_partials))+" initial expanded partials"  # DEBUG
+            # print "\tdone; got "+str(len(expanded_partials))+" initial expanded partials"  # DEBUG
             if len(expanded_partials) == 0:
-                print "\tremoving added entry from lexicon since it didn't help"  # DEBUG
+                # print "\tremoving added entry from lexicon since it didn't help"  # DEBUG
                 for sur_idx, sem_idx in generator_genlex_entries:
                     if sem_idx in self.lexicon.entries[sur_idx]:
                         del self.lexicon.entries[sur_idx][self.lexicon.entries[sur_idx].index(sem_idx)]
