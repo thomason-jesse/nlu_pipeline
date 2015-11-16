@@ -453,7 +453,7 @@ class Parser:
                      refs[1].__hash__() in self.known_binary_expansions[refs[0].__hash__()]):
                     for be in self.known_binary_expansions[refs[0].__hash__()][refs[1].__hash__()]:
                         possible_joins.append([i, j, be, tree[i], tree[j], None])
-                    pairwise_joins = True
+                        pairwise_joins = True
                 else:
 
                     if refs[0].__hash__() not in self.known_binary_expansions:
