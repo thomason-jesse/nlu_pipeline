@@ -205,7 +205,7 @@ class SemanticNode:
         c_keys = []
         if self.children is not None:
             for c in self.children:
-                c_keys.append(c.__has__())
+                c_keys.append(c.__hash__())
         key = (self.type, self.category, self.is_lambda, self.idx, self.lambda_name, self.is_lambda_instantiation,
                tuple(c_keys))
         return key
