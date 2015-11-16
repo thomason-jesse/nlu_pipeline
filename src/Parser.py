@@ -299,8 +299,8 @@ class Parser:
         if none_range is None:
             none_range = [0, len(tokens)]
         self.new_adjectives = []
-        self.known_unary_expansions = []
-        self.known_binary_expansions = []
+        self.known_unary_expansions = {}
+        self.known_binary_expansions = {}
         iterations_limit = max([1000, int(math.pow(2, len(tokens)))])
 
         candidate_semantic_forms = {}
