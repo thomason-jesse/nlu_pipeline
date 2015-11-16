@@ -198,3 +198,17 @@ class SemanticNode:
         if not self.equal_ignoring_syntax(other, ignore_syntax=False):
             return False
         return True
+
+    # implementations of __key and __hash__ map two nodes to the same value if they and their children share all
+    # identifying attributes, but they need not be the same object ID nor share a parent
+    def __key(self):
+        c_keys = []
+        if self.children is not None:
+            for c in self.children:
+                c_keys.append(c.__has__())
+        key = (self.type, self.category, self.is_lambda, self.idx, self.lambda_name, self.is_lambda_instantiation,
+               tuple(c_keys))
+        return key
+
+    def __hash__(self):
+        return hash(self.__key())

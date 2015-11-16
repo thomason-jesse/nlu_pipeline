@@ -15,6 +15,8 @@ class Parser:
         self.grounder = grounder
         self.beam_width = beam_width
         self.new_adjectives = []  # cleared before every parsing job
+        self.known_unary_expansions = {}  # cleared before every parsing job
+        self.known_binary_expansions = {}  # clared before every parsing job
         self.safety = safety
         self.commutative_idxs = [self.ontology.preds.index('and'), self.ontology.preds.index('or')]
 
@@ -297,6 +299,8 @@ class Parser:
         if none_range is None:
             none_range = [0, len(tokens)]
         self.new_adjectives = []
+        self.known_unary_expansions = []
+        self.known_binary_expansions = []
         iterations_limit = max([1000, int(math.pow(2, len(tokens)))])
 
         candidate_semantic_forms = {}
@@ -443,20 +447,34 @@ class Parser:
 
                 refs = [self.lexicon.semantic_forms[partial[idx]] if type(partial[idx]) is int else partial[idx] for idx
                         in [i, j]]
-                # try FA from i to j
-                if self.can_perform_fa(i, j, refs[0], refs[1]):
-                    objs = [copy.deepcopy(self.lexicon.semantic_forms[partial[idx]]) if type(partial[idx]) is int else
-                            partial[idx] for idx in [i, j]]
-                    joined_subtrees = self.perform_fa(objs[0], objs[1])
-                    possible_joins.append([i, j, joined_subtrees, tree[i], tree[j], None])
+
+                # if we have already seen these, access map instead of performing operations
+                if refs[0] in self.known_binary_expansions and refs[1] in self.known_binary_expansions[refs[0]]:
+                    possible_joins.append(
+                        [i, j, self.known_binary_expansions[refs[0]][refs[1]], tree[i], tree[j], None])
                     pairwise_joins = True
-                # try merge from i to j
-                if self.can_perform_merge(refs[0], refs[1]):
-                    merged_subtrees = self.perform_merge(refs[0], refs[1])
-                    possible_joins.append([i, j, merged_subtrees, tree[i], tree[j], None])
-                    pairwise_joins = True
-            # try Type Raising on i
+                else:
+
+                    # try FA from i to j
+                    if self.can_perform_fa(i, j, refs[0], refs[1]):
+                        objs = [copy.deepcopy(self.lexicon.semantic_forms[partial[idx]])
+                                if type(partial[idx]) is int else partial[idx] for idx in [i, j]]
+                        joined_subtrees = self.perform_fa(objs[0], objs[1])
+                        possible_joins.append([i, j, joined_subtrees, tree[i], tree[j], None])
+                        pairwise_joins = True
+                    # try merge from i to j
+                    if self.can_perform_merge(refs[0], refs[1]):
+                        merged_subtrees = self.perform_merge(refs[0], refs[1])
+                        possible_joins.append([i, j, merged_subtrees, tree[i], tree[j], None])
+                        pairwise_joins = True
+
             ref = self.lexicon.semantic_forms[partial[i]] if type(partial[i]) is int else partial[i]
+
+            # if we have already seen this, access map instead of performing operation
+            if ref in self.known_unary_expansions:
+                possible_joins.append([i, i, self.known_unary_expansions[ref], tree[i], tree[i], None])
+
+            # try Type Raising on i
             if self.can_perform_type_raising(ref) == "DESC->N/N":
                 raised_subtrees = self.perform_adjectival_type_raise(ref)
                 possible_joins.append([i, i, raised_subtrees, tree[i], tree[i], None])
