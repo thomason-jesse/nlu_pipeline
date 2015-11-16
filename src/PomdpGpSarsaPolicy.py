@@ -111,7 +111,6 @@ class PomdpGpSarsaPolicy :
         max_q_val = -sys.maxint
         best_action = None
         candidate_actions = self.get_candidate_actions(b)
-        print b.get_feature_vector()
         for a in candidate_actions :
             (idx, closest_dict_point) = self.get_closest_dictionary_point(b, a)
             
@@ -119,20 +118,21 @@ class PomdpGpSarsaPolicy :
             #print 'sim_to_dict_point = ', sim_to_dict_point
             #print 'closest_dict_point : ', closest_dict_point[0].get_feature_vector(), ', action = ', closest_dict_point[1] 
             if sim_to_dict_point < self.dist_threshold :
+                print 's = ', b.get_feature_vector()
+                print 'a = ', a
                 print 'Using hand coded policy because sim = ', sim_to_dict_point
                 hand_coded_policy_a = self.get_action_from_hand_coded_policy(b)
                 #print 'hand_coded_policy_a = ', hand_coded_policy_a
                 if a == hand_coded_policy_a :
                     mean = 1
-                    std_dev = 0.1
+                    std_dev = 1
                 else :
                     mean = 0
-                    std_dev = 0.1
+                    std_dev = 1
             else :
-                mean = self.mu[idx]
-                std_dev = math.sqrt(self.C[idx, idx])
-            
-            #print 'action = ', a, 'mean = ', mean, ', std_dev = ', std_dev
+                mean = self.mu[idx, 0]
+                #std_dev = math.sqrt(self.C[idx, idx])
+                std_dev = math.sqrt(abs(self.C[idx, idx]))
             
             if std_dev < 0.0000001 :
                 q = mean
@@ -141,6 +141,7 @@ class PomdpGpSarsaPolicy :
             if q > max_q_val :
                 max_q_val = q
                 best_action = a
+            print 'action = ', a, ', mean = ', mean, ', std_dev = ', std_dev, ', q = ', q, '\n'
         return best_action
     
     def get_initial_action(self, initial_state) :
@@ -270,9 +271,9 @@ class PomdpGpSarsaPolicy :
         else :
             h = self.g - self.gamma * g_prime
             c_prime = (self.gamma * self.sigma * self.sigma / self.v) * self.c + h - self.C * delta_k
-            print 'self.v = ', self.v
+            #print 'self.v = ', self.v
             self.v = (1 + self.gamma * self.gamma) * self.sigma * self.sigma + (delta_k.T * (c_prime + (self.gamma * self.sigma * self.sigma / self.v) * self.c)).item(0,0) - ((self.gamma ** 2) * (self.sigma ** 4) / self.v)
-            print 'self.v = ', self.v
+            #print 'self.v = ', self.v
         
         if self.c.shape != self.mu.shape :        
             self.c = np.append(self.c, np.matrix([[0]]), 0)
@@ -289,9 +290,9 @@ class PomdpGpSarsaPolicy :
         else :
             self.k_b_a = k_b_prime_a_prime
         
-        print 'End of get_next_action'      # DEBUG   
-        self.print_vars()                   # DEBUG
-        print '-------------------------'   # DEBUG
+        #print 'End of get_next_action'      # DEBUG   
+        #self.print_vars()                   # DEBUG
+        #print '-------------------------'   # DEBUG
         
         return (self.a, self.get_system_action_requirements(self.a, self.b))
         

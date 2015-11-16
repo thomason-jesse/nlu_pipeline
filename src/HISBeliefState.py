@@ -53,9 +53,6 @@ class HISBeliefState:
     def make_all_matching_partitions(self, system_action, utterance) :
         print 'In make_all_matching_partitions'
         print '**********************************************'
-        if system_action.action_type == 'confirm_action' :
-            if utterance.action_type != 'affirm' :
-                return # If the user did not confirm, then no need to split any partition
         required_goal = None
         if system_action.referring_goal != None :
             required_goal = system_action.referring_goal
@@ -82,12 +79,14 @@ class HISBeliefState:
         # superset of what is required
         new_partitions = list()
         for partition in self.partitions :
-            print '#########################'
-            print str(partition)
-            print 'Superset : ', partition.is_superset(required_goal, required_params)
-            print 'Equal : ', partition.is_equal(required_goal, required_params)
-            print '#########################'
+            #print '#########################'
+            #print str(partition)
+            #print 'Superset : ', partition.is_superset(required_goal, required_params)
+            #print 'Equal : ', partition.is_equal(required_goal, required_params)
+            #print '#########################'
             if partition.is_superset(required_goal, required_params) and not partition.is_equal(required_goal, required_params) :
+                #print 'Entered if'
+                #print '#########################'
                 # This is a partition to be split
                 goal_split_partitions = list()
                 if required_goal != None :  # Split based on goal
@@ -130,24 +129,24 @@ class HISBeliefState:
     # Perform belief monitoring update using the system action and n best 
     # parses
     def update(self, system_action, n_best_utterances) :
-        print 'In update'
-        print '----------------------------------------------'
-        print str(system_action)
+        #print 'In update'
+        #print '----------------------------------------------'
+        #print str(system_action)
         for utterance in n_best_utterances :
-            print str(utterance)
+            #print str(utterance)
             # Check whether there are partitions that exactly match the 
             # system action-utterance pair
             matching_partitions = self.get_matching_partitions(system_action, utterance)
-            print 'len(matching_partitions) = ', len(matching_partitions)
+            #print 'len(matching_partitions) = ', len(matching_partitions)
             if len(matching_partitions) == 0 :
                 # if there are no matching partitions, split all partitions
                 # that are supersets of the goal and param values of this 
                 # pair to obtain matching partitions
                 self.make_all_matching_partitions(system_action, utterance)
-            else :
-                for partition in matching_partitions :
-                    print str(partition)
-        print '----------------------------------------------'
+            #else :
+                #for partition in matching_partitions :
+                    #print str(partition)
+        #print '----------------------------------------------'
         hypothesis_beliefs = dict()
         sum_hypothesis_beliefs = 0.0
         

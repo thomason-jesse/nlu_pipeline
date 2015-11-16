@@ -59,10 +59,20 @@ class Utterance:
         
     def match(self, partition, system_action) :
         if self.action_type == 'deny' :
-            return True # Deny matches anything
-        elif self.action_type == 'affirm' :
-            # Goal and param values will be in the system action. These 
-            # should be compatible with the partition
+            # Match all partitions that in some way do not match the 
+            # system action
+            match_system_action = True
+            if system_action.referring_goal != None and system_action.referring_goal not in partition.possible_goals :
+                match_system_action = False
+            if system_action.referring_params != None :
+                for param_name in system_action.referring_params :
+                    if param_name not in partition.possible_param_values or system_action.referring_params[param_name] not in partition.possible_param_values[param_name] :
+                        match_system_action = False
+            return not match_system_action
+            
+        if self.action_type == 'affirm' :
+            # Match all partitions that have the goal and params which
+            # the system action mentions
             if system_action.referring_goal != None and system_action.referring_goal not in partition.possible_goals :
                 return False
             if system_action.referring_params != None :

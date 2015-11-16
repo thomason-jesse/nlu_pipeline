@@ -14,6 +14,7 @@ import StaticDialogPolicy
 
 from PomdpStaticDialogPolicy import PomdpStaticDialogPolicy
 from PomdpDialogAgent import PomdpDialogAgent
+from Utils import *
 
 class InputFromKeyboard:
     def __init__(self):
@@ -53,7 +54,8 @@ print "instantiating KBGrounder"
 grounder = KBGrounder.KBGrounder(ont)
 
 print "instantiating Parser"
-parser = Parser.Parser(ont, lex, learner, grounder, beam_width=10)
+#parser = Parser.Parser(ont, lex, learner, grounder, beam_width=10)
+parser = load_model('parser')
 grounder.parser = parser
 
 print "instantiating Generator"
@@ -75,10 +77,11 @@ u_out = OutputToStdout()
 static_policy = PomdpStaticDialogPolicy()
 A = PomdpDialogAgent(parser, grounder, static_policy, u_in, u_out)
 
-print "reading in data and training parser from actions"
-D = A.read_in_utterance_action_pairs(sys.argv[3])
-converged = A.train_parser_from_utterance_action_pairs(D, epochs=10, parse_beam=30)
-print "theta: "+str(parser.learner.theta)
+#print "reading in data and training parser from actions"
+#D = A.read_in_utterance_action_pairs(sys.argv[3])
+#converged = A.train_parser_from_utterance_action_pairs(D, epochs=10, parse_beam=30)
+#print "theta: "+str(parser.learner.theta)
+#save_model(parser, 'parser')
 
 while True:
     A.first_turn = True
