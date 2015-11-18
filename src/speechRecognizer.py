@@ -19,7 +19,7 @@ class InputFromSpeech:
         self.n = 5
 
         if True: #TODO Allow path specification is None:
-            self.libHandle = ctypes.CDLL("./src/bwi_common/bwi_dialogue/src/nlu_pipeline/src/speech/speechRecognizer.so")
+            self.libHandle = ctypes.CDLL("./src/nlu_pipeline/src/speech/speechRecognizer.so")
         else:
             self.libHandle = ctypes.CDLL(path)
 

@@ -46,9 +46,9 @@ void sphinx_interrupt() {
 void sphinx_init() {
 	//TODO Check for and return errors. 
 	config = cmd_ln_init(NULL, ps_args(), TRUE,
-				"-hmm", "./src/bwi_common/bwi_dialogue/src/nlu_pipeline/src/speech/sphinx_resources/en-us/en-us",
-				"-lm", "./src/bwi_common/bwi_dialogue/src/nlu_pipeline/src/speech/sphinx_resources/en-us/fifty_fifty.lm.bin",
-				"-dict", "./src/bwi_common/bwi_dialogue/src/nlu_pipeline/src/speech/sphinx_resources/en-us/cmudict-en-us.dict",
+				"-hmm", "./src/nlu_pipeline/src/speech/sphinx_resources/en-us/en-us",
+				"-lm", "./src/nlu_pipeline/src/speech/sphinx_resources/en-us/fifty_fifty.lm.bin",
+				"-dict", "./src/nlu_pipeline/src/speech/sphinx_resources/en-us/cmudict-en-us.dict",
 				"-fwdtree", "yes",
 				"-fwdflat", "yes",
 				"-bestpath", "yes",
