@@ -53,3 +53,9 @@ rosrun nlu_pipeline TestPomdpPipeline.py src/nlu_pipeline/src/resources/asp_acti
 NOTE:
   Right now there will be an initial "testing Generator" prompt. You can skip this by typing "stop".
   This is a result of me not branching the latest component.
+
+TESTING SPEECH RECOGNIZER:
+
+In a new tab for catkin_ws/, the speech recognizer node may be run with:
+
+$ rosrun bwi_dialogue speechRecognizer.py

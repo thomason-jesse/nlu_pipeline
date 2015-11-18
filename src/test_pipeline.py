@@ -13,7 +13,9 @@ import Generator
 import DialogAgent
 import StaticDialogPolicy
 import ActionSender
-
+import pygame
+import threading
+from std_msgs.msg import String
 
 class InputFromKeyboard:
     def __init__(self):
@@ -21,6 +23,29 @@ class InputFromKeyboard:
 
     def get(self):
         return raw_input()
+
+class InputFromSpeechNode:
+    def __init__(self):
+        #Subscribes to speech node. 
+        rospy.Subscriber('speech', String, self.callback)
+        self.utterance = ""
+        self.waiting = True
+
+    def callback(self, data):
+        self.utterance = data.data.split(";")[0]
+
+        self.waiting = False
+
+    def get(self):
+        #Waits for utterance message to arrive. 
+        while self.waiting:
+            pass
+
+        print self.utterance
+
+        self.waiting = True
+
+        return self.utterance
 
 
 class OutputToStdout:
@@ -71,7 +96,7 @@ while True:
 generator.flush_seen_nodes()
 
 print "instantiating DialogAgent"
-u_in = InputFromKeyboard()
+u_in = InputFromSpeechNode()
 u_out = OutputToStdout()
 static_policy = StaticDialogPolicy.StaticDialogPolicy()
 A = DialogAgent.DialogAgent(parser, generator, grounder, static_policy, u_in, u_out)
@@ -81,7 +106,7 @@ action_sender = ActionSender.ActionSender(lex, generator, u_out)
 
 while True:
     u_out.say("How can I help?")
-    s = raw_input()
+    s = u_in.get()
     if s == 'stop':
         break
     a = A.initiate_dialog_to_get_action(s)
@@ -105,7 +130,7 @@ print "theta: "+str(parser.learner.theta)
 
 while True:
     u_out.say("How can I help?")
-    s = raw_input()
+    s = u_in.get()
     if s == 'stop':
         break
     a = A.initiate_dialog_to_get_action(s)
@@ -115,10 +140,10 @@ while True:
 
 print "testing Generator:"
 while True:
-    s = raw_input()
+    s = u_in.get()
     if s == 'stop':
         break
     _, form = lex.read_syn_sem(s)
+
     token_responses = generator.reverse_parse_semantic_form(form, n=1)
     print "token responses: "+str(token_responses)
-
