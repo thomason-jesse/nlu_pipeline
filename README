@@ -58,4 +58,4 @@ TESTING SPEECH RECOGNIZER:
 
 In a new tab for catkin_ws/, the speech recognizer node may be run with:
 
-$ rosrun bwi_dialogue speechRecognizer.py
+$ rosrun nlu_pipeline speechRecognizer.py
