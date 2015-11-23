@@ -54,6 +54,31 @@ NOTE:
   Right now there will be an initial "testing Generator" prompt. You can skip this by typing "stop".
   This is a result of me not branching the latest component.
 
+INSTALLING SPEECH RECOGNIZER:
+
+First navigate to catkin_ws/src/nlu_pipeline/, then create and pull the speech branch of the pipeline.
+
+$ cd catkin_ws/src/nlu_pipeline/
+$ git checkout -b speech
+$ git pull origin speech
+
+Next, install CMU Sphinxbase and pocketsphinx using the instructions found on:
+
+http://cmusphinx.sourceforge.net/wiki/tutorialpocketsphinx
+
+Now, install the python pygame package:
+
+$ sudo apt-get install python-pygame
+
+Or follow other installation instructions for your system at:
+
+http://www.pygame.org/download.shtml
+
+Finally, navigate to catkin_ws/src/nlu_pipeline/src/speech/ and make the speech node
+
+$ cd catkin_ws/src/nlu_pipeline/src/speech/
+$ make all
+
 TESTING SPEECH RECOGNIZER:
 
 In a new tab for catkin_ws/, the speech recognizer node may be run with:
