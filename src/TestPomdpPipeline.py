@@ -11,6 +11,7 @@ import Parser
 import Generator
 import DialogAgent
 import StaticDialogPolicy
+import numpy
 
 from PomdpStaticDialogPolicy import PomdpStaticDialogPolicy
 from PomdpDialogAgent import PomdpDialogAgent
@@ -30,6 +31,8 @@ class OutputToStdout:
 
     def say(self, s):
         print "SYSTEM: "+s
+
+#numpy.random.seed(2)
 
 print "reading in Ontology"
 ont = Ontology.Ontology(sys.argv[1])

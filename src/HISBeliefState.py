@@ -51,8 +51,8 @@ class HISBeliefState:
     # that they match in goal and params. In the case of a confirm system
     # action, it does not check whether the user said yes or no    
     def make_all_matching_partitions(self, system_action, utterance) :
-        print 'In make_all_matching_partitions'
-        print '**********************************************'
+        #print 'In make_all_matching_partitions'
+        #print '**********************************************'
         required_goal = None
         if system_action.referring_goal != None :
             required_goal = system_action.referring_goal
@@ -72,8 +72,8 @@ class HISBeliefState:
                 else :
                     required_params[param_name] = [utterance.referring_params[param_name]]
 
-        print "required_goal = ", required_goal        # DEBUG
-        print "required_params = ", required_params    # DEBUG
+        #print "required_goal = ", required_goal        # DEBUG
+        #print "required_params = ", required_params    # DEBUG
         
         # Iterate over the partitions and split any partition that is a 
         # superset of what is required
@@ -124,7 +124,7 @@ class HISBeliefState:
                 # required goal and params so don't split it
                 new_partitions = new_partitions + [partition]    
         self.partitions = new_partitions
-        print '**********************************************'
+        #print '**********************************************'
 
     # Perform belief monitoring update using the system action and n best 
     # parses

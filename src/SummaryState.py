@@ -57,7 +57,7 @@ class SummaryState :
                     num_params_uncertain += 1
                     #uncertain_params.append(param_name)
         else :
-            num_params_uncertain = sys.maxint
+            num_params_uncertain = len(self.knowledge.goal_params)
         feature.append(num_params_uncertain)           
         #print 'uncertain_params = ', uncertain_params             
         

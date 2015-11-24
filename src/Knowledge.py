@@ -98,7 +98,7 @@ class Knowledge:
         self.summary_system_actions = self.system_dialog_actions + ['take_action']
         
         # Sparsification param nu for GP-SARSA
-        self.sparsification_param = 0.1
+        self.sparsification_param = 1
         
         # Hyperparameters for polynomial kernel - values set from the paper
         self.kernel_std_dev = 5     # sigma_k in the paper

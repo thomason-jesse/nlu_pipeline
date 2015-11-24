@@ -34,7 +34,7 @@ class PomdpDialogAgent :
     # user entered stop
     def run_dialog(self) :
         self.state = HISBeliefState(self.knowledge)
-        print 'Belief state: ', str(self.state) 
+        #print 'Belief state: ', str(self.state) 
         summary_state = SummaryState(self.state)
         (dialog_action, dialog_action_arg) = self.policy.get_initial_action(summary_state)    
         
@@ -62,7 +62,7 @@ class PomdpDialogAgent :
                     return False
                 # Belief monitoring - update belief based on the response
                 self.update_state(response)
-                print 'Belief state: ', str(self.state) 
+                #print 'Belief state: ', str(self.state) 
                 
                 reward = self.knowledge.per_turn_reward
                 summary_state = SummaryState(self.state)

@@ -61,15 +61,19 @@ class PomdpGpSarsaPolicy :
         #print 'b\' = ', b_prime.get_feature_vector()
         #print 'a = ', a, 'a_prime = ', a_prime
         
-        action_kernel_value = 3 * float(a == a_prime)
+        action_kernel_value = float(a == a_prime)
         #print 'action_kernel_value = ', action_kernel_value
         state_kernel_value = b.calc_kernel(b_prime)
         #print 'state_kernel_value = ', state_kernel_value
-        return state_kernel_value * action_kernel_value
+        k = state_kernel_value * action_kernel_value
+        #print 'k((b,a),(b,a)) = ', k
+        return k
     
     def calc_k_vector(self, b, a) :
         replicas = [(b, a)] * len(self.D)
-        return np.matrix([map(self.calc_k, replicas, self.D)]).T
+        k_vector = np.matrix([map(self.calc_k, replicas, self.D)]).T
+        #print 'k(b,a) = ', k_vector
+        return k_vector 
     
     def get_closest_dictionary_point(self, target_b, target_a) :
         max_sim = -sys.maxint
@@ -131,8 +135,8 @@ class PomdpGpSarsaPolicy :
                     std_dev = 1
             else :
                 mean = self.mu[idx, 0]
-                #std_dev = math.sqrt(self.C[idx, idx])
-                std_dev = math.sqrt(abs(self.C[idx, idx]))
+                std_dev = math.sqrt(self.C[idx, idx])
+                #std_dev = math.sqrt(abs(self.C[idx, idx]))
             
             if std_dev < 0.0000001 :
                 q = mean
@@ -205,9 +209,8 @@ class PomdpGpSarsaPolicy :
             #      [ 0  ] 
             self.c = np.append(self.c, np.matrix([[0]]), 0)
         
-        #print 'End of get_initial_action'   # DEBUG   
-        #self.print_vars()                   # DEBUG
-        #print '-------------------------'   # DEBUG
+        print 'End of get_initial_action'   # DEBUG   
+        self.print_vars()                   # DEBUG
         return (self.a, self.get_system_action_requirements(self.a, self.b))
     
     def get_next_action(self, reward, current_state) :
@@ -215,22 +218,30 @@ class PomdpGpSarsaPolicy :
         #self.print_vars()                   # DEBUG
         
         b_prime = current_state
+        print 'b_prime = ', b_prime.get_feature_vector()
         r_prime = reward
+        print 'r_prime = ', r_prime
         
         a_prime = self.pi(b_prime)
+        print 'a_prime = ', a_prime
         k_b_prime_a_prime = self.calc_k_vector(b_prime, a_prime)
+        print 'k_b_prime_a_prime = ', k_b_prime_a_prime
         
         # g' = K^{-1}k(b',a')
         g_prime = self.K_inv * k_b_prime_a_prime
+        print 'g_prime = ', g_prime
         
         # delta = k((b',a'), (b',a')) - (k(b',a')^T * g)
         k = self.calc_k((b_prime, a_prime), (b_prime, a_prime))
+        print 'k = ', k
         self.delta = k - (k_b_prime_a_prime.T * g_prime).item(0,0)
+        print 'self.delta = ', self.delta
         
         delta_k = self.k_b_a - self.gamma * k_b_prime_a_prime
-        
+        print 'delta_k = ', delta_k
         self.d = (self.gamma * self.sigma * self.sigma / self.v) * self.d + r_prime - (delta_k.T * self.mu).item(0,0)
-    
+        print 'self.d = ', self.d
+        
         if self.delta > self.nu :
             self.D.append((b_prime, a_prime))
             
@@ -241,58 +252,74 @@ class PomdpGpSarsaPolicy :
             new_row = np.append(-self.g.T, np.matrix([[1]]), 1)
             self.K_inv = np.append(self.K_inv, new_row, 0)
             self.K_inv = (1.0 / self.delta) * self.K_inv 
+            print 'self.K_inv = ', self.K_inv
             
             # g' = [0, 0, ... 1]^T
             g_prime = self.get_zero_vector(len(self.D))
             g_prime[len(self.D) - 1, 0] = 1
+            print 'g_prime = ', g_prime
             
             h = np.append(self.g, np.matrix([[-self.gamma]]), 0)
+            print 'h = ', h
             
             # delta_k_tt = g^T(k(b,a) - 2*gamma*k(b',a')) + (gamma^2)k((b',a'),(b',a'))
             delta_k_tt = (self.g.T * (self.k_b_a - 2 * self.gamma * k_b_prime_a_prime)).item(0,0) + self.gamma * self.gamma * k
+            print 'delta_k_tt = ', delta_k_tt
             
             # c' = (gamma * sigma^2 / v)[ c ]  + h - [ C * delta_k ]
             #                           [ 0 ]        [     0       ]
             c_prime = ((self.gamma * self.sigma * self.sigma / self.v) * np.append(self.c, np.matrix([[0]]), 0)) + h - np.append(self.C * delta_k, np.matrix([[0]]), 0)
+            print 'c_prime = ', c_prime
         
             # v = (1 + gamma^2)sigma^2 + delta_k_tt - (delta_k^T)(C)(delta_k) + (2*gamma*sigma^2/v)(c^T delta_k) - (gamma^2 * sigma^4 / v)
             self.v = (1 + self.gamma * self.gamma) * self.sigma * self.sigma + delta_k_tt - (delta_k.T * self.C * delta_k).item(0,0) + (2 * self.gamma * self.sigma * self.sigma / self.v) * (self.c.T * delta_k).item(0,0) - ((self.gamma ** 2) * (self.sigma ** 4) / self.v)
+            print 'self.v = ', self.v
             
             # mu = [ mu ]
             #      [ 0  ] 
             self.mu = np.append(self.mu, np.matrix([[0]]), 0)
+            print 'mu = ', self.mu
             
             # C = [  C   0 ]
             #     [ 0^T  0 ]
             orig_C_size = len(self.C)
             self.C = np.append(self.C, self.get_zero_vector(orig_C_size), 1)
             self.C = np.append(self.C, self.get_zero_vector(orig_C_size + 1).T, 0)
+            print 'self.C = ', self.C
         
         else :
             h = self.g - self.gamma * g_prime
+            print 'h = ', h
             c_prime = (self.gamma * self.sigma * self.sigma / self.v) * self.c + h - self.C * delta_k
-            #print 'self.v = ', self.v
+            print 'c_prime = ', c_prime
             self.v = (1 + self.gamma * self.gamma) * self.sigma * self.sigma + (delta_k.T * (c_prime + (self.gamma * self.sigma * self.sigma / self.v) * self.c)).item(0,0) - ((self.gamma ** 2) * (self.sigma ** 4) / self.v)
-            #print 'self.v = ', self.v
+            print 'self.v = ', self.v
         
-        if self.c.shape != self.mu.shape :        
-            self.c = np.append(self.c, np.matrix([[0]]), 0)
-        self.mu = self.mu + self.c * (self.d / self.v)
-        self.C = self.C + (1.0 / self.v) * (self.c * self.c.T)
-
+        #if self.c.shape != self.mu.shape :        
+            #self.c = np.append(self.c, np.matrix([[0]]), 0)
+        #self.mu = self.mu + self.c * (self.d / self.v)
+        self.mu = self.mu + c_prime * (self.d / self.v)
+        print 'self.mu = ', self.mu
+        self.C = self.C + (1.0 / self.v) * (c_prime * c_prime.T)
+        print 'self.C = ', self.C
         self.c = c_prime
+        print 'self.c = ', self.c
         self.g = g_prime
+        print 'self.g = ', self.g
         self.b = b_prime
+        print 'self.b = ', self.b.get_feature_vector()
         self.a = a_prime
+        print 'self.a = ', self.a
         
         if self.delta > self.nu :
             self.k_b_a = self.calc_k_vector(self.b, self.a)
         else :
             self.k_b_a = k_b_prime_a_prime
+        print 'self.k_b_a = ', self.k_b_a
         
-        #print 'End of get_next_action'      # DEBUG   
-        #self.print_vars()                   # DEBUG
-        #print '-------------------------'   # DEBUG
+        print '---------------------------------------'
+        print 'End of get_next_action'      # DEBUG   
+        self.print_vars()                   # DEBUG
         
         return (self.a, self.get_system_action_requirements(self.a, self.b))
         
@@ -301,24 +328,40 @@ class PomdpGpSarsaPolicy :
         #self.print_vars()                   # DEBUG
         
         r_prime = reward
+        print 'r_prime = ', r_prime
         g_prime = self.get_zero_vector(len(self.D))
+        print 'g_prime = ', g_prime
         self.delta = 0
+        print 'self.delta = ', self.delta
         self.k_b_a = self.calc_k_vector(self.b, self.a)
+        print 'self.k_b_a = ', self.k_b_a
         delta_k = self.k_b_a
+        print 'delta_k = ', delta_k
 
         self.d = (self.gamma * self.sigma * self.sigma / self.v) * self.d + r_prime - (delta_k.T * self.mu).item(0,0)
-    
+        print 'self.d = ', self.d
         h = self.g - self.gamma * g_prime
+        print 'h = ', h
         c_prime = (self.gamma * self.sigma * self.sigma / self.v) * self.c + h - self.C * delta_k
+        print 'first term = ', (self.gamma * self.sigma * self.sigma / self.v) * self.c
+        print 'second term = ', h
+        print 'third term = ', self.C * delta_k
+        print 'c_prime = ', c_prime
         
         self.v = self.sigma * self.sigma + (delta_k.T * (c_prime + (self.gamma * self.sigma * self.sigma / self.v) * self.c)).item(0,0) - ((self.gamma ** 2) * (self.sigma ** 4) / self.v)
-        
-        self.mu = self.mu + self.c * (self.d / self.v)
-        self.C = self.C + (1.0 / self.v) * (self.c * self.c.T)
-        
+        print 'self.v = ', self.v
+        print 'first term = ', self.mu
+        self.mu = self.mu + c_prime * (self.d / self.v)
+        print 'second term = ', (self.d / self.v), '*', c_prime, ' = ', c_prime * (self.d / self.v) 
+        print 'self.mu = ', self.mu
+        print 'first term = ', self.C
+        print 'second term = ', (1.0 / self.v), '*', (c_prime * c_prime.T), ' = ', (1.0 / self.v) * (c_prime * c_prime.T)
+        self.C = self.C + (1.0 / self.v) * (c_prime * c_prime.T)
+        print 'self.C = ', self.C
         self.c = c_prime
+        print 'self.c = ', self.c
         self.g = g_prime
-        
+        print 'self.g = ', self.g
         self.save_vars()
 
         #print 'End of update_final_reward'  # DEBUG   
@@ -444,17 +487,21 @@ class PomdpGpSarsaPolicy :
         save_model(self.K_inv, 'K_inv')
 
     def print_vars(self) :
+        print '------------------------------------------------'
         print 'self.mu = ', self.mu
         print 'self.C = ', self.C
         print 'self.c = ', self.c
         print 'self.d = ', self.d
         print 'self.v = ', self.v
-        print 'self.D = ', self.D
         print 'self.K_inv = ', self.K_inv
         print 'self.a = ', self.a
-        print 'self.b = ', self.b
+        print 'self.b = ', self.b.get_feature_vector()
         print 'self.g = ', self.g
         print 'self.delta = ', self.delta
+        print 'self.D: ' 
+        for (b, a) in self.D :    
+            print b.get_feature_vector(), '\t', a
+        print '------------------------------------------------'
        
     def get_action_from_hand_coded_policy(self, state) :
         if state.num_dialog_turns > 10 :
