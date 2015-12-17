@@ -17,6 +17,9 @@ from PomdpStaticDialogPolicy import PomdpStaticDialogPolicy
 from PomdpDialogAgent import PomdpDialogAgent
 from Utils import *
 
+# For testing typechecking
+from SemanticNode import SemanticNode
+
 class InputFromKeyboard:
     def __init__(self):
         pass
@@ -88,6 +91,20 @@ A = PomdpDialogAgent(parser, grounder, static_policy, u_in, u_out)
 #print "theta: "+str(parser.learner.theta)
 #save_model(parser, 'parser')
 #print 'Parser ontology : ', parser.ontology.preds
+
+# Testing typechecking
+idx = grounder.ontology.preds.index('ray')
+person_idx = grounder.ontology.preds.index('person')
+child = SemanticNode(None, 9, 15, False, idx)
+parent = SemanticNode(None, 9, 15, False, person_idx, children=[child])
+child.parent = parent  
+print "Grounding ", parser.print_parse(parent)
+g = grounder.groundSemanticNode(parent, [], [], [])
+answers = grounder.grounding_to_answer_set(g)
+print 'answers = ', answers
+print '--------------------------------'
+sys.exit(1)
+
 
 while True:
     A.first_turn = True
