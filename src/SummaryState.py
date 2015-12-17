@@ -90,19 +90,19 @@ class SummaryState :
         
     # Calculate the distance between this summary state and the other
     # summary state
-    def distance_to(self, other_summary_state) :
-        distance = 0.0
-        cts_distance = 0.0
-        self_feature_vector = self.get_feature_vector()
-        other_feature_vector = other_summary_state.get_feature_vector()
-        weights = self.knowledge.summary_space_distance_weights
-        for i in xrange(0, len(self_feature_vector)) :
-            if i in SummaryState.discrete_features :
-                distance += weights[i] * (1.0 - float(self_feature_vector[i] == other_feature_vector[i]))
-            else :
-                cts_distance += weights[i] * (self_feature_vector[i] - other_feature_vector[i]) * (self_feature_vector[i] - other_feature_vector[i])
-        distance += math.sqrt(cts_distance)        
-        return distance
+    #def distance_to(self, other_summary_state) :
+        #distance = 0.0
+        #cts_distance = 0.0
+        #self_feature_vector = self.get_feature_vector()
+        #other_feature_vector = other_summary_state.get_feature_vector()
+        #weights = self.knowledge.summary_space_distance_weights
+        #for i in xrange(0, len(self_feature_vector)) :
+            #if i in SummaryState.discrete_features :
+                #distance += weights[i] * (1.0 - float(self_feature_vector[i] == other_feature_vector[i]))
+            #else :
+                #cts_distance += weights[i] * (self_feature_vector[i] - other_feature_vector[i]) * (self_feature_vector[i] - other_feature_vector[i])
+        #distance += math.sqrt(cts_distance)        
+        #return distance
         
     def calc_kernel(self, other_summary_state) :
         p = self.knowledge.kernel_degree
@@ -113,9 +113,9 @@ class SummaryState :
         other_feature_vector = other_summary_state.get_feature_vector()
         for i in xrange(0, len(self_feature_vector)) :
             if i in self.discrete_features :
-                k_disc += float(self_feature_vector[i] == other_feature_vector[i])
+                k_disc += self.knowledge.kernel_weights[i] * float(self_feature_vector[i] == other_feature_vector[i])
             else :
-                norm_cts += (self_feature_vector[i] - other_feature_vector[i]) ** 2
+                norm_cts += self.knowledge.kernel_weights[i] * (self_feature_vector[i] - other_feature_vector[i]) ** 2
         k_cts = p * p * math.exp( - norm_cts / (2 * sigma_k * sigma_k))
         return k_disc + k_cts
      

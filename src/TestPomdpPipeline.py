@@ -32,7 +32,8 @@ class OutputToStdout:
     def say(self, s):
         print "SYSTEM: "+s
 
-#numpy.random.seed(2)
+# Fixing the random seed for debugging
+#numpy.random.seesd(42)
 
 print "reading in Ontology"
 ont = Ontology.Ontology(sys.argv[1])
@@ -60,6 +61,7 @@ print "instantiating Parser"
 #parser = Parser.Parser(ont, lex, learner, grounder, beam_width=10)
 parser = load_model('parser')
 grounder.parser = parser
+grounder.ontology = parser.ontology
 
 print "instantiating Generator"
 generator = Generator.Generator(ont, lex, learner, parser, beam_width=100)
@@ -85,14 +87,15 @@ A = PomdpDialogAgent(parser, grounder, static_policy, u_in, u_out)
 #converged = A.train_parser_from_utterance_action_pairs(D, epochs=10, parse_beam=30)
 #print "theta: "+str(parser.learner.theta)
 #save_model(parser, 'parser')
+#print 'Parser ontology : ', parser.ontology.preds
 
 while True:
     A.first_turn = True
     success = A.run_dialog()
     if not success :
-        u_out.say("Are you sure you want to exit? (y/n) : ")
+        u_out.say("I'm sorry I could not understand you. Do you want to try another dialogue? (y/n) : ")
         response = u_in.get()   
-        if response.lower() == 'y' or response.lower() == 'yes' :
+        if response.lower() == 'n' or response.lower() == 'no' :
             break
     else :
         u_out.say("Do you want to try another dialog? (y/n) : ")

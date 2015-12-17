@@ -108,6 +108,7 @@ class PomdpGpSarsaPolicy :
             return candidate_actions
     
     def pi(self, b) :
+        self.check_covariance_matrix()
         if self.D is None or len(self.D) == 0 :
             #return self.get_random_action(b)
             return self.get_action_from_hand_coded_policy(b)
@@ -122,9 +123,9 @@ class PomdpGpSarsaPolicy :
             #print 'sim_to_dict_point = ', sim_to_dict_point
             #print 'closest_dict_point : ', closest_dict_point[0].get_feature_vector(), ', action = ', closest_dict_point[1] 
             if sim_to_dict_point < self.dist_threshold :
-                print 's = ', b.get_feature_vector()
-                print 'a = ', a
-                print 'Using hand coded policy because sim = ', sim_to_dict_point
+                #print 's = ', b.get_feature_vector()
+                #print 'a = ', a
+                #print 'Using hand coded policy because sim = ', sim_to_dict_point
                 hand_coded_policy_a = self.get_action_from_hand_coded_policy(b)
                 #print 'hand_coded_policy_a = ', hand_coded_policy_a
                 if a == hand_coded_policy_a :
@@ -145,7 +146,7 @@ class PomdpGpSarsaPolicy :
             if q > max_q_val :
                 max_q_val = q
                 best_action = a
-            print 'action = ', a, ', mean = ', mean, ', std_dev = ', std_dev, ', q = ', q, '\n'
+            #print 'action = ', a, ', mean = ', mean, ', std_dev = ', std_dev, ', q = ', q, '\n'
         return best_action
     
     def get_initial_action(self, initial_state) :
@@ -209,117 +210,146 @@ class PomdpGpSarsaPolicy :
             #      [ 0  ] 
             self.c = np.append(self.c, np.matrix([[0]]), 0)
         
-        print 'End of get_initial_action'   # DEBUG   
-        self.print_vars()                   # DEBUG
+        #print 'End of get_initial_action'   # DEBUG   
+        #self.print_vars()                   # DEBUG
         return (self.a, self.get_system_action_requirements(self.a, self.b))
+    
+    def check_covariance_matrix(self) :
+        m = copy.deepcopy(self.C)
+        n = m.shape[0]
+        for i in range(n) :
+            if m[i, i] < 0 :
+                print 'Diagonal element is < 0'
+                print 'C = ', self.C
+                sys.exit(1)
+        for i in range(n) :
+            for j in range(n) :
+                if m[i, j] != m[j, i] :
+                    print 'Matrix not symmetric'
+                    print 'C = ', self.C
+                    sys.exit(1)
+        (eig_vals, eig_vectors) = np.linalg.eig(m)
+        for eig_val in eig_vals :
+            if type(eig_val) in [np.complex_, np.complex64, np.complex128] :
+                print 'Complex eigen value'
+                print 'C = ', self.C
+                sys.exit(1)
+            elif eig_val < -0.0001 :
+                print 'Negative eigen value'
+                print 'C = ', self.C
+                sys.exit(1)
+        
     
     def get_next_action(self, reward, current_state) :
         #print '\nIn get_next_action'        # DEBUG
         #self.print_vars()                   # DEBUG
         
         b_prime = current_state
-        print 'b_prime = ', b_prime.get_feature_vector()
+        #print 'b_prime = ', b_prime.get_feature_vector()
         r_prime = reward
-        print 'r_prime = ', r_prime
+        #print 'r_prime = ', r_prime
         
         a_prime = self.pi(b_prime)
-        print 'a_prime = ', a_prime
+        #print 'a_prime = ', a_prime
         k_b_prime_a_prime = self.calc_k_vector(b_prime, a_prime)
-        print 'k_b_prime_a_prime = ', k_b_prime_a_prime
+        #print 'k_b_prime_a_prime = ', k_b_prime_a_prime
         
         # g' = K^{-1}k(b',a')
         g_prime = self.K_inv * k_b_prime_a_prime
-        print 'g_prime = ', g_prime
+        #print 'g_prime = ', g_prime
         
         # delta = k((b',a'), (b',a')) - (k(b',a')^T * g)
         k = self.calc_k((b_prime, a_prime), (b_prime, a_prime))
-        print 'k = ', k
+        #print 'k = ', k
         self.delta = k - (k_b_prime_a_prime.T * g_prime).item(0,0)
-        print 'self.delta = ', self.delta
+        #print 'self.delta = ', self.delta
         
         delta_k = self.k_b_a - self.gamma * k_b_prime_a_prime
-        print 'delta_k = ', delta_k
+        #print 'delta_k = ', delta_k
         self.d = (self.gamma * self.sigma * self.sigma / self.v) * self.d + r_prime - (delta_k.T * self.mu).item(0,0)
-        print 'self.d = ', self.d
+        #print 'self.d = ', self.d
         
         if self.delta > self.nu :
             self.D.append((b_prime, a_prime))
             
-            # K^{-1} = (1/delta) * [delta * K^{-1} + gg^T   -g ]
-            #                      [    -g^T                 1 ]
-            self.K_inv = (self.delta * self.K_inv) + (self.g * self.g.T)
-            self.K_inv = np.append(self.K_inv, -self.g, 1)
-            new_row = np.append(-self.g.T, np.matrix([[1]]), 1)
+            # K^{-1} = (1/delta) * [delta * K^{-1} + g'g'^T   -g' ]
+            #                      [    -g'^T                  1  ]
+            #self.K_inv = (self.delta * self.K_inv) + (self.g * self.g.T)
+            #self.K_inv = np.append(self.K_inv, -self.g, 1)
+            #new_row = np.append(-self.g.T, np.matrix([[1]]), 1)
+            self.K_inv = (self.delta * self.K_inv) + (g_prime * g_prime.T)
+            self.K_inv = np.append(self.K_inv, -g_prime, 1)
+            new_row = np.append(-g_prime.T, np.matrix([[1]]), 1)
             self.K_inv = np.append(self.K_inv, new_row, 0)
             self.K_inv = (1.0 / self.delta) * self.K_inv 
-            print 'self.K_inv = ', self.K_inv
+            #print 'self.K_inv = ', self.K_inv
             
             # g' = [0, 0, ... 1]^T
             g_prime = self.get_zero_vector(len(self.D))
             g_prime[len(self.D) - 1, 0] = 1
-            print 'g_prime = ', g_prime
+            #print 'g_prime = ', g_prime
             
             h = np.append(self.g, np.matrix([[-self.gamma]]), 0)
-            print 'h = ', h
+            #print 'h = ', h
             
             # delta_k_tt = g^T(k(b,a) - 2*gamma*k(b',a')) + (gamma^2)k((b',a'),(b',a'))
             delta_k_tt = (self.g.T * (self.k_b_a - 2 * self.gamma * k_b_prime_a_prime)).item(0,0) + self.gamma * self.gamma * k
-            print 'delta_k_tt = ', delta_k_tt
+            #print 'delta_k_tt = ', delta_k_tt
             
             # c' = (gamma * sigma^2 / v)[ c ]  + h - [ C * delta_k ]
             #                           [ 0 ]        [     0       ]
             c_prime = ((self.gamma * self.sigma * self.sigma / self.v) * np.append(self.c, np.matrix([[0]]), 0)) + h - np.append(self.C * delta_k, np.matrix([[0]]), 0)
-            print 'c_prime = ', c_prime
+            #print 'c_prime = ', c_prime
         
             # v = (1 + gamma^2)sigma^2 + delta_k_tt - (delta_k^T)(C)(delta_k) + (2*gamma*sigma^2/v)(c^T delta_k) - (gamma^2 * sigma^4 / v)
             self.v = (1 + self.gamma * self.gamma) * self.sigma * self.sigma + delta_k_tt - (delta_k.T * self.C * delta_k).item(0,0) + (2 * self.gamma * self.sigma * self.sigma / self.v) * (self.c.T * delta_k).item(0,0) - ((self.gamma ** 2) * (self.sigma ** 4) / self.v)
-            print 'self.v = ', self.v
+            #print 'self.v = ', self.v
             
             # mu = [ mu ]
             #      [ 0  ] 
             self.mu = np.append(self.mu, np.matrix([[0]]), 0)
-            print 'mu = ', self.mu
+            #print 'mu = ', self.mu
             
             # C = [  C   0 ]
             #     [ 0^T  0 ]
             orig_C_size = len(self.C)
             self.C = np.append(self.C, self.get_zero_vector(orig_C_size), 1)
             self.C = np.append(self.C, self.get_zero_vector(orig_C_size + 1).T, 0)
-            print 'self.C = ', self.C
+            #print 'self.C = ', self.C
         
         else :
             h = self.g - self.gamma * g_prime
-            print 'h = ', h
+            #print 'h = ', h
             c_prime = (self.gamma * self.sigma * self.sigma / self.v) * self.c + h - self.C * delta_k
-            print 'c_prime = ', c_prime
+            #print 'c_prime = ', c_prime
             self.v = (1 + self.gamma * self.gamma) * self.sigma * self.sigma + (delta_k.T * (c_prime + (self.gamma * self.sigma * self.sigma / self.v) * self.c)).item(0,0) - ((self.gamma ** 2) * (self.sigma ** 4) / self.v)
-            print 'self.v = ', self.v
+            #print 'self.v = ', self.v
         
         #if self.c.shape != self.mu.shape :        
             #self.c = np.append(self.c, np.matrix([[0]]), 0)
         #self.mu = self.mu + self.c * (self.d / self.v)
         self.mu = self.mu + c_prime * (self.d / self.v)
-        print 'self.mu = ', self.mu
+        #print 'self.mu = ', self.mu
         self.C = self.C + (1.0 / self.v) * (c_prime * c_prime.T)
-        print 'self.C = ', self.C
+        #print 'self.C = ', self.C
         self.c = c_prime
-        print 'self.c = ', self.c
+        #print 'self.c = ', self.c
         self.g = g_prime
-        print 'self.g = ', self.g
+        #print 'self.g = ', self.g
         self.b = b_prime
-        print 'self.b = ', self.b.get_feature_vector()
+        #print 'self.b = ', self.b.get_feature_vector()
         self.a = a_prime
-        print 'self.a = ', self.a
+        #print 'self.a = ', self.a
         
         if self.delta > self.nu :
             self.k_b_a = self.calc_k_vector(self.b, self.a)
         else :
             self.k_b_a = k_b_prime_a_prime
-        print 'self.k_b_a = ', self.k_b_a
+        #print 'self.k_b_a = ', self.k_b_a
         
-        print '---------------------------------------'
-        print 'End of get_next_action'      # DEBUG   
-        self.print_vars()                   # DEBUG
+        #print '---------------------------------------'
+        #print 'End of get_next_action'      # DEBUG   
+        #self.print_vars()                   # DEBUG
         
         return (self.a, self.get_system_action_requirements(self.a, self.b))
         
@@ -328,40 +358,40 @@ class PomdpGpSarsaPolicy :
         #self.print_vars()                   # DEBUG
         
         r_prime = reward
-        print 'r_prime = ', r_prime
+        #print 'r_prime = ', r_prime
         g_prime = self.get_zero_vector(len(self.D))
-        print 'g_prime = ', g_prime
+        #print 'g_prime = ', g_prime
         self.delta = 0
-        print 'self.delta = ', self.delta
+        #print 'self.delta = ', self.delta
         self.k_b_a = self.calc_k_vector(self.b, self.a)
-        print 'self.k_b_a = ', self.k_b_a
+        #print 'self.k_b_a = ', self.k_b_a
         delta_k = self.k_b_a
-        print 'delta_k = ', delta_k
+        #print 'delta_k = ', delta_k
 
         self.d = (self.gamma * self.sigma * self.sigma / self.v) * self.d + r_prime - (delta_k.T * self.mu).item(0,0)
-        print 'self.d = ', self.d
+        #print 'self.d = ', self.d
         h = self.g - self.gamma * g_prime
-        print 'h = ', h
+        #print 'h = ', h
         c_prime = (self.gamma * self.sigma * self.sigma / self.v) * self.c + h - self.C * delta_k
-        print 'first term = ', (self.gamma * self.sigma * self.sigma / self.v) * self.c
-        print 'second term = ', h
-        print 'third term = ', self.C * delta_k
-        print 'c_prime = ', c_prime
+        #print 'first term = ', (self.gamma * self.sigma * self.sigma / self.v) * self.c
+        #print 'second term = ', h
+        #print 'third term = ', self.C * delta_k
+        #print 'c_prime = ', c_prime
         
         self.v = self.sigma * self.sigma + (delta_k.T * (c_prime + (self.gamma * self.sigma * self.sigma / self.v) * self.c)).item(0,0) - ((self.gamma ** 2) * (self.sigma ** 4) / self.v)
-        print 'self.v = ', self.v
-        print 'first term = ', self.mu
+        #print 'self.v = ', self.v
+        #print 'first term = ', self.mu
         self.mu = self.mu + c_prime * (self.d / self.v)
-        print 'second term = ', (self.d / self.v), '*', c_prime, ' = ', c_prime * (self.d / self.v) 
-        print 'self.mu = ', self.mu
-        print 'first term = ', self.C
-        print 'second term = ', (1.0 / self.v), '*', (c_prime * c_prime.T), ' = ', (1.0 / self.v) * (c_prime * c_prime.T)
+        #print 'second term = ', (self.d / self.v), '*', c_prime, ' = ', c_prime * (self.d / self.v) 
+        #print 'self.mu = ', self.mu
+        #print 'first term = ', self.C
+        #print 'second term = ', (1.0 / self.v), '*', (c_prime * c_prime.T), ' = ', (1.0 / self.v) * (c_prime * c_prime.T)
         self.C = self.C + (1.0 / self.v) * (c_prime * c_prime.T)
-        print 'self.C = ', self.C
+        #print 'self.C = ', self.C
         self.c = c_prime
-        print 'self.c = ', self.c
+        #print 'self.c = ', self.c
         self.g = g_prime
-        print 'self.g = ', self.g
+        #print 'self.g = ', self.g
         self.save_vars()
 
         #print 'End of update_final_reward'  # DEBUG   
@@ -432,20 +462,21 @@ class PomdpGpSarsaPolicy :
             system_action = SystemAction(action_type, goal)
             param_order = state.knowledge.param_order[goal]
             params = dict()
-            param_to_request = None
+            uncertain_params = list()
             partition_params = state.top_hypothesis[0].possible_param_values
             if partition_params is None :
                 return system_action
             for param_name in param_order :
                 if param_name not in partition_params or len(partition_params) != 1 :
-                    if param_to_request is None :
-                        param_to_request = param_name
+                    uncertain_params.append(param_name)
                 else :
                     params[param_name] = partition_params[param_name][0]
             system_action.referring_params = params
-            system_action.extra_data = [param_to_request]
-            
-            if param_to_request is None :
+            if len(uncertain_params) > 0 :
+                param_idx = int(np.random.uniform(0, len(uncertain_params)))
+                system_action.extra_data = [uncertain_params[param_idx]]
+                return system_action
+            else :
                 # The top hypothesis partition doesn't have uncertain 
                 # params but it is possible it is not of high enough 
                 # confidence
@@ -615,7 +646,7 @@ class PomdpGpSarsaPolicy :
                         action = 'request_missing_param'
                 examples.append((s, action))
                     
-        print len(examples), 'examples'        
+        #print len(examples), 'examples'        
         D = list()
         mean = []
         cov = []
@@ -627,12 +658,12 @@ class PomdpGpSarsaPolicy :
                     mean.append(1.0)
                 else :
                     mean.append(0.0)
-        print 'len(D) = ', len(D)
-        cov = numpy.matrix(numpy.zeros((len(D), len(D))))
+        #print 'len(D) = ', len(D)
+        cov = np.matrix(np.zeros((len(D), len(D))))
         for i in range(0, len(D)) :
             cov[(i,i)] = 0.1
         self.D = D
-        self.mu = numpy.matrix([[x] for x in mean])
+        self.mu = np.matrix([[x] for x in mean])
         self.C = cov
         
         # TODO: Calculate K^-1
