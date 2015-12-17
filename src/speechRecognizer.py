@@ -10,7 +10,9 @@ import threading
 import pygame
 import sys
 import rospy
+import shutil
 from std_msgs.msg import String
+
 
 class InputFromSpeech:
     def __init__(self):
@@ -142,10 +144,16 @@ class InputFromSpeech:
 
         hypotheses = [result.split(":") for result in resultList]
 
+        #Stores raw audio and recognition result pair.  
+        #self.storeData()
+
         return hypotheses
 
     def getHypString(self, hypothesis):
         return hypothesis[0]
+
+    def storeData(self):
+        name = self.getUniqueName()
 
 if __name__ == '__main__':
     recognizer = InputFromSpeech()

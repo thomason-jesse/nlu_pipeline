@@ -14,6 +14,7 @@ import DialogAgent
 import StaticDialogPolicy
 import ActionSender
 import pygame
+import os
 import threading
 from std_msgs.msg import String
 
@@ -54,6 +55,17 @@ class OutputToStdout:
 
     def say(self, s):
         print "SYSTEM: "+s
+
+class OutputWithSpeech:
+    def __init__(self):
+        pass
+ 
+    def say(self, s):
+        
+        #Prints and synthesizes dialogue.
+        print s
+
+        os.system("espeak '" + s + "'")
 
 print "calling ROSpy init"
 rospy.init_node('test_NLU_pipeline')
@@ -97,7 +109,7 @@ generator.flush_seen_nodes()
 
 print "instantiating DialogAgent"
 u_in = InputFromSpeechNode()
-u_out = OutputToStdout()
+u_out = OutputWithSpeech()
 static_policy = StaticDialogPolicy.StaticDialogPolicy()
 A = DialogAgent.DialogAgent(parser, generator, grounder, static_policy, u_in, u_out)
 
