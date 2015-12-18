@@ -17,9 +17,6 @@ from PomdpStaticDialogPolicy import PomdpStaticDialogPolicy
 from PomdpDialogAgent import PomdpDialogAgent
 from Utils import *
 
-# For testing typechecking
-from SemanticNode import SemanticNode
-
 class InputFromKeyboard:
     def __init__(self):
         pass
@@ -36,7 +33,7 @@ class OutputToStdout:
         print "SYSTEM: "+s
 
 # Fixing the random seed for debugging
-#numpy.random.seesd(42)
+numpy.random.seed(4)
 
 print "reading in Ontology"
 ont = Ontology.Ontology(sys.argv[1])
@@ -93,17 +90,21 @@ A = PomdpDialogAgent(parser, grounder, static_policy, u_in, u_out)
 #print 'Parser ontology : ', parser.ontology.preds
 
 # Testing typechecking
-idx = grounder.ontology.preds.index('ray')
-person_idx = grounder.ontology.preds.index('person')
-child = SemanticNode(None, 9, 15, False, idx)
-parent = SemanticNode(None, 9, 15, False, person_idx, children=[child])
-child.parent = parent  
-print "Grounding ", parser.print_parse(parent)
-g = grounder.groundSemanticNode(parent, [], [], [])
-answers = grounder.grounding_to_answer_set(g)
-print 'answers = ', answers
-print '--------------------------------'
-sys.exit(1)
+#idx = grounder.ontology.preds.index('ray')
+#person_idx = grounder.ontology.preds.index('person')
+#child = SemanticNode(None, 9, 15, False, idx)
+#parent = SemanticNode(None, 9, 15, False, person_idx, children=[child])
+#child.parent = parent  
+#print "Grounding ", parser.print_parse(parent)
+#g = grounder.groundSemanticNode(parent, [], [], [])
+#answers = grounder.grounding_to_answer_set(g)
+#print 'answers = ', answers
+#print '--------------------------------'
+#print predicate_holds('person', 'ray', grounder)
+#print predicate_holds('person', 'l3_512', grounder)
+#print predicate_holds('room', 'ray', grounder)
+#print predicate_holds('room', 'l3_512', grounder)
+#sys.exit(1)
 
 
 while True:

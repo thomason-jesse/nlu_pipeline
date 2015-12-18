@@ -41,7 +41,7 @@ class KBGrounder:
     def groundSemanticNode(self, root, lambda_names, lambda_types, lambda_assignments):
         # print "Inside groundSemanticNode"
         groundings = []
-        print "grounding "+self.parser.print_parse(root,True)+" with "+str(lambda_names)+","+str(lambda_types)+","+str(lambda_assignments) #DEBUG
+        #print "grounding "+self.parser.print_parse(root,True)+" with "+str(lambda_names)+","+str(lambda_types)+","+str(lambda_assignments) #DEBUG
 
         # if lambda, index and try assignments on children
         if root.is_lambda and root.is_lambda_instantiation:

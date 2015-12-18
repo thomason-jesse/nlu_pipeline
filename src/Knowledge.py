@@ -78,6 +78,9 @@ class Knowledge:
         self.param_relevance = dict()
         self.set_param_relevance()
 
+        # Constraints for type checking
+        self.set_param_constraints()
+        
         # Component-wise weights for distance metric in summary space
         # When calculating the distance, a sum of the weighted L2 norm
         # of the continuous components and weighted misclassification
@@ -159,6 +162,34 @@ class Knowledge:
                         # that the user took an unexpected action equally
                         # among all unexpected actions
                         self.action_type_probs[system_dialog_action][user_dialog_action] = self.user_wrong_action_prob / (len(self.user_dialog_actions) - len(expected_actions[system_dialog_action]))
-                        
 
-    
+    # The true_constraints and false_constraints are to introduce 
+    # type constraints for each param of each action, for example, 
+    # the patient of searchroom should be a person and the patient 
+    # of bring should not be a room. The lists need to be initialized
+    # for each parameter relevant to each goal. By default, they will 
+    # be empty so it is sufficient to specify them when they are non 
+    # empty                        
+    def set_param_constraints(self) :
+        self.true_constraints = dict()
+        self.false_constraints = dict()
+        for action in self.goal_actions :
+            self.true_constraints[action] = dict()
+            self.false_constraints[action] = dict()
+            for param in self.goal_params : 
+                self.true_constraints[action][param] = list()
+                self.false_constraints[action][param] = list()
+                
+        self.true_constraints['searchroom']['patient'] = ['person']
+        self.true_constraints['searchroom']['location'] = ['room']
+        self.true_constraints['remind']['recipient'] = ['person']
+        self.true_constraints['remind']['location'] = ['room']
+        self.true_constraints['askperson']['patient'] = ['person']
+        self.true_constraints['askperson']['recipient'] = ['person']
+        self.true_constraints['bring']['recipient'] = ['person']
+        self.true_constraints['at']['location'] = ['room']
+        
+        self.false_constraints['speak_t']['patient'] = ['person', 'room']
+        self.false_constraints['remind']['patient'] = ['person', 'room']
+        self.false_constraints['bring']['patient'] = ['room']
+

@@ -1,5 +1,6 @@
 __author__ = 'aishwarya'
 
+import copy 
 from Utils import *
 
 class Partition:
@@ -90,6 +91,68 @@ class Partition:
                 return False
         return True
                 
+    def is_valid(self, knowledge, grounder) :
+        # Basic sanity check - alteast one valid goal
+        if self.possible_goals is None or len(self.possible_goals) < 1 :
+            return False
+        for param_name in self.possible_param_values :
+            if len(self.possible_param_values[param_name]) < 1 :
+                return False
+        
+        if len(self.possible_goals) > 1 :
+            return True         
+        
+        # If control reaches here, there is only one goal. Check that all 
+        # its params have values which are valid
+        goal = self.possible_goals[0]
+        relevant_params = knowledge.param_order[goal]
+        for param_name in relevant_params :
+            if param_name not in self.possible_param_values or len(self.possible_param_values[param_name]) < 1 :
+                return False
+            if len(self.possible_param_values[param_name]) == 1 :
+                value = self.possible_param_values[param_name][0]
+                if not self.param_value_valid(goal, param_name, value, knowledge, grounder) :
+                    return False
+        return True
+    
+    def param_value_valid(self, goal, param_name, value, knowledge, grounder) :
+        if param_name not in knowledge.param_order[goal] :
+            return True
+        if value is None :
+            return False
+        for true_pred in knowledge.true_constraints[goal][param_name] :
+            if not predicate_holds(true_pred, value, grounder) :
+                # A predicate that should hold does not
+                return False
+        for false_pred in knowledge.false_constraints[goal][param_name] :
+            if predicate_holds(false_pred, value, grounder) :
+                # A predicate that should not hold does
+                return False
+        return True
+    
+    def remove_invalid_params(self, knowledge, grounder) :
+        print 'In remove invalid params with '
+        print str(self)
+        if len(self.possible_goals) != 1 :
+            print 'no change'
+            return 
+        goal = self.possible_goals[0]
+        for param_name in self.possible_param_values :
+            if param_name in knowledge.param_order[goal] :
+                current_values = self.possible_param_values[param_name]
+                new_values = list()
+                for value in current_values :
+                    if self.param_value_valid(goal, param_name, value, knowledge, grounder) :
+                        new_values.append(value)
+                if len(new_values) > 0 :
+                    self.possible_param_values[param_name] = new_values
+                else :
+                    self.possible_param_values[param_name] = [None]
+            else :
+                self.possible_param_values[param_name] = [None]
+        print 'End of remove invalid params with '
+        print str(self)
+        print '--------------------------------------------'
     
     # Check whether this partition contains all states having some goal 
     # and params        
@@ -150,27 +213,40 @@ class Partition:
                         return False
         return True
             
-    def split_by_goal(self, new_goal, knowledge) :
+    def split_by_goal(self, new_goal, knowledge, grounder) :
         if new_goal not in self.possible_goals or len(self.possible_goals) == 1 :
             return [self]
         else :
-            p1 = Partition([new_goal], self.possible_param_values)
+            p1 = Partition([new_goal], copy.deepcopy(self.possible_param_values))
             split_prob = knowledge.partition_split_goal_probs[new_goal]
             p1.reaching_prob = self.reaching_prob * split_prob
             p1.belief = self.belief * split_prob
             if p1.is_terminal(knowledge) :
                 #p1.belief = min(p1.belief + 0.5, 1)    
                 pass
+            p1.remove_invalid_params(knowledge, grounder)    
+                
             other_goals = [goal for goal in self.possible_goals if goal != new_goal]
-            p2 = Partition(other_goals, self.possible_param_values)
+            p2 = Partition(other_goals, copy.deepcopy(self.possible_param_values))
             p2.reaching_prob = self.reaching_prob * (1 - split_prob)
             p2.belief = self.belief * (1 - split_prob)
             if p2.is_terminal(knowledge) :
                 #p2.belief = min(p2.belief + 0.5, 1)    
                 pass
-            return [p1, p2]
+            p2.remove_invalid_params(knowledge, grounder)
+            
+            # Check that both partitions are valid. If not, return only 
+            # the one which is    
+            if not p1.is_valid(knowledge, grounder) :
+                p2.belief = self.belief
+                return [p2]
+            elif not p2.is_valid(knowledge, grounder) :
+                p1.belief = self.belief
+                return [p1]
+            else :
+                return [p1, p2]
 
-    def split_by_param(self, split_param_name, split_param_value, knowledge) :
+    def split_by_param(self, split_param_name, split_param_value, knowledge, grounder) :
         if self.possible_param_values == None or \
         split_param_name not in self.possible_param_values or \
         split_param_value not in self.possible_param_values[split_param_name] or \
@@ -186,8 +262,8 @@ class Partition:
                 else :
                     p1_param_values[param_name] = [split_param_value]
                     p2_param_values[param_name] = [param_value for param_value in self.possible_param_values[split_param_name] if param_value != split_param_value]
-            p1 = Partition(self.possible_goals, p1_param_values)
-            p2 = Partition(self.possible_goals, p2_param_values)
+            p1 = Partition(copy.deepcopy(self.possible_goals), p1_param_values)
+            p2 = Partition(copy.deepcopy(self.possible_goals), p2_param_values)
             split_prob = knowledge.partition_split_param_probs[split_param_name][split_param_value]
             p1.reaching_prob = self.reaching_prob * split_prob
             p1.belief = self.belief * split_prob
@@ -199,5 +275,15 @@ class Partition:
             if p2.is_terminal(knowledge) :
                 p2.belief = min(p2.belief + 0.1, 1)    
                 pass
-            return [p1, p2]
+            
+            # Check that both partitions are valid. If not, return only 
+            # the one which is    
+            if not p1.is_valid(knowledge, grounder) :
+                p2.belief = self.belief
+                return [p2]
+            elif not p2.is_valid(knowledge, grounder) :
+                p1.belief = self.belief
+                return [p1]
+            else :
+                return [p1, p2]
             

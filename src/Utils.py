@@ -2,6 +2,9 @@ __author__ = 'aishwarya'
 
 import pickle
 
+# For typechecking
+from SemanticNode import SemanticNode
+
 def save_model(obj, name):
     with open('src/nlu_pipeline/src/models/'+ str(name) + '.pkl', 'wb') as f:
         pickle.dump(obj, f, pickle.HIGHEST_PROTOCOL)
@@ -56,4 +59,23 @@ def arg_max(d):
             max = d[k]
             arg_max = k
     return arg_max, max
+    
+def predicate_holds(predicate, argument, grounder) :
+    if argument is None :
+        return False
+    if argument not in grounder.ontology.preds :
+        return False
+    if predicate not in grounder.ontology.preds :
+        return False    
+    arg_idx = grounder.ontology.preds.index(argument)
+    pred_idx = grounder.ontology.preds.index(predicate)
+    child = SemanticNode(None, 9, 15, False, arg_idx)
+    parent = SemanticNode(None, 9, 15, False, pred_idx, children=[child])
+    child.parent = parent  
+    g = grounder.groundSemanticNode(parent, [], [], [])
+    answers = grounder.grounding_to_answer_set(g)
+    if True in answers :
+        return True
+    else :
+        return False
 

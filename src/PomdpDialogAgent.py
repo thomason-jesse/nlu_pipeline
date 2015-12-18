@@ -62,7 +62,7 @@ class PomdpDialogAgent :
                     return False
                 # Belief monitoring - update belief based on the response
                 self.update_state(response)
-                #print 'Belief state: ', str(self.state) 
+                print 'Belief state: ', str(self.state) 
                 
                 reward = self.knowledge.per_turn_reward
                 summary_state = SummaryState(self.state)
@@ -110,7 +110,7 @@ class PomdpDialogAgent :
             #print '\nGoing to update belief state'
             #print 'Previous system action - ', str(self.previous_system_action)
             #print 'Utterances - ', '\n'.join([str(utterance) for utterance in self.n_best_utterances])
-            self.state.update(self.previous_system_action, self.n_best_utterances)
+            self.state.update(self.previous_system_action, self.n_best_utterances, self.grounder)
 
     # Confirm a (possibly partial) action
     def confirm_action(self):
@@ -165,8 +165,17 @@ class PomdpDialogAgent :
             #print 'Is deny'
             return [Utterance('deny')]
         elif parse.idx == self.parser.ontology.preds.index('none'):
+            #print 'Got a none response'
             goal = self.previous_system_action.referring_goal
-            return [Utterance('deny')]
+            if self.previous_system_action.extra_data is not None and len(self.previous_system_action.extra_data) >= 1:
+                param_name = self.previous_system_action.extra_data[0]
+            else :
+                return []
+            params = dict()
+            params[param_name] = None
+            utterance = Utterance('inform', goal, params)      
+            print '\n'
+            return [utterance]
         
         #print 'Neither affirm nor deny'
         
@@ -243,11 +252,11 @@ class PomdpDialogAgent :
         #print 'Trying to ground as param value'
         #print "\nGrounding ", self.parser.print_parse(parse)
         try :
-            print "Grounding ", self.parser.print_parse(parse)
+            #print "Grounding ", self.parser.print_parse(parse)
             g = self.grounder.groundSemanticNode(parse, [], [], [])
             answers = self.grounder.grounding_to_answer_set(g)
-            print 'answers = ', answers
-            print '--------------------------------'
+            #print 'answers = ', answers
+            #print '--------------------------------'
             utterances = []
             if type(answers) == 'str' :
                 answers = [answers]
@@ -298,37 +307,13 @@ class PomdpDialogAgent :
         self.n_best_utterances = []
         N = self.parser.beam_width
         for [parse, parse_tree, parse_trace, conf] in n_best_parses :
-            print "\nParsing ", self.parser.print_parse(parse)
+            #print "\nParsing ", self.parser.print_parse(parse)
             #print 'conf = ', conf
             #print '-------------------------------'
             #print 'parse = ', parse
             #print 'parse_tree = ', parse_tree
             #print 'parse_trace = ', parse_trace
             #print 'conf = ', conf 
-            
-            relevant_node = parse.children[0]
-            print 'relevant_node = ', self.parser.print_parse(relevant_node)
-            print 'relevant_node.parent = ', relevant_node.parent
-            print 'relevant_node.type = ', relevant_node.type
-            print 'relevant_node.category = ', relevant_node.category
-            print 'relevant_node.is_lambda = ', relevant_node.is_lambda
-            print 'relevant_node.idx = ', relevant_node.idx
-            print 'relevant_node.lambda_name = ', relevant_node.lambda_name 
-            print 'relevant_node.is_lambda_instantiation = ', relevant_node.is_lambda_instantiation
-            print 'relevant_node.children = ', relevant_node.children
-            
-            if relevant_node.children is not None and len(relevant_node.children) > 0 :
-                child = relevant_node.children[0]
-                print 'child = ', self.parser.print_parse(child)
-                print 'child.parent = ', child.parent
-                print 'child.type = ', child.type
-                print 'child.category = ', child.category
-                print 'child.is_lambda = ', child.is_lambda
-                print 'child.idx = ', child.idx
-                print 'child.lambda_name = ', child.lambda_name 
-                print 'child.is_lambda_instantiation = ', child.is_lambda_instantiation
-                print 'child.children = ', child.children
-            print '-------------------------------'
 
             utterances = self.create_utterances_of_parse(parse)
             if utterances is not None and len(utterances) >= N :
@@ -433,13 +418,13 @@ class PomdpDialogAgent :
             # print "Going to enter loop"
             for arg in root.children:
                 # print "In loop"
-                print "Grounding ", self.parser.print_parse(arg)
+                #print "Grounding ", self.parser.print_parse(arg)
                 g = self.grounder.groundSemanticNode(arg, [], [], [])
                 # print "Grounded"
                 # print "arg: "+str(g)  # DEBUG
                 answer = self.grounder.grounding_to_answer_set(g)
-                print 'answers = ', answer
-                print '--------------------------------'
+                #print 'answers = ', answer
+                #print '--------------------------------'
                 # print "Interpreted grounding"
                 if len(answer) == 0:
                     # print "Single answer found"

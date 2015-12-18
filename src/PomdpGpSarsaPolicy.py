@@ -93,18 +93,32 @@ class PomdpGpSarsaPolicy :
         sample = int(np.random.uniform(0, num_actions))
         return candidate_actions[sample]
     
+    # Allow 'take-action' only if the top hypothesis has a unique 
+    # executable action
+    # Do not allow 'request-missing-param' for speak actions
     def get_candidate_actions(self, current_state) :
+        candidate_actions = copy.deepcopy(self.knowledge.summary_system_actions)
         if current_state is None or current_state.top_hypothesis is None :
-            return self.knowledge.summary_system_actions
+            candidate_actions.remove('take_action')
+            return candidate_actions
         elif current_state.top_hypothesis[0] is None or current_state.top_hypothesis[0].possible_goals is None :
-            return self.knowledge.summary_system_actions
+            candidate_actions.remove('take_action')
+            return candidate_actions
         elif len(current_state.top_hypothesis[0].possible_goals) != 1 :
-            return self.knowledge.summary_system_actions
+            candidate_actions.remove('take_action')
+            return candidate_actions
         else :
             unique_goal = current_state.top_hypothesis[0].possible_goals[0]
-            candidate_actions = copy.deepcopy(self.knowledge.summary_system_actions)
             if unique_goal == 'speak_t' or unique_goal == 'speak_e' :
-                candidate_actions.remove('request_missing_param')
+                if 'request_missing_param' in candidate_actions :
+                    candidate_actions.remove('request_missing_param')
+            for param_name in self.knowledge.param_order[unique_goal] :
+                if param_name not in current_state.top_hypothesis[0].possible_param_values :
+                    if 'take_action' in candidate_actions :
+                        candidate_actions.remove('take_action')
+                elif len(current_state.top_hypothesis[0].possible_param_values[param_name]) != 1 :
+                    if 'take_action' in candidate_actions :
+                        candidate_actions.remove('take_action')
             return candidate_actions
     
     def pi(self, b) :
@@ -231,9 +245,10 @@ class PomdpGpSarsaPolicy :
         (eig_vals, eig_vectors) = np.linalg.eig(m)
         for eig_val in eig_vals :
             if type(eig_val) in [np.complex_, np.complex64, np.complex128] :
-                print 'Complex eigen value'
-                print 'C = ', self.C
-                sys.exit(1)
+                #print 'Complex eigen value'
+                #print 'C = ', self.C
+                #sys.exit(1)
+                pass
             elif eig_val < -0.0001 :
                 print 'Negative eigen value'
                 print 'C = ', self.C

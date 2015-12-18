@@ -105,3 +105,30 @@ class Utterance:
                     return False
         return True
         
+    def is_valid(self, knowledge, grounder) :
+        # Sanity check - only inform type has a goal
+        if self.action_type not in ['inform', 'affirm', 'deny'] :
+            return False
+        if self.action_type == 'inform' and self.referring_goal is None :
+            return False
+        if self.action_type == 'affirm' and self.referring_goal is not None :
+            return False         
+        if self.action_type == 'deny' and self.referring_goal is not None :
+            return False
+        
+        # Check that if a relevant param has a value, it is valid
+        goal = self.possible_goals[0]
+        relevant_params = knowledge.param_order[goal]
+        for param_name in relevant_params :
+            if param_name in self.referring_params :
+                argument = self.referring_params[param_name]
+                for true_pred in knowledge.true_constraints[goal][param_name] :
+                    if not predicate_holds(true_pred, argument, grounder) :
+                        # A predicate that should hold does not
+                        return False
+                for false_pred in knowledge.false_constraints[goal][param_name] :
+                    if predicate_holds(false_pred, argument, grounder) :
+                        # A predicate that should not hold does
+                        return False
+        return True
+        
