@@ -185,6 +185,16 @@ class Partition:
         #print '^^^^^^^^^^^^^^^^^^^^^'
         return True
     
+    # Returns true if either the goal or some param has only one possible 
+    # value
+    def something_certain(self) :
+        if len(self.possible_goals) == 1 :
+            return True
+        for param_name in self.possible_param_values :
+            if len(self.possible_param_values[param_name]) == 1 :
+                return True
+        return False
+    
     # Check whether this partition has only the goal and param values indicated
     def is_equal(self, required_goal, required_params) :
         #print 'required_params = ', str(required_params)

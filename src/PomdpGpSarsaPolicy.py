@@ -450,7 +450,15 @@ class PomdpGpSarsaPolicy :
             if state.top_hypothesis is None :
                 goal_idx = int(np.random.uniform(0, len(state.knowledge.goal_actions)))
                 return SystemAction(action_type, state.knowledge.goal_actions[goal_idx])
-            goal = state.top_hypothesis[0].possible_goals[0]
+            
+            goal = None
+            if state.top_hypothesis[0].something_certain() :
+                if len(state.top_hypothesis[0].possible_goals) > 0 :
+                    goal = state.top_hypothesis[0].possible_goals[0]
+            else :
+                goal_idx = int(np.random.uniform(0, len(state.top_hypothesis[0].possible_goals)))    
+                goal = state.top_hypothesis[0].possible_goals[goal_idx]
+
             system_action = SystemAction(action_type, goal)
             param_order = state.knowledge.param_order[goal]
             params = dict()
@@ -460,14 +468,15 @@ class PomdpGpSarsaPolicy :
             for param_name in param_order :
                 if param_name in partition_params and len(partition_params[param_name]) == 1 :
                     params[param_name] = partition_params[param_name][0]
-                else :
-                    print 'Uncertain about ', param_name, ' : ', partition_params[param_name]
+                #else :
+                    #print 'Uncertain about ', param_name, ' : ', partition_params[param_name]
             system_action.referring_params = params
             return system_action
             
         elif action_type == 'request_missing_param' :
             if state.top_hypothesis is None :
-                goal = None
+                goal_idx = int(np.random.uniform(0, len(state.knowledge.goal_actions)))
+                goal = state.knowledge.goal_actions[goal_idx]
                 system_action = SystemAction(action_type)
                 param_idx = int(np.random.uniform(0, len(state.knowledge.goal_params)))
                 system_action.extra_data = [state.knowledge.goal_params[param_idx]]
