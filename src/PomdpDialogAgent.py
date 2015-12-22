@@ -8,6 +8,7 @@ from PomdpGpSarsaPolicy import PomdpGpSarsaPolicy
 from SystemAction import SystemAction
 from Utterance import Utterance
 from Action import Action
+from TemplateBasedGenerator import TemplateBasedGenerator
 
 class PomdpDialogAgent :
 
@@ -17,6 +18,7 @@ class PomdpDialogAgent :
         self.parse_depth = parse_depth
         self.input = u_input
         self.output = output
+        self.generator = TemplateBasedGenerator()
 
         self.knowledge = Knowledge()    
         self.state = HISBeliefState(self.knowledge)  
@@ -43,7 +45,9 @@ class PomdpDialogAgent :
             if dialog_action == 'take_action' :
                 # Submit the action given by the policy
                 action = dialog_action_arg
-                self.output.say("Action: " + str(action))
+                #self.output.say("Action: " + str(action))
+                output = self.generator.get_action_sentence(action)
+                self.output.say(output)
                 self.output.say("Was this the correct action? (y/n) : ")
                 response = self.input.get().lower()    
                 if response.lower() == 'y' or response.lower() == 'yes' :
@@ -75,16 +79,16 @@ class PomdpDialogAgent :
     # Request the user to state/repeat their goal
     def request_user_initiative(self):
         if self.first_turn :
-            self.output.say("How can I help?")
-        else :
-            self.output.say("Can you restate your question or command?")
+            self.previous_system_action.extra_data = ['first']
+        output = self.generator.get_sentence(self.previous_system_action)
+        self.output.say(output)
         response = self.input.get()
         return response
 
     # Request a missing action parameter
     def request_missing_param(self):
-        theme = self.previous_system_action.extra_data[0]
-        self.output.say("What is the " + theme + " of the action you'd like me to take?")
+        output = self.generator.get_sentence(self.previous_system_action)
+        self.output.say(output)
         response = self.input.get()
         return response
 
@@ -116,20 +120,22 @@ class PomdpDialogAgent :
     def confirm_action(self):
         # with reverse parsing, want to confirm(a.name(a.params))
         # for now, just use a.name and a.params raw
-        system_action = self.previous_system_action
-        params = []
-        goal = system_action.referring_goal
-        if system_action.referring_params is not None :
-            param_order = self.knowledge.param_order[goal]
-            for param_name in param_order :
-                if param_name in system_action.referring_params :
-                    params.append(system_action.referring_params[param_name])
-        if goal is None :
-            self.output.say("I should take action involving " +
-                        ','.join([str(p) for p in params if p is not None]) + "?")
-        else :
-            self.output.say("I should take action " + goal +" involving " +
-                        ','.join([str(p) for p in params if p is not None]) + "?")
+        #system_action = self.previous_system_action
+        #params = []
+        #goal = system_action.referring_goal
+        #if system_action.referring_params is not None :
+            #param_order = self.knowledge.param_order[goal]
+            #for param_name in param_order :
+                #if param_name in system_action.referring_params :
+                    #params.append(system_action.referring_params[param_name])
+        #if goal is None :
+            #self.output.say("I should take action involving " +
+                        #','.join([str(p) for p in params if p is not None]) + "?")
+        #else :
+            #self.output.say("I should take action " + goal +" involving " +
+                        #','.join([str(p) for p in params if p is not None]) + "?")
+        output = self.generator.get_sentence(self.previous_system_action)
+        self.output.say(output)                        
         response = self.input.get()
         return response
 

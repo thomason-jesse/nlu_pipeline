@@ -16,18 +16,19 @@ class TemplateBasedGenerator :
     
     def get_action_sentence(self, action) :
         if action.name == 'searchroom' :
-            return 'The robot searched for ' + action.params[0] + ' in room ' + action.params[1] + '.'
+            return 'The robot searched for ' + str(action.params[0]) + ' in room ' + str(action.params[1]) + '.'
         elif action.name == 'bring' :
-            return 'The robot brought ' + action.params[0] + ' to ' + action.params[1] + '.'
+            return 'The robot brought ' + str(action.params[0]) + ' to ' + str(action.params[1]) + '.'
         elif action.name == 'at' :
-            return 'The robot went to ' + action.params[0] + '.'
+            return 'The robot went to ' + str(action.params[0]) + '.'
         else :
             if len(action.params) == 0 :
                 return 'The robot took action ' + action.name + '.'
             elif len(action.params) == 1 :
-                return 'The robot took action ' + action.name + ' with parameter ' + action.params[0] + '.'
+                return 'The robot took action ' + action.name + ' with parameter ' + str(action.params[0]) + '.'
             else :
-                return 'The robot took action ' + action.name + ' with parameters ' + ', '.join(action.params[:-1]) + ' and ' + action.params[-1] + '.'
+                params = [str(param) for param in action.params]
+                return 'The robot took action ' + action.name + ' with parameters ' + ', '.join(params[:-1]) + ' and ' + params[-1] + '.'
             
     
     def get_sentence(self, system_action) :
@@ -35,11 +36,11 @@ class TemplateBasedGenerator :
             if system_action.extra_data is not None and 'first' in system_action.extra_data :
                 return 'How can I help?'
             else :
-                return 'I\'m sorry, I didn\'t quite understand that. What did you want me to do?'
+                return 'I\'m sorry but could you clarify again what you wanted me to do?'
                 
         elif system_action.action_type == 'confirm_action' :
             if system_action.referring_goal is None :
-                params = system_action.referring_params.values()
+                params = [str(param) for param in system_action.referring_params.values()]
                 if len(params) == 0 :
                     return 'I\'m sorry, I didn\'t quite understand that. What did you want me to do?'
                 elif len(params) == 1 :
@@ -76,7 +77,7 @@ class TemplateBasedGenerator :
                     return 'You want me to go somewhere?'
             else :
                 goal = system_action.referring_goal
-                params = system_action.referring_params.values()
+                params = [str(param) for param in system_action.referring_params.values()]
                 if len(params) == 0 :
                     return 'You want me to take action ' + goal + '?'
                 elif len(params) == 1 :
@@ -85,16 +86,16 @@ class TemplateBasedGenerator :
                     return 'You want me to take action ' + goal + ' with ' + ', '.join(params[:-1]) + ' and ' + params[-1]
         
         elif system_action.action_type == 'request_missing_param' :
-            param_to_confirm = system_action.extra_data
+            param_to_confirm = system_action.extra_data[0]
             if system_action.referring_goal == 'searchroom' :
                 if param_to_confirm == 'location' :
                     return 'Where would you like me to search?'
-                else param_to_confirm == 'patient' :
+                else :
                     return 'Whom would you like me to search for?'
             elif system_action.referring_goal == 'bring' :
                 if param_to_confirm == 'patient' :
                     return 'What would you like me to bring?'
-                else param_to_confirm == 'recipient' :
+                else :
                     patient = self.get_param(system_action, 'patient')
                     if patient is not None :
                         return 'Whom would you like me to bring ' + patient + ' to?'

@@ -11,7 +11,7 @@ import Parser
 import Generator
 import DialogAgent
 import StaticDialogPolicy
-import numpy
+import numpy, re
 
 from PomdpStaticDialogPolicy import PomdpStaticDialogPolicy
 from PomdpDialogAgent import PomdpDialogAgent
@@ -22,7 +22,11 @@ class InputFromKeyboard:
         pass
 
     def get(self):
-        return raw_input()
+        text = raw_input()
+        text = text.lower()
+        regex = re.compile('[\?\.,\;\:]')
+        text = regex.sub('', text)
+        return text 
 
 
 class OutputToStdout:
@@ -33,7 +37,7 @@ class OutputToStdout:
         print "SYSTEM: "+s
 
 # Fixing the random seed for debugging
-numpy.random.seed(4)
+#numpy.random.seed(4)
 
 print "reading in Ontology"
 ont = Ontology.Ontology(sys.argv[1])
@@ -62,6 +66,8 @@ print "instantiating Parser"
 parser = load_model('parser')
 grounder.parser = parser
 grounder.ontology = parser.ontology
+
+#print '\n\n', predicate_holds('room', 'l3_432', grounder), '\n\n'
 
 print "instantiating Generator"
 generator = Generator.Generator(ont, lex, learner, parser, beam_width=100)
