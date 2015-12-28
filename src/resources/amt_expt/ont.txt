@@ -34,11 +34,14 @@ l3_414b:e
 searchroom:<e,<e,a>>
 at:<e,a>
 bring:<e,<e,a>>
+speak_t:<t,a>
+speak_e:<e,a>
 
 #int preds
 inroom:<e,<e,t>>
 person:<e,t>
 room:<e,t>
+item:<e,t>
 canbeinroom:<e,<e,t>>
 inoffice:<e,t>
 hasoffice:<e,<e,t>>

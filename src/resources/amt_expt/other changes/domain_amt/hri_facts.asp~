@@ -23,19 +23,17 @@ ingroup(mallory,bwi).
 ingroup(peggy,bwi).
 ingroup(walter,bwi).
 
-hasoffice(peter,l3_508). 
-hasoffice(ray,l3_512).
-hasoffice(dana,l3_510). 
-hasoffice(kazunori,l3_402). 
-hasoffice(matteo,l3_418).
-hasoffice(shiqi,l3_420).
-hasoffice(jivko,l3_432). 
-hasoffice(stacy,l3_502).
+hasoffice(mallory,l3_508). 
+hasoffice(walter,l3_512).
+hasoffice(frannie,l3_510). 
+hasoffice(bob,l3_402). 
+hasoffice(eve,l3_418).
+hasoffice(alice,l3_502).
 
 %students in the lab
-hasoffice(yuqian,l3_414b).
-hasoffice(pato,l3_414b).
-hasoffice(max,l3_414b).
+hasoffice(carol,l3_414b).
+hasoffice(dave,l3_414b).
+hasoffice(peggy,l3_414b).
 
 canbeinroom(P,R) :- hasoffice(P,R), person(P), room(R).
 canbeinroom(P,l3_414b) :- ingroup(P,bwi).

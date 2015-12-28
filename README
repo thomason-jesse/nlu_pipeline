@@ -50,6 +50,10 @@ TESTING POMDP:
 
 rosrun nlu_pipeline TestPomdpPipeline.py src/nlu_pipeline/src/resources/asp_actions/ont.txt src/nlu_pipeline/src/resources/asp_actions/lex.txt src/nlu_pipeline/src/resources/asp_actions/utterance_action_pairs.txt
 
+POMDP AMT Experiment
+
+rosrun nlu_pipeline TestPomdpPipeline.py src/nlu_pipeline/src/resources/amt_expt/ont.txt src/nlu_pipeline/src/resources/amt_expt/lex.txt src/nlu_pipeline/src/resources/amt_expt/utterance_action_pairs.txt
+
 NOTE:
   Right now there will be an initial "testing Generator" prompt. You can skip this by typing "stop".
   This is a result of me not branching the latest component.

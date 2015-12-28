@@ -14,7 +14,7 @@ bring mallory coffee
 M : bring(coffee,mallory)
 bring(coffee,mallory)
 
-get alice a hamburger
+bring alice a hamburger
 M : bring(hamburger,alice)
 bring(hamburger,alice)
 
@@ -22,6 +22,6 @@ walk to 3512
 M : at(l3_512)
 at(l3_512)
 
-go to alice's office
-M : at(l3_502)
+walk to alice's office
+M : at(lambda x:e.(hasoffice(alice,x)))
 at(l3_502)

@@ -10,6 +10,12 @@ person(mallory).
 person(peggy).
 person(walter).
 
+item(hamburger).
+item(coffee).
+item(juice).
+item(muffin).
+item(chips).
+
 group(bwi).
 
 ingroup(alice,bwi).

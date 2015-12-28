@@ -8,13 +8,15 @@ class Knowledge:
     unk = '-UNK-'
 
     def __init__(self):
-        self.goal_actions = ['searchroom', 'speak_t', 'speak_e', 'remind', 'askperson', 'bring', 'at']
+        #self.goal_actions = ['searchroom', 'speak_t', 'speak_e', 'remind', 'askperson', 'bring', 'at']
+        self.goal_actions = ['searchroom', 'bring', 'at']
         self.goal_params = ['patient', 'recipient', 'location']
 
         # This is kept as a single vector common to all values so that hopefully 
         # some operaitons involving them can be made matrix operations and implemented
         # efficiently using numpy
-        self.goal_params_values = [None, 'peter', 'ray', 'dana', 'kazunori', 'matteo', 'shiqi', 'jivko', 'stacy', 'yuqian', 'max', 'pato', 'bwi', 'bwi_m', 'l3_516', 'l3_508', 'l3_512', 'l3_510', 'l3_402', 'l3_418', 'l3_420', 'l3_432', 'l3_502', 'l3_414b', True, False]
+        #self.goal_params_values = [None, 'peter', 'ray', 'dana', 'kazunori', 'matteo', 'shiqi', 'jivko', 'stacy', 'yuqian', 'max', 'pato', 'bwi', 'bwi_m', 'l3_516', 'l3_508', 'l3_512', 'l3_510', 'l3_402', 'l3_418', 'l3_420', 'l3_432', 'l3_502', 'l3_414b', True, False]
+        self.goal_params_values = [None, 'chips', 'coffee', 'hamburger', 'juice', 'muffin', 'alice', 'frannie', 'bob', 'carol', 'dave', 'george', 'eve', 'mallory', 'peggy', 'walter', 'l3_516', 'l3_508', 'l3_512', 'l3_510', 'l3_402', 'l3_418', 'l3_420', 'l3_432', 'l3_502', 'l3_414b']      
         
         self.system_dialog_actions = ['repeat_goal', 'confirm_action', 'request_missing_param']
         self.user_dialog_actions = ['inform', 'affirm', 'deny']
@@ -182,14 +184,14 @@ class Knowledge:
                 
         self.true_constraints['searchroom']['patient'] = ['person']
         self.true_constraints['searchroom']['location'] = ['room']
-        self.true_constraints['remind']['recipient'] = ['person']
-        self.true_constraints['remind']['location'] = ['room']
-        self.true_constraints['askperson']['patient'] = ['person']
-        self.true_constraints['askperson']['recipient'] = ['person']
+        #self.true_constraints['remind']['recipient'] = ['person']
+        #self.true_constraints['remind']['location'] = ['room']
+        #self.true_constraints['askperson']['patient'] = ['person']
+        #self.true_constraints['askperson']['recipient'] = ['person']
         self.true_constraints['bring']['recipient'] = ['person']
         self.true_constraints['at']['location'] = ['room']
         
-        self.false_constraints['speak_t']['patient'] = ['person', 'room']
-        self.false_constraints['remind']['patient'] = ['person', 'room']
+        #self.false_constraints['speak_t']['patient'] = ['person', 'room']
+        #self.false_constraints['remind']['patient'] = ['person', 'room']
         self.false_constraints['bring']['patient'] = ['room']
 
