@@ -12,18 +12,17 @@ import sys
 import rospy
 import shutil
 from std_msgs.msg import String
+from os import walk
 
 
 class InputFromSpeech:
     def __init__(self):
         import ctypes
 
+        #Initialize variables. 
         self.n = 5
-
-        if True: #TODO Allow path specification is None:
-            self.libHandle = ctypes.CDLL("./src/nlu_pipeline/src/speech/speechRecognizer.so")
-        else:
-            self.libHandle = ctypes.CDLL(path)
+        self.path = "./src/nlu_pipeline/src/speech/"
+        self.libHandle = ctypes.CDLL(self.path + "speechRecognizer.so")
 
         #Initialize Sphinx. 
         self.libHandle.sphinx_init()
@@ -137,7 +136,7 @@ class InputFromSpeech:
             sys.exit()
 
         #Opens up results to begin reading from them. 
-        results = open("results.txt", "r")
+        results = open(self.path + "data/recording/results.txt", "r")
 
         #Makes a list of each hypothesis, containing string, confidence, etc.
         resultList = [line.strip('\n') for line in results]
@@ -145,7 +144,7 @@ class InputFromSpeech:
         hypotheses = [result.split(":") for result in resultList]
 
         #Stores raw audio and recognition result pair.  
-        #self.storeData()
+        self.storeData()
 
         return hypotheses
 
@@ -153,7 +152,32 @@ class InputFromSpeech:
         return hypothesis[0]
 
     def storeData(self):
-        name = self.getUniqueName()
+        num = self.getUniqueFileNum()
+
+        #Copies results from utterance recognition into logs. 
+        shutil.copy(self.path + "data/recording/results.txt", self.path + "data/logs/" + str(num) + "-results")
+        shutil.copy(self.path + "data/recording/voice.raw", self.path + "data/logs/" + str(num) + "-recording")
+
+    def getUniqueFileNum(self):
+
+        # Gets file names in data directory. 
+        filenames = []
+
+        for (dirpath, dirnames, names) in walk(self.path + "data/logs"):
+            filenames.extend(names)
+            break
+
+        num = 0
+
+        if filenames:
+            for name in filenames:
+                fileNum = int(name.split('-')[0])
+
+                if num <= fileNum:
+                    num = fileNum + 1
+
+        return num
+
 
 if __name__ == '__main__':
     recognizer = InputFromSpeech()

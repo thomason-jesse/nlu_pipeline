@@ -5,12 +5,13 @@ and writes to standard output for 5 seconds of data.
 
 */
 
-#include "record.h"
+#include "record.h" 
 
 //Used to determine when to record. 
 static int recording = 0;
 static int interrupted = 0; 
 static struct micParams mp; 
+static char* voice = "./src/nlu_pipeline/src/speech/data/recording/voice.raw";
 
 void startRecord() {
 	recording = 1; 
@@ -133,49 +134,8 @@ void closeMic() {
   		free(mp.buffer);
 }
 
-int record1600Hz_f(const char *fout) {
-	FILE *file = fopen(fout, "w");
-	int rc = 0; 
-
-	if (!file) {
-		fprintf(stderr, "Could not open file for sound output!\n");
-
-		return -1; 
-	}
-
-	//Waits for recording to start. 
-	while (!recording);
-
- 	while (recording) {
-    	rc = snd_pcm_readi(mp.handle, mp.buffer, mp.frames);
-    
-		if (rc == -EPIPE) {
-      		/* EPIPE means overrun */
-      		fprintf(stderr, "overrun occurred\n");
-      		snd_pcm_prepare(mp.handle);
-    	} 
-		else if (rc < 0) {
-      		fprintf(stderr,
-              "error from read: %s\n",
-              snd_strerror(rc));
-    	} 
-		else if (rc != (int)mp.frames) {
-      		fprintf(stderr, "short read, read %d frames\n", rc);
-    	}
-    
-		rc = write(fileno(file), mp.buffer, mp.size);
-    
-		if (rc != mp.size)
-      		fprintf(stderr, "short write: wrote %d bytes\n", rc);
-  	}
-
-	fclose(file);
-
-	return 0;
-}
-
 void* decodeRecording(void *ps) {
-	FILE *file = fopen("voice.raw", "r"); 
+	FILE *file = fopen(voice, "r"); 
 	int16 *buffer = (int16*) malloc(mp.frames * sizeof(int16));
 	int rc = 0;
 	
@@ -204,7 +164,7 @@ void* decodeRecording(void *ps) {
 
 int record1600Hz_s(ps_decoder_t *ps) {
 	int rc = 0; 
-	FILE *file = fopen("voice.raw", "w");
+	FILE *file = fopen(voice, "w");
 
 	ps_start_stream(ps); 
 	ps_start_utt(ps); 

@@ -152,7 +152,7 @@ int sphinx_n_best_m(int n) {
 	close(temp);
 
 	//File to write results into. 
-	FILE *results = fopen("results.txt", "w");
+	FILE *results = fopen("./src/nlu_pipeline/src/speech/data/recording/results.txt", "w");
 
 	if (!results){
 		printf("Error creating results file!");

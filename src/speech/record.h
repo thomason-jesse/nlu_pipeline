@@ -26,10 +26,6 @@ int initMic();
 //Cleans up mic resources. 
 void closeMic(); 
 
-/*Records mono audio at 1600Hz, little endian and
-  outputs it to a file fout. */
-int record1600Hz(const char *fout); 
-
 /*Records mono audio at 1600Hz, little endian 
   and uses sphinx directly to recognize it. 
   The recognized utterance is written to a file. */
