@@ -73,6 +73,7 @@ parker :- N : peggy
 walter :- N : walter
 walter ward :- N : walter
 ward :- N : walter
+supervisor :- N : walter
 3516 :- N : l3_516
 3508 :- N : l3_508
 3512 :- N : l3_512

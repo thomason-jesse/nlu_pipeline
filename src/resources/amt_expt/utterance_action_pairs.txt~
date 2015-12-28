@@ -6,10 +6,6 @@ check frannie's office for eve
 M : searchroom(eve,the(lambda x:e.(hasoffice(frannie,x))))
 searchroom(eve,l3_510)
 
-search for carol in mallory's office
-M : searchroom(carol,the(lambda x:e.(hasoffice(mallory,x))))
-searchroom(carol,l3_508)
-
 bring chips to george
 M : bring(chips,george)
 bring(chips,george)

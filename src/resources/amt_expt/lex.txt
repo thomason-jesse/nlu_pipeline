@@ -38,6 +38,11 @@ a :- (N/N)/(N/N) : lambda P:<e,t>.(P)
 a :- N/N : lambda x:e.(x)
 
 #atoms
+chips :- N : chips
+coffee :- N : coffee
+hamburger :- N : hamburger
+juice :- N : juice
+muffin :- N : muffin
 alice :- N : alice
 alice ashcraft :- N : alice
 ashcraft :- N : alice
