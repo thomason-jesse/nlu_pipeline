@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-__author__ = 'jesse'
+__author__ = 'aishwarya'
 
 import sys
 import Ontology
@@ -10,8 +10,10 @@ import KBGrounder
 import Parser
 import Generator
 import DialogAgent
+import StaticDialogPolicy
 import numpy, re
 
+from PomdpStaticDialogPolicy import PomdpStaticDialogPolicy
 from PomdpDialogAgent import PomdpDialogAgent
 from Utils import *
 
