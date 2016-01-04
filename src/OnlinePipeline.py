@@ -28,10 +28,10 @@ class InputFromSocket:
     def get(self):
         try :
             text = self.socket.recv(MAX_BUFFER_SIZE)
+            print 'Received: ', text
             text = text.lower()
             regex = re.compile('[\?\.,\;\:]')
             text = regex.sub('', text)
-            print 'Received: ', text 
             print 'Press enter'
             x = raw_input()
             return text 
@@ -103,7 +103,8 @@ def listen(agent) :
     print 'Creating server socket'
     # create a socket object
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
-    host = 'localhost'
+    server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    host = '128.83.120.240'
     port = 9999                                           
     server_socket.bind((host, port))                                  
     server_socket.listen(MAX_OUTSTANDING_REQUESTS)                                           
@@ -113,6 +114,9 @@ def listen(agent) :
         # establish a connection
         client_socket,addr = server_socket.accept()      
         print("Received connection from %s" % str(addr))
+        print 'Waiting for hello'
+        text = client_socket.recv(MAX_BUFFER_SIZE)
+        print 'Received: ', text
         u_in = InputFromSocket(client_socket)
         u_out = OutputToSocket(client_socket)
         agent.input = u_in
