@@ -12,125 +12,122 @@ import Generator
 import DialogAgent
 import StaticDialogPolicy
 import numpy, re
+import socket
 
 from PomdpStaticDialogPolicy import PomdpStaticDialogPolicy
 from PomdpDialogAgent import PomdpDialogAgent
 from Utils import *
 
-class InputFromKeyboard:
-    def __init__(self):
-        pass
+MAX_BUFFER_SIZE = 1024
+MAX_OUTSTANDING_REQUESTS = 10
+
+class InputFromSocket:
+    def __init__(self, socket):
+        self.socket = socket
 
     def get(self):
-        text = raw_input()
-        text = text.lower()
-        regex = re.compile('[\?\.,\;\:]')
-        text = regex.sub('', text)
-        return text 
+        try :
+            text = self.socket.recv(MAX_BUFFER_SIZE)
+            text = text.lower()
+            regex = re.compile('[\?\.,\;\:]')
+            text = regex.sub('', text)
+            print 'Received: ', text 
+            print 'Press enter'
+            x = raw_input()
+            return text 
+        except socket.error :
+            print 'Error receiving'
+            return '<ERROR/>'    
+        
 
-
-class OutputToStdout:
-    def __init__(self):
-        pass
+class OutputToSocket:
+    def __init__(self, socket):
+        self.socket = socket
 
     def say(self, s):
-        print "SYSTEM: "+s
+        try :
+            print 'Sending: ', s
+            print 'Press enter'
+            x = raw_input()
+            self.socket.send(s)
+        except socket.error :
+            print 'Error sending'
+            return '<ERROR/>'
+
 
 # Fixing the random seed for debugging
 #numpy.random.seed(4)
 
-print "reading in Ontology"
-ont = Ontology.Ontology(sys.argv[1])
-print "predicates: " + str(ont.preds)
-print "types: " + str(ont.types)
-print "entries: " + str(ont.entries)
+def init_dialog_agent(args) :
+    print "Reading in Ontology"
+    ont = Ontology.Ontology(args[1])
+    print "predicates: " + str(ont.preds)
+    print "types: " + str(ont.types)
+    print "entries: " + str(ont.entries)
 
-print "reading in Lexicon"
-lex = Lexicon.Lexicon(ont, sys.argv[2])
-print "surface forms: " + str(lex.surface_forms)
-print "categories: " + str(lex.categories)
-print "semantic forms: " + str(lex.semantic_forms)
-print "entries: " + str(lex.entries)
+    print "Reading in Lexicon"
+    lex = Lexicon.Lexicon(ont, args[2])
+    print "surface forms: " + str(lex.surface_forms)
+    print "categories: " + str(lex.categories)
+    print "semantic forms: " + str(lex.semantic_forms)
+    print "entries: " + str(lex.entries)
 
-print "instantiating Feature Extractor"
-f_extractor = FeatureExtractor.FeatureExtractor(ont, lex)
+    print "Instantiating Feature Extractor"
+    f_extractor = FeatureExtractor.FeatureExtractor(ont, lex)
 
-print "instantiating Linear Learner"
-learner = LinearLearner.LinearLearner(ont, lex, f_extractor)
+    print "Instantiating Linear Learner"
+    learner = LinearLearner.LinearLearner(ont, lex, f_extractor)
 
-print "instantiating KBGrounder"
-grounder = KBGrounder.KBGrounder(ont)
+    print "Instantiating KBGrounder"
+    grounder = KBGrounder.KBGrounder(ont)
 
-print "instantiating Parser"
-parser = Parser.Parser(ont, lex, learner, grounder, beam_width=10)
-#parser = load_model('parser')
-grounder.parser = parser
-grounder.ontology = parser.ontology
+    print "Instantiating Parser"
+    parser = Parser.Parser(ont, lex, learner, grounder, beam_width=10)
+    parser = load_model('parser')
+    grounder.parser = parser
+    grounder.ontology = parser.ontology
 
-#print '\n\n', predicate_holds('room', 'l3_432', grounder), '\n\n'
+    print "Instantiating DialogAgent"
+    agent = PomdpDialogAgent(parser, grounder, None, None)
 
-print "instantiating Generator"
-generator = Generator.Generator(ont, lex, learner, parser, beam_width=100)
-#print "testing Generator:"
-#while True:
-#    s = raw_input()
-#    if s == 'stop':
-#        break
-#    form = lex.read_semantic_form_from_str(s, None, None, [])
-#    token_responses = generator.reverse_parse_semantic_form(form, k=3, n=1)
-#    print "token responses: "+str(token_responses)
+    #print "reading in data and training parser from actions"
+    #D = agent.read_in_utterance_action_pairs(args[3])
+    #converged = agent.train_parser_from_utterance_action_pairs(D, epochs=10, parse_beam=30)
+    #print "theta: "+str(parser.learner.theta)
+    #save_model(parser, 'parser')
+    #print 'Parser ontology : ', parser.ontology.preds
 
-print "instantiating DialogAgent"
-u_in = InputFromKeyboard()
-u_out = OutputToStdout()
-#static_policy = StaticDialogPolicy.StaticDialogPolicy()
-#A = DialogAgent.DialogAgent(parser, grounder, static_policy, u_in, u_out)
-A = PomdpDialogAgent(parser, grounder, u_in, u_out)
+    return agent
 
-print "reading in data and training parser from actions"
-D = A.read_in_utterance_action_pairs(sys.argv[3])
-converged = A.train_parser_from_utterance_action_pairs(D, epochs=10, parse_beam=30)
-print "theta: "+str(parser.learner.theta)
-save_model(parser, 'parser')
-#print 'Parser ontology : ', parser.ontology.preds
+def listen(agent) :
+    print 'Creating server socket'
+    # create a socket object
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
+    host = 'localhost'
+    port = 9999                                           
+    server_socket.bind((host, port))                                  
+    server_socket.listen(MAX_OUTSTANDING_REQUESTS)                                           
+    print '\n\nDialog agent listening on ' + str(host) + ':' + str(port)
 
-# Testing typechecking
-#idx = grounder.ontology.preds.index('ray')
-#person_idx = grounder.ontology.preds.index('person')
-#child = SemanticNode(None, 9, 15, False, idx)
-#parent = SemanticNode(None, 9, 15, False, person_idx, children=[child])
-#child.parent = parent  
-#print "Grounding ", parser.print_parse(parent)
-#g = grounder.groundSemanticNode(parent, [], [], [])
-#answers = grounder.grounding_to_answer_set(g)
-#print 'answers = ', answers
-#print '--------------------------------'
-#print predicate_holds('person', 'ray', grounder)
-#print predicate_holds('person', 'l3_512', grounder)
-#print predicate_holds('room', 'ray', grounder)
-#print predicate_holds('room', 'l3_512', grounder)
-#sys.exit(1)
+    while True :
+        # establish a connection
+        client_socket,addr = server_socket.accept()      
+        print("Received connection from %s" % str(addr))
+        u_in = InputFromSocket(client_socket)
+        u_out = OutputToSocket(client_socket)
+        agent.input = u_in
+        agent.output = u_out
+        run_dialog(agent, u_in, u_out)
+        client_socket.close()
 
-
-while True:
-    A.first_turn = True
-    success = A.run_dialog()
+def run_dialog(agent, u_in, u_out) :
+    agent.first_turn = True
+    success = agent.run_dialog()
     if not success :
-        u_out.say("I'm sorry I could not help you. Do you want to try another dialogue? (y/n) : ")
-        response = u_in.get()   
-        if response.lower() == 'n' or response.lower() == 'no' :
-            break
+        u_out.say("I'm sorry I could not help you.")
     else :
-        u_out.say("Do you want to try another dialogue? (y/n) : ")
-        response = u_in.get()   
-        if response.lower() == 'n' or response.lower() == 'no' :
-            break 
-
-#print "testing Generator:"
-#while True:
-#    s = raw_input()
-#    if s == 'stop':
-#        break
-#    form = lex.read_semantic_form_from_str(s, None, None, [])
-#    token_responses = generator.reverse_parse_semantic_form(form, k=3, n=3)
-#    print "token responses: "+str(token_responses)
+        u_out.say("Happy to help!")
+        
+if __name__ == '__main__' :
+    agent = init_dialog_agent(sys.argv)
+    listen(agent)

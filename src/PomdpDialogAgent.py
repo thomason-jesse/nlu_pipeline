@@ -49,11 +49,14 @@ class PomdpDialogAgent :
                 output = self.generator.get_action_sentence(action)
                 self.output.say(output)
                 self.output.say("Was this the correct action? (y/n) : ")
-                response = self.input.get().lower()    
+                response = self.input.get().lower()  
+                if response == '<ERROR/>' :
+                    return False  
                 if response.lower() == 'y' or response.lower() == 'yes' :
                     self.policy.update_final_reward(self.knowledge.correct_action_reward)
                 else :
                     self.policy.update_final_reward(self.knowledge.wrong_action_reward)
+                    return False
                 return True
             else :
                 self.previous_system_action = dialog_action_arg
@@ -61,19 +64,21 @@ class PomdpDialogAgent :
                 #print str(self.previous_system_action)
                 # Take the dialog action
                 response = self.dialog_action_functions[self.dialog_actions.index(dialog_action)]()
+                if response == '<ERROR/>' :
+                    return False
                 if response == 'stop' :
                     self.policy.update_final_reward(self.knowledge.wrong_action_reward)
                     return False
                 # Belief monitoring - update belief based on the response
                 self.update_state(response)
-                print 'Belief state: ', str(self.state) 
+                #print 'Belief state: ', str(self.state) 
                 
                 reward = self.knowledge.per_turn_reward
                 summary_state = SummaryState(self.state)
                 # Get the next action from the policy
                 (dialog_action, dialog_action_arg) = self.policy.get_next_action(reward, summary_state)
-                print 'dialog_action = ', dialog_action
-                print str(dialog_action_arg)
+                #print 'dialog_action = ', dialog_action
+                #print str(dialog_action_arg)
             self.first_turn = False
         
     # Request the user to state/repeat their goal
@@ -180,7 +185,7 @@ class PomdpDialogAgent :
             params = dict()
             params[param_name] = None
             utterance = Utterance('inform', goal, params)      
-            print '\n'
+            #print '\n'
             return [utterance]
         
         #print 'Neither affirm nor deny'
@@ -307,8 +312,8 @@ class PomdpDialogAgent :
         return merged_utterances    
             
     def get_n_best_utterances_from_parses(self, n_best_parses) :
-        print "In get_n_best_utterances_from_parses"
-        print "No of parses = ", len(n_best_parses)
+        #print "In get_n_best_utterances_from_parses"
+        #print "No of parses = ", len(n_best_parses)
         sum_exp_conf = 0.0
         self.n_best_utterances = []
         N = self.parser.beam_width
@@ -343,9 +348,9 @@ class PomdpDialogAgent :
         for utterance in self.n_best_utterances :
             utterance.parse_prob /= sum_exp_conf
             
-        print "N-best utterances: "
-        for utterance in self.n_best_utterances :
-            print str(utterance)
+        #print "N-best utterances: "
+        #for utterance in self.n_best_utterances :
+            #print str(utterance)
 
     def read_in_utterance_action_pairs(self, fname):
         f = open(fname, 'r')

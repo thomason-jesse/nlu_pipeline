@@ -9,6 +9,8 @@ class TemplateBasedGenerator :
         pass
     
     def get_param(self, system_action, param_name) :
+        if system_action.referring_params is None :
+            return None
         if param_name in system_action.referring_params :
             return system_action.referring_params[param_name]
         else :
