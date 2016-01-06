@@ -19,7 +19,7 @@ from Utils import *
 
 from std_msgs.msg import String
 from Queue import Queue, Empty
-from threading import Lock
+from threading import Lock, Thread
 
 MAX_BUFFER_SIZE = 1024
 MAX_WAITING_USERS = 100
@@ -144,6 +144,9 @@ class OutputToTopic:
         self.msg = None
         self.seq_no = 0
         self.input_from_topic = input_from_topic
+        self.publish_thread = Thread(target=self.publish, args=())
+        self.publish_thread.daemon = True
+        self.publish_thread.start()
 
     def say(self, response):
         if self.logging_enabled :
@@ -151,6 +154,7 @@ class OutputToTopic:
             f = open(filename, 'a')
             f.write('ROBOT: ' + response + '\n')
             f.close()
+        print 'Going to publish: ', response
         self.msg = str(self.seq_no) + '|' + self.input_from_topic.last_get + '|' + response
         self.seq_no += 1
 
@@ -223,6 +227,7 @@ def start(agent) :
             agent.input = u_in
             agent.output = u_out
             run_dialog(agent, u_in, u_out)
+            print 'Waiting for a new user '
 
 def run_dialog(agent, u_in, u_out) :
     agent.first_turn = True

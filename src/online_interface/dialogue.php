@@ -223,8 +223,27 @@
 		//draw a new task to display; updates task variables and displays new description
 		drawRandomDeliverTask();
 		
-		//callPhp('create_socket', [], onCreateSocket, generalError)
-        callPhp('receive', [socket], invokeDialogAgentOutput, invokeDialogAgentError)
+		// Set up a subscriber to listen to the dialog agent
+        subscriber = new ROSLIB.Topic({
+                            ros : ros,
+                            name : 'python_pub_' + user_id,
+                            messageType : 'std_msgs/String'
+                        });
+
+        subscriber.subscribe(dialogResponseReceiver);
+        alert('Subscriber created');
+        
+        // Publish id continuously 
+        publisher = new ROSLIB.Topic({
+                        ros : ros,
+                        name : '/new_user_topic',
+                        messageType : 'std_msgs/String'
+                    });
+        publish_msg = user_id
+        publishing = true;
+        setInterval(publish, 100);        
+        alert('Publishing started');
+        
         
 		return false;
 	}
@@ -269,6 +288,7 @@
 	//run when the user submits a new response to the system
 	function getDialogResponse(form)
 	{
+        //alert('In getDialogResponse, current_task =  ' + current_task);
 		//get user input and clear text box
 		var user_input_raw = form.user_input_box.value;
 		form.user_input_box.value = '';
@@ -301,22 +321,33 @@
 		system_name_cell.innerHTML = "ROBOT";
 		system_name_cell.style.backgroundColor = system_cell_color;
 
-		// Set up a subscriber to listen to the dialog agent
-        subscriber = new ROSLIB.Topic({
+        if (current_task == 'query') {
+            //submit php request
+            getRequest(
+              'query_validation.php', // URL for the PHP file
+              'task='.concat(current_task).concat('&user_input=').concat(user_input).concat('&user_id=').concat(user_id), // parameters for PHP
+               invokeDialogAgentOutput,  // handle successful request
+               invokeDialogAgentError    // handle error
+            );
+        } else {
+            // Set up a subscriber to listen to the dialog agent
+            subscriber = new ROSLIB.Topic({
+                                ros : ros,
+                                name : 'python_pub_' + user_id,
+                                messageType : 'std_msgs/String'
+                            }); // This is probably unnecessary
+            subscriber.subscribe(dialogResponseReceiver);
+            
+            // Publish user response
+            publisher = new ROSLIB.Topic({
                             ros : ros,
-                            name : 'python_pub_' + user_id,
+                            name : 'js_pub_' + user_id,
                             messageType : 'std_msgs/String'
-                        }); // This is probably unnecessary
-        subscriber.subscribe(dialogResponseReceiver);
-        
-        // Publish user response
-        publisher = new ROSLIB.Topic({
-                        ros : ros,
-                        name : 'js_pub_' + user_id,
-                        messageType : 'std_msgs/String'
-                    });
-        publish_msg = seq_no + '|' + user_input
-        publishing = true;     
+                        });
+            publish_msg = seq_no + '|' + user_input
+            seq_no = seq_no + 1;
+            publishing = true;     
+        }
 	}
 
 	// handles drawing an error message
@@ -324,7 +355,7 @@
 		alert('DEBUG: there was an error calling dialog_agent.php');
 	}
 
-    function dialogResponseReceiver() {
+    function dialogResponseReceiver(msg) {
         text = msg.data;
         if (text.indexOf('|') <= -1) {
             alert('Malformed string');
@@ -340,16 +371,18 @@
             // Since js does not have a lock, this could be a problem. 
             subscriber.unsubscribe();
             subscriber_prev_msg = text;
-            alert('Received ' + text);
+            //alert('Received ' + text);
             var parts = text.split('|');
+            //alert('parts = ' + parts);
             var response_text = parts[1] + '\n' + parts[2];
+            //alert('response_text = ' + response_text);
             invokeDialogAgentOutput(response_text);
         }
     }
 
 	// handles the response, adds the html
 	function invokeDialogAgentOutput(response_text) {
-        alert('In invokeDialogAgentOutput: Response = ' + response);
+        alert('In invokeDialogAgentOutput: Response = ' + response_text);
 		//alert('DEBUG: output from php:\n'.concat(response_text));
 	
 		//split input and output from php response

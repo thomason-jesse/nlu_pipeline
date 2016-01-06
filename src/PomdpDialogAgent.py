@@ -47,8 +47,7 @@ class PomdpDialogAgent :
                 action = dialog_action_arg
                 #self.output.say("Action: " + str(action))
                 output = self.generator.get_action_sentence(action)
-                self.output.say(output)
-                self.output.say("Was this the correct action? (y/n) : ")
+                self.output.say(output + " Was this the correct action?")
                 response = self.input.get().lower()  
                 if response == '<ERROR/>' :
                     return False  
@@ -60,8 +59,8 @@ class PomdpDialogAgent :
                 return True
             else :
                 self.previous_system_action = dialog_action_arg
-                #print 'System action - '
-                #print str(self.previous_system_action)
+                print 'System action - '
+                print str(self.previous_system_action)
                 # Take the dialog action
                 response = self.dialog_action_functions[self.dialog_actions.index(dialog_action)]()
                 if response == '<ERROR/>' :
@@ -86,6 +85,7 @@ class PomdpDialogAgent :
         if self.first_turn :
             self.previous_system_action.extra_data = ['first']
         output = self.generator.get_sentence(self.previous_system_action)
+        print 'output = ', output
         self.output.say(output)
         response = self.input.get()
         return response

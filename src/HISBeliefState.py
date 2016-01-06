@@ -214,10 +214,12 @@ class HISBeliefState:
                 invalid_beliefs.add((partition, utterance))
                 
         for key in invalid_beliefs :
-            del self.hypothesis_beliefs[key]
+            if key in self.hypothesis_beliefs :
+                del self.hypothesis_beliefs[key]
         
         for partition in invalid_partitions :
-            self.partitions.remove(partition)    
+            if partition in self.partitions : 
+                self.partitions.remove(partition)    
         
             
             
