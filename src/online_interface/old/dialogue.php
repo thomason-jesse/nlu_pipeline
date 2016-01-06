@@ -4,9 +4,6 @@
 <TITLE>Robot Language Grounding</TITLE>
 <META http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
-<script type="text/javascript" src="http://cdn.robotwebtools.org/EventEmitter2/current/eventemitter2.min.js"></script>
-<script type="text/javascript" src="http://cdn.robotwebtools.org/roslibjs/current/roslib.min.js"></script>
-
 <SCRIPT LANGUAGE="JavaScript" >
 
 	var train_or_test = "train";
@@ -18,38 +15,7 @@
 	var user_cell_color = 'AliceBlue';
 	var system_cell_color = 'GhostWhite';
 
-    // Set up rosbridge connecton
-    var ros = new ROSLIB.Ros({
-        url : 'ws://localhost:9090'
-    });
-
-    ros.on('connection', function() {
-        console.log('Connected to websocket server.');
-        alert('Connected to websocket server.');
-    });
-
-    ros.on('error', function(error) {
-        console.log('Error connecting to websocket server: ', error);
-        alert('Error connecting to websocket server: ' + error);
-    });
-
-    ros.on('close', function() {
-        console.log('Connection to websocket server closed.');
-        alert.log('Connection to websocket server closed.');
-    });
-
-    // These will point to different topics as the dialogue progresses
-    var publisher = null;
-    var subscriber = null;
-    
-    // Global variables to talk to the publisher
-    var publish_msg = null;
-    var publish_interval = 100;
-    var publishing = false;
-    var seq_no = 0;
-    
-    // Global variables for subscriber
-    var subscriber_prev_msg = null;
+    var socket = NULL;
 
 	//draw a random walk task and return the description to javascript; write the task goal to file for later comparison against command generated
 	function drawRandomWalkTask()
@@ -111,7 +77,6 @@
 	
 		var task_description_text = document.getElementById('task_description_text');
 		task_description_text.innerHTML = response_text;
-
 	}
 	
 	// handles drawing an error message
@@ -119,21 +84,10 @@
 		alert('DEBUG: there was an error calling draw_random_task.php');
 	}
     
-    // Publish the current message 
-    function publish() {
-       if (publisher !== null && publish_msg !== null && publishing) {
-            var msg = new ROSLIB.Message({
-                data : publish_msg
-            });
-            //alert('Publishing ' + publish_msg);
-            publisher.publish(msg);
-       }
-    }
-    
     //run to start a dialog with the system for a new user
 	function startDialog()
 	{
-		alert('DEBUG: startDialog() called');
+		//alert('DEBUG: startDialog() called');
 		
 		//hide start div and open dialog div
 		document.getElementById('dialog_start_block').style.display = 'none';
@@ -152,28 +106,16 @@
 		system_name_cell.innerHTML = "ROBOT";
 		system_name_cell.style.backgroundColor = system_cell_color;
         
-        alert('ros = ' + ros + ' user_id = ' + user_id);
-
-        // Set up a subscriber to listen to the dialog agent
-        subscriber = new ROSLIB.Topic({
-                            ros : ros,
-                            name : 'python_pub_' + user_id,
-                            messageType : 'std_msgs/String'
-                        });
-
-        subscriber.subscribe(dialogResponseReceiver);
-        alert('Subscriber created');
-        
-        // Publish id continuously 
-        publisher = new ROSLIB.Topic({
-                        ros : ros,
-                        name : '/new_user_topic',
-                        messageType : 'std_msgs/String'
-                    });
-        publish_msg = user_id
-        publishing = true;
-        setInterval(publish, 100);        
-        alert('Publishing started');
+        //alert('Before calling create_socket');
+        //callPhp('create_socket', [], onCreateSocket, generalError);
+        //alert('After caling create_socket, before receive');
+        callPhp('receive', [socket], invokeDialogAgentOutput, invokeDialogAgentError);
+        //getRequest(
+		  //'dialog_agent.php', // URL for the PHP file
+		  //'task='.concat(current_task).concat('&user_input=').concat(user_input).concat('&user_id=').concat(user_id), // parameters for PHP
+		   //invokeDialogAgentOutput,  // handle successful request
+		   //invokeDialogAgentError    // handle error
+		//);
         
 		return false;
 	}
@@ -301,55 +243,46 @@
 		system_name_cell.innerHTML = "ROBOT";
 		system_name_cell.style.backgroundColor = system_cell_color;
 
-		// Set up a subscriber to listen to the dialog agent
-        subscriber = new ROSLIB.Topic({
-                            ros : ros,
-                            name : 'python_pub_' + user_id,
-                            messageType : 'std_msgs/String'
-                        }); // This is probably unnecessary
-        subscriber.subscribe(dialogResponseReceiver);
+		//submit php request
+		getRequest(
+		  'dialog_agent.php', // URL for the PHP file
+		  'task='.concat(current_task).concat('&user_input=').concat(user_input).concat('&user_id=').concat(user_id), // parameters for PHP
+		   invokeDialogAgentOutput,  // handle successful request
+		   invokeDialogAgentError    // handle error
+		);
         
-        // Publish user response
-        publisher = new ROSLIB.Topic({
-                        ros : ros,
-                        name : 'js_pub_' + user_id,
-                        messageType : 'std_msgs/String'
-                    });
-        publish_msg = seq_no + '|' + user_input
-        publishing = true;     
+        callPhp('send', [user_input, socket], saveSocketAfterSend, generalError)
+        callPhp('receive', [socket], invokeDialogAgentOutput, invokeDialogAgentError)
 	}
 
 	// handles drawing an error message
 	function invokeDialogAgentError () {
 		alert('DEBUG: there was an error calling dialog_agent.php');
 	}
-
-    function dialogResponseReceiver() {
-        text = msg.data;
-        if (text.indexOf('|') <= -1) {
-            alert('Malformed string');
+    
+    function saveSocketAfterSend(response) {
+        if (response_obj[0] != '') {
+            alert('Error: ' + response_obj[0]);
             return;
         }
-        
-        if (publish_msg === user_id) {
-            // This is for the first response of a task. Stop publishing id
-            publishing = false;
-        }
-        
-        if (text !== subscriber_prev_msg) {
-            // Since js does not have a lock, this could be a problem. 
-            subscriber.unsubscribe();
-            subscriber_prev_msg = text;
-            alert('Received ' + text);
-            var parts = text.split('|');
-            var response_text = parts[1] + '\n' + parts[2];
-            invokeDialogAgentOutput(response_text);
-        }
+        socket = response_obj[2];
     }
 
 	// handles the response, adds the html
-	function invokeDialogAgentOutput(response_text) {
+	function invokeDialogAgentOutput(response) {
         alert('In invokeDialogAgentOutput: Response = ' + response);
+        var response_obj = eval(response)
+        alert('In invokeDialogAgentOutput: response_obj = ' + response_obj);
+        if (response_obj[0] != '') {
+            alert('Error: ' + response_obj[0]);
+            return;
+        }
+        //alert(response_obj[1]);
+        var response_text = response_obj[1];
+        alert('response_text = ' + response_text);
+        
+        socket = response_obj[2];
+    
 		//alert('DEBUG: output from php:\n'.concat(response_text));
 	
 		//split input and output from php response
@@ -382,7 +315,7 @@
 		}
 		
 		//if the dialog has concluded
-		if (system_output[system_output.length-1] == "<END/>")
+		if (system_output[system_output.length-1] == "Happy to help")
 		{
 			//hide the table's final row (the one with the form for input)
 			
