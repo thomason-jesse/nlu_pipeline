@@ -25,7 +25,7 @@
 
     ros.on('connection', function() {
         console.log('Connected to websocket server.');
-        alert('Connected to websocket server.');
+        //alert('Connected to websocket server.');
     });
 
     ros.on('error', function(error) {
@@ -133,7 +133,7 @@
     //run to start a dialog with the system for a new user
 	function startDialog()
 	{
-		alert('DEBUG: startDialog() called');
+		//alert('DEBUG: startDialog() called');
 		
 		//hide start div and open dialog div
 		document.getElementById('dialog_start_block').style.display = 'none';
@@ -152,7 +152,7 @@
 		system_name_cell.innerHTML = "ROBOT";
 		system_name_cell.style.backgroundColor = system_cell_color;
         
-        alert('ros = ' + ros + ' user_id = ' + user_id);
+        //alert('ros = ' + ros + ' user_id = ' + user_id);
 
         // Set up a subscriber to listen to the dialog agent
         subscriber = new ROSLIB.Topic({
@@ -162,7 +162,7 @@
                         });
 
         subscriber.subscribe(dialogResponseReceiver);
-        alert('Subscriber created');
+        //alert('Subscriber created');
         
         // Publish id continuously 
         publisher = new ROSLIB.Topic({
@@ -173,7 +173,7 @@
         publish_msg = user_id
         publishing = true;
         setInterval(publish, 100);        
-        alert('Publishing started');
+        //alert('Publishing started');
         
 		return false;
 	}
@@ -197,7 +197,7 @@
 		//alert('DEBUG: startSecondDialog() called');
 		
 		//change map
-		document.getElementById('task_map').innerHTML = "<b>DIRECTORY</b><p><img src=\"map_dir_serve.png\" alt=\"GDC Third Floor\" style=\"width:100%\"></p>";
+		document.getElementById('task_map').innerHTML = "<b>DIRECTORY</b><p><img src=\"bring_task_data.png\" alt=\"People and items known to robot\" style=\"width:60%\"></p>";
 		
 		//hide start div and clear dialog table of past conversation
 		document.getElementById('second_dialog_start_block').style.display = 'none';
@@ -231,7 +231,7 @@
                         });
 
         subscriber.subscribe(dialogResponseReceiver);
-        alert('Subscriber created');
+        //alert('Subscriber created');
         
         // Publish id continuously 
         publisher = new ROSLIB.Topic({
@@ -242,7 +242,7 @@
         publish_msg = user_id
         publishing = true;
         setInterval(publish, 100);        
-        alert('Publishing started');
+        //alert('Publishing started');
         
         
 		return false;
@@ -253,7 +253,7 @@
 		//alert('DEBUG: startThirdDialog() called');
 		
 		//change map
-		document.getElementById('task_map').innerHTML = "<b>DIRECTORY</b><p><img src=\"map_dir_walk.png\" alt=\"GDC Third Floor\" style=\"width:100%\"></p>";
+		document.getElementById('task_map').innerHTML = "<b>DIRECTORY</b><p><img src=\"directory.png\" alt=\"Rooms, offices and labs\" style=\"width:100%\"></p>";
 		
 		//hide start div and clear dialog table of past conversation
 		document.getElementById('third_dialog_start_block').style.display = 'none';
@@ -382,7 +382,7 @@
 
 	// handles the response, adds the html
 	function invokeDialogAgentOutput(response_text) {
-        alert('In invokeDialogAgentOutput: Response = ' + response_text);
+        //alert('In invokeDialogAgentOutput: Response = ' + response_text);
 		//alert('DEBUG: output from php:\n'.concat(response_text));
 	
 		//split input and output from php response
@@ -685,7 +685,7 @@ width:50%
 
 	<DIV ID="task_map" style="display:none">
 		<b>DIRECTORY</b>
-			<p><img src="map_dir_walk.png" alt="GDC Third Floor" style="width:100%"></p>
+			<p><img src="directory.png" alt="Rooms, labs and offices" style="width:60%"></p>
 	</DIV>
 	
 </DIV>
