@@ -33,7 +33,9 @@ class InputFromSpeechNode:
         self.waiting = True
 
     def callback(self, data):
-        self.utterance = data.data.split(";")[0]
+        
+        #Creates list of nbest hypotheses returned by Sphinx. 
+        self.utterance = data.data.split(";")
 
         self.waiting = False
 

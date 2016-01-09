@@ -20,7 +20,7 @@ class InputFromSpeech:
         import ctypes
 
         #Initialize variables. 
-        self.n = 5
+        self.n = 10
         self.path = "./src/nlu_pipeline/src/speech/"
         self.libHandle = ctypes.CDLL(self.path + "speechRecognizer.so")
 

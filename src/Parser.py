@@ -288,8 +288,24 @@ class Parser:
 
     # tokenizes str and passes it to a function to parse tokens
     def parse_expression(self, s, k=None, n=1, allow_UNK_E=True, generator_genlex=None):
-        tokens = self.tokenize(s)
-        return self.parse_tokens(tokens, k=k, n=n, allow_UNK_E=allow_UNK_E, generator_genlex=generator_genlex)
+        
+        bestParseList = None
+        maxScore = None
+
+        #Chooses list of parses which contains the top scoring parse. 
+        for string in s:
+            tokens = self.tokenize(string)
+            parses = self.parse_tokens(tokens, k=k, n=n, allow_UNK_E=allow_UNK_E, generator_genlex=generator_genlex)
+
+            for parse in parses:
+                if maxScore == None or parse[3] > maxScore:
+                    maxScore = parse[3]
+                    bestParseList = parses
+
+        if maxScore != 0:
+            print "NON_ZERO MAX SCORE!: ", maxScore
+
+        return bestParseList
 
     # given tokens, returns list of up to n [parse, parse tree, parse trace, score]
     # less than n returned if fewer than n full parses could be found
