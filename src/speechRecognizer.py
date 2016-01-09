@@ -47,7 +47,7 @@ class InputFromSpeech:
             else:
                 utterance += ' ' + word + ' '
 
-        return utterance
+        return utterance.lstrip().rstrip()
 
     def get(self):
         return self.getNBest(self.n)
