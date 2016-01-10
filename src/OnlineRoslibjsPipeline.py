@@ -13,6 +13,7 @@ import DialogAgent
 import StaticDialogPolicy
 import numpy, re, time, rospy
 
+from TemplateBasedGenerator import TemplateBasedGenerator
 from PomdpStaticDialogPolicy import PomdpStaticDialogPolicy
 from PomdpDialogAgent import PomdpDialogAgent
 from Utils import *
@@ -82,11 +83,12 @@ class InputFromTopic:
         self.last_get = ''  
 
     def get(self):
-        timeout = time.time() + 60*5 # Set a time for 5 min from now
+        print 'In get'
+        timeout_min = 2
+        timeout = time.time() + 60*timeout_min 
         while True :
             if time.time() > timeout :
-                print 'Error: No reply receeived in 5 minutes. Timing out'
-                return '<ERROR/>'    
+                raise RuntimeError('No reply received on websocket for ' + str(timeout_min) + ' minutes. Timing out.')
             try :
                 text = self.msg_queue.get_nowait() 
                 print 'Received: ', text
@@ -107,7 +109,7 @@ class InputFromTopic:
             
     
     def add_to_queue(self, msg) :
-        #print 'Received ', msg.data
+        #print 'Received ', msg.data, 'self.prev_msg = ', self.prev_msg
         if '|' not in msg.data :
             print 'Malformed message: ', msg.data
         elif self.prev_msg != msg.data :
@@ -171,7 +173,56 @@ class OutputToTopic:
 # Fixing the random seed for debugging
 #numpy.random.seed(4)
 
-def init_dialog_agent(args) :
+def init_static_dialog_agent(args) :
+    print "reading in Ontology"
+    ont = Ontology.Ontology(sys.argv[1])
+    print "predicates: " + str(ont.preds)
+    print "types: " + str(ont.types)
+    print "entries: " + str(ont.entries)
+
+    print "reading in Lexicon"
+    lex = Lexicon.Lexicon(ont, sys.argv[2])
+    print "surface forms: " + str(lex.surface_forms)
+    print "categories: " + str(lex.categories)
+    print "semantic forms: " + str(lex.semantic_forms)
+    print "entries: " + str(lex.entries)
+
+    print "instantiating Feature Extractor"
+    f_extractor = FeatureExtractor.FeatureExtractor(ont, lex)
+
+    print "instantiating Linear Learner"
+    learner = LinearLearner.LinearLearner(ont, lex, f_extractor)
+
+    print "instantiating KBGrounder"
+    grounder = KBGrounder.KBGrounder(ont)
+
+    print "instantiating Parser"
+    parser = Parser.Parser(ont, lex, learner, grounder, beam_width=10, safety=True)
+
+    print "instantiating Generator"
+    generator = Generator.Generator(ont, lex, learner, parser, beam_width=sys.maxint, safety=True)
+
+    print "instantiating DialogAgent"
+    static_policy = StaticDialogPolicy.StaticDialogPolicy()
+    A = DialogAgent.DialogAgent(parser, generator, grounder, static_policy, None, None)
+
+    print "reading in training data"
+    D = A.read_in_utterance_action_pairs(args[3])
+
+    if len(args) > 4 and args[4] == "both":
+        print "training parser and generator jointly from actions"
+        converged = A.jointly_train_parser_and_generator_from_utterance_action_pairs(
+            D, epochs=10, parse_beam=30, generator_beam=10)
+    else:
+        print "training parser from actions"
+        converged = A.train_parser_from_utterance_action_pairs(
+            D, epochs=10, parse_beam=30)
+
+    print "theta: "+str(parser.learner.theta)
+    
+    return A
+
+def init_pomdp_dialog_agent(args) :
     print "Reading in Ontology"
     ont = Ontology.Ontology(args[1])
     print "predicates: " + str(ont.preds)
@@ -212,7 +263,7 @@ def init_dialog_agent(args) :
 
     return agent
 
-def start(agent) :
+def start(pomdp_agent, static_agent) :
     # Set up the user manager which waits for users
     user_manager = UserManager()
     print 'Dialog agent ready'
@@ -220,24 +271,48 @@ def start(agent) :
     while True :
         user = user_manager.get_next_user()    
         if user is not None :
-            print 'Starting communication with user', user
-            # There is actually a user
-            u_in = InputFromTopic(user)
-            u_out = OutputToTopic(user, u_in)
-            agent.input = u_in
-            agent.output = u_out
-            run_dialog(agent, u_in, u_out)
-            print 'Waiting for a new user '
+            try :
+                print 'Starting communication with user', user
+                # There is actually a user
+                u_in = InputFromTopic(user)
+                u_out = OutputToTopic(user, u_in)
+                
+                # Randomly choose an agent
+                r = numpy.random.random_sample()
+                if r < 0.5 :    
+                    static_agent.input = u_in
+                    static_agent.output = u_out
+                    run_static_dialog(static_agent, u_in, u_out)
+                else :
+                    pomdp_agent.input = u_in
+                    pomdp_agent.output = u_out
+                    run_pomdp_dialog(pomdp_agent, u_in, u_out)
+                print 'Waiting for a new user '
+            except RuntimeError as e :
+                print 'Error : ', str(e)
+                print 'Waiting for a new user '
 
-def run_dialog(agent, u_in, u_out) :
+def run_static_dialog(agent, u_in, u_out) :
+    u_out.say("How can I help?")
+    s = u_in.get()
+    if s == 'stop':
+        return
+    a = agent.initiate_dialog_to_get_action(s)
+    response_generator = TemplateBasedGenerator()
+    print response_generator.get_action_sentence(a)
+    #u_out.say("Happy to help!")
+    u_out.say("<END/>")
+    
+def run_pomdp_dialog(agent, u_in, u_out) :
     agent.first_turn = True
     success = agent.run_dialog()
-    if not success :
-        u_out.say("I'm sorry I could not help you.")
-    else :
-        u_out.say("Happy to help!")
+    #if not success :
+        #u_out.say("I'm sorry I could not help you.")
+    #else :
+        #u_out.say("Happy to help!")
     u_out.say("<END/>")
         
 if __name__ == '__main__' :
-    agent = init_dialog_agent(sys.argv)
-    start(agent)
+    static_agent = init_static_dialog_agent(sys.argv)
+    pomdp_agent = init_pomdp_dialog_agent(sys.argv)
+    start(pomdp_agent, static_agent)  

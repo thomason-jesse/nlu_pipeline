@@ -13,7 +13,7 @@ import Generator
 import DialogAgent
 import StaticDialogPolicy
 import ActionSender
-
+from TemplateBasedGenerator import TemplateBasedGenerator
 
 class InputFromKeyboard:
     def __init__(self):
@@ -60,15 +60,15 @@ parser = Parser.Parser(ont, lex, learner, grounder, beam_width=10, safety=True)
 
 print "instantiating Generator"
 generator = Generator.Generator(ont, lex, learner, parser, beam_width=sys.maxint, safety=True)
-print "testing Generator:"
-while True:
-    s = raw_input()
-    if s == 'stop':
-        break
-    _, form = lex.read_syn_sem(s)
-    token_responses = generator.reverse_parse_semantic_form(form, n=1, c=1)
-    print "token responses: "+str(token_responses)
-generator.flush_seen_nodes()
+#print "testing Generator:"
+#while True:
+    #s = raw_input()
+    #if s == 'stop':
+        #break
+    #_, form = lex.read_syn_sem(s)
+    #token_responses = generator.reverse_parse_semantic_form(form, n=1, c=1)
+    #print "token responses: "+str(token_responses)
+#generator.flush_seen_nodes()
 
 print "instantiating DialogAgent"
 u_in = InputFromKeyboard()
@@ -79,15 +79,15 @@ A = DialogAgent.DialogAgent(parser, generator, grounder, static_policy, u_in, u_
 print "instantiating ActionSender"
 action_sender = ActionSender.ActionSender(lex, generator, u_out)
 
-while True:
-    u_out.say("How can I help?")
-    s = raw_input()
-    if s == 'stop':
-        break
-    a = A.initiate_dialog_to_get_action(s)
-    print "ACTION: "+str(a)
-    r = action_sender.take_action(a)
-    print "RESULT: "+str(r)
+#while True:
+    #u_out.say("How can I help?")
+    #s = raw_input()
+    #if s == 'stop':
+        #break
+    #a = A.initiate_dialog_to_get_action(s)
+    #print "ACTION: "+str(a)
+    #r = action_sender.take_action(a)
+    #print "RESULT: "+str(r)
 
 print "reading in training data"
 D = A.read_in_utterance_action_pairs(sys.argv[3])
@@ -103,22 +103,24 @@ else:
 
 print "theta: "+str(parser.learner.theta)
 
+response_generator = TemplateBasedGenerator()
+
 while True:
     u_out.say("How can I help?")
     s = raw_input()
     if s == 'stop':
         break
     a = A.initiate_dialog_to_get_action(s)
-    print "ACTION: "+str(a)
-    r = action_sender.take_action(a)
-    print "RESULT: "+str(r)
+    print response_generator.get_action_sentence(a)
+    #r = action_sender.take_action(a)
+    #print "RESULT: "+str(r)
 
-print "testing Generator:"
-while True:
-    s = raw_input()
-    if s == 'stop':
-        break
-    _, form = lex.read_syn_sem(s)
-    token_responses = generator.reverse_parse_semantic_form(form, n=1)
-    print "token responses: "+str(token_responses)
+#print "testing Generator:"
+#while True:
+    #s = raw_input()
+    #if s == 'stop':
+        #break
+    #_, form = lex.read_syn_sem(s)
+    #token_responses = generator.reverse_parse_semantic_form(form, n=1)
+    #print "token responses: "+str(token_responses)
 

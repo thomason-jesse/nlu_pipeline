@@ -74,9 +74,9 @@ class TemplateBasedGenerator :
             elif system_action.referring_goal == 'at' :
                 location = self.get_param(system_action, 'location')
                 if location is not None :
-                    return 'You want me to go to room ' + location + '?'
+                    return 'You want me to walk to room ' + location + '?'
                 else :    
-                    return 'You want me to go somewhere?'
+                    return 'You want me to walk to somewhere?'
             else :
                 goal = system_action.referring_goal
                 params = [str(param) for param in system_action.referring_params.values()]

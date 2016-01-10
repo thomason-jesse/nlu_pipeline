@@ -5,7 +5,8 @@ import copy
 import sys
 import Action
 import StaticDialogState
-
+from TemplateBasedGenerator import TemplateBasedGenerator
+from SystemAction import SystemAction
 
 class DialogAgent:
 
@@ -23,14 +24,16 @@ class DialogAgent:
         self.dialog_actions = ["repeat_goal", "confirm_action", "request_missing_param"]
         self.dialog_action_functions = [self.request_user_initiative, self.confirm_action, self.request_missing_param]
 
+        self.response_generator = TemplateBasedGenerator()
+
     # initiate a new dialog with the agent with initial utterance u
     def initiate_dialog_to_get_action(self, u):
-        # print "Function call succeeded"         
+        print "Function call succeeded"         
 
         self.state = StaticDialogState.StaticDialogState()
-        # print "Created state"
+        print "Created state"
         self.update_state_from_user_initiative(u)
-        # print "Updated state"
+        print "Updated state"
 
         # select next action from state
         action = None
@@ -51,7 +54,8 @@ class DialogAgent:
 
     # request the user repeat their original goal
     def request_user_initiative(self, args):
-        self.output.say("Can you restate your question or command?")
+        #self.output.say("Can you restate your question or command?")
+        self.output.say("I\'m sorry but could you clarify again what you wanted me to do?")
         u = self.input.get()
         self.update_state_from_user_initiative(u)
 
@@ -67,7 +71,28 @@ class DialogAgent:
             theme = "location"
         else:
             sys.exit("ERROR: unrecognized theme idx "+str(idx))
-        self.output.say("What is the " + theme + " of the action you'd like me to take?")
+        #self.output.say("What is the " + theme + " of the action you'd like me to take?")
+        
+        # Using a bad approximation to generate an understandable prompt
+        max_belief_action = ''
+        if 'bring' in self.state.user_action_belief and 'at' in self.state.user_action_belief :
+            if self.state.user_action_belief['bring'] > self.state.user_action_belief['at'] :
+                max_belief_action = 'bring'
+            else :
+                max_belief_action = 'at'
+        elif 'bring' in self.state.user_action_belief :
+            max_belief_action = 'bring'
+        else :
+            max_belief_action = 'at'
+        
+        if max_belief_action == 'bring' :
+            if idx == 0:
+                self.output.say("What should I bring?")
+            elif idx == 1:
+                self.output.say("Whom should I bring something for?")    
+        else :
+            self.output.say("Where should I walk to?")
+        
         u = self.input.get()
         self.update_state_from_missing_param(u, idx)
 
@@ -97,8 +122,28 @@ class DialogAgent:
         a = args[0]
         # with reverse parsing, want to confirm(a.name(a.params))
         # for now, just use a.name and a.params raw
-        self.output.say("I should take action " + a.name+" involving " +
+
+        #self.output.say("I should take action " + a.name+" involving " +
+                        #','.join([str(p) for p in a.params if p is not None]) + "?")
+        
+        system_action = SystemAction('confirm_action', a.name)
+        system_action.referring_params = dict()
+        if a.name == 'bring' :
+            if len(a.params) > 0 :
+                system_action.referring_params['patient'] = a.params[0]
+            if len(a.params) > 1 :
+                system_action.referring_params['recipient'] = a.params[1]
+            response = self.response_generator.get_sentence(system_action)    
+            self.output.say(response)
+        elif a.name == 'at' :
+            if len(a.params) > 0 :
+                system_action.referring_params['location'] = a.params[0]
+            response = self.response_generator.get_sentence(system_action)    
+            self.output.say(response)
+        else :
+            self.output.say("I should take action " + a.name+" involving " +
                         ','.join([str(p) for p in a.params if p is not None]) + "?")
+                        
         c = self.input.get()
         self.update_state_from_action_confirmation(c, a)
 

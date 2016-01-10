@@ -197,7 +197,7 @@
 		//alert('DEBUG: startSecondDialog() called');
 		
 		//change map
-		document.getElementById('task_map').innerHTML = "<b>DIRECTORY</b><p><img src=\"bring_task_data.png\" alt=\"People and items known to robot\" style=\"width:60%\"></p>";
+		document.getElementById('task_map').innerHTML = "<b>DIRECTORY</b><p><img src=\"bring_task_data.png\" alt=\"People and items known to robot\" style=\"width:100%\"></p>";
 		
 		//hide start div and clear dialog table of past conversation
 		document.getElementById('second_dialog_start_block').style.display = 'none';
@@ -253,7 +253,7 @@
 		//alert('DEBUG: startThirdDialog() called');
 		
 		//change map
-		document.getElementById('task_map').innerHTML = "<b>DIRECTORY</b><p><img src=\"directory.png\" alt=\"Rooms, offices and labs\" style=\"width:100%\"></p>";
+		document.getElementById('task_map').innerHTML = "<b>DIRECTORY</b><p><img src=\"directory.png\" alt=\"Rooms, offices and labs\" style=\"width:60%\"></p>";
 		
 		//hide start div and clear dialog table of past conversation
 		document.getElementById('third_dialog_start_block').style.display = 'none';

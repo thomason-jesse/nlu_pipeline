@@ -23,5 +23,5 @@ M : at(l3_512)
 at(l3_512)
 
 walk to alice's office
-M : at(lambda x:e.(hasoffice(alice,x)))
-at(l3_502)
+M : at(the(lambda x:e.(hasoffice(alice,x))))
+at(l3_404)
