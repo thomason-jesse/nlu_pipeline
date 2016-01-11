@@ -1,0 +1,2 @@
+Remove this file to use recognizer. 
+This merely serves as a file so that correct directory structure shows up on git. 

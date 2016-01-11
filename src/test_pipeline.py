@@ -44,8 +44,6 @@ class InputFromSpeechNode:
         while self.waiting:
             pass
 
-        print self.utterance
-
         self.waiting = True
 
         return self.utterance

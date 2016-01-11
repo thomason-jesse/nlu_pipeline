@@ -14,15 +14,40 @@ import shutil
 from std_msgs.msg import String
 from os import walk
 
+resultsPath = "./src/nlu_pipeline/src/speech/" 
+
+# Gets a unique file name for logging results. 
+def getUniqueFileNum():
+
+    # Gets file names in data directory. 
+    filenames = []
+
+    for (dirpath, dirnames, names) in walk(resultsPath + "data/parsing_results"):
+        filenames.extend(names)
+        break
+
+    num = 0
+
+    if filenames:
+        for name in filenames:
+            fileNum = int(name.split('-')[0])
+
+            if num <= fileNum:
+                num = fileNum + 1
+
+    return num
+
+
 
 class InputFromSpeech:
     def __init__(self):
         import ctypes
 
         #Initialize variables. 
-        self.n = 10
-        self.path = "./src/nlu_pipeline/src/speech/"
+        self.n = 10 
+        self.path = resultsPath
         self.libHandle = ctypes.CDLL(self.path + "speechRecognizer.so")
+        self.error = False
 
         #Initialize Sphinx. 
         self.libHandle.sphinx_init()
@@ -53,7 +78,9 @@ class InputFromSpeech:
         return self.getNBest(self.n)
 
     def record(self):
-        self.libHandle.sphinx_n_best_m(self.n); 
+        if self.libHandle.sphinx_n_best_m(self.n) < 0:
+            self.error = True
+            self.errorMessage = "speechRecognizer.py: Error in sphinx_n_best_m()!"
 
     def recordToggle(self):
         #Initializes pygame window to read spacebar presses. 
@@ -131,12 +158,18 @@ class InputFromSpeech:
         thread1.join()
         thread2.join()
 
+        # Exits if error was encountered. 
+        if self.error == True:
+            print self.errorMessage
+
+            sys.exit()
+
         #Checks to see if system was interrupted. 
         if __name__ == '__main__' and rospy.is_shutdown():
             sys.exit()
 
         #Opens up results to begin reading from them. 
-        results = open(self.path + "data/recording/results.txt", "r")
+        results = open(self.path + "data/recording_resources/results.txt", "r")
 
         #Makes a list of each hypothesis, containing string, confidence, etc.
         resultList = [line.strip('\n') for line in results]
@@ -152,31 +185,11 @@ class InputFromSpeech:
         return hypothesis[0]
 
     def storeData(self):
-        num = self.getUniqueFileNum()
+        num = getUniqueFileNum()
 
         #Copies results from utterance recognition into logs. 
-        shutil.copy(self.path + "data/recording/results.txt", self.path + "data/logs/" + str(num) + "-results")
-        shutil.copy(self.path + "data/recording/voice.raw", self.path + "data/logs/" + str(num) + "-recording")
-
-    def getUniqueFileNum(self):
-
-        # Gets file names in data directory. 
-        filenames = []
-
-        for (dirpath, dirnames, names) in walk(self.path + "data/logs"):
-            filenames.extend(names)
-            break
-
-        num = 0
-
-        if filenames:
-            for name in filenames:
-                fileNum = int(name.split('-')[0])
-
-                if num <= fileNum:
-                    num = fileNum + 1
-
-        return num
+        shutil.copy(self.path + "data/recording_resources/results.txt", self.path + "data/nbest_results/" + str(num) + "-nbest")
+        shutil.copy(self.path + "data/recording_resources/voice.raw", self.path + "data/recording_results/" + str(num) + "-recording")
 
 
 if __name__ == '__main__':

@@ -152,16 +152,20 @@ int sphinx_n_best_m(int n) {
 	close(temp);
 
 	//File to write results into. 
-	FILE *results = fopen("./src/nlu_pipeline/src/speech/data/recording/results.txt", "w");
+	FILE *results = fopen("./src/nlu_pipeline/src/speech/data/recording_resources/results.txt", "w");
 
 	if (!results){
-		printf("Error creating results file!");
+		printf("sphinx.c: Error creating results file!");
 
-		return 0; 
+		return -1; 
 	} 
 
 	//Records and processes an utterance. 
-	record1600Hz_s(ps); 
+	if (record1600Hz_s(ps) < 0) {
+		printf("sphinx.c: Error recording!"); 
+
+		return -1; 
+	}
 
 	//FILE *rawfh = fopen("voice.raw", "rb"); 
 	//ps_decode_raw(ps, rawfh, -1); 

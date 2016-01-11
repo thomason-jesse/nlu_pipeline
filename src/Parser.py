@@ -5,6 +5,7 @@ import copy
 import random
 import math
 import SemanticNode
+from speechRecognizer import getUniqueFileNum
 
 
 class Parser:
@@ -287,23 +288,36 @@ class Parser:
                 self.add_genlex_entries_to_lexicon_from_bracketing(bracketing[1][i])
 
     # tokenizes str and passes it to a function to parse tokens
+    # NOTE: In speech branch, this tokenizes the nbest results from Sphinx and returns best one. 
     def parse_expression(self, s, k=None, n=1, allow_UNK_E=True, generator_genlex=None):
         
         bestParseList = None
         maxScore = None
+        bestString = None
 
-        #Chooses list of parses which contains the top scoring parse. 
+        # Chooses list of parses which contains the top scoring parse. 
         for string in s:
             tokens = self.tokenize(string)
             parses = self.parse_tokens(tokens, k=k, n=n, allow_UNK_E=allow_UNK_E, generator_genlex=generator_genlex)
 
-            for parse in parses:
-                if maxScore == None or parse[3] > maxScore:
-                    maxScore = parse[3]
-                    bestParseList = parses
+            if not parses:
+                parseScore = -1
+            else:
+                parseScore = parses[0][3]
 
-        if maxScore != 0:
-            print "NON_ZERO MAX SCORE!: ", maxScore
+            # Compares current best score to string's top scoring parse. 
+            if maxScore == None or parseScore > maxScore:
+                maxScore = parseScore
+                bestParseList = parses
+                bestString = string
+
+        fileNum = getUniqueFileNum()
+
+        # Store best parse in logs for Sphinx adaptation. 
+        result = open('./src/nlu_pipeline/src/speech/data/parsing_results/' + str(fileNum) + '-parsing', 'w')
+        result.write(bestString)
+
+        print bestString
 
         return bestParseList
 

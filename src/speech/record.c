@@ -11,7 +11,7 @@ and writes to standard output for 5 seconds of data.
 static int recording = 0;
 static int interrupted = 0; 
 static struct micParams mp; 
-static char* voice = "./src/nlu_pipeline/src/speech/data/recording/voice.raw";
+static char* voice = "./src/nlu_pipeline/src/speech/data/recording_resources/voice.raw";
 
 void startRecord() {
 	recording = 1; 
@@ -166,6 +166,12 @@ int record1600Hz_s(ps_decoder_t *ps) {
 	int rc = 0; 
 	FILE *file = fopen(voice, "w");
 
+	if (!file) {
+		printf("record.c: Error opening voice.raw!");
+
+		return -1; 
+	}
+
 	ps_start_stream(ps); 
 	ps_start_utt(ps); 
 
@@ -217,8 +223,11 @@ int record1600Hz_s(ps_decoder_t *ps) {
   	}
 
 	//Stops mic from recording and gathers remaining data. 
-	if ((rc = snd_pcm_drain(mp.handle)) != 0)
+	if ((rc = snd_pcm_drain(mp.handle)) != 0) {
 		fprintf(stderr, "Error draining PCM: %d\n", rc);  
+		
+		return -1; 
+	}
 
 	while ((rc = snd_pcm_readi(mp.handle, (char *)mp.buffer, mp.frames)) > 0)
 		write(fileno(file), (char *)mp.buffer, mp.frames * sizeof(int16)); 
