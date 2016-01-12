@@ -158,7 +158,7 @@ class Lexicon:
                 sur_idx = len(surface_forms)
                 surface_forms.append(surface_form)
                 entries.append([])
-
+                
             cat_idx, semantic_form = self.read_syn_sem(rhs, allow_expanding_ont=allow_expanding_ont)
             try:
                 sem_idx = semantic_forms.index(semantic_form)

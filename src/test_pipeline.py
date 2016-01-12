@@ -105,6 +105,42 @@ print "theta: "+str(parser.learner.theta)
 
 response_generator = TemplateBasedGenerator()
 
+print '\n\n', 'Trying to add to lexicon'
+# Training the parser
+#tokens = A.parser.tokenize('burger') 
+#semantic_form = A.parser.lexicon.read_semantic_form_from_str('hamburger', None, None, [], allow_expanding_ont=False)
+##print 'Ontology entry: ', A.parser.lexicon.ontology.preds[semantic_form.idx]
+#examples = [[tokens, semantic_form]]
+#A.parser.generator_genlex = True
+#A.parser.train_learner_on_semantic_forms(examples, generator=generator)
+
+# Directly adding to the lexicon
+example = 'burger :- N : hamburger'
+lines = [example]
+print 'surface forms = ', A.parser.lexicon.surface_forms
+A.parser.lexicon.expand_lex_from_strs(
+            lines, A.parser.lexicon.surface_forms, A.parser.lexicon.semantic_forms, 
+            A.parser.lexicon.entries, A.parser.lexicon.pred_to_surface, 
+            allow_expanding_ont=False)
+print 'surface forms = ', A.parser.lexicon.surface_forms
+
+if 'burger' in A.parser.lexicon.surface_forms :
+    example_surface_idx = A.parser.lexicon.surface_forms.index('burger')
+    print 'example_surface_idx = ', example_surface_idx
+    print 'type(A.parser.lexicon.entries) = ', type(A.parser.lexicon.entries)
+    if len(A.parser.lexicon.entries) > example_surface_idx:
+        semantic_form_indices = A.parser.lexicon.entries[example_surface_idx]
+        semantic_forms = [A.parser.lexicon.semantic_forms[idx] for idx in semantic_form_indices]
+        ont_entries = [A.parser.lexicon.ontology.preds[semantic_form.idx] for semantic_form in semantic_forms]
+        print 'Matching ontology entry = ', ont_entries
+    else :
+        print 'No entry for surface form'
+else :
+    print 'Surface form not in lexicon'
+
+#print 'Lexicon: ', [A.parser.lexicon.ontology.preds[form.idx] for form in A.parser.lexicon.semantic_forms if form.idx is not None]
+#print 'Ontology: ', A.parser.lexicon.ontology.preds
+
 while True:
     u_out.say("How can I help?")
     s = raw_input()

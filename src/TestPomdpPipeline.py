@@ -109,6 +109,7 @@ save_model(parser, 'parser')
 #print predicate_holds('room', 'l3_512', grounder)
 #sys.exit(1)
 
+print 'Lexicon - ', parser.lexicon.surface_forms, '\n\n'
 
 while True:
     A.first_turn = True

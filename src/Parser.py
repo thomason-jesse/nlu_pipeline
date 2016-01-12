@@ -198,7 +198,7 @@ class Parser:
             num_fails = 0
             for [x, y] in D:
                 generator_genlex = None if generator is None else [generator, x, y]
-                # print "training on pair "+str(x)+", "+self.print_parse(y, True)  # DEBUG
+                print "training on pair "+str(x)+", "+self.print_parse(y, True)  # DEBUG
                 if generator is not None:
                     generator.flush_seen_nodes()
                 chosen_parse = None
@@ -211,6 +211,7 @@ class Parser:
                     n_best = self.parse_tokens(
                         x, k, n-num_examined, none_range=[none_max, none_max+1],
                         allow_UNK_E=allow_UNK_E, generator_genlex=generator_genlex)
+                    print 'x = ', x, 'n_best = ', n_best
                     if len(n_best) > 0:
                         any_parse = True
                         if chosen_parse is None:

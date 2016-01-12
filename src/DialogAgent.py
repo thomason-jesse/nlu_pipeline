@@ -28,12 +28,12 @@ class DialogAgent:
 
     # initiate a new dialog with the agent with initial utterance u
     def initiate_dialog_to_get_action(self, u):
-        print "Function call succeeded"         
+        #print "Function call succeeded"         
 
         self.state = StaticDialogState.StaticDialogState()
-        print "Created state"
+        #print "Created state"
         self.update_state_from_user_initiative(u)
-        print "Updated state"
+        #print "Updated state"
 
         # select next action from state
         action = None
@@ -175,7 +175,7 @@ class DialogAgent:
 
         # get n best parses for utterance
         n_best_parses = self.parser.parse_expression(u, n=self.parse_depth)
-        print 'n_best_parses - ', n_best_parses
+        #print 'n_best_parses - ', n_best_parses
 
         # try to digest parses to action request
         success = False

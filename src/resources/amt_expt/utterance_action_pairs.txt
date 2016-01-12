@@ -11,7 +11,7 @@ M : bring(chips,george)
 bring(chips,george)
 
 bring mallory coffee
-M : bring(coffee,mallory)
+M : bring(coffee,mallory)   
 bring(coffee,mallory)
 
 bring alice a hamburger

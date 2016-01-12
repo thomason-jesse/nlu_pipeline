@@ -247,19 +247,19 @@ def init_pomdp_dialog_agent(args) :
 
     print "Instantiating Parser"
     parser = Parser.Parser(ont, lex, learner, grounder, beam_width=10)
-    parser = load_model('parser')
+    #parser = load_model('parser')
     grounder.parser = parser
     grounder.ontology = parser.ontology
 
     print "Instantiating DialogAgent"
     agent = PomdpDialogAgent(parser, grounder, None, None)
 
-    #print "reading in data and training parser from actions"
-    #D = agent.read_in_utterance_action_pairs(args[3])
-    #converged = agent.train_parser_from_utterance_action_pairs(D, epochs=10, parse_beam=30)
-    #print "theta: "+str(parser.learner.theta)
-    #save_model(parser, 'parser')
-    #print 'Parser ontology : ', parser.ontology.preds
+    print "reading in data and training parser from actions"
+    D = agent.read_in_utterance_action_pairs(args[3])
+    converged = agent.train_parser_from_utterance_action_pairs(D, epochs=10, parse_beam=30)
+    print "theta: "+str(parser.learner.theta)
+    save_model(parser, 'parser')
+    print 'Parser ontology : ', parser.ontology.preds
 
     return agent
 

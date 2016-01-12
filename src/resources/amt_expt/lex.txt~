@@ -65,10 +65,10 @@ george :- N : george
 george green :- N : george
 green :- N : george
 intern :- N : george
-evelyn :- N : eve
 evelyn eckhart :- N : eve
 eve eckhart :- N : eve
 eckhart :- N : eve
+eve :- N : eve
 mallory morgan :- N : mallory
 morgan :- N : mallory
 mallory :- N : mallory

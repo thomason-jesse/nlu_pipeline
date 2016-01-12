@@ -31,11 +31,16 @@ class PomdpDialogAgent :
         self.dialog_action_functions = [self.request_user_initiative, self.confirm_action, self.request_missing_param]
 
         self.first_turn = True
+        
+        # To store data for retraining the parser
+        self.parser_train_data = None
 
     # Returns True if the dialog terminates on its own and False if the u
     # user entered stop
     def run_dialog(self) :
         self.state = HISBeliefState(self.knowledge)
+        self.parser_train_data = dict()
+        
         #print 'Belief state: ', str(self.state) 
         summary_state = SummaryState(self.state)
         (dialog_action, dialog_action_arg) = self.policy.get_initial_action(summary_state)    
@@ -53,6 +58,7 @@ class PomdpDialogAgent :
                     return False  
                 if response.lower() == 'y' or response.lower() == 'yes' :
                     self.policy.update_final_reward(self.knowledge.correct_action_reward)
+                    self.train_parser_from_dialogue(action)
                 else :
                     self.policy.update_final_reward(self.knowledge.wrong_action_reward)
                     return False
@@ -88,6 +94,10 @@ class PomdpDialogAgent :
         print 'output = ', output
         self.output.say(output)
         response = self.input.get()
+        if 'full' in self.parser_train_data :
+            self.parser_train_data['full'].append(response)
+        else :
+            self.parser_train_data['full'] = [response]
         return response
 
     # Request a missing action parameter
@@ -95,6 +105,11 @@ class PomdpDialogAgent :
         output = self.generator.get_sentence(self.previous_system_action)
         self.output.say(output)
         response = self.input.get()
+        param_name = self.previous_system_action.extra_data[0]
+        if param_name in self.parser_train_data :
+            self.parser_train_data[param_name].append(response)
+        else :
+            self.parser_train_data[param_name] = [response]
         return response
 
     # Parse the user response and update belief state
@@ -458,4 +473,134 @@ class PomdpDialogAgent :
 
         else:
             raise SystemError("cannot get action from return type "+str(self.parser.ontology.types[root.return_type]))
+
+    def train_parser_from_dialogue(self, final_action) :
+        print 'Lexicon - ', self.parser.lexicon.surface_forms
+        
+        print 'self.parser_train_data = ', self.parser_train_data
+        
+        semantic_forms = dict()
+        semantic_forms['full'] = str(final_action)
+        goal = final_action.name
+        for (idx, param_name) in enumerate(self.knowledge.param_order[goal]) :
+            semantic_forms[param_name] = final_action.params[idx]
+        
+        print 'semantic_forms = ', semantic_forms
+        
+        new_lexical_entries = list()
+        
+        for key in self.parser_train_data :
+            if key != 'full' :
+                # This is a param value. It may be a multi-word expression
+                # present in the lexicon
+                for value in self.parser_train_data[key] :
+                    print 'value = ', value
+                    if value in self.parser.lexicon.surface_forms :
+                        semantic_indices = self.parser.lexicon.get_semantic_forms_for_surface_form(value)
+                        semantic_forms = [self.parser.lexicon.semantic_forms[idx] for idx in semantic_indices]
+                        ont_values = [self.parser.lexicon.ontology.preds[semantic_form.idx] for semantic_form in semantic_forms]
+                        print 'ont_values = ', ont_values
+                        # Known expression. No need for new lexical entry
+                        continue
+                    else :
+                        # If the first word is a, an, the, see if the rest
+                        # of it is present in the lexicon
+                        tokens = self.parser.tokenize(value)
+                        if tokens[0] == 'a' or tokens[0] == 'an' or tokens[0] == 'the' :
+                            rest_of_it = ' '.join(tokens[1:])
+                            if rest_of_it in self.parser.lexicon.surface_forms :
+                                print 'Entry without article present'
+                                continue
+                            else :
+                                del tokens[0]
+                        
+                        # If it is of the form x's office and x is known 
+                        # again it can be ignored
+                        if tokens[-1] == 'office' :
+                            rest_of_it = ' '.join(tokens[:-1])
+                            if rest_of_it in self.parser.lexicon.surface_forms :
+                                print 'Office owner present'
+                                continue
+                            # Else you'd ideally want to use the knowledge 
+                            # base to find who's office is the room you're 
+                            # talking about and hence create an entry for x
+                        
+                        # If it has too many words it is unlikely to be 
+                        # a multi-word expression to be learnt as such
+                        if len(tokens) > 3 :
+                            print 'Too long'
+                            continue
+                    
+                        surface_form = ' '.join(tokens)
+                        if key in semantic_forms :
+                            semantic_form = semantic_forms[key]
+                            entry = surface_form + ' :- N : ' + semantic_form
+                            print 'Creating entry ', entry 
+                            new_lexical_entries.append(entry)
+            
+            else :    
+                for value in self.parser_train_data[key] :            
+                    tokens = self.parser.tokenize(value)
+                    unknown_surface_forms = [(idx, token) for (idx, token) in enumerate(tokens) if token not in self.parser.lexicon.surface_forms]
+                    non_multi_word_expressions = list()
+                    possible_matchers = tokens 
+                    for (idx, token) in unknown_surface_forms :
+                        # Bad heuristic to check for multi-word expressions
+                        possible_multi_word_tokens = []
+                        if idx >= 1 :
+                            possible_multi_word_tokens.append(tokens[idx-1:idx+1])
+                        if idx >= 2 :
+                            possible_multi_word_tokens.append(tokens[idx-2:idx+1])
+                        if idx >= 3 :
+                            possible_multi_word_tokens.append(tokens[idx-3:idx+1])
+                        if idx <= len(tokens) - 2 :
+                            possible_multi_word_tokens.append(tokens[idx:idx+1])
+                        if idx <= len(tokens) - 3 :
+                            possible_multi_word_tokens.append(tokens[idx:idx+2])
+                        if idx <= len(tokens) - 4 :
+                            possible_multi_word_tokens.append(tokens[idx:idx+3])
+                        match_found = False
+                        for multi_word_token in possible_multi_word_tokens :
+                            text = ' '.join(multi_word_token)
+                            if text in self.parser.lexicon.surface_forms :
+                                possible_matchers.append(text)
+                                match_found = True
+                                break
+                        if not match_found :
+                            non_multi_word_expressions.append(token)
+                    
+                    if len(non_multi_word_expressions) == 1 :
+                        # Try to create lexical entries only if exactly one
+                        # unknown surface form
+                        unknown_surface_form = non_multi_word_expressions[0]
+                        possible_matches = final_action.params
+                        if unknown_surface_form + '\'s office' not in value :
+                            # We don't really know how to do the whole office
+                            # thing yet
+                            for matcher in possible_matchers :
+                                semantic_indices = self.parser.lexicon.get_semantic_forms_for_surface_form(matcher)
+                                for idx in semantic_indices :
+                                    semantic_form = self.parser.lexicon.semantic_forms[idx]
+                                    if semantic_form.idx is not None :
+                                        ont_value = self.parser.lexicon.ontology.preds[semantic_form.idx]
+                                        if ont_value in possible_matches :
+                                            possible_matches.remove(ont_value)
+                                            
+                            if len(possible_matches) == 1 :
+                                # Only add an extry if it appears unambiguous
+                                new_lexical_entries.append(surface_form + ' :- N : ' + possible_matches[0])
+                             
+        print 'new_lexical_entries = ', new_lexical_entries                
+        
+        
+        
+        # Example - adding a new surface form
+        #example = 'burger :- N : hamburger'
+        #lines = [example]
+        #print 'surface forms = ', A.parser.lexicon.surface_forms
+        #A.parser.lexicon.expand_lex_from_strs(
+                    #lines, A.parser.lexicon.surface_forms, A.parser.lexicon.semantic_forms, 
+                    #A.parser.lexicon.entries, A.parser.lexicon.pred_to_surface, 
+                    #allow_expanding_ont=False)
+        #print 'surface forms = ', A.parser.lexicon.surface_forms
 
