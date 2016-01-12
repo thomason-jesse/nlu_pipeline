@@ -1,0 +1,26 @@
+These are personalized steps for the Sphinx acoustic model adaptation process. 
+The instructions here are not complete and hence, this should be used
+in conjunction with the instructions on the Sphinx wiki. 
+
+Generating acoustic features files step:
+
+sphinx_fe -argfile en-us/feat.params -samprate 16000 -c adaptation.fileids -di . -do . -eo mfc -raw yes
+
+Accumulating observation count step:
+
+NOTE: Look for WARN statmenents in this step to find words not supported by dictionary. These should be added 
+	  to dictionary before proceeding. 
+
+./bw -hmmdir en-us -moddeffn en-us/mdef -ts2cbfn .ptm. -feat 1s_c_d_dd -svspec 0-12/13-25/26-38 -cmn current -agc none -dictfn cmudict-en-us.dict -ctlfn adaptation.fileids -lsnfn transcription.txt -accumdir .
+
+MAP adapt step:
+
+./map_adapt -moddeffn en-us/mdef -ts2cbfn .ptm.     -meanfn en-us/means     -varfn en-us/variances     -mixwfn en-us/mixture_weights     -tmatfn en-us/transition_matrices     -accumdir .     -mapmeanfn en-us-adapt/means     -mapvarfn en-us-adapt/variances     -mapmixwfn en-us-adapt/mixture_weights     -maptmatfn en-us-adapt/transition_matrices
+
+Testing step:
+
+NOTE: Make sure audio files are in their own folder and that they have the .raw extension. 
+
+pocketsphinx_batch -adcin yes -cepdir files -cepext .raw -ctl adaptation.fileids -lm fifty_fifty.lm.bin -dict cmudict-en-us.dict -hmm en-us-adapt -hyp adaptation-test.hyp
+
+
