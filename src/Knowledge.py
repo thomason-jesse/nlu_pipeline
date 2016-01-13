@@ -188,10 +188,10 @@ class Knowledge:
         #self.true_constraints['remind']['location'] = ['room']
         #self.true_constraints['askperson']['patient'] = ['person']
         #self.true_constraints['askperson']['recipient'] = ['person']
+        self.true_constraints['bring']['patient'] = ['item']
         self.true_constraints['bring']['recipient'] = ['person']
         self.true_constraints['at']['location'] = ['room']
         
         #self.false_constraints['speak_t']['patient'] = ['person', 'room']
         #self.false_constraints['remind']['patient'] = ['person', 'room']
-        self.false_constraints['bring']['patient'] = ['room']
 

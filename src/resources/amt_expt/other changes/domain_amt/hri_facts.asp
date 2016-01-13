@@ -40,6 +40,7 @@ hasoffice(alice,l3_502).
 hasoffice(carol,l3_414b).
 hasoffice(dave,l3_414b).
 hasoffice(peggy,l3_414b).
+hasoffice(george,l3_414b).
 
 canbeinroom(P,R) :- hasoffice(P,R), person(P), room(R).
 canbeinroom(P,l3_414b) :- ingroup(P,bwi).
@@ -50,6 +51,7 @@ canknow(P2,P1) :- canknow(P1,P2).
 
 meeting(M,G,R) :- meeting(M,G,R). %here for when not using meetings
 
+%#hide item/1.
 %#hide person/1.
 %#hide hasoffice/2.
 %#hide canbeinroom/2.

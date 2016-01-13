@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-__author__ = 'jesse'
+__author__ = 'aishwarya'
 
 import sys
 import Ontology
@@ -35,7 +35,7 @@ class OutputToStdout:
         print "SYSTEM: "+s
 
 # Fixing the random seed for debugging
-#numpy.random.seed(4)
+numpy.random.seed(4)
 
 print "reading in Ontology"
 ont = Ontology.Ontology(sys.argv[1])

@@ -126,7 +126,6 @@ class Lexicon:
                 return []
 
     def read_lex_from_file(self, fname, allow_expanding_ont):
-
         surface_forms = []
         semantic_forms = []
         entries = []
@@ -140,7 +139,6 @@ class Lexicon:
 
     def expand_lex_from_strs(
             self, lines, surface_forms, semantic_forms, entries, pred_to_surface, allow_expanding_ont=False):
-
         for line_idx in range(0, len(lines)):
             line = lines[line_idx]
 
@@ -241,7 +239,6 @@ class Lexicon:
         return idx
 
     def read_semantic_form_from_str(self, s, category, parent, scoped_lambdas, allow_expanding_ont):
-
         # the node to be instantiated and returned
         s = s.strip()
 

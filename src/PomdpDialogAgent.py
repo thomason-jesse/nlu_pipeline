@@ -117,6 +117,7 @@ class PomdpDialogAgent :
         # get n best parses for confirmation
         #print 'response = ', response
         n_best_parses = self.parser.parse_expression(response, n=self.parse_depth)
+        
         #print 'n_best_parses = '
         #for [parse, parse_tree, parse_trace, conf] in n_best_parses :
             #print 'parse = ', parse
@@ -479,13 +480,13 @@ class PomdpDialogAgent :
         
         print 'self.parser_train_data = ', self.parser_train_data
         
-        semantic_forms = dict()
-        semantic_forms['full'] = str(final_action)
+        answers = dict()
+        answers['full'] = str(final_action)
         goal = final_action.name
         for (idx, param_name) in enumerate(self.knowledge.param_order[goal]) :
-            semantic_forms[param_name] = final_action.params[idx]
+            answers[param_name] = final_action.params[idx]
         
-        print 'semantic_forms = ', semantic_forms
+        print 'answers = ', answers
         
         new_lexical_entries = list()
         
@@ -494,12 +495,7 @@ class PomdpDialogAgent :
                 # This is a param value. It may be a multi-word expression
                 # present in the lexicon
                 for value in self.parser_train_data[key] :
-                    print 'value = ', value
-                    if value in self.parser.lexicon.surface_forms :
-                        semantic_indices = self.parser.lexicon.get_semantic_forms_for_surface_form(value)
-                        semantic_forms = [self.parser.lexicon.semantic_forms[idx] for idx in semantic_indices]
-                        ont_values = [self.parser.lexicon.ontology.preds[semantic_form.idx] for semantic_form in semantic_forms]
-                        print 'ont_values = ', ont_values
+                    if len(self.parser.lexicon.get_semantic_forms_for_surface_form(value)) > 0 :
                         # Known expression. No need for new lexical entry
                         continue
                     else :
@@ -508,8 +504,7 @@ class PomdpDialogAgent :
                         tokens = self.parser.tokenize(value)
                         if tokens[0] == 'a' or tokens[0] == 'an' or tokens[0] == 'the' :
                             rest_of_it = ' '.join(tokens[1:])
-                            if rest_of_it in self.parser.lexicon.surface_forms :
-                                print 'Entry without article present'
+                            if len(self.parser.lexicon.get_semantic_forms_for_surface_form(rest_of_it)) > 0 :
                                 continue
                             else :
                                 del tokens[0]
@@ -517,9 +512,8 @@ class PomdpDialogAgent :
                         # If it is of the form x's office and x is known 
                         # again it can be ignored
                         if tokens[-1] == 'office' :
-                            rest_of_it = ' '.join(tokens[:-1])
-                            if rest_of_it in self.parser.lexicon.surface_forms :
-                                print 'Office owner present'
+                            rest_of_it = ' '.join(tokens[:-2])
+                            if len(self.parser.lexicon.get_semantic_forms_for_surface_form(rest_of_it)) > 0 :
                                 continue
                             # Else you'd ideally want to use the knowledge 
                             # base to find who's office is the room you're 
@@ -528,12 +522,11 @@ class PomdpDialogAgent :
                         # If it has too many words it is unlikely to be 
                         # a multi-word expression to be learnt as such
                         if len(tokens) > 3 :
-                            print 'Too long'
                             continue
                     
                         surface_form = ' '.join(tokens)
-                        if key in semantic_forms :
-                            semantic_form = semantic_forms[key]
+                        if key in answers :
+                            semantic_form = answers[key]
                             entry = surface_form + ' :- N : ' + semantic_form
                             print 'Creating entry ', entry 
                             new_lexical_entries.append(entry)
@@ -541,7 +534,7 @@ class PomdpDialogAgent :
             else :    
                 for value in self.parser_train_data[key] :            
                     tokens = self.parser.tokenize(value)
-                    unknown_surface_forms = [(idx, token) for (idx, token) in enumerate(tokens) if token not in self.parser.lexicon.surface_forms]
+                    unknown_surface_forms = [(idx, token) for (idx, token) in enumerate(tokens) if len(self.parser.lexicon.get_semantic_forms_for_surface_form(token)) == 0]
                     non_multi_word_expressions = list()
                     possible_matchers = tokens 
                     for (idx, token) in unknown_surface_forms :
@@ -562,7 +555,7 @@ class PomdpDialogAgent :
                         match_found = False
                         for multi_word_token in possible_multi_word_tokens :
                             text = ' '.join(multi_word_token)
-                            if text in self.parser.lexicon.surface_forms :
+                            if len(self.parser.lexicon.get_semantic_forms_for_surface_form(text)) > 0 :
                                 possible_matchers.append(text)
                                 match_found = True
                                 break
@@ -585,22 +578,29 @@ class PomdpDialogAgent :
                                         ont_value = self.parser.lexicon.ontology.preds[semantic_form.idx]
                                         if ont_value in possible_matches :
                                             possible_matches.remove(ont_value)
-                                            
+                            print 'possible_matches = ', possible_matches
                             if len(possible_matches) == 1 :
                                 # Only add an extry if it appears unambiguous
-                                new_lexical_entries.append(surface_form + ' :- N : ' + possible_matches[0])
+                                entry = unknown_surface_form + ' :- N : ' + possible_matches[0]
+                                print 'Creating entry from sentence ', entry
+                                new_lexical_entries.append(entry)
                              
         print 'new_lexical_entries = ', new_lexical_entries                
+        print 'Retraining parser'
         
-        
-        
-        # Example - adding a new surface form
-        #example = 'burger :- N : hamburger'
-        #lines = [example]
-        #print 'surface forms = ', A.parser.lexicon.surface_forms
-        #A.parser.lexicon.expand_lex_from_strs(
-                    #lines, A.parser.lexicon.surface_forms, A.parser.lexicon.semantic_forms, 
-                    #A.parser.lexicon.entries, A.parser.lexicon.pred_to_surface, 
-                    #allow_expanding_ont=False)
-        #print 'surface forms = ', A.parser.lexicon.surface_forms
+        self.parser.lexicon.expand_lex_from_strs(
+                    new_lexical_entries, self.parser.lexicon.surface_forms, self.parser.lexicon.semantic_forms, 
+                    self.parser.lexicon.entries, self.parser.lexicon.pred_to_surface, 
+                    allow_expanding_ont=False)
+                    
+        training_pairs = list()
+        for key in self.parser_train_data :
+            if key in answers :
+                for item in self.parser_train_data[key] :
+                    training_pairs.append((item, answers[key]))
 
+        self.parser.train_learner_on_denotations(training_pairs, 10, 4, 4)
+
+        print 'Finished retraining parser'
+
+        self.parser_train_data = dict()
