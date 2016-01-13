@@ -183,7 +183,7 @@ int record1600Hz_s(ps_decoder_t *ps) {
 
 	//Waits for recording to start. 
 	while (!recording && !interrupted)
-		usleep(100000);
+		usleep(70000);
 
 	if (interrupted) {
 		fclose(file); 
