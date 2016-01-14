@@ -9,6 +9,7 @@ from TemplateBasedGenerator import TemplateBasedGenerator
 from SystemAction import SystemAction
 from Knowledge import Knowledge
 from Utils import *
+from StaticDialogStateWithTypechecking import StaticDialogStateWithTypechecking
 
 class DialogAgent:
 
@@ -34,7 +35,8 @@ class DialogAgent:
         self.parser_train_data = dict()
         #print "Function call succeeded"         
 
-        self.state = StaticDialogState.StaticDialogState()
+        #self.state = StaticDialogState.StaticDialogState()
+        self.state = StaticDialogStateWithTypechecking()
         #print "Created state"
         self.update_state_from_user_initiative(u)
         #print "Updated state"
@@ -130,7 +132,7 @@ class DialogAgent:
             answer = self.grounder.grounding_to_answer_set(g)
             if len(answer) == 1:
                 success = True
-                self.state.update_from_missing_param(answer[0], idx)
+                self.state.update_from_missing_param(answer[0], idx, self.grounder)
                 break
         if not success:
             self.state.update_from_failed_parse()
@@ -223,7 +225,7 @@ class DialogAgent:
         # print "Tried getting action from parse"
         if p_action is not None:
             # print "Going to update state from action"
-            self.state.update_from_action(p_action, p)
+            self.state.update_from_action(p_action, p, self.grounder)
             return True
 
         # if this failed, try again allowing missing lambdas to become UNK without token ties
@@ -244,7 +246,7 @@ class DialogAgent:
         except SystemError:
             p_unk_action = None
         if p_unk_action is not None:
-            self.state.update_from_action(p_unk_action, UNK_root)
+            self.state.update_from_action(p_unk_action, UNK_root, self.grounder)
             return True
 
         # parse could not be resolved into an action with which to update state
@@ -556,17 +558,17 @@ class DialogAgent:
                     self.parser.lexicon.entries, self.parser.lexicon.pred_to_surface, 
                     allow_expanding_ont=False)
                     
-        training_pairs = list()
-        for key in self.parser_train_data :
-            if key in answers :
-                for item in self.parser_train_data[key] :
-                    training_pairs.append((item, answers[key]))
+        #training_pairs = list()
+        #for key in self.parser_train_data :
+            #if key in answers :
+                #for item in self.parser_train_data[key] :
+                    #training_pairs.append((item, answers[key]))
 
-        print 'training_pairs = ', training_pairs
+        #print 'training_pairs = ', training_pairs
 
-        self.parser.train_learner_on_denotations(training_pairs, 10, 100, 3)
+        #self.parser.train_learner_on_denotations(training_pairs, 10, 100, 3)
 
-        print 'Finished retraining parser'
+        #print 'Finished retraining parser'
 
         self.parser_train_data = dict()
         save_model(self.parser, 'static_parser')
