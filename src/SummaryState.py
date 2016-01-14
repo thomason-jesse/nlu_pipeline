@@ -3,7 +3,7 @@ __author__ = 'aishwarya'
 import sys, math
 
 class SummaryState :
-    discrete_features = [5,6]
+    discrete_features = [5,6,7]
     
     def __init__(self, hisBeliefState=None) :
         # TODO: These default values don't make sense. Think about them
@@ -34,7 +34,8 @@ class SummaryState :
     #     - Number of dialog turns used so far
     #     - Do the top and second hypothesis use the same partition: yes/no  
     #     - Type of last user utterance - inform/affirm/deny
-    # NOTE: DO NOT CHANGE THIS. OTHER FILES DEPEND ON THSI ORDERING
+    #     - Goal in top hypothesis partition or 'None' if this is not unique
+    # NOTE: PomdpGpSarsaPolicy.py DEPENDS ON THIS ORDERING. 
     def get_feature_vector(self) :
         # Probability of top hypothesis; Probability of second hypothesis
         feature = [self.top_hypothesis_prob, self.second_hypothesis_prob]
@@ -85,6 +86,17 @@ class SummaryState :
             feature.append(self.top_hypothesis[1])
         else :
             feature.append(self.top_hypothesis[1].action_type)
+            
+            
+        # Goal in top hypothesis partition or 'None' if this is not unique
+        if self.top_hypothesis is None or self.top_hypothesis[0] is None:
+            feature.append('None')
+        elif len(self.top_hypothesis[0].possible_goals) > 1 :
+            feature.append('None')
+        elif len(self.top_hypothesis[0].possible_goals) == 1 :
+            feature.append(self.top_hypothesis[0].possible_goals[0])
+        else :
+            feature.append('None')
         
         return feature
         

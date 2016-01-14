@@ -108,8 +108,8 @@ class Knowledge:
         # Hyperparameters for polynomial kernel - values set from the paper
         self.kernel_std_dev = 5     # sigma_k in the paper
         self.kernel_degree = 4      # p in the paper
-        #self.kernel_weights = [1, 1, 0.1, 0.1, 0.1, 0.1, 0.1]
-        self.kernel_weights = [1, 1, 1, 1, 1, 1, 1]
+        self.kernel_weights = [1, 1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+        #self.kernel_weights = [1, 1, 1, 1, 1, 1, 1]
         
         # Parameters for the RL problem and GP-SARSA
         self.gamma = 0.1
