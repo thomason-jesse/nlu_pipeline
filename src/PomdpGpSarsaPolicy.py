@@ -12,8 +12,6 @@ __author__ = 'aishwarya'
 # in the hope that it scales better. I always use numpy matrices not 
 # arrays because arrays don't do vector math in an intuitive way
 
-# TODO: Make candidate action sets which are sensible
-
 import numpy as np, sys, math, copy, itertools
 from Utils import *
 from SystemAction import SystemAction
@@ -447,16 +445,18 @@ class PomdpGpSarsaPolicy :
             return self.resolve_state_to_goal(state)
             
         elif action_type == 'confirm_action' :
-            if state.top_hypothesis is None :
+            if state.top_hypothesis is None or state.top_hypothesis[0] is None :
+                # No hypotheses to verify. Confirm something random
                 goal_idx = int(np.random.uniform(0, len(state.knowledge.goal_actions)))
                 return SystemAction(action_type, state.knowledge.goal_actions[goal_idx])
             
             goal = None
-            if state.top_hypothesis[0].something_certain() :
-                if len(state.top_hypothesis[0].possible_goals) > 0 :
-                    goal = state.top_hypothesis[0].possible_goals[0]
-            else :
+            if len(state.top_hypothesis[0].possible_goals) > 0 : 
                 goal_idx = int(np.random.uniform(0, len(state.top_hypothesis[0].possible_goals)))    
+                goal = state.top_hypothesis[0].possible_goals[goal_idx]
+            else :
+                # Top hypothesis has no goals, verify any random goal
+                goal_idx = int(np.random.uniform(0, len(self.knowledge.possible_goals)))    
                 goal = state.top_hypothesis[0].possible_goals[goal_idx]
 
             system_action = SystemAction(action_type, goal)
@@ -467,6 +467,8 @@ class PomdpGpSarsaPolicy :
                 return system_action
             for param_name in param_order :
                 if param_name in partition_params and len(partition_params[param_name]) == 1 :
+                    # Only confirm params if the hypothesis thinks there is only one 
+                    # possible value for it
                     params[param_name] = partition_params[param_name][0]
                 #else :
                     #print 'Uncertain about ', param_name, ' : ', partition_params[param_name]
@@ -474,12 +476,13 @@ class PomdpGpSarsaPolicy :
             return system_action
             
         elif action_type == 'request_missing_param' :
-            if state.top_hypothesis is None :
+            if state.top_hypothesis is None or state.top_hypothesis[0] is None :
+                # No hypotheses. Anything can be asked
                 goal_idx = int(np.random.uniform(0, len(state.knowledge.goal_actions)))
                 goal = state.knowledge.goal_actions[goal_idx]
-                system_action = SystemAction(action_type)
-                param_idx = int(np.random.uniform(0, len(state.knowledge.goal_params)))
-                system_action.extra_data = [state.knowledge.goal_params[param_idx]]
+                system_action = SystemAction(action_type, goal)
+                param_idx = int(np.random.uniform(0, len(state.knowledge.param_order[goal])))
+                system_action.extra_data = [state.knowledge.param_order[goal][param_idx]]
                 return system_action
                     
             goal = state.top_hypothesis[0].possible_goals[0]
@@ -491,12 +494,13 @@ class PomdpGpSarsaPolicy :
             if partition_params is None :
                 return system_action
             for param_name in param_order :
-                if param_name not in partition_params or len(partition_params) != 1 :
+                if param_name not in partition_params or len(partition_params[param_name]) != 1 :
                     uncertain_params.append(param_name)
                 else :
                     params[param_name] = partition_params[param_name][0]
             system_action.referring_params = params
             if len(uncertain_params) > 0 :
+                # If the top partition is uncertain about a param, confirm it
                 param_idx = int(np.random.uniform(0, len(uncertain_params)))
                 system_action.extra_data = [uncertain_params[param_idx]]
                 return system_action
@@ -508,7 +512,7 @@ class PomdpGpSarsaPolicy :
                 # If there is no second hypothesis, just confirm any value
                 # This param si chosen at random so that you don't get 
                 # stuck in a loop here
-                if state.second_hypothesis is None or state.second_hypothesis.partition.possible_param_values is None :
+                if state.second_hypothesis is None or state.second_hypothesis[0].possible_param_values is None :
                     param_idx = int(np.random.uniform(0, len(param_order)))
                     system_action.extra_data = [param_order[param_idx]]
                     return system_action
@@ -516,10 +520,13 @@ class PomdpGpSarsaPolicy :
                 # A good heuristic is to see in what params the first 
                 # and second hypotheses differ. Any one of these is 
                 # likely to help. 
-                second_params = state.second_hypothesis.partition.possible_param_values
+                second_params = state.second_hypothesis[0].possible_param_values
                 for param_name in param_order :
                     top_param_value = partition_params[param_name][0]
-                    if param_name not in second_params or top_param_value not in second_params[param_name] or len(second_params[param_name]) != 1 :
+                    if param_name not in second_params or top_param_value not in second_params[param_name] or len(second_params[param_name]) == 1 :
+                        # This is not a useful param to compare
+                        pass
+                    else :
                         system_action.extra_data = [param_name]
                         return system_action
                 

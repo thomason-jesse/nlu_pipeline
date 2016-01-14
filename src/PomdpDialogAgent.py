@@ -12,7 +12,7 @@ from TemplateBasedGenerator import TemplateBasedGenerator
 
 class PomdpDialogAgent :
 
-    def __init__(self, parser, grounder, u_input, output, parse_depth=10):
+    def __init__(self, parser, grounder, u_input, output, parse_depth=10, load_policy_from_file=False):
         self.parser = parser
         self.grounder = grounder
         self.parse_depth = parse_depth
@@ -22,7 +22,7 @@ class PomdpDialogAgent :
 
         self.knowledge = Knowledge()    
         self.state = HISBeliefState(self.knowledge)  
-        self.policy = PomdpGpSarsaPolicy(self.knowledge)
+        self.policy = PomdpGpSarsaPolicy(self.knowledge, load_policy_from_file)
         self.previous_system_action = SystemAction('repeat_goal')  
         self.n_best_utterances = None
 
@@ -41,7 +41,7 @@ class PomdpDialogAgent :
         self.state = HISBeliefState(self.knowledge)
         self.parser_train_data = dict()
         
-        #print 'Belief state: ', str(self.state) 
+        print 'Belief state: ', str(self.state) 
         summary_state = SummaryState(self.state)
         (dialog_action, dialog_action_arg) = self.policy.get_initial_action(summary_state)    
         
@@ -599,7 +599,9 @@ class PomdpDialogAgent :
                 for item in self.parser_train_data[key] :
                     training_pairs.append((item, answers[key]))
 
-        self.parser.train_learner_on_denotations(training_pairs, 10, 4, 4)
+        print 'training_pairs = ', training_pairs
+
+        self.parser.train_learner_on_denotations(training_pairs, 10, 100, 3)
 
         print 'Finished retraining parser'
 

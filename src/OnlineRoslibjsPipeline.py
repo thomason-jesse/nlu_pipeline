@@ -196,8 +196,18 @@ def init_static_dialog_agent(args) :
     print "instantiating KBGrounder"
     grounder = KBGrounder.KBGrounder(ont)
 
-    print "instantiating Parser"
-    parser = Parser.Parser(ont, lex, learner, grounder, beam_width=10, safety=True)
+    load_parser_from_file = False
+    if len(args) > 4 :
+        if args[4].lower() == 'true' :
+            load_parser_from_file = True
+            
+    if load_parser_from_file :
+        parser = load_model('static_parser')
+        grounder.parser = parser
+        grounder.ontology = parser.ontology
+    else :
+        print "instantiating Parser"
+        parser = Parser.Parser(ont, lex, learner, grounder, beam_width=10, safety=True)
 
     print "instantiating Generator"
     generator = Generator.Generator(ont, lex, learner, parser, beam_width=sys.maxint, safety=True)
@@ -206,19 +216,21 @@ def init_static_dialog_agent(args) :
     static_policy = StaticDialogPolicy.StaticDialogPolicy()
     A = DialogAgent.DialogAgent(parser, generator, grounder, static_policy, None, None)
 
-    print "reading in training data"
-    D = A.read_in_utterance_action_pairs(args[3])
+    if not load_parser_from_file :
+        print "reading in training data"
+        D = A.read_in_utterance_action_pairs(args[3])
 
-    if len(args) > 4 and args[4] == "both":
-        print "training parser and generator jointly from actions"
-        converged = A.jointly_train_parser_and_generator_from_utterance_action_pairs(
-            D, epochs=10, parse_beam=30, generator_beam=10)
-    else:
-        print "training parser from actions"
-        converged = A.train_parser_from_utterance_action_pairs(
-            D, epochs=10, parse_beam=30)
+        if len(args) > 4 and args[4] == "both":
+            print "training parser and generator jointly from actions"
+            converged = A.jointly_train_parser_and_generator_from_utterance_action_pairs(
+                D, epochs=10, parse_beam=30, generator_beam=10)
+        else:
+            print "training parser from actions"
+            converged = A.train_parser_from_utterance_action_pairs(
+                D, epochs=10, parse_beam=30)
 
-    print "theta: "+str(parser.learner.theta)
+        print "theta: "+str(parser.learner.theta)
+        save_model(parser, 'static_parser')
     
     return A
 
@@ -245,21 +257,32 @@ def init_pomdp_dialog_agent(args) :
     print "Instantiating KBGrounder"
     grounder = KBGrounder.KBGrounder(ont)
 
-    print "Instantiating Parser"
-    parser = Parser.Parser(ont, lex, learner, grounder, beam_width=10)
-    #parser = load_model('parser')
-    grounder.parser = parser
-    grounder.ontology = parser.ontology
+    load_models_from_file = False
+    if len(args) > 4 :
+        if args[4].lower() == 'true' :
+            load_models_from_file = True
+
+    if load_models_from_file :
+        parser = load_model('pomdp_parser')
+        grounder.parser = parser
+        grounder.ontology = parser.ontology
+    else :
+        print "Instantiating Parser"
+        parser = Parser.Parser(ont, lex, learner, grounder, beam_width=10)
 
     print "Instantiating DialogAgent"
-    agent = PomdpDialogAgent(parser, grounder, None, None)
+    if load_models_from_file :
+        agent = PomdpDialogAgent(parser, grounder, None, None, parse_depth=10, load_policy_from_file=True)
+    else :
+        agent = PomdpDialogAgent(parser, grounder, None, None, parse_depth=10, load_policy_from_file=False)
 
-    print "reading in data and training parser from actions"
-    D = agent.read_in_utterance_action_pairs(args[3])
-    converged = agent.train_parser_from_utterance_action_pairs(D, epochs=10, parse_beam=30)
-    print "theta: "+str(parser.learner.theta)
-    save_model(parser, 'parser')
-    print 'Parser ontology : ', parser.ontology.preds
+    if not load_models_from_file :
+        print "reading in data and training parser from actions"
+        D = agent.read_in_utterance_action_pairs(args[3])
+        converged = agent.train_parser_from_utterance_action_pairs(D, epochs=10, parse_beam=30)
+        print "theta: "+str(parser.learner.theta)
+        save_model(parser, 'pomdp_parser')
+        #print 'Parser ontology : ', parser.ontology.preds
 
     return agent
 

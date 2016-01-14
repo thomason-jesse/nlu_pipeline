@@ -131,10 +131,10 @@ class Partition:
         return True
     
     def remove_invalid_params(self, knowledge, grounder) :
-        print 'In remove invalid params with '
-        print str(self)
+        #print 'In remove invalid params with '
+        #print str(self)
         if len(self.possible_goals) != 1 :
-            print 'no change'
+            #print 'no change'
             return 
         goal = self.possible_goals[0]
         for param_name in self.possible_param_values :
@@ -150,9 +150,9 @@ class Partition:
                     self.possible_param_values[param_name] = [None]
             else :
                 self.possible_param_values[param_name] = [None]
-        print 'End of remove invalid params with '
-        print str(self)
-        print '--------------------------------------------'
+        #print 'End of remove invalid params with '
+        #print str(self)
+        #print '--------------------------------------------'
     
     # Check whether this partition contains all states having some goal 
     # and params        
