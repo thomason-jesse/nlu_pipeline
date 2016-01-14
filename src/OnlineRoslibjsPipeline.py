@@ -9,13 +9,13 @@ import LinearLearner
 import KBGrounder
 import Parser
 import Generator
-import DialogAgent
 import StaticDialogPolicy
 import numpy, re, time, rospy
 
 from TemplateBasedGenerator import TemplateBasedGenerator
 from PomdpStaticDialogPolicy import PomdpStaticDialogPolicy
 from PomdpDialogAgent import PomdpDialogAgent
+from StaticDialogAgent import StaticDialogAgent
 from Utils import *
 
 from std_msgs.msg import String
@@ -214,7 +214,7 @@ def init_static_dialog_agent(args) :
 
     print "instantiating DialogAgent"
     static_policy = StaticDialogPolicy.StaticDialogPolicy()
-    A = DialogAgent.DialogAgent(parser, generator, grounder, static_policy, None, None)
+    A = StaticDialogAgent(parser, generator, grounder, static_policy, None, None)
 
     if not load_parser_from_file :
         print "reading in training data"

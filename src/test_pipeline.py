@@ -10,10 +10,10 @@ import LinearLearner
 import KBGrounder
 import Parser
 import Generator
-import DialogAgent
 import StaticDialogPolicy
 import ActionSender
 from TemplateBasedGenerator import TemplateBasedGenerator
+from StaticDialogAgent import StaticDialogAgent
 
 class InputFromKeyboard:
     def __init__(self):
@@ -74,7 +74,7 @@ print "instantiating DialogAgent"
 u_in = InputFromKeyboard()
 u_out = OutputToStdout()
 static_policy = StaticDialogPolicy.StaticDialogPolicy()
-A = DialogAgent.DialogAgent(parser, generator, grounder, static_policy, u_in, u_out)
+A = StaticDialogAgent(parser, generator, grounder, static_policy, u_in, u_out)
 
 print "instantiating ActionSender"
 action_sender = ActionSender.ActionSender(lex, generator, u_out)
