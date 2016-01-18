@@ -667,7 +667,7 @@ class PomdpDialogAgent :
                 # Re-parse expression
                 print 'Parsing expression'
                 expr = ' '.join([w for (o, w) in utterance.parse_leaves[1]])
-                n_best_parses = self.parser.parse_expression(' '.join(expr), n=1)
+                n_best_parses = self.parser.parse_expression(' '.join(expr), k=100, n=1)
                 
                 # Create utterances of parse
                 print 'Creating utterances'
