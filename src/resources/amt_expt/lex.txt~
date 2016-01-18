@@ -44,7 +44,6 @@ hamburger :- N : hamburger
 juice :- N : juice
 muffin :- N : muffin
 alice :- N : alice
-alice ashcraft :- N : alice
 ashcraft :- N : alice
 secretary :- N : alice
 francis foster :- N : frannie
@@ -65,6 +64,7 @@ george :- N : george
 george green :- N : george
 green :- N : george
 intern :- N : george
+evelyn :- N : eve
 evelyn eckhart :- N : eve
 eve eckhart :- N : eve
 eckhart :- N : eve

@@ -34,12 +34,14 @@ class PomdpDialogAgent :
         
         # To store data for retraining the parser
         self.parser_train_data = None
+        self.max_prob_user_utterances = None
 
     # Returns True if the dialog terminates on its own and False if the u
     # user entered stop
     def run_dialog(self) :
         self.state = HISBeliefState(self.knowledge)
         self.parser_train_data = dict()
+        self.max_prob_user_utterances = list()
         
         print 'Belief state: ', str(self.state) 
         summary_state = SummaryState(self.state)
@@ -120,14 +122,17 @@ class PomdpDialogAgent :
         
         #print 'n_best_parses = '
         #for [parse, parse_tree, parse_trace, conf] in n_best_parses :
-            #print 'parse = ', parse
-            #print 'parse_tree = ', parse_tree
+            #print 'parse = ', self.parser.print_parse(parse)
+            #print 'parse_tree = ', self.parser.print_parse(parse_tree[0])
+            #print 'parse_trace[-1] = ', parse_trace[-1]
             #print 'parse_trace = ', parse_trace
+            #print 'type(parse_trace) = ', type(parse_trace)
+            #print 'len(parse_trace) = ', len(parse_trace)
             #print 'conf = ', conf 
             #print '-------------------------------'
 
         # Create an n-best list of Utterance objects along with probabiltiies 
-        # obtained fromt ehir confidences
+        # obtained from their confidences
         self.get_n_best_utterances_from_parses(n_best_parses)
         
         if len(self.n_best_utterances) > 0 :
@@ -349,6 +354,10 @@ class PomdpDialogAgent :
             if utterances is not None and len(utterances) > 0:
                 #print "Got ", len(utterances), " utterances"
                 for utterance in utterances :
+                    utterance.parse_leaves = parse_trace[-1]
+                    utterance.parse = parse
+                    utterance.parse_tree = parse_tree
+                    utterance.parse_trace = parse_trace
                     #print str(utterance)
                     utterance.parse_prob = math.exp(conf) / len(utterances)
                     self.n_best_utterances.append(utterance)
@@ -361,9 +370,14 @@ class PomdpDialogAgent :
             sum_exp_conf += utterance.parse_prob
             
         sum_exp_conf += self.knowledge.obs_by_non_n_best_prob
+        max_prob_utterance = None
         for utterance in self.n_best_utterances :
+            if max_prob_utterance is None or utterance.parse_prob > max_prob_utterance.parse_prob :
+                max_prob_utterance = utterance
             utterance.parse_prob /= sum_exp_conf
             
+        #print 'max_prob_utterance parse = ', max_prob_utterance.parse_leaves 
+        self.max_prob_user_utterances.append(max_prob_utterance)
         #print "N-best utterances: "
         #for utterance in self.n_best_utterances :
             #print str(utterance)
@@ -599,10 +613,79 @@ class PomdpDialogAgent :
                 for item in self.parser_train_data[key] :
                     training_pairs.append((item, answers[key]))
 
-        print 'training_pairs = ', training_pairs
+        #print 'training_pairs = ', training_pairs
 
-        self.parser.train_learner_on_denotations(training_pairs, 10, 100, 3)
+        #self.parser.train_learner_on_denotations(training_pairs, 10, 100, 3)
 
-        print 'Finished retraining parser'
+        #print 'Finished retraining parser'
+        
+        print 'Looking for None parses'
+        
+        for utterance in self.max_prob_user_utterances :
+            print 'Examining ', utterance.parse_leaves
+            words_matched_to_none = list()
+            print 'words_matched_to_none = ', words_matched_to_none
+            for (idx, (ont_pred, word)) in enumerate(utterance.parse_leaves[1]) :
+                if ont_pred is None :
+                    # In the most confident parse, this word was ignored
+                    if len(self.parser.lexicon.get_semantic_forms_for_surface_form(word)) == 0 :
+                        # There is no entry for this word in the lexicon
+                        words_matched_to_none.append((idx, ont_pred, word))
+                        
+            # Avoid dealing with ambiguity
+            if len(words_matched_to_none) == 1 :
+                # See whether the thing on either side is a noun
+                (idx, ont_pred, word) = words_matched_to_none[0]
+                print 'Going to try for (', idx, ', ', ont_pred, ', ', word, ')'
+                lexicon_entry = None
+                if idx > 0 :
+                    sem_indices = self.parser.lexicon.get_semantic_forms_for_surface_form(utterance.parse_leaves[1][idx-1][1])
+                    sem_forms = [self.parser.lexicon.semantic_forms[sem_idx] for sem_idx in sem_indices]
+                    if len(sem_forms) == 1 :
+                        if sem_forms[0].category == self.parser.lexicon.read_category_from_str('N') :
+                            ont_idx = sem_forms[0].idx
+                            ont_pred = self.parser.ontology.preds[ont_idx]
+                            # Word before is a noun
+                            lexicon_entry = word + ' :- N : ' + ont_pred
+                if lexicon_entry is None and idx < len(utterance.parse_leaves[1]) - 1 :
+                    sem_forms = self.parser.lexicon.get_semantic_forms_for_surface_form(utterance.parse_leaves[1][idx+1][1])
+                    if len(sem_forms) == 1 :
+                        if sem_forms[0].category == self.parser.lexicon.read_category_from_str('N') :
+                            ont_idx = sem_forms[0].idx
+                            ont_pred = self.parser.ontology.preds[ont_idx]
+                            # Word before is a noun
+                            lexicon_entry = word + ' :- N : ' + ont_pred
+                
+                print 'lexicon_entry = ', lexicon_entry
+                # If one of them is, combine with that - add this entry to lexicon
+                if lexicon_entry is not None :
+                    self.parser.lexicon.expand_lex_from_strs([lexicon_entry], 
+                        self.parser.lexicon.surface_forms, self.parser.lexicon.semantic_forms, 
+                        self.parser.lexicon.entries, self.parser.lexicon.pred_to_surface, 
+                        allow_expanding_ont=False)
+                
+                # Re-parse expression
+                print 'Parsing expression'
+                expr = ' '.join([w for (o, w) in utterance.parse_leaves[1]])
+                n_best_parses = self.parser.parse_expression(' '.join(expr), n=1)
+                
+                # Create utterances of parse
+                print 'Creating utterances'
+                self.get_n_best_utterances_from_parses(n_best_parses)
+                    # Writes n best utterances into self.n_best_utterances
+                
+                # Check that new max prob utterance matches old max prob utterance = utterance
+                new_max_prob_utterance = None
+                for new_utterance in self.n_best_utterances :
+                    if new_max_prob_utterance is None or new_utterance.parse_prob > new_max_prob_utterance.parse_prob :
+                        new_max_prob_utterance = new_utterance
+                
+                # If not, delete the lexical entry just added
+                if not utterance.is_like(new_max_prob_utterance) and ont_idx in self.parser.ontology.preds :
+                    print 'Utterances not matching. Deleting entry.'
+                    self.parser.lexicon.delete_semantic_form_for_surface_form(word, self.parser.ontology.preds.index(ont_idx))
 
         self.parser_train_data = dict()
+        self.max_prob_user_utterances = list()
+        
+        

@@ -6,7 +6,20 @@ __author__ = 'aishwarya'
 class TemplateBasedGenerator :
     
     def __init__(self) :
-        pass
+        self.init_room_str()
+    
+    def init_room_str(self) :
+        self.room_str = dict()
+        self.room_str['l3_516'] = '3516'
+        self.room_str['l3_508'] = '3508'
+        self.room_str['l3_512'] = '3512'
+        self.room_str['l3_510'] = '3510'
+        self.room_str['l3_402'] = '3402'
+        self.room_str['l3_418'] = '3418'
+        self.room_str['l3_420'] = '3420'
+        self.room_str['l3_432'] = '3432'
+        self.room_str['l3_502'] = '3502'
+        self.room_str['l3_414b'] = '3414b'
     
     def get_param(self, system_action, param_name) :
         if system_action.referring_params is None :
@@ -18,19 +31,19 @@ class TemplateBasedGenerator :
     
     def get_action_sentence(self, action) :
         if action.name == 'searchroom' :
-            return 'The robot searched for ' + str(action.params[0]) + ' in room ' + str(action.params[1]) + '.'
+            return 'I searched for ' + str(action.params[0]) + ' in room ' + str(action.params[1]) + '.'
         elif action.name == 'bring' :
-            return 'The robot brought ' + str(action.params[0]) + ' to ' + str(action.params[1]) + '.'
+            return 'I brought ' + str(action.params[0]) + ' to ' + str(action.params[1]) + '.'
         elif action.name == 'at' :
-            return 'The robot went to ' + str(action.params[0]) + '.'
+            return 'I went to ' + self.room_str[str(action.params[0])] + '.'
         else :
             if len(action.params) == 0 :
-                return 'The robot took action ' + action.name + '.'
+                return 'I took action ' + action.name + '.'
             elif len(action.params) == 1 :
-                return 'The robot took action ' + action.name + ' with parameter ' + str(action.params[0]) + '.'
+                return 'I took action ' + action.name + ' with parameter ' + str(action.params[0]) + '.'
             else :
                 params = [str(param) for param in action.params]
-                return 'The robot took action ' + action.name + ' with parameters ' + ', '.join(params[:-1]) + ' and ' + params[-1] + '.'
+                return 'I took action ' + action.name + ' with parameters ' + ', '.join(params[:-1]) + ' and ' + params[-1] + '.'
             
     
     def get_sentence(self, system_action) :
@@ -53,11 +66,11 @@ class TemplateBasedGenerator :
                 patient = self.get_param(system_action, 'patient')
                 location = self.get_param(system_action, 'location')
                 if patient is not None and location is not None :
-                    return 'You want me to search for ' + patient + ' in room ' + location + '?'
+                    return 'You want me to search for ' + patient + ' in ' + self.room_str[location] + '?'
                 elif patient is not None :
                     return 'You want me to search for ' + patient + ' in some room?'
                 elif location is not None :
-                    return 'You want me to search for someone in room ' + location + '?'
+                    return 'You want me to search for someone in ' + self.room_str[location] + '?'
                 else :    
                     return 'You want me to search for someone?'
             elif system_action.referring_goal == 'bring' :
@@ -74,9 +87,9 @@ class TemplateBasedGenerator :
             elif system_action.referring_goal == 'at' :
                 location = self.get_param(system_action, 'location')
                 if location is not None :
-                    return 'You want me to walk to room ' + location + '?'
+                    return 'You want me to walk to ' + self.room_str[location] + '?'
                 else :    
-                    return 'You want me to walk to somewhere?'
+                    return 'You want me to walk to some room?'
             else :
                 goal = system_action.referring_goal
                 params = [str(param) for param in system_action.referring_params.values()]

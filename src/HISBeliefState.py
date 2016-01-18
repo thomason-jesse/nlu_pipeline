@@ -62,16 +62,18 @@ class HISBeliefState:
         if system_action.referring_params != None :
             for param_name in system_action.referring_params :
                 if param_name in required_params :
-                    required_params[param_name] = required_params[param_name] + system_action.referring_params[param_name]
+                    required_params[param_name] = required_params[param_name] + [system_action.referring_params[param_name]]
                 else :
                     required_params[param_name] = [system_action.referring_params[param_name]]
+                required_params[param_name] = list(set(required_params[param_name]))
         if utterance.referring_params != None :
             for param_name in utterance.referring_params :
                 if param_name in required_params :
-                    required_params[param_name] = required_params[param_name] + utterance.referring_params[param_name]
+                    required_params[param_name] = required_params[param_name] + [utterance.referring_params[param_name]]
                 else :
                     required_params[param_name] = [utterance.referring_params[param_name]]
-
+                required_params[param_name] = list(set(required_params[param_name]))
+                
         #print "required_goal = ", required_goal        # DEBUG
         #print "required_params = ", required_params    # DEBUG
         

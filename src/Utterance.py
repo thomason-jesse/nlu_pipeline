@@ -4,7 +4,8 @@ from Utils import *
 
 class Utterance:
 
-    def __init__(self, action_type, referring_goal=None, referring_params=None, parse_prob=0.0):
+    def __init__(self, action_type, referring_goal=None, 
+            referring_params=None, parse_prob=0.0):
         # This gives the type of dialog action
         # Possible types - inform, affirm, deny
         # In case of affirm and deny, the goal and params will be None
@@ -18,6 +19,12 @@ class Utterance:
         
         # Probability of the utterance given the most recent observation
         self.parse_prob = parse_prob
+        
+        # Some extra parse info
+        self.parse_leaves = None
+        self.parse = None
+        self.parse_tree = None
+        self.parse_trace = None
 
     def __str__(self):
         str_form = 'Utterance: '+ str(self.action_type) + '\n'
@@ -49,6 +56,7 @@ class Utterance:
         if not checkDicts(self.referring_params, other.referring_params) :
             return False
         return True
+        
     def __hash__(self):
         hash_tuple = ()
         if self.referring_params is not None :

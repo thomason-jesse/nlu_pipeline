@@ -342,3 +342,30 @@ class Lexicon:
         if not node.validate_tree_structure():
             sys.exit("ERROR: read in invalidly linked semantic node from string '"+s+"'")  # DEBUG
         return node
+
+    def delete_semantic_form_for_surface_form(self, surface_form, ont_idx) :
+        if surface_form not in self.surface_forms :
+            return
+        matching_semantic_form = None
+        for semantic_form in self.semantic_forms :
+            if semantic_form.idx == ont_idx :
+                matching_semantic_form = semantic_form
+                break
+        if matching_semantic_form is None :
+            return
+            
+        sur_idx = self.surface_forms.index(surface_form)
+        sem_idx = self.semantic_forms.index(matching_semantic_form)
+        
+        if sur_idx in self.entries :
+            if sem_idx in self.entries[sur_idx] :
+                self.entries[sur_idx].remove(sem_idx)
+                
+        if ont_idx in self.pred_to_surface :
+            if sur_idx in self.pred_to_surface[ont_idx] :
+                self.pred_to_surface.remove(sur_idx)
+                
+        if sem_idx in self.reverse_entries :
+            if sur_idx in self.reverse_entries[sem_idx] :
+                self.reverse_entries.remove(sur_idx)
+        

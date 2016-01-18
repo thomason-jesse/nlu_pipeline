@@ -44,8 +44,6 @@ hamburger :- N : hamburger
 juice :- N : juice
 muffin :- N : muffin
 alice :- N : alice
-alice ashcraft :- N : alice
-ashcraft :- N : alice
 secretary :- N : alice
 francis foster :- N : frannie
 frannie :- N : frannie
