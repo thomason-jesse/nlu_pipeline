@@ -294,11 +294,19 @@ def start(pomdp_agent, static_agent) :
     while True :
         user = user_manager.get_next_user()    
         if user is not None :
+            # There is actually a user
             try :
                 print 'Starting communication with user', user
-                # There is actually a user
-                u_in = InputFromTopic(user)
-                u_out = OutputToTopic(user, u_in)
+                user_manager.lock.acquire()
+                # Making this a critical section otherwise sometimes the
+                # dialogue hangs 
+                try :
+                    u_in = InputFromTopic(user)
+                    u_out = OutputToTopic(user, u_in)
+                except :
+                    raise
+                finally :
+                    user_manager.lock.release()
                 
                 # Randomly choose an agent
                 r = numpy.random.random_sample()
@@ -322,7 +330,7 @@ def run_static_dialog(agent, u_in, u_out) :
         return
     a = agent.initiate_dialog_to_get_action(s)
     response_generator = TemplateBasedGenerator()
-    u_out.say(response_generator.get_action_sentence(a) + '. Was this the right action?')
+    u_out.say(response_generator.get_action_sentence(a) + ' Was this the right action?')
     r = u_in.get()
     #u_out.say("Happy to help!")
     u_out.say("<END/>")

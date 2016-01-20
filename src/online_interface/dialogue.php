@@ -51,6 +51,19 @@
     // Global variables for subscriber
     var subscriber_prev_msg = null;
 
+    function decideTask() {
+        var tasks = ['walk', 'deliver', 'search'];
+        var task = tasks[Math.floor(Math.random()*tasks.length)];
+        if (task == 'walk') {
+            drawRandomWalkTask();
+        } else if (task == 'deliver') {
+            drawRandomDeliverTask();
+        } else {
+            drawRandomSearchTask();
+        }
+        
+    }
+
 	//draw a random walk task and return the description to javascript; write the task goal to file for later comparison against command generated
 	function drawRandomWalkTask()
 	{
@@ -78,8 +91,17 @@
 	function drawRandomDeliverTask()
 	{
 		//update user id for new task
+		//get user id
+		user_id_base = <?php echo "'".uniqid()."'";?>;
 		user_id = user_id_base.concat('_deliver');
 		current_task = "deliver";
+	
+		//hide ask id div and open task show div
+		document.getElementById('ask_for_ID').style.display = 'none';
+		document.getElementById('inst').style.display = 'block';
+		document.getElementById('introduce_task').style.display = 'block';
+		document.getElementById('task_map').style.display = 'block';
+		document.getElementById('dialog_start_block').style.display = 'block';
 	
 		getRequest(
 			  'draw_random_task.php', // URL for the PHP file
@@ -92,11 +114,19 @@
     //draw a random search task and return the description to javascript; write the task goal to file for later comparison against command generated
 	function drawRandomSearchTask()
 	{
-		//update user id for new task
+        //get user id
+		user_id_base = <?php echo "'".uniqid()."'";?>;
 		user_id = user_id_base.concat('_search');
 		current_task = "search";
 	
-		getRequest(
+		//hide ask id div and open task show div
+		document.getElementById('ask_for_ID').style.display = 'none';
+		document.getElementById('inst').style.display = 'block';
+		document.getElementById('introduce_task').style.display = 'block';
+		document.getElementById('task_map').style.display = 'block';
+		document.getElementById('dialog_start_block').style.display = 'block';
+	
+        getRequest(
 			  'draw_random_task.php', // URL for the PHP file
 			  'task=search&user_id='.concat(user_id).concat('&train_or_test=').concat(train_or_test), // parameters for PHP
 			   invokeRandomTaskOutput,  // handle successful request
@@ -206,62 +236,6 @@
         //alert(response_obj[1]);
         socket = response_obj[1];
     }
-    
-    function startSecondDialog()
-	{
-		//alert('DEBUG: startSecondDialog() called');
-		
-		//change map
-		document.getElementById('task_map').innerHTML = "<b>DIRECTORY</b><p><img src=\"bring_task_data.png\" alt=\"People and items known to robot\" style=\"width:100%\"></p>";
-		
-		//hide start div and clear dialog table of past conversation
-		document.getElementById('second_dialog_start_block').style.display = 'none';
-		table = document.getElementsByName('history')[0];
-		while (table.rows.length > 1)
-		{
-			table.deleteRow(0);
-		}
-		
-		//gray out text area to prevent overloading system while it's starting up
-		document.getElementsByName("user_input_box")[0].disabled = true;
-		
-		//add robot initial [thinking...] cell
-		var table = document.getElementsByName('history')[0];
-		var system_row = table.insertRow(table.rows.length-1);
-		var system_response_cell = system_row.insertCell(0);
-		system_response_cell.innerHTML = "<i>typing...</i>";
-		system_response_cell.style.backgroundColor = system_cell_color;
-		var system_name_cell = system_row.insertCell(0);
-		system_name_cell.innerHTML = "ROBOT";
-		system_name_cell.style.backgroundColor = system_cell_color;
-	
-		//draw a new task to display; updates task variables and displays new description
-		drawRandomDeliverTask();
-		
-		// Set up a subscriber to listen to the dialog agent
-        subscriber = new ROSLIB.Topic({
-                            ros : ros,
-                            name : 'python_pub_' + user_id,
-                            messageType : 'std_msgs/String'
-                        });
-
-        subscriber.subscribe(dialogResponseReceiver);
-        //alert('Subscriber created');
-        
-        // Publish id continuously 
-        publisher = new ROSLIB.Topic({
-                        ros : ros,
-                        name : '/new_user_topic',
-                        messageType : 'std_msgs/String'
-                    });
-        publish_msg = user_id
-        publishing = true;
-        setInterval(publish, 100);        
-        //alert('Publishing started');
-        
-        
-		return false;
-	}
 	
 	function startThirdDialog()
 	{
@@ -650,10 +624,27 @@ width:50%
 <DIV ID="wrap">
 <DIV ID="left">
 	<DIV ID="ask_for_ID">
-		<p>You will have a text conversation with a robot that knows how to navigate a floor of a building and has access to some food and drink items for people on the floor. You will instruct the robot to accomplish two tasks, then you will be asked to name a person on the floor. Then, you will complete a small survey about your experiences and receive your code for Mechanical Turk.</p>
+		<p>You will have a text conversation with a robot that knows how to perform the following tasks -  
+        <ul>
+          <li>Walk to a location. </li>
+          <li>Bring an item for someone. </li>
+          <li>Search a room for someone. </li>
+        </ul>
+        </p>
+        <p> You need to do the following - 
+        <ol>
+          <li>Instruct the robot to accomplish a task, clarifying any questions it has. </li>
+          <li>Name a person on the floor to verify that you are a human. </li>
+          <li>Complete a small survery about your experiences. </li>
+          <li>Receive your code for Mechanical Turk. </li>
+        </ol>
+        </p>
+        
+        <p> You need to complete all the above steps to complete the HIT. Navigating away from the page or refreshing it during any of the above steps <b>will</b> prevent you from completing the HIT. If the conversation extends too long, you may end it by replying 'stop' but ending the conversation before ten responses from your side without successfully communicating the task <b>will</b> invalidate your HIT.  </p>
+        
 		<p><FORM NAME="ask_for_ID_form" ACTION="" METHOD="GET">
 			Click the button below to begin.<br/>
-			<INPUT TYPE="button" NAME="user_id_button" Value="Begin" onClick="drawRandomWalkTask()">
+			<INPUT TYPE="button" NAME="user_id_button" Value="Begin" onClick="decideTask()">
 		</FORM></p>
 	</DIV>
 
@@ -681,12 +672,6 @@ width:50%
 		</TABLE>
 	</DIV>
 	
-	<DIV ID="second_dialog_start_block" style="display:none">
-		<FORM NAME="user_start_second_dialog_form" ACTION="" METHOD="GET">
-			<INPUT TYPE="button" NAME="user_start_second_dialog_button" Value="Next Task" onClick="startSecondDialog()">
-		</FORM>
-	</DIV>
-	
 	<DIV ID="third_dialog_start_block" style="display:none">
 		<FORM NAME="user_start_third_dialog_form" ACTION="" METHOD="GET">
 			<INPUT TYPE="button" NAME="user_start_third_dialog_button" Value="Final Task" onClick="startThirdDialog()">
@@ -703,8 +688,8 @@ width:50%
 <DIV ID="right">
 
 	<DIV ID="task_map" style="display:none">
-		<b>DIRECTORY</b>
-			<p><img src="directory.png" alt="Rooms, labs and offices" style="width:60%"></p>
+		<b>People and items the robot knows - </b>
+			<p><img src="bring_task_data.png" alt="Rooms, labs and offices" style="width:100%"></p>
 	</DIV>
 	
 </DIV>
