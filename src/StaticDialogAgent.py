@@ -29,6 +29,7 @@ class StaticDialogAgent:
 
         self.response_generator = TemplateBasedGenerator()
         self.knowledge = Knowledge()
+        self.dialogue_stopped = False
 
     # initiate a new dialog with the agent with initial utterance u
     def initiate_dialog_to_get_action(self, u):
@@ -55,6 +56,8 @@ class StaticDialogAgent:
                     sys.exit("ERROR: unrecognized dialog action '"+dialog_action+"' returned by policy for state "+str(self.state))
                 self.state.previous_action = [dialog_action, dialog_action_args]
                 self.dialog_action_functions[self.dialog_actions.index(dialog_action)](dialog_action_args)
+                if self.dialogue_stopped :
+                    return None
 
         self.train_parser_from_dialogue(action)
 
@@ -63,8 +66,11 @@ class StaticDialogAgent:
     # request the user repeat their original goal
     def request_user_initiative(self, args):
         #self.output.say("Can you restate your question or command?")
-        self.output.say("I\'m sorry but could you clarify again what you wanted me to do?")
+        self.output.say("I\'m sorry but could you repeat or rephrase your command?")
         u = self.input.get()
+        if u.lower().strip() == 'stop' :
+            self.dialogue_stopped = True
+            return
         if 'full' in self.parser_train_data :
             self.parser_train_data['full'].append(u)
         else :
@@ -86,26 +92,31 @@ class StaticDialogAgent:
         #self.output.say("What is the " + theme + " of the action you'd like me to take?")
         
         # Using a bad approximation to generate an understandable prompt
-        max_belief_action = ''
-        if 'bring' in self.state.user_action_belief and 'at' in self.state.user_action_belief :
-            if self.state.user_action_belief['bring'] > self.state.user_action_belief['at'] :
-                max_belief_action = 'bring'
-            else :
-                max_belief_action = 'at'
-        elif 'bring' in self.state.user_action_belief :
-            max_belief_action = 'bring'
-        else :
-            max_belief_action = 'at'
+        max_belief_action = None
+        for goal in self.state.user_action_belief :
+            if max_belief_action is None or self.state.user_action_belief[max_belief_action] < self.state.user_action_belief[goal] :
+                max_belief_action = goal
         
         if max_belief_action == 'bring' :
             if idx == 0:
                 self.output.say("What should I bring?")
             elif idx == 1:
                 self.output.say("Whom should I bring something for?")    
-        else :
+        elif max_belief_action == 'at' :
             self.output.say("Where should I walk to?")
+        elif max_belief_action == 'searchroom' :
+            if idx == 0:
+                self.output.say("Whom should I search for?")
+            elif idx == 1:
+                self.output.say("Where should I search?")    
+        else :
+            self.output.say("What is the " + theme + " of the action you want me to take?")    
         
         u = self.input.get()
+        
+        if u.lower().strip() == 'stop' :
+            self.dialogue_stopped = True
+            return
         
         if theme == 'agent' :
             theme = 'patient'
@@ -160,11 +171,23 @@ class StaticDialogAgent:
                 system_action.referring_params['location'] = a.params[0]
             response = self.response_generator.get_sentence(system_action)    
             self.output.say(response)
+        elif a.name == 'searchroom' :
+            if len(a.params) > 0 :
+                system_action.referring_params['patient'] = a.params[0]
+            if len(a.params) > 1 :
+                system_action.referring_params['location'] = a.params[1]
+            response = self.response_generator.get_sentence(system_action)    
+            self.output.say(response)
         else :
             self.output.say("I should take action " + a.name+" involving " +
                         ','.join([str(p) for p in a.params if p is not None]) + "?")
                         
         c = self.input.get()
+        
+        if c.lower().strip() == 'stop' :
+            self.dialogue_stopped = True
+            return
+        
         self.update_state_from_action_confirmation(c, a)
 
     # update state after asking user to confirm a (possibly partial) action

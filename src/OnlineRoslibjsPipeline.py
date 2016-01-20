@@ -329,9 +329,10 @@ def run_static_dialog(agent, u_in, u_out) :
     if s == 'stop':
         return
     a = agent.initiate_dialog_to_get_action(s)
-    response_generator = TemplateBasedGenerator()
-    u_out.say(response_generator.get_action_sentence(a) + ' Was this the right action?')
-    r = u_in.get()
+    if a is not None :
+        response_generator = TemplateBasedGenerator()
+        u_out.say(response_generator.get_action_sentence(a) + ' Was this the right action?')
+        r = u_in.get()
     #u_out.say("Happy to help!")
     u_out.say("<END/>")
     

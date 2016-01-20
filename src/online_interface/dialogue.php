@@ -674,13 +674,13 @@ width:50%
 	
 	<DIV ID="third_dialog_start_block" style="display:none">
 		<FORM NAME="user_start_third_dialog_form" ACTION="" METHOD="GET">
-			<INPUT TYPE="button" NAME="user_start_third_dialog_button" Value="Final Task" onClick="startThirdDialog()">
+			<INPUT TYPE="button" NAME="user_start_third_dialog_button" Value="Validate" onClick="startThirdDialog()">
 		</FORM>
 	</DIV>
 	
 	<DIV ID="end_session_block" style="display:none">
 		<FORM NAME="user_end_session_form" ACTION="" METHOD="GET">
-			<INPUT TYPE="button" NAME="user_end_session_button" Value="Exit Survey" onClick="endSession()">
+			<INPUT TYPE="button" NAME="user_end_session_button" Value="Fill Survey" onClick="endSession()">
 		</FORM>
 	</DIV>
 

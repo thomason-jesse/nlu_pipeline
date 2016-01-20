@@ -51,7 +51,7 @@ class TemplateBasedGenerator :
             if system_action.extra_data is not None and 'first' in system_action.extra_data :
                 return 'How can I help?'
             else :
-                return 'I\'m sorry but could you clarify again what you wanted me to do?'
+                return 'I\'m sorry but could you repeat or rephrase your command?'
                 
         elif system_action.action_type == 'confirm_action' :
             if system_action.referring_goal is None :
