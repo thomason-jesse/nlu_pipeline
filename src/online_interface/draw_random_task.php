@@ -43,6 +43,7 @@ $rooms_to_numbers = array('l3_502' => '3502', 'l3_402' => '3402', 'l3_414b' => '
 //$rooms_to_people = array('l3_416'=>'subha','l3_436'=>'katie','l3_508'=>'peter','l3_512'=>'ray','l3_510'=>'dana','l3_404'=>'kazunori','l3_418'=>'matteo','l3_420'=>'shiqi','l3_432'=>'jivko','l3_502'=>'stacy');
 $rooms_to_people = array('l3_502' => 'alice', 'l3_402' => 'bob', 'l3_414b' => 'carol', 'l3_418' => 'eve', 'l3_510' => 'frannie', 'l3_508' => 'mallory', 'l3_512' => 'walter');
 $people = array('alice', 'bob', 'carol', 'dave', 'eve', 'frannie', 'george', 'mallory', 'peggy', 'walter');
+$people_with_offices = array('alice', 'bob', 'carol', 'eve', 'frannie', 'mallory', 'walter');
 $foods = array('muffin', 'chips', 'coffee', 'hamburger', 'juice');
 $foods_to_needs = array('muffin'=>'1','chips'=>'2','coffee'=>'3','hamburger'=>'4','juice'=>'5');
 
@@ -118,7 +119,7 @@ elseif (strcmp($task_type,"at") == 0)
 elseif (strcmp($task_type,"query") == 0)
 {
 	//choose a person
-	$person = $people[rand(0,count($people)-1)];
+	$person = $people_with_offices[rand(0,count($people_with_offices)-1)];
 	
 	//get the person's office number
 	$room = False;

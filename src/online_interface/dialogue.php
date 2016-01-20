@@ -88,6 +88,21 @@
 			   invokeRandomTaskError    // handle error
 		  );
 	}
+    
+    //draw a random search task and return the description to javascript; write the task goal to file for later comparison against command generated
+	function drawRandomSearchTask()
+	{
+		//update user id for new task
+		user_id = user_id_base.concat('_search');
+		current_task = "search";
+	
+		getRequest(
+			  'draw_random_task.php', // URL for the PHP file
+			  'task=search&user_id='.concat(user_id).concat('&train_or_test=').concat(train_or_test), // parameters for PHP
+			   invokeRandomTaskOutput,  // handle successful request
+			   invokeRandomTaskError    // handle error
+		  );
+	}
 	
 	//draw a random query task and return the description to javascript; write the task goal to file for later comparison against command generated; this is the validation task to detect spammers
 	function drawRandomQueryTask()
@@ -420,21 +435,25 @@
 			//hide the table's final row (the one with the form for input)
 			
 			//make visible the DIV to start the next task
-			if (current_task == "walk")
-			{
-				document.getElementById('second_dialog_start_block').style.display = 'block';
-			}
+			//if (current_task == "walk")
+			//{
+				//document.getElementById('second_dialog_start_block').style.display = 'block';
+			//}
 			
-			//make visible the DIV to start the final task
-			else if (current_task == "deliver")
-			{
-				document.getElementById('third_dialog_start_block').style.display = 'block';
-			}
+			////make visible the DIV to start the final task
+			//else if (current_task == "deliver")
+			//{
+				//document.getElementById('third_dialog_start_block').style.display = 'block';
+			//}
 			
 			//end session and give user code for MTurk
-			else if (current_task == "query")
+			if (current_task == "query")
 			{
 				document.getElementById('end_session_block').style.display = 'block';
+			}
+            else
+            {
+				document.getElementById('third_dialog_start_block').style.display = 'block';
 			}
 		}
 		else

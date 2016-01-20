@@ -21,36 +21,41 @@ $task_type = $_POST['task'];
 $user_id = $_POST['user_id'];
 $train_or_test = $_POST['train_or_test'];
 
-$people_to_expressions = array('peter'=>array('Mallory','Mallory Morgan','Dr. Morgan','The Director'),
-										'ray'=>array('Walter','Walter Ward','The Supervisor'),
-										'dana'=>array('Peggy','Peggy Parker','Dr. Parker'),
-										'kazunori'=>array('Alice','Alice Ashcraft','The Secretary'),
-										'matteo'=>array('Robert','Robert Brown','Bob'),
-										'shiqi'=>array('Carol','Carol Clark','Dr. Clark'),
-										'jivko'=>array('Dave','Dave Daniel','Dr. Daniel'),
-										'stacy'=>array('Evelyn','Evelyn Eckhart','Eve'),
-										'subha'=>array('Francis','Francis Foster','Frannie'),
-										'katie'=>array('George','George Green','The Intern'));
-$person_to_possessive = array('subha'=>'her','katie'=>'his','peter'=>'her','ray'=>'his','dana'=>'her','kazunori'=>'her','matteo'=>'his','shiqi'=>'his','jivko'=>'his','stacy'=>'her');
-$person_to_obj_pronoun = array('subha'=>'her','katie'=>'him','peter'=>'her','ray'=>'him','dana'=>'her','kazunori'=>'her','matteo'=>'him','shiqi'=>'him','jivko'=>'him','stacy'=>'her');
-$person_to_pronoun = array('subha'=>'she','katie'=>'he','peter'=>'she','ray'=>'he','dana'=>'she','kazunori'=>'she','matteo'=>'he','shiqi'=>'he','jivko'=>'he','stacy'=>'she');
+$people_to_expressions = array('mallory'=>array('Mallory','Mallory Morgan','Dr. Morgan','The director'),
+                                    'walter'=>array('Walter','Walter Ward','The supervisor'),
+                                    'peggy'=>array('Peggy','Peggy Parker'),
+                                    'alice'=>array('Alice','Alice Ashcraft','The secretary'),
+                                    'bob'=>array('Robert','Robert Brown','Bob'),
+                                    'carol'=>array('Carol','Carol Clark'),
+                                    'dave'=>array('Dave','Dave Daniel'),
+                                    'eve'=>array('Evelyn','Evelyn Eckhart','Eve'),
+                                    'frannie'=>array('Francis','Francis Foster','Frannie'),
+                                    'george'=>array('George','George Green','The intern'));
+$person_to_possessive = array('alice'=>'her','bob'=>'his','carol'=>'her','dave'=>'his','eve'=>'her','frannie'=>'her','george'=>'his','mallory'=>'her','peggy'=>'her','walter'=>'his');
+$person_to_obj_pronoun = array('alice'=>'her','bob'=>'him','carol'=>'her','dave'=>'him','eve'=>'her','frannie'=>'her','george'=>'him','mallory'=>'her','peggy'=>'her','walter'=>'him');
+$person_to_pronoun = array('alice'=>'she','bob'=>'he','carol'=>'she','dave'=>'he','eve'=>'she','frannie'=>'she','george'=>'he','mallory'=>'she','peggy'=>'she','walter'=>'he');
 //$rooms = array('l3_508','l3_512','l3_510','l3_404','l3_418','l3_420','l3_432','l3_502','l3_416','l3_436','l3_414b','l3_516');
-$rooms = array('l3_508','l3_512','l3_510','l3_404','l3_418','l3_420','l3_432','l3_502','l3_416','l3_436');
-$rooms_to_names = array('l3_416'=>'Meeting Room','l3_436'=>'Research Lab','l3_414b'=>'Robot Lab','l3_516'=>'Conference Room');
-$rooms_to_numbers = array('l3_508'=>'3508','l3_512'=>'3512','l3_510'=>'3510','l3_404'=>'3404','l3_418'=>'3418','l3_420'=>'3420','l3_432'=>'3432','l3_502'=>'3502','l3_416'=>'3416','l3_436'=>'3436','l3_414b'=>'3414b','l3_516'=>'3516');
-$rooms_to_people = array('l3_416'=>'subha','l3_436'=>'katie','l3_508'=>'peter','l3_512'=>'ray','l3_510'=>'dana','l3_404'=>'kazunori','l3_418'=>'matteo','l3_420'=>'shiqi','l3_432'=>'jivko','l3_502'=>'stacy');
-$people = array('subha','katie','peter','ray','dana','kazunori','matteo','shiqi','jivko','stacy');
-$foods = array('hamburger','coffee','trashcan','phone','calendar');
-$foods_to_needs = array('coffee'=>'1','hamburger'=>'2','phone'=>'3','trashcan'=>'4','calendar'=>'5');
+//$rooms = array('l3_508','l3_512','l3_510','l3_404','l3_418','l3_420','l3_432','l3_502','l3_416','l3_436');
+$rooms = array('l3_502', 'l3_402', 'l3_414b', 'l3_418', 'l3_510', 'l3_508', 'l3_512');
+//$rooms_to_names = array('l3_416'=>'Meeting Room','l3_436'=>'Research Lab','l3_414b'=>'Robot Lab','l3_516'=>'Conference Room');
+$rooms_to_names = array();
+$rooms_to_numbers = array('l3_502' => '3502', 'l3_402' => '3402', 'l3_414b' => '3414b', 'l3_418' => '3418', 'l3_510' => '3510', 'l3_508' => '3508', 'l3_512' => '3512');
+//$rooms_to_people = array('l3_416'=>'subha','l3_436'=>'katie','l3_508'=>'peter','l3_512'=>'ray','l3_510'=>'dana','l3_404'=>'kazunori','l3_418'=>'matteo','l3_420'=>'shiqi','l3_432'=>'jivko','l3_502'=>'stacy');
+$rooms_to_people = array('l3_502' => 'alice', 'l3_402' => 'bob', 'l3_414b' => 'carol', 'l3_418' => 'eve', 'l3_510' => 'frannie', 'l3_508' => 'mallory', 'l3_512' => 'walter');
+$people = array('alice', 'bob', 'carol', 'dave', 'eve', 'frannie', 'george', 'mallory', 'peggy', 'walter');
+$foods = array('muffin', 'chips', 'coffee', 'hamburger', 'juice');
+$foods_to_needs = array('muffin'=>'1','chips'=>'2','coffee'=>'3','hamburger'=>'4','juice'=>'5');
 
 //define train/test splits (80% / 20%)
-$deliver_test = array('shiqi'=>array('phone','trashcan','coffee'),
-						'kazunori'=>array('calendar','hamburger'),
-						'stacy'=>array('calendar','trashcan'),
-						'peter'=>array('calendar'),
-						'katie'=>array('trashcan'),
-						'matteo'=>array('phone'));
-$walk_test = array('l3_512','l3_416');
+//$deliver_test = array('alice'=>array('muffin','hamburger','coffee'),
+						//'carol'=>array('calendar','hamburger'),
+						//'dave'=>array('calendar','trashcan'),
+						//'george'=>array('calendar'),
+						//'mallory'=>array('trashcan'),
+						//'bob'=>array('phone'));
+//$walk_test = array('l3_512','l3_416');
+$deliver_test = array();
+$walk_test = array();
 
 //draw deliver task
 if (strcmp($task_type,"deliver") == 0)
