@@ -9,7 +9,7 @@ class Knowledge:
 
     def __init__(self):
         #self.goal_actions = ['searchroom', 'speak_t', 'speak_e', 'remind', 'askperson', 'bring', 'at']
-        self.goal_actions = ['bring', 'at']
+        self.goal_actions = ['bring', 'at', 'searchroom']
         self.goal_params = ['patient', 'recipient', 'location']
 
         # This is kept as a single vector common to all values so that hopefully 
@@ -182,8 +182,8 @@ class Knowledge:
                 self.true_constraints[action][param] = list()
                 self.false_constraints[action][param] = list()
                 
-        #self.true_constraints['searchroom']['patient'] = ['person']
-        #self.true_constraints['searchroom']['location'] = ['room']
+        self.true_constraints['searchroom']['patient'] = ['person']
+        self.true_constraints['searchroom']['location'] = ['room']
         #self.true_constraints['remind']['recipient'] = ['person']
         #self.true_constraints['remind']['location'] = ['room']
         #self.true_constraints['askperson']['patient'] = ['person']

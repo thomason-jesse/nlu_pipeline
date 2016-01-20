@@ -9,6 +9,7 @@ from SystemAction import SystemAction
 from Utterance import Utterance
 from Action import Action
 from TemplateBasedGenerator import TemplateBasedGenerator
+from Utils import *
 
 class PomdpDialogAgent :
 
