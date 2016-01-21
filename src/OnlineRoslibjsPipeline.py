@@ -25,7 +25,8 @@ from threading import Lock, Thread
 MAX_BUFFER_SIZE = 1024
 MAX_WAITING_USERS = 100
 MAX_OUTSTANDING_MESSAGES = 1000
-LOGGING_PATH = 'log/'
+LOGGING_PATH = 'src/nlu_pipeline/src/log/'
+FINAL_ACTION_PATH = 'src/nlu_pipeline/src/executed_action/'
 
 class UserManager :
     def __init__(self) :
@@ -72,13 +73,13 @@ class UserManager :
 # This class has a lot of similarities to the previous one so may have 
 # been worth making an abstract class for them
 class InputFromTopic:
-    def __init__(self, user):
+    def __init__(self, user, logfile=None):
         topic_name = 'js_pub_' + user
         self.sub = rospy.Subscriber(topic_name, String, self.add_to_queue)
         self.msg_queue = Queue(MAX_OUTSTANDING_MESSAGES) # Using this as it is thread safe
         self.lock = Lock()
         self.prev_msg = None
-        self.logging_enabled = False    
+        self.logfile = logfile
         self.current_user = user
         self.last_get = ''  
 
@@ -98,9 +99,8 @@ class InputFromTopic:
                 text = regex.sub('', text)
                 #print 'Press enter'
                 #x = raw_input()
-                if self.logging_enabled :
-                    filename = LOGGING_PATH + self.current_user
-                    f = open(filename, 'a')
+                if self.logfile is not None :
+                    f = open(self.logfile, 'a')
                     f.write('USER: ' + text + '\n')
                     f.close()
                 return text 
@@ -137,10 +137,10 @@ class InputFromTopic:
         self.sub.unregister()
 
 class OutputToTopic:
-    def __init__(self, user, input_from_topic):
+    def __init__(self, user, input_from_topic, logfile=None):
         self.response = None
         topic_name =  'python_pub_' + user
-        self.logging_enabled = False    
+        self.logfile = logfile    
         self.current_user = user  
         self.pub = rospy.Publisher(topic_name, String, queue_size=MAX_OUTSTANDING_MESSAGES)
         self.msg = None
@@ -151,9 +151,8 @@ class OutputToTopic:
         self.publish_thread.start()
 
     def say(self, response):
-        if self.logging_enabled :
-            filename = LOGGING_PATH + self.current_user
-            f = open(filename, 'a')
+        if self.logfile is not None :
+            f = open(self.logfile, 'a')
             f.write('ROBOT: ' + response + '\n')
             f.close()
         print 'Going to publish: ', response
@@ -300,9 +299,13 @@ def start(pomdp_agent, static_agent) :
                 user_manager.lock.acquire()
                 # Making this a critical section otherwise sometimes the
                 # dialogue hangs 
+                logfile = None
+                final_action_log = None
                 try :
-                    u_in = InputFromTopic(user)
-                    u_out = OutputToTopic(user, u_in)
+                    logfile = LOGGING_PATH + user
+                    final_action_log = FINAL_ACTION_PATH + user
+                    u_in = InputFromTopic(user, logfile)
+                    u_out = OutputToTopic(user, u_in, logfile)
                 except :
                     raise
                 finally :
@@ -313,17 +316,17 @@ def start(pomdp_agent, static_agent) :
                 if r < 0.5 :    
                     static_agent.input = u_in
                     static_agent.output = u_out
-                    run_static_dialog(static_agent, u_in, u_out)
+                    run_static_dialog(static_agent, u_in, u_out, final_action_log)
                 else :
                     pomdp_agent.input = u_in
                     pomdp_agent.output = u_out
-                    run_pomdp_dialog(pomdp_agent, u_in, u_out)
+                    run_pomdp_dialog(pomdp_agent, u_in, u_out, final_action_log)
                 print 'Waiting for a new user '
             except RuntimeError as e :
                 print 'Error : ', str(e)
                 print 'Waiting for a new user '
 
-def run_static_dialog(agent, u_in, u_out) :
+def run_static_dialog(agent, u_in, u_out, final_action_log=None) :
     u_out.say("How can I help?")
     s = u_in.get()
     if s == 'stop':
@@ -331,12 +334,13 @@ def run_static_dialog(agent, u_in, u_out) :
     a = agent.initiate_dialog_to_get_action(s)
     if a is not None :
         response_generator = TemplateBasedGenerator()
-        u_out.say(response_generator.get_action_sentence(a) + ' Was this the right action?')
+        u_out.say(response_generator.get_action_sentence(a, final_action_log) + ' Was this the right action?')
         r = u_in.get()
     #u_out.say("Happy to help!")
     u_out.say("<END/>")
     
-def run_pomdp_dialog(agent, u_in, u_out) :
+def run_pomdp_dialog(agent, u_in, u_out, final_action_log=None) :
+    agent.final_action_log = final_action_log
     agent.first_turn = True
     success = agent.run_dialog()
     #if not success :

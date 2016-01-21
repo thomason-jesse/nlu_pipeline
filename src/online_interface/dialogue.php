@@ -69,8 +69,8 @@
 	{
 		//get user id
 		user_id_base = <?php echo "'".uniqid()."'";?>;
-		user_id = user_id_base.concat('_walk');
-		current_task = "walk";
+		user_id = user_id_base.concat('_main');
+		current_task = "main";
 	
 		//hide ask id div and open task show div
 		document.getElementById('ask_for_ID').style.display = 'none';
@@ -93,8 +93,8 @@
 		//update user id for new task
 		//get user id
 		user_id_base = <?php echo "'".uniqid()."'";?>;
-		user_id = user_id_base.concat('_deliver');
-		current_task = "deliver";
+		user_id = user_id_base.concat('_main');
+		current_task = "main";
 	
 		//hide ask id div and open task show div
 		document.getElementById('ask_for_ID').style.display = 'none';
@@ -116,8 +116,8 @@
 	{
         //get user id
 		user_id_base = <?php echo "'".uniqid()."'";?>;
-		user_id = user_id_base.concat('_search');
-		current_task = "search";
+		user_id = user_id_base.concat('_main');
+		current_task = "main";
 	
 		//hide ask id div and open task show div
 		document.getElementById('ask_for_ID').style.display = 'none';

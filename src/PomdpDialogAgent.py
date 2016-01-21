@@ -36,6 +36,8 @@ class PomdpDialogAgent :
         # To store data for retraining the parser
         self.parser_train_data = None
         self.max_prob_user_utterances = None
+        
+        self.final_action_log = None
 
     # Returns True if the dialog terminates on its own and False if the u
     # user entered stop
@@ -54,7 +56,7 @@ class PomdpDialogAgent :
                 # Submit the action given by the policy
                 action = dialog_action_arg
                 #self.output.say("Action: " + str(action))
-                output = self.generator.get_action_sentence(action)
+                output = self.generator.get_action_sentence(action, self.final_action_log)
                 self.output.say(output + " Was this the correct action?")
                 response = self.input.get().lower()  
                 if response == '<ERROR/>' :

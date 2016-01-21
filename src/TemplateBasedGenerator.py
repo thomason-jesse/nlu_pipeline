@@ -29,9 +29,13 @@ class TemplateBasedGenerator :
         else :
             return None
     
-    def get_action_sentence(self, action) :
+    def get_action_sentence(self, action, logfile=None) :
+        if logfile is not None :
+            f = open(logfile, 'w')
+            f.write(str(action))
+            f.close()
         if action.name == 'searchroom' :
-            return 'I searched for ' + str(action.params[0]) + ' in room ' + str(action.params[1]) + '.'
+            return 'I searched for ' + str(action.params[0]) + ' in room ' + self.room_str[str(action.params[1])] + '.'
         elif action.name == 'bring' :
             return 'I brought ' + str(action.params[0]) + ' to ' + str(action.params[1]) + '.'
         elif action.name == 'at' :

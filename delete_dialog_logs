@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+rm -f ~/public_html/AMT/surveys/*
+rm -f ~/public_html/AMT/target_commands/*
+rm -f ~/public_html/AMT/validations/*
+rm -f src/log/*
+rm -f src/executed_action/*

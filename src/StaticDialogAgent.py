@@ -30,6 +30,7 @@ class StaticDialogAgent:
         self.response_generator = TemplateBasedGenerator()
         self.knowledge = Knowledge()
         self.dialogue_stopped = False
+        self.final_action_log = None
 
     # initiate a new dialog with the agent with initial utterance u
     def initiate_dialog_to_get_action(self, u):

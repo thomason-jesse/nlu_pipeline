@@ -53,7 +53,7 @@ $foods_to_needs = array('muffin'=>'1','chips'=>'2','coffee'=>'3','hamburger'=>'4
 if (strcmp($task_type,"deliver") == 0) {
     $person = $people[rand(0,count($people)-1)];
     $food = $foods[rand(0,count($foods)-1)];
-	$target_command = "served(".$person.",".$food.",n)";
+	$target_command = "bring(".$food.",".$person.")";
 	$task_description = $people_to_expressions[$person][rand(0,count($people_to_expressions[$person])-1)]." wants the item in slot ".$foods_to_needs[$food].".";
 }
 
@@ -65,12 +65,12 @@ elseif (strcmp($task_type,"at") == 0) {
 		$person = $rooms_to_people[$room];						
 		$referring_expression = $people_to_expressions[$person][rand(0,count($people_to_expressions[$person])-1)];
 		
-		$target_command = "at(".$room.",n)";
+		$target_command = "at(".$room.")";
 		$task_description = $referring_expression." needs the robot. Send it to ".$person_to_possessive[$person]." office.";
 	}
 	//choose a referring expression for the room and design query
 	else {
-		$target_command = "at(".$room.",n)";
+		$target_command = "at(".$room.")";
 		$task_description = "Send the robot to the ".$rooms_to_names[$room].".";
 	}
 }
@@ -93,7 +93,7 @@ elseif (strcmp($task_type,"search") == 0) {
 			break;
 		}
 	}
-    $target_command = "search(".$searchee.','.$room.",n)";
+    $target_command = "search(".$searchee.','.$room.")";
     $searchee_expression = $people_to_expressions_lc[$searchee][rand(0,count($people_to_expressions_lc[$searchee])-1)];
     $owner_expression = $people_to_expressions_lc[$owner][rand(0,count($people_to_expressions_lc[$owner])-1)];
     $task_description = "Make the robot find out whether ".$searchee_expression." is in ".$owner_expression."'s office";
