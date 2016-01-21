@@ -27,7 +27,8 @@ MAX_WAITING_USERS = 100
 MAX_OUTSTANDING_MESSAGES = 1000
 LOGGING_PATH = 'src/nlu_pipeline/src/log/'
 FINAL_ACTION_PATH = 'src/nlu_pipeline/src/executed_action/'
-USER_LOG = 'src/nlu_pipeline/src/log/user_list'
+USER_LOG = 'src/nlu_pipeline/src/log_special/user_list'
+LEXICAL_ADDITION_LOG = 'src/nlu_pipeline/src/log_special/lexical_addition'
 
 class UserManager :
     def __init__(self) :
@@ -292,6 +293,8 @@ def start(pomdp_agent, static_agent) :
     print 'Dialog agent ready'
     
     user_log = open(USER_LOG, 'a')
+    pomdp_agent.lexical_addition_log = LEXICAL_ADDITION_LOG + '_pomdp'
+    static_agent.lexical_addition_log = LEXICAL_ADDITION_LOG + '_static'
     
     while True :
         user = user_manager.get_next_user()    

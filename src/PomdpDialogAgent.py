@@ -37,7 +37,9 @@ class PomdpDialogAgent :
         self.parser_train_data = None
         self.max_prob_user_utterances = None
         
+        # Logging for future use
         self.final_action_log = None
+        self.lexical_addition_log = None
 
     # Returns True if the dialog terminates on its own and False if the u
     # user entered stop
@@ -603,12 +605,20 @@ class PomdpDialogAgent :
                                 new_lexical_entries.append(entry)
                              
         print 'new_lexical_entries = ', new_lexical_entries                
-        print 'Retraining parser'
+        #print 'Retraining parser'
         
+        # Add entries to lexicon
         self.parser.lexicon.expand_lex_from_strs(
                     new_lexical_entries, self.parser.lexicon.surface_forms, self.parser.lexicon.semantic_forms, 
                     self.parser.lexicon.entries, self.parser.lexicon.pred_to_surface, 
                     allow_expanding_ont=False)
+                    
+        # Log the added lexicon entries   
+        if self.lexical_addition_log is not None :
+            f = open(self.lexical_addition_log, 'a')
+            for entry in new_lexical_entries :
+                f.write(entry + '\n')
+            f.close()
                     
         training_pairs = list()
         for key in self.parser_train_data :
