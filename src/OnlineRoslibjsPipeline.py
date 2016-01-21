@@ -27,6 +27,7 @@ MAX_WAITING_USERS = 100
 MAX_OUTSTANDING_MESSAGES = 1000
 LOGGING_PATH = 'src/nlu_pipeline/src/log/'
 FINAL_ACTION_PATH = 'src/nlu_pipeline/src/executed_action/'
+USER_LOG = 'src/nlu_pipeline/src/log/user_list'
 
 class UserManager :
     def __init__(self) :
@@ -290,12 +291,15 @@ def start(pomdp_agent, static_agent) :
     user_manager = UserManager()
     print 'Dialog agent ready'
     
+    user_log = open(USER_LOG, 'a')
+    
     while True :
         user = user_manager.get_next_user()    
         if user is not None :
             # There is actually a user
             try :
                 print 'Starting communication with user', user
+                user_log.write(user + '\n')
                 user_manager.lock.acquire()
                 # Making this a critical section otherwise sometimes the
                 # dialogue hangs 
@@ -322,9 +326,13 @@ def start(pomdp_agent, static_agent) :
                     pomdp_agent.output = u_out
                     run_pomdp_dialog(pomdp_agent, u_in, u_out, final_action_log)
                 print 'Waiting for a new user '
+                user_log.flush()
             except RuntimeError as e :
                 print 'Error : ', str(e)
                 print 'Waiting for a new user '
+                user_log.flush()
+                
+    user_log.close()
 
 def run_static_dialog(agent, u_in, u_out, final_action_log=None) :
     u_out.say("How can I help?")
