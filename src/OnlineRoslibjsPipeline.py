@@ -296,9 +296,12 @@ def start(pomdp_agent, static_agent) :
     pomdp_agent.lexical_addition_log = LEXICAL_ADDITION_LOG + '_pomdp'
     static_agent.lexical_addition_log = LEXICAL_ADDITION_LOG + '_static'
     
+    wait_time = 0
+    
     while True :
         user = user_manager.get_next_user()    
         if user is not None :
+            wait_time = 0
             # There is actually a user
             try :
                 print 'Starting communication with user', user
@@ -334,6 +337,12 @@ def start(pomdp_agent, static_agent) :
                 print 'Error : ', str(e)
                 print 'Waiting for a new user '
                 user_log.flush()
+        else :
+            # Increase wait time before checking for user again so that 
+            # user queue does not get stuck servciing only get requests
+            if wait_time <= 1.0 :
+                wait_time += 0.1
+        time.sleep(wait_time)
                 
     user_log.close()
 
