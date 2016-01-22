@@ -141,8 +141,8 @@ class PomdpGpSarsaPolicy :
                 hand_coded_policy_a = self.get_action_from_hand_coded_policy(b)
                 #print 'hand_coded_policy_a = ', hand_coded_policy_a
                 if a == hand_coded_policy_a :
-                    mean = 1
-                    std_dev = 1
+                    mean = 5
+                    std_dev = 0.5
                 else :
                     mean = 0
                     std_dev = 1
@@ -575,7 +575,7 @@ class PomdpGpSarsaPolicy :
             if num_uncertain_params == 0 :
                 if state.top_hypothesis_prob < 0.3 :
                     return 'request_missing_param'
-                elif state.top_hypothesis_prob < 0.9 :
+                elif state.top_hypothesis_prob < 0.99 :
                     return 'confirm_action'
                 else :
                     return 'take_action'

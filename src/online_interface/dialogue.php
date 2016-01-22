@@ -699,7 +699,7 @@ width:50%
 	
 	<DIV ID="third_dialog_start_block" style="display:none">
 		<FORM NAME="user_start_third_dialog_form" ACTION="" METHOD="GET">
-			<INPUT TYPE="button" NAME="user_start_third_dialog_button" Value="Validate" onClick="startThirdDialog()">
+			<INPUT TYPE="button" NAME="user_start_third_dialog_button" Value="Next task" onClick="startThirdDialog()">
 		</FORM>
 	</DIV>
 	
@@ -749,7 +749,7 @@ width:50%
 		</TABLE></p>
 		<p><b>6)</b>Feel free to leave comments on your experience (optional):<br/>
 			<textarea id="user_survey_comment_box" name="comment" form="survey_form" style="width:50%" rows="4"></textarea></p>
-		<INPUT TYPE="button" NAME="user_submit_survey_button" Value="Finish and get code" onClick="submitSurvey(this.form)">
+		<INPUT TYPE="button" NAME="user_submit_survey_button" Value="Finish" onClick="submitSurvey(this.form)">
 	</FORM>
 </DIV>
 

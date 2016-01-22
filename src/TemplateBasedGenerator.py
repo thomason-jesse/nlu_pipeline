@@ -9,6 +9,7 @@ class TemplateBasedGenerator :
     
     def __init__(self) :
         self.init_room_str()
+        self.rooms = ['l3_516','l3_508','l3_512','l3_510','l3_402','l3_418','l3_420','l3_432','l3_502','l3_414b']
     
     def init_room_str(self) :
         self.room_str = dict()
@@ -27,7 +28,11 @@ class TemplateBasedGenerator :
         if system_action.referring_params is None :
             return None
         if param_name in system_action.referring_params :
-            return system_action.referring_params[param_name]
+            param_value = system_action.referring_params[param_name]
+            if param_value in self.rooms :
+                return self.room_str[param_value]
+            else :
+                return param_value 
         else :
             return None
     
@@ -41,11 +46,17 @@ class TemplateBasedGenerator :
             f.close()
             os.chmod(logfile, mode)
         if action.name == 'searchroom' :
-            return 'I searched for ' + str(action.params[0]) + ' in room ' + self.room_str[str(action.params[1])] + '.'
+            if str(action.params[1]) in self.rooms :
+                return 'I searched for ' + str(action.params[0]) + ' in ' + self.room_str[str(action.params[1])] + '.'
+            else :
+                return 'I searched for ' + str(action.params[0]) + ' in ' + str(action.params[1]) + '.'
         elif action.name == 'bring' :
             return 'I brought ' + str(action.params[0]) + ' to ' + str(action.params[1]) + '.'
         elif action.name == 'at' :
-            return 'I went to ' + self.room_str[str(action.params[0])] + '.'
+            if str(action.params[0]) in self.rooms :
+                return 'I went to ' + self.room_str[str(action.params[0])] + '.'
+            else :
+                return 'I went to ' + str(action.params[0]) + '.'
         else :
             if len(action.params) == 0 :
                 return 'I took action ' + action.name + '.'
@@ -76,11 +87,11 @@ class TemplateBasedGenerator :
                 patient = self.get_param(system_action, 'patient')
                 location = self.get_param(system_action, 'location')
                 if patient is not None and location is not None :
-                    return 'You want me to search for ' + patient + ' in ' + self.room_str[location] + '?'
+                    return 'You want me to search for ' + patient + ' in ' + location + '?'
                 elif patient is not None :
                     return 'You want me to search for ' + patient + ' in some room?'
                 elif location is not None :
-                    return 'You want me to search for someone in ' + self.room_str[location] + '?'
+                    return 'You want me to search for someone in ' + location + '?'
                 else :    
                     return 'You want me to search for someone?'
             elif system_action.referring_goal == 'bring' :
@@ -97,7 +108,7 @@ class TemplateBasedGenerator :
             elif system_action.referring_goal == 'at' :
                 location = self.get_param(system_action, 'location')
                 if location is not None :
-                    return 'You want me to walk to ' + self.room_str[location] + '?'
+                    return 'You want me to walk to ' + location + '?'
                 else :    
                     return 'You want me to walk to some room?'
             else :

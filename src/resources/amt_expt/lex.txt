@@ -44,40 +44,15 @@ hamburger :- N : hamburger
 juice :- N : juice
 muffin :- N : muffin
 alice :- N : alice
-secretary :- N : alice
-francis foster :- N : frannie
 frannie :- N : frannie
-francis :- N : frannie
-robert brown :- N : bob
-brown :- N : bob
 bob :- N : bob
-bob brown :- N : bob
-robert :- N : bob
 carol :- N : carol
-carol clark :- N : carol
-clark :- N : carol
 dave :- N : dave
-dave daniel :- N : dave
-daniel :- N : dave
 george :- N : george
-george green :- N : george
-green :- N : george
-intern :- N : george
-evelyn :- N : eve
-evelyn eckhart :- N : eve
-eve eckhart :- N : eve
-eckhart :- N : eve
 eve :- N : eve
-mallory morgan :- N : mallory
-morgan :- N : mallory
 mallory :- N : mallory
 peggy :- N : peggy
-peggy parker :- N : peggy
-parker :- N : peggy
 walter :- N : walter
-walter ward :- N : walter
-ward :- N : walter
-supervisor :- N : walter
 3516 :- N : l3_516
 3508 :- N : l3_508
 3512 :- N : l3_512
