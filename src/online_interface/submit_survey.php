@@ -16,9 +16,17 @@ if (!isset($_POST['understand']) || $_POST['understand'] == -1)
 {
 	die("FAILED\nno understand survey response posted");
 }
-if (!isset($_POST['frustrate']) || $_POST['frustrate'] == -1)
+if (!isset($_POST['delays']) || $_POST['delays'] == -1)
 {
-	die("FAILED\nno frustrate survey response posted");
+	die("FAILED\nno delays survey response posted");
+}
+if (!isset($_POST['sensible']) || $_POST['sensible'] == -1)
+{
+	die("FAILED\nno sensible survey response posted");
+}
+if (!isset($_POST['conv_long']) || $_POST['conv_long'] == -1)
+{
+	die("FAILED\nno conv_long survey response posted");
 }
 if (!isset($_POST['comment']))
 {
@@ -36,12 +44,14 @@ $task_type = $_POST['task'];
 $user_id = $_POST['user_id'];
 $easy = $_POST['easy'];
 $understand = $_POST['understand'];
-$frustrate = $_POST['frustrate'];
+$delays = $_POST['delays'];
+$sensible = $_POST['sensible'];
+$conv_long = $_POST['conv_long'];
 $comment = $_POST['comment'];
 
 // Write user survey responses to file
 $input_file = fopen('surveys/'.$user_id.'.txt', 'w');
-$survey_output = $easy.",".$understand.",".$frustrate."\n".$comment;
+$survey_output = $easy.",".$understand.",".$delays.",".$sensible.",".$conv_long."\n".$comment;
 fwrite($input_file, $survey_output);
 fclose($input_file);
 
@@ -108,7 +118,7 @@ if (strcmp($validation_response,$target_validation) != 0) {
 	$task_success = false;
 }
 
-// Write MTurk validation to output
+// Create Mturk code
 $num = rand(49, 61);
 if ($task_success) {
     $ord = 2 * $num - 1;        
@@ -116,6 +126,14 @@ if ($task_success) {
     $ord = 2 * $num;    
 }
 $mturk_code = $user_id."_".substr(sha1("rlg_salted_hash".$user_id),0,13).chr($ord);
+
+// Write Mturk code to file
+$input_file = fopen('codes/'.$user_id.'.txt', 'w');
+$file_output = $user_id.','.$mturk_code.'\n';
+fwrite($input_file, $file_output);
+fclose($input_file);
+
+// Write MTurk code to output
 $output = $output."<p>task_success = ".(int)$task_success;
 $output = $output."</p>"."<p>Thank you for your participation!</p><p>Copy the code below, return to Mechanical Turk, and enter it to receive payment:<br/>".$mturk_code."</p>";
 echo $output

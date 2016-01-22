@@ -463,6 +463,7 @@
 				break;
 			}
 		}
+        //alert('easy');
 		var understand_selection = -1;
 		for (var i = 0; i < form.understand.length; i++) {
 			if (form.understand[i].checked)
@@ -471,27 +472,51 @@
 				break;
 			}
 		}
-		var frustrate_selection = -1;
-		for (var i = 0; i < form.frustrate.length; i++) {
-			if (form.frustrate[i].checked)
+        //alert('understand');
+		var delays = -1;
+		for (var i = 0; i < form.delays.length; i++) {
+			if (form.delays[i].checked)
 			{
-				frustrate_selection = i;
+				delays_selection = i;
 				break;
 			}
 		}
-		if (easy_selection == -1 || understand_selection == -1 || frustrate_selection == -1)
+        //alert('delays');
+        var sensible_selection = -1;
+		for (var i = 0; i < form.sensible.length; i++) {
+			if (form.sensible[i].checked)
+			{
+				sensible_selection = i;
+				break;
+			}
+		}
+        //alert('sensible');
+        var conv_long_selection = -1;
+		for (var i = 0; i < form.conv_long.length; i++) {
+			if (form.conv_long[i].checked)
+			{
+				conv_long_selection = i;
+				break;
+			}
+		}
+        //alert('conv_long');
+		if (easy_selection == -1 || understand_selection == -1 || delays_selection == -1 || sensible_selection == -1 || conv_long_selection == -1)
 		{
-			alert('Please answer all three survey questions.');
+			alert('Please answer all survey questions.');
 			return false;
 		}
 		
+        //alert('Before inst hide');
+        
 		//hide instructions
 		document.getElementById('inst').style.display = 'none';
 		
+        //alert('Going to php');
+        
 		//submit php request
 		getRequest(
 		  'submit_survey.php', // URL for the PHP file
-		  'user_id='.concat(user_id).concat('&easy=').concat(easy_selection).concat('&understand=').concat(understand_selection).concat('&frustrate=').concat(frustrate_selection).concat('&comment=').concat(comment_text), // parameters for PHP
+		  'user_id='.concat(user_id).concat('&easy=').concat(easy_selection).concat('&understand=').concat(understand_selection).concat('&delays=').concat(delays_selection).concat('&sensible=').concat(sensible_selection).concat('&conv_long=').concat(conv_long_selection).concat('&comment=').concat(comment_text), // parameters for PHP
 		   submitSurveyOutput,  // handle successful request
 		   submitSurveyError    // handle error
 		);
@@ -707,12 +732,22 @@ width:50%
 			<tr align="center" bgcolor='GhostWhite'><td style="width:20%">Strongly Disagree</td><td style="width:20%">Somewhat Disagree</td><td style="width:20%">Neutral</td><td style="width:20%">Somewhat Agree</td><td style="width:20%">Strongly Agree</td></tr>
 			<tr align="center" bgcolor='AliceBlue'><td style="width:20%"><INPUT TYPE="radio" name="understand" value="0"></td><td style="width:20%"><INPUT TYPE="radio" name="understand" value="1"></td><td style="width:20%"><INPUT TYPE="radio" name="understand" value="2"></td><td style="width:20%"><INPUT TYPE="radio" name="understand" value="3"></td><td style="width:20%"><INPUT TYPE="radio" name="understand" value="4"></td></tr>
 		</TABLE></p>
-		<p><b>3)</b> The robot frustrated me.
+		<p><b>3)</b> The robot took too long to respond.
 		<TABLE style="width:50%">
 			<tr align="center" bgcolor='GhostWhite'><td style="width:20%">Strongly Disagree</td><td style="width:20%">Somewhat Disagree</td><td style="width:20%">Neutral</td><td style="width:20%">Somewhat Agree</td><td style="width:20%">Strongly Agree</td></tr>
-			<tr align="center" bgcolor='AliceBlue'><td style="width:20%"><INPUT TYPE="radio" name="frustrate" value="0"></td><td style="width:20%"><INPUT TYPE="radio" name="frustrate" value="1"></td><td style="width:20%"><INPUT TYPE="radio" name="frustrate" value="2"></td><td style="width:20%"><INPUT TYPE="radio" name="frustrate" value="3"></td><td style="width:20%"><INPUT TYPE="radio" name="frustrate" value="4"></td></tr>
+			<tr align="center" bgcolor='AliceBlue'><td style="width:20%"><INPUT TYPE="radio" name="delays" value="0"></td><td style="width:20%"><INPUT TYPE="radio" name="delays" value="1"></td><td style="width:20%"><INPUT TYPE="radio" name="delays" value="2"></td><td style="width:20%"><INPUT TYPE="radio" name="delays" value="3"></td><td style="width:20%"><INPUT TYPE="radio" name="delays" value="4"></td></tr>
 		</TABLE></p>
-		<p><b>4)</b>Feel free to leave comments on your experience (optional):<br/>
+        <p><b>4)</b> The robot asked sensible questions.
+		<TABLE style="width:50%">
+			<tr align="center" bgcolor='GhostWhite'><td style="width:20%">Strongly Disagree</td><td style="width:20%">Somewhat Disagree</td><td style="width:20%">Neutral</td><td style="width:20%">Somewhat Agree</td><td style="width:20%">Strongly Agree</td></tr>
+			<tr align="center" bgcolor='AliceBlue'><td style="width:20%"><INPUT TYPE="radio" name="sensible" value="0"></td><td style="width:20%"><INPUT TYPE="radio" name="sensible" value="1"></td><td style="width:20%"><INPUT TYPE="radio" name="sensible" value="2"></td><td style="width:20%"><INPUT TYPE="radio" name="sensible" value="3"></td><td style="width:20%"><INPUT TYPE="radio" name="sensible" value="4"></td></tr>
+		</TABLE></p>
+        <p><b>5)</b> The conversation was too long.
+		<TABLE style="width:50%">
+			<tr align="center" bgcolor='GhostWhite'><td style="width:20%">Strongly Disagree</td><td style="width:20%">Somewhat Disagree</td><td style="width:20%">Neutral</td><td style="width:20%">Somewhat Agree</td><td style="width:20%">Strongly Agree</td></tr>
+			<tr align="center" bgcolor='AliceBlue'><td style="width:20%"><INPUT TYPE="radio" name="conv_long" value="0"></td><td style="width:20%"><INPUT TYPE="radio" name="conv_long" value="1"></td><td style="width:20%"><INPUT TYPE="radio" name="conv_long" value="2"></td><td style="width:20%"><INPUT TYPE="radio" name="conv_long" value="3"></td><td style="width:20%"><INPUT TYPE="radio" name="conv_long" value="4"></td></tr>
+		</TABLE></p>
+		<p><b>6)</b>Feel free to leave comments on your experience (optional):<br/>
 			<textarea id="user_survey_comment_box" name="comment" form="survey_form" style="width:50%" rows="4"></textarea></p>
 		<INPUT TYPE="button" NAME="user_submit_survey_button" Value="Finish and get code" onClick="submitSurvey(this.form)">
 	</FORM>
