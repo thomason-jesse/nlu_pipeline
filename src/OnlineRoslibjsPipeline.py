@@ -11,6 +11,7 @@ import Parser
 import Generator
 import StaticDialogPolicy
 import numpy, re, time, rospy
+import os, stat
 
 from TemplateBasedGenerator import TemplateBasedGenerator
 from PomdpStaticDialogPolicy import PomdpStaticDialogPolicy
@@ -25,10 +26,15 @@ from threading import Lock, Thread
 MAX_BUFFER_SIZE = 1024
 MAX_WAITING_USERS = 100
 MAX_OUTSTANDING_MESSAGES = 1000
-LOGGING_PATH = 'src/nlu_pipeline/src/log/'
-FINAL_ACTION_PATH = 'src/nlu_pipeline/src/executed_action/'
-USER_LOG = 'src/nlu_pipeline/src/log_special/user_list'
-LEXICAL_ADDITION_LOG = 'src/nlu_pipeline/src/log_special/lexical_addition'
+#LOGGING_PATH = 'src/nlu_pipeline/src/log/'
+#FINAL_ACTION_PATH = 'src/nlu_pipeline/src/executed_action/'
+#USER_LOG = 'src/nlu_pipeline/src/log_special/user_list'
+#LEXICAL_ADDITION_LOG = 'src/nlu_pipeline/src/log_special/lexical_addition'
+
+LOGGING_PATH = '../../../../public_html/AMT/log/'
+FINAL_ACTION_PATH = '../../../../public_html/AMT/executed_actions/'
+USER_LOG = '../../../../public_html/AMT/log_special/user_list.txt'
+LEXICAL_ADDITION_LOG = '../../../../public_html/AMT/log_special/lexical_addition.txt'
 
 class UserManager :
     def __init__(self) :
@@ -102,9 +108,19 @@ class InputFromTopic:
                 #print 'Press enter'
                 #x = raw_input()
                 if self.logfile is not None :
-                    f = open(self.logfile, 'a')
+                    #f = open(self.logfile, 'a')
+                    #f.write('USER: ' + text + '\n')
+                    #f.close()
+                    mode = stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO 
+                    flags = os.O_CREAT | os.O_APPEND | os.O_WRONLY 
+                    fd = os.open(self.logfile, flags, mode)
+                    #if fd is None :
+                        #print 'Bad file descriptor'
+                        #sys.exit(1)
+                    f = os.fdopen(fd, 'a')
                     f.write('USER: ' + text + '\n')
                     f.close()
+                    os.chmod(self.logfile, mode)
                 return text 
             except Empty :
                 pass  
@@ -154,18 +170,32 @@ class OutputToTopic:
 
     def say(self, response):
         if self.logfile is not None :
-            f = open(self.logfile, 'a')
+            #f = open(self.logfile, 'a')
+            ##os.fchmod(f, stat.S_IROTH)
+            #f.write('ROBOT: ' + response + '\n')
+            #f.close()
+            mode = stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO 
+            flags = os.O_CREAT | os.O_APPEND | os.O_WRONLY
+            #print 'mode = ', mode, 'flags = ', flags, '\n\n'
+            fd = os.open(self.logfile, flags, mode)
+            f = os.fdopen(fd, 'a')
             f.write('ROBOT: ' + response + '\n')
             f.close()
+            os.chmod(self.logfile, mode)
         print 'Going to publish: ', response
         self.msg = str(self.seq_no) + '|' + self.input_from_topic.last_get + '|' + response
         self.seq_no += 1
 
     def publish(self) :
+        print 'Publish thread created \n\n\n'
         r = rospy.Rate(10) # 10hz
         while not rospy.is_shutdown():
+            #print 'Hello'
             if self.msg is not None :
+                #print 'Publishing ', self.msg
                 self.pub.publish(self.msg)
+            #else :
+                #print 'No msg'
             r.sleep()
 
     def __del__(self) :
@@ -293,8 +323,8 @@ def start(pomdp_agent, static_agent) :
     print 'Dialog agent ready'
     
     user_log = open(USER_LOG, 'a')
-    pomdp_agent.lexical_addition_log = LEXICAL_ADDITION_LOG + '_pomdp'
-    static_agent.lexical_addition_log = LEXICAL_ADDITION_LOG + '_static'
+    pomdp_agent.lexical_addition_log = LEXICAL_ADDITION_LOG + '_pomdp.txt'
+    static_agent.lexical_addition_log = LEXICAL_ADDITION_LOG + '_static.txt'
     
     wait_time = 0
     
@@ -312,8 +342,8 @@ def start(pomdp_agent, static_agent) :
                 logfile = None
                 final_action_log = None
                 try :
-                    logfile = LOGGING_PATH + user
-                    final_action_log = FINAL_ACTION_PATH + user
+                    logfile = LOGGING_PATH + user + '.txt'
+                    final_action_log = FINAL_ACTION_PATH + user + '.txt'
                     u_in = InputFromTopic(user, logfile)
                     u_out = OutputToTopic(user, u_in, logfile)
                 except :
@@ -350,6 +380,8 @@ def run_static_dialog(agent, u_in, u_out, final_action_log=None) :
     u_out.say("How can I help?")
     s = u_in.get()
     if s == 'stop':
+        
+        u_out.say("<END/>")
         return
     a = agent.initiate_dialog_to_get_action(s)
     if a is not None :
