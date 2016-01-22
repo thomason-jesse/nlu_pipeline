@@ -1,5 +1,7 @@
 __author__ = 'aishwarya'
 
+import os, stat 
+
 # This is a simple generator based on templates that gives sensible 
 # sentences given the system action, goal and arguments
 
@@ -31,9 +33,13 @@ class TemplateBasedGenerator :
     
     def get_action_sentence(self, action, logfile=None) :
         if logfile is not None :
-            f = open(logfile, 'w')
+            mode = stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO 
+            flags = os.O_CREAT | os.O_APPEND | os.O_WRONLY 
+            fd = os.open(logfile, flags, mode)
+            f = os.fdopen(fd, 'a')
             f.write(str(action))
             f.close()
+            os.chmod(logfile, mode)
         if action.name == 'searchroom' :
             return 'I searched for ' + str(action.params[0]) + ' in room ' + self.room_str[str(action.params[1])] + '.'
         elif action.name == 'bring' :
