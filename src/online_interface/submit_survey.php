@@ -25,7 +25,12 @@ if (!isset($_POST['comment']))
 	die("FAILED\nno comment survey response posted");
 }
 
-$path_to_dialog = '../../users/jesse/RLG/dialog/';
+//$path_to_log = '../../Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/log/';
+//$path_to_log_special = '../../Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/log_special/';
+//$path_to_executed_action = '../../Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/executed_action/';
+$path_to_log = 'log/';
+$path_to_log_special = 'log_special/';
+$path_to_executed_action = 'executed_actions/'; 
 
 $task_type = $_POST['task'];
 $user_id = $_POST['user_id'];
@@ -34,53 +39,63 @@ $understand = $_POST['understand'];
 $frustrate = $_POST['frustrate'];
 $comment = $_POST['comment'];
 
-//write user survey responses to file
+// Write user survey responses to file
 $input_file = fopen('surveys/'.$user_id.'.txt', 'w');
 $survey_output = $easy.",".$understand.",".$frustrate."\n".$comment;
 fwrite($input_file, $survey_output);
 fclose($input_file);
 
-//validate user's responses
-$walk_valid_moved = false;
-$deliver_valid_moved = false;
+// Validate user's responses
+$task_success = false;
+$output = '';
 
-//walk validation
-$input_filename = $path_to_dialog."offline_data/commands/".$user_id."_walk_command.txt";
-$input_file = fopen($input_filename, 'r');
-$command = strtolower(trim(fread($input_file, filesize($input_filename))));
+// Get target command
+$input_filename = 'target_commands/'.$user_id.'_main.txt';
+$input_file = fopen($input_filename, 'r') or die('Error: Target command log not found');
+$target_command = strtolower(trim(fread($input_file, filesize($input_filename))));
 fclose($input_file);
-$input_filename = 'target_commands/'.$user_id.'_walk.txt';
-$input_file = fopen($input_filename, 'r');
-$target_validation = strtolower(trim(fread($input_file, filesize($input_filename))));
-fclose($input_file);
-if (strcmp($command,$target_validation) != 0)
-{
-	//rename user's alog files so they won't be used
-	$walk_valid_moved = true;
-	$path_alog_prefix = $path_to_dialog."offline_data/alignments/".$user_id;
-	exec("mv ".$path_alog_prefix."_walk_alog.txt ".$path_alog_prefix."_walk_alog.wrong.txt");
-	//echo "walk error<br/>".$command."<br/>".$target_validation."<br/>"; #DEBUG
+
+// Get executed action
+$input_filename = $path_to_executed_action.$user_id.'_main.txt';
+clearstatcache();
+if (file_exists($input_filename)) {
+    $input_file = fopen($input_filename, 'r');
+    $executed_action = strtolower(trim(fread($input_file, filesize($input_filename))));
+    fclose($input_file);
+    
+    if ($executed_action == $target_command) {
+        $task_success = true;
+    }
 }
 
-//deliver validation
-$input_filename = $path_to_dialog."offline_data/commands/".$user_id."_deliver_command.txt";
-$input_file = fopen($input_filename, 'r');
-$command = strtolower(trim(fread($input_file, filesize($input_filename))));
-fclose($input_file);
-$input_filename = 'target_commands/'.$user_id.'_deliver.txt';
-$input_file = fopen($input_filename, 'r');
-$target_validation = strtolower(trim(fread($input_file, filesize($input_filename))));
-fclose($input_file);
-if (strcmp($command,$target_validation) != 0)
-{
-	//rename user's alog files so they won't be used
-	$deliver_valid_moved = true;
-	$path_alog_prefix = $path_to_dialog."offline_data/alignments/".$user_id;
-	exec("mv ".$path_alog_prefix."_deliver_alog.txt ".$path_alog_prefix."_deliver_alog.wrong.txt");
-	//echo "deliver error<br/>".$command."<br/>".$target_validation."<br/>"; #DEBUG
+// If the executed action did not match the target, check if the dialog  
+// terminated with 'stop' and if so, how long it was
+$input_filename = $path_to_log.$user_id.'_main.txt';
+$num_user_responses = 0;
+$stop_used = false;
+
+if (file_exists($input_filename)) {
+    $input_file = fopen($input_filename, 'r');
+    //$output = $output.'File exists <br/>';
+    if ($input_file) {
+        //$output = $output.'Opened file';
+        while (($line = fgets($input_file, 4096)) !== false) {
+            //$output = $output.$line.'<br/>';
+            if (substr($line, 0, 4) == 'USER') {
+                if (strtolower(trim(substr($line, 6))) == 'stop') {
+                    $stop_used = true;
+                }
+                $num_user_responses++;
+            }
+        }
+        fclose($input_file);
+    }
+}
+if (!$stop_used || $num_user_responses >= 10) {
+    $task_success = true;
 }
 
-//query validation (can invalidate both previous dialogs)
+// Verification of correct query entry 
 $input_filename = 'validations/'.$user_id.'_query.txt';
 $input_file = fopen($input_filename, 'r');
 $validation_response = strtolower(trim(fread($input_file, filesize($input_filename))));
@@ -89,22 +104,19 @@ $input_filename = 'target_commands/'.$user_id.'_query.txt';
 $input_file = fopen($input_filename, 'r');
 $target_validation = strtolower(trim(fread($input_file, filesize($input_filename))));
 fclose($input_file);
-if (strcmp($validation_response,$target_validation) != 0)
-{
-	//rename user's alog files so they won't be used
-	$path_alog_prefix = $path_to_dialog."offline_data/alignments/".$user_id;
-	if ($walk_valid_moved == false)
-		exec("mv ".$path_alog_prefix."_walk_alog.txt ".$path_alog_prefix."_walk_alog.invalid.txt");
-	if ($deliver_valid_moved == false)
-		exec("mv ".$path_alog_prefix."_deliver_alog.txt ".$path_alog_prefix."_deliver_alog.invalid.txt");
-
-	//don't pay user maybe
-	//echo "validation error<br/>".$validation_response."<br/>".$target_validation; #DEBUG
-	//die("Sorry; you failed to complete enough tasks correctly to warrant payment.");
+if (strcmp($validation_response,$target_validation) != 0) {
+	$task_success = false;
 }
 
-//write MTurk validation to output
-$mturk_code = $user_id."_".substr(sha1("rlg_salted_hash".$user_id),0,13);
-echo "<p>Thank you for your participation!</p><p>Copy the code below, return to Mechanical Turk, and enter it to receive payment:<br/>".$mturk_code."</p>";
-
+// Write MTurk validation to output
+$num = rand(49, 61);
+if ($task_success) {
+    $ord = 2 * $num - 1;        
+} else {
+    $ord = 2 * $num;    
+}
+$mturk_code = $user_id."_".substr(sha1("rlg_salted_hash".$user_id),0,13).chr($ord);
+$output = $output."<p>task_success = ".(int)$task_success;
+$output = $output."</p>"."<p>Thank you for your participation!</p><p>Copy the code below, return to Mechanical Turk, and enter it to receive payment:<br/>".$mturk_code."</p>";
+echo $output
 ?>
