@@ -335,7 +335,6 @@ def start(pomdp_agent, static_agent) :
             # There is actually a user
             try :
                 print 'Starting communication with user', user
-                user_log.write(user + '\n')
                 user_manager.lock.acquire()
                 # Making this a critical section otherwise sometimes the
                 # dialogue hangs 
@@ -353,11 +352,13 @@ def start(pomdp_agent, static_agent) :
                 
                 # Randomly choose an agent
                 r = numpy.random.random_sample()
-                if r < 0.5 :    
+                if r < 0.5 :   
+                    user_log.write(user + ',static\n') 
                     static_agent.input = u_in
                     static_agent.output = u_out
                     run_static_dialog(static_agent, u_in, u_out, final_action_log)
                 else :
+                    user_log.write(user + ',pomdp\n')
                     pomdp_agent.input = u_in
                     pomdp_agent.output = u_out
                     run_pomdp_dialog(pomdp_agent, u_in, u_out, final_action_log)

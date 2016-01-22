@@ -45,7 +45,7 @@ $rooms_to_names = array();
 $rooms_to_numbers = array('l3_502' => '3502', 'l3_402' => '3402', 'l3_414b' => '3414b', 'l3_418' => '3418', 'l3_510' => '3510', 'l3_508' => '3508', 'l3_512' => '3512');
 $rooms_to_people = array('l3_502' => 'alice', 'l3_402' => 'bob', 'l3_414b' => 'carol', 'l3_418' => 'eve', 'l3_510' => 'frannie', 'l3_508' => 'mallory', 'l3_512' => 'walter');
 $people = array('alice', 'bob', 'carol', 'dave', 'eve', 'frannie', 'george', 'mallory', 'peggy', 'walter');
-$people_with_offices = array('alice', 'bob', 'carol', 'eve', 'frannie', 'mallory', 'walter');
+$people_with_offices = array('alice', 'bob', 'eve', 'frannie', 'mallory', 'walter');
 $foods = array('muffin', 'chips', 'coffee', 'hamburger', 'juice');
 $foods_to_needs = array('muffin'=>'1','chips'=>'2','coffee'=>'3','hamburger'=>'4','juice'=>'5');
 
