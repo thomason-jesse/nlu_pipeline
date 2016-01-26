@@ -114,16 +114,19 @@ class Partition:
             return True
             
         # If control reaches here, there is more than one goal. Check if
-        # any param value is fixed. If so, no goal should be incompatible
+        # any param value is fixed. If so, some goal should be compatible
         # with it
         for param_name in self.possible_param_values :
             if len(self.possible_param_values[param_name]) == 1 :            
                 # Parameter param_name has exactly one value
                 param_value = self.possible_param_values[param_name][0]
+                compatible_goals = list()
                 for goal in self.possible_goals :
                     # No goal should be incompatible with it
-                    if not self.param_value_valid(goal, param_name, param_value, knowledge, grounder) :
-                        return False
+                    if self.param_value_valid(goal, param_name, param_value, knowledge, grounder) :
+                        compatible_goals.append(goal)
+                if len(compatible_goals) == 0 :
+                    return False
         return True
     
     def param_value_valid(self, goal, param_name, value, knowledge, grounder) :
@@ -315,6 +318,9 @@ class Partition:
             if p2.is_terminal(knowledge) :
                 p2.belief = min(p2.belief + knowledge.boost_for_terminal_partition, 1)    
                 pass
+                
+            p1.remove_invalid_goals(knowledge, grounder)
+            p2.remove_invalid_goals(knowledge, grounder)
             
             # Check that both partitions are valid. If not, return only 
             # the one which is    
