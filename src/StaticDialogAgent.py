@@ -37,6 +37,7 @@ class StaticDialogAgent:
 
     # initiate a new dialog with the agent with initial utterance u
     def initiate_dialog_to_get_action(self, u):
+        self.dialogue_stopped = False
         self.parser_train_data = dict()
         #print "Function call succeeded"         
 
@@ -61,9 +62,11 @@ class StaticDialogAgent:
                 self.state.previous_action = [dialog_action, dialog_action_args]
                 self.dialog_action_functions[self.dialog_actions.index(dialog_action)](dialog_action_args)
                 if self.dialogue_stopped :
+                    print 'Dialogue stopped'
                     return None
-
-        self.train_parser_from_dialogue(action)
+        
+        if action is not None :
+            self.train_parser_from_dialogue(action)
 
         return action
 

@@ -12,6 +12,7 @@ import Generator
 import StaticDialogPolicy
 import numpy, re, time, rospy
 import os, stat
+import traceback
 
 from TemplateBasedGenerator import TemplateBasedGenerator
 from PomdpStaticDialogPolicy import PomdpStaticDialogPolicy
@@ -26,6 +27,8 @@ from threading import Lock, Thread
 MAX_BUFFER_SIZE = 1024
 MAX_WAITING_USERS = 100
 MAX_OUTSTANDING_MESSAGES = 1000
+MAX_TIMEOUT_TO_ADD_USER = 1 # in seconds
+
 #LOGGING_PATH = 'src/nlu_pipeline/src/log/'
 #FINAL_ACTION_PATH = 'src/nlu_pipeline/src/executed_action/'
 #USER_LOG = 'src/nlu_pipeline/src/log_special/user_list'
@@ -34,6 +37,7 @@ MAX_OUTSTANDING_MESSAGES = 1000
 LOGGING_PATH = '../../../../public_html/AMT/log/'
 FINAL_ACTION_PATH = '../../../../public_html/AMT/executed_actions/'
 USER_LOG = '../../../../public_html/AMT/log_special/user_list.txt'
+ERROR_LOG = '../../../../public_html/AMT/log_special/errors.txt'
 LEXICAL_ADDITION_LOG = '../../../../public_html/AMT/log_special/lexical_addition.txt'
 
 class UserManager :
@@ -47,7 +51,7 @@ class UserManager :
     def get_next_user(self) :
         try :
             # No need for lock as Queue is thread safe
-            user = self.user_queue.get_nowait() 
+            user = self.user_queue.get(True, 0.1) 
             return user
         except Empty :
             return None  
@@ -64,16 +68,20 @@ class UserManager :
                     # Check has to be done again because a competing 
                     # callback could have just added the same user 
                     user = msg.data
-                    self.user_queue.put(user) 
-                        # This will actually block till the put  gets done
-                        # But as it is in the critical section, there should
-                        # be no competing puts
+                    self.user_queue.put(user, True, MAX_TIMEOUT_TO_ADD_USER) 
+                        # Ideally this should not need a timeout as it 
+                        # is in a critical section and hence should not 
+                        # suffer from competing puts
                     self.prev_user = msg.data
                     print 'Processed'
             except KeyboardInterrupt, SystemExit :
                 pass
             except :
-                print 'Error : ', sys.exc_info()[0]
+                error = str(sys.exc_info()[0])
+                error_log.write(error + '\n')
+                print traceback.format_exc()
+                error_log.write(traceback.format_exc() + '\n\n\n')
+                error_log.flush()
             finally :
                 self.lock.release()
                 print 'Released lock'
@@ -99,24 +107,16 @@ class InputFromTopic:
             if time.time() > timeout :
                 raise RuntimeError('No reply received on websocket for ' + str(timeout_min) + ' minutes. Timing out.')
             try :
-                text = self.msg_queue.get_nowait() 
+                text = self.msg_queue.get(True, 0.1) 
                 print 'Received: ', text
                 self.last_get = text
                 text = text.lower()
                 regex = re.compile('[\?\.,\;\:]')
                 text = regex.sub('', text)
-                #print 'Press enter'
-                #x = raw_input()
                 if self.logfile is not None :
-                    #f = open(self.logfile, 'a')
-                    #f.write('USER: ' + text + '\n')
-                    #f.close()
                     mode = stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO 
                     flags = os.O_CREAT | os.O_APPEND | os.O_WRONLY 
                     fd = os.open(self.logfile, flags, mode)
-                    #if fd is None :
-                        #print 'Bad file descriptor'
-                        #sys.exit(1)
                     f = os.fdopen(fd, 'a')
                     f.write('USER: ' + text + '\n')
                     f.close()
@@ -139,7 +139,7 @@ class InputFromTopic:
                     # Check has to be done again because a competing 
                     # callback could have just added the same message 
                     text = msg.data.split('|')[1]
-                    self.msg_queue.put(text) 
+                    self.msg_queue.put(text, True, 1) 
                         # This will actually block till the put gets 
                         # done but as it is in the critical section,  
                         # there should be no competing puts
@@ -147,7 +147,11 @@ class InputFromTopic:
             except KeyboardInterrupt, SystemExit :
                 pass
             except :
-                print 'Error : ', sys.exc_info()[0]
+                error = str(sys.exc_info()[0])
+                error_log.write(error + '\n')
+                print traceback.format_exc()
+                error_log.write(traceback.format_exc() + '\n\n\n')
+                error_log.flush()
             finally :
                 self.lock.release()    
     
@@ -160,42 +164,51 @@ class OutputToTopic:
         topic_name =  'python_pub_' + user
         self.logfile = logfile    
         self.current_user = user  
-        self.pub = rospy.Publisher(topic_name, String, queue_size=MAX_OUTSTANDING_MESSAGES)
+        #self.pub = rospy.Publisher(topic_name, String, queue_size=MAX_OUTSTANDING_MESSAGES)
+        self.pub = rospy.Publisher(topic_name, String, queue_size=1)
+            # The rospy documentation says that a queue size of 1 should
+            # be fine for 10 Hz if you're not sedning a burst of messages
+            # This will prevent a backlog of messages to be cleared in  
+            # case the connection is slow which often happens on Wifi
         self.msg = None
         self.seq_no = 0
         self.input_from_topic = input_from_topic
         self.publish_thread = Thread(target=self.publish, args=())
         self.publish_thread.daemon = True
         self.publish_thread.start()
+        self.lock = Lock()
 
     def say(self, response):
         if self.logfile is not None :
-            #f = open(self.logfile, 'a')
-            ##os.fchmod(f, stat.S_IROTH)
-            #f.write('ROBOT: ' + response + '\n')
-            #f.close()
             mode = stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO 
             flags = os.O_CREAT | os.O_APPEND | os.O_WRONLY
-            #print 'mode = ', mode, 'flags = ', flags, '\n\n'
             fd = os.open(self.logfile, flags, mode)
             f = os.fdopen(fd, 'a')
             f.write('ROBOT: ' + response + '\n')
             f.close()
             os.chmod(self.logfile, mode)
         print 'Going to publish: ', response
-        self.msg = str(self.seq_no) + '|' + self.input_from_topic.last_get + '|' + response
-        self.seq_no += 1
+        self.lock.acquire()
+        try :
+            self.msg = str(self.seq_no) + '|' + self.input_from_topic.last_get + '|' + response
+            self.seq_no += 1
+        except KeyboardInterrupt, SystemExit :
+            pass
+        except :
+            error = str(sys.exc_info()[0])
+            error_log.write(error + '\n')
+            print traceback.format_exc()
+            error_log.write(traceback.format_exc() + '\n\n\n')
+            error_log.flush()
+        finally :
+            self.lock.release()
 
     def publish(self) :
         print 'Publish thread created \n\n\n'
-        r = rospy.Rate(10) # 10hz
+        r = rospy.Rate(50) # 10hz
         while not rospy.is_shutdown():
-            #print 'Hello'
             if self.msg is not None :
-                #print 'Publishing ', self.msg
                 self.pub.publish(self.msg)
-            #else :
-                #print 'No msg'
             r.sleep()
 
     def __del__(self) :
@@ -323,59 +336,75 @@ def start(pomdp_agent, static_agent) :
     print 'Dialog agent ready'
     
     user_log = open(USER_LOG, 'a')
+    error_log = open(ERROR_LOG, 'a')
     pomdp_agent.lexical_addition_log = LEXICAL_ADDITION_LOG + '_pomdp.txt'
     static_agent.lexical_addition_log = LEXICAL_ADDITION_LOG + '_static.txt'
     
     wait_time = 0
     
     while True :
-        user = user_manager.get_next_user()    
-        if user is not None :
-            wait_time = 0
-            # There is actually a user
-            try :
-                print 'Starting communication with user', user
-                user_manager.lock.acquire()
-                # Making this a critical section otherwise sometimes the
-                # dialogue hangs 
-                logfile = None
-                final_action_log = None
+        #print 'Checking for user'
+        try :
+            user = user_manager.get_next_user()    
+            if user is not None :
+                wait_time = 0
+                # There is actually a user
                 try :
-                    logfile = LOGGING_PATH + user + '.txt'
-                    final_action_log = FINAL_ACTION_PATH + user + '.txt'
-                    u_in = InputFromTopic(user, logfile)
-                    u_out = OutputToTopic(user, u_in, logfile)
-                except :
-                    raise
-                finally :
-                    user_manager.lock.release()
-                
-                # Randomly choose an agent
-                r = numpy.random.random_sample()
-                if r < 0.5 :   
-                    user_log.write(user + ',static\n') 
-                    static_agent.input = u_in
-                    static_agent.output = u_out
-                    run_static_dialog(static_agent, u_in, u_out, final_action_log)
-                else :
-                    user_log.write(user + ',pomdp\n')
-                    pomdp_agent.input = u_in
-                    pomdp_agent.output = u_out
-                    run_pomdp_dialog(pomdp_agent, u_in, u_out, final_action_log)
-                print 'Waiting for a new user '
-                user_log.flush()
-            except RuntimeError as e :
-                print 'Error : ', str(e)
-                print 'Waiting for a new user '
-                user_log.flush()
-        else :
-            # Increase wait time before checking for user again so that 
-            # user queue does not get stuck servciing only get requests
-            if wait_time <= 1.0 :
-                wait_time += 0.1
-        time.sleep(wait_time)
+                    print 'Starting communication with user', user
+                    user_manager.lock.acquire()
+                    # Making this a critical section otherwise sometimes the
+                    # dialogue hangs 
+                    logfile = None
+                    final_action_log = None
+                    try :
+                        logfile = LOGGING_PATH + user + '.txt'
+                        final_action_log = FINAL_ACTION_PATH + user + '.txt'
+                        u_in = InputFromTopic(user, logfile)
+                        u_out = OutputToTopic(user, u_in, logfile)
+                    except :
+                        raise
+                    finally :
+                        user_manager.lock.release()
+                    
+                    # Randomly choose an agent
+                    r = numpy.random.random_sample()
+                    if r < 0.5 :   
+                        user_log.write(user + ',static\n')
+                        error_log.write(user + ',static\n') 
+                        static_agent.input = u_in
+                        static_agent.output = u_out
+                        run_static_dialog(static_agent, u_in, u_out, final_action_log)
+                    else :
+                        user_log.write(user + ',pomdp\n')
+                        error_log.write(user + ',pomdp\n')
+                        pomdp_agent.input = u_in
+                        pomdp_agent.output = u_out
+                        run_pomdp_dialog(pomdp_agent, u_in, u_out, final_action_log)
+                    print 'Waiting for a new user '
+                    user_log.flush()
+                except RuntimeError as e :
+                    error = str(e)
+                    error_log.write(error + '\n\n\n')
+                    print 'Waiting for a new user '
+                    user_log.flush()
+                    error_log.flush()
+            else :
+                # Increase wait time before checking for user again so that 
+                # user queue does not get stuck servciing only get requests
+                if wait_time <= 1.0 :
+                    wait_time += 0.1
+            time.sleep(wait_time)
+        except KeyboardInterrupt, SystemExit :
+            raise
+        except :
+            error = str(sys.exc_info()[0])
+            error_log.write(error + '\n')
+            print traceback.format_exc()
+            error_log.write(traceback.format_exc() + '\n\n\n')
+            error_log.flush()
                 
     user_log.close()
+    error_log.close()
 
 def run_static_dialog(agent, u_in, u_out, final_action_log=None) :
     u_out.say("How can I help?")

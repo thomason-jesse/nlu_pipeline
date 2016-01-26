@@ -99,20 +99,31 @@ class Partition:
             if len(self.possible_param_values[param_name]) < 1 :
                 return False
         
-        if len(self.possible_goals) > 1 :
-            return True         
-        
-        # If control reaches here, there is only one goal. Check that all 
+        # If there is only one goal. Check that all 
         # its params have values which are valid
-        goal = self.possible_goals[0]
-        relevant_params = knowledge.param_order[goal]
-        for param_name in relevant_params :
-            if param_name not in self.possible_param_values or len(self.possible_param_values[param_name]) < 1 :
-                return False
-            if len(self.possible_param_values[param_name]) == 1 :
-                value = self.possible_param_values[param_name][0]
-                if not self.param_value_valid(goal, param_name, value, knowledge, grounder) :
+        if len(self.possible_goals) == 1 :
+            goal = self.possible_goals[0]
+            relevant_params = knowledge.param_order[goal]
+            for param_name in relevant_params :
+                if param_name not in self.possible_param_values or len(self.possible_param_values[param_name]) < 1 :
                     return False
+                if len(self.possible_param_values[param_name]) == 1 :
+                    value = self.possible_param_values[param_name][0]
+                    if not self.param_value_valid(goal, param_name, value, knowledge, grounder) :
+                        return False
+            return True
+            
+        # If control reaches here, there is more than one goal. Check if
+        # any param value is fixed. If so, no goal should be incompatible
+        # with it
+        for param_name in self.possible_param_values :
+            if len(self.possible_param_values[param_name]) == 1 :            
+                # Parameter param_name has exactly one value
+                param_value = self.possible_param_values[param_name][0]
+                for goal in self.possible_goals :
+                    # No goal should be incompatible with it
+                    if not self.param_value_valid(goal, param_name, param_value, knowledge, grounder) :
+                        return False
         return True
     
     def param_value_valid(self, goal, param_name, value, knowledge, grounder) :
@@ -129,6 +140,23 @@ class Partition:
                 # A predicate that should not hold does
                 return False
         return True
+    
+    def remove_invalid_goals(self, knowledge, grounder) :
+        if len(self.possible_goals) <= 1 :
+            # Better to have one wrong goal than a malformed partition 
+            # object so return
+            return
+            
+        for param_name in self.possible_param_values :
+            if len(self.possible_param_values[param_name]) == 1 :
+                value = self.possible_param_values[param_name][0]
+                goals_to_remove = list()
+                for goal in self.possible_goals :
+                    if not self.param_value_valid(goal, param_name, value, knowledge, grounder) :
+                        goals_to_remove.append(goal)
+                for goal in goals_to_remove :
+                    self.possible_goals.remove(goal)
+                
     
     def remove_invalid_params(self, knowledge, grounder) :
         #print 'In remove invalid params with '
