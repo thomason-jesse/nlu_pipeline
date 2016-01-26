@@ -40,6 +40,9 @@ USER_LOG = '../../../../public_html/AMT/log_special/user_list.txt'
 ERROR_LOG = '../../../../public_html/AMT/log_special/errors.txt'
 LEXICAL_ADDITION_LOG = '../../../../public_html/AMT/log_special/lexical_addition.txt'
 
+# Fixing the random seed for debugging
+numpy.random.seed(4)
+
 class UserManager :
     def __init__(self) :
         rospy.init_node('dialog_agent_aishwarya')
@@ -165,7 +168,7 @@ class OutputToTopic:
         self.logfile = logfile    
         self.current_user = user  
         #self.pub = rospy.Publisher(topic_name, String, queue_size=MAX_OUTSTANDING_MESSAGES)
-        self.pub = rospy.Publisher(topic_name, String, queue_size=1)
+        self.pub = rospy.Publisher(topic_name, String, queue_size=1, tcp_nodelay=True)
             # The rospy documentation says that a queue size of 1 should
             # be fine for 10 Hz if you're not sedning a burst of messages
             # This will prevent a backlog of messages to be cleared in  
@@ -213,9 +216,6 @@ class OutputToTopic:
 
     def __del__(self) :
         self.pub.unregister()
-
-# Fixing the random seed for debugging
-#numpy.random.seed(4)
 
 def init_static_dialog_agent(args) :
     print "reading in Ontology"

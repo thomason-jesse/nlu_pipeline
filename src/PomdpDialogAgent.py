@@ -83,7 +83,7 @@ class PomdpDialogAgent :
                     return False
                 # Belief monitoring - update belief based on the response
                 self.update_state(response)
-                #print 'Belief state: ', str(self.state) 
+                print 'Belief state: ', str(self.state) 
                 
                 reward = self.knowledge.per_turn_reward
                 summary_state = SummaryState(self.state)
@@ -124,7 +124,7 @@ class PomdpDialogAgent :
         # get n best parses for confirmation
         #print 'response = ', response
         n_best_parses = self.parser.parse_expression(response, n=self.parse_depth)
-        
+        print 'Parsed'
         #print 'n_best_parses = '
         #for [parse, parse_tree, parse_trace, conf] in n_best_parses :
             #print 'parse = ', self.parser.print_parse(parse)
@@ -139,13 +139,15 @@ class PomdpDialogAgent :
         # Create an n-best list of Utterance objects along with probabiltiies 
         # obtained from their confidences
         self.get_n_best_utterances_from_parses(n_best_parses)
+        print 'Created utterances'
         
         if len(self.n_best_utterances) > 0 :
             # Update the belief state
-            #print '\nGoing to update belief state'
-            #print 'Previous system action - ', str(self.previous_system_action)
-            #print 'Utterances - ', '\n'.join([str(utterance) for utterance in self.n_best_utterances])
+            print '\nGoing to update belief state'
+            print 'Previous system action - ', str(self.previous_system_action)
+            print 'Utterances - ', '\n'.join([str(utterance) for utterance in self.n_best_utterances])
             self.state.update(self.previous_system_action, self.n_best_utterances, self.grounder)
+            print 'Updated'
 
     # Confirm a (possibly partial) action
     def confirm_action(self):
@@ -298,7 +300,7 @@ class PomdpDialogAgent :
             if type(answers) == 'str' :
                 answers = [answers]
             for answer in answers :
-                if self.previous_system_action.extra_data is not None and len(self.previous_system_action.extra_data) > 1:
+                if self.previous_system_action.action_type == 'request_missing_param' and self.previous_system_action.extra_data is not None and len(self.previous_system_action.extra_data) == 1 :
                     param_name = self.previous_system_action.extra_data[0]
                 else :
                     param_name = 'patient'

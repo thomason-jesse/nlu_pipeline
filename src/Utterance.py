@@ -90,26 +90,31 @@ class Utterance:
             return True
             
         # Control comes here if the utterance is information providing (not affirm/deny)
+        print 'Inform utterance'
         if self.referring_goal != None :
             if system_action.referring_goal != None and self.referring_goal != system_action.referring_goal :
                 # Normally utterance and system_action will not both have
                 # a goal but if they do, they should match
+                print 'Goal does not match in utterance and system action'
                 return False
             if partition.possible_goals == None or self.referring_goal not in partition.possible_goals :
                 # The partition does not allow the desired goal
+                print 'Partition does not allow the desired goal'
                 return False
         if self.referring_params != None :
             for param_name in self.referring_params :
                 if system_action.referring_params != None :
-                    if param_name not in system_action.referring_params or system_action.referring_params[param_name] != self.referring_params[param_name] :
+                    if param_name in system_action.referring_params and system_action.referring_params[param_name] != self.referring_params[param_name] :
                         # Any param present in both the system action and the 
                         # utterance must match. Note that a param need not and 
                         # generally doesn't exist in both
+                        print 'Non matching value for ', param_name, ' in system_action and utterance'
                         return False
                 if param_name not in partition.possible_param_values or self.referring_params[param_name] not in partition.possible_param_values[param_name] :
                     # Typically all partitions have some set of values 
                     # for all param names. The partition must allow 
                     # the values specified in the utterance
+                    print 'Parition does not allow ', self.referring_params[param_name], ' for ', param_name
                     return False
         return True
         

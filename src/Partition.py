@@ -260,8 +260,9 @@ class Partition:
             p1.reaching_prob = self.reaching_prob * split_prob
             p1.belief = self.belief * split_prob
             if p1.is_terminal(knowledge) :
-                #p1.belief = min(p1.belief + 0.5, 1)    
-                pass
+                # Boosting probability if it is a valid terminal task
+                p1.belief = min(p1.belief + knowledge.boost_for_terminal_partition, 1)    
+                #pass
             p1.remove_invalid_params(knowledge, grounder)    
                 
             other_goals = [goal for goal in self.possible_goals if goal != new_goal]
@@ -269,8 +270,9 @@ class Partition:
             p2.reaching_prob = self.reaching_prob * (1 - split_prob)
             p2.belief = self.belief * (1 - split_prob)
             if p2.is_terminal(knowledge) :
-                #p2.belief = min(p2.belief + 0.5, 1)    
-                pass
+                # Boosting probability if it is a valid terminal task
+                p2.belief = min(p2.belief + knowledge.boost_for_terminal_partition, 1)    
+                #pass
             p2.remove_invalid_params(knowledge, grounder)
             
             # Check that both partitions are valid. If not, return only 
@@ -306,12 +308,12 @@ class Partition:
             p1.reaching_prob = self.reaching_prob * split_prob
             p1.belief = self.belief * split_prob
             if p1.is_terminal(knowledge) :
-                p1.belief = min(p1.belief + 0.1, 1)    
+                p1.belief = min(p1.belief + knowledge.boost_for_terminal_partition, 1)    
                 pass
             p2.reaching_prob = self.reaching_prob * (1 - split_prob)
             p2.belief = self.belief * (1 - split_prob)
             if p2.is_terminal(knowledge) :
-                p2.belief = min(p2.belief + 0.1, 1)    
+                p2.belief = min(p2.belief + knowledge.boost_for_terminal_partition, 1)    
                 pass
             
             # Check that both partitions are valid. If not, return only 
