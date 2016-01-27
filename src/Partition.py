@@ -43,22 +43,28 @@ class Partition:
             return False
         return True     
         
-    # A partition matches with a system action and utterance if, for each attribute 
-    # specified by them, including the action and its parameters, the partition allows 
-    # only that value
+    # A partition matches with a system action and utterance if, for each 
+    # attribute specified by them, including the action and its parameters,  
+    # the partition allows only that value
+    # NOTE : Partition.match() is used to determine whether or not to 
+    # split the partition. Hence, for a confirm, whether it is affirmed
+    # or denied, it is a match only if the partition exactly allows what
+    # is mentioned in the system action
+    # V.IMP. NOTE: Do not use this to determine whether to boost the 
+    # probability of the (partition, utterance) pair
     def match(self, system_action, utterance) :
-        if system_action.action_type == 'confirm_action' and utterance.action_type == 'deny' :
-            # The user said that something in the goal/params of the 
-            # system action was wrong. So consider all partitions that 
-            # don't match with the system action
-            if system_action.referring_goal is not None :
-                if system_action.referring_goal in self.possible_goals :
-                    return False
-            if system_action.referring_params is not None :
-                for param_name in system_action.referring_params :
-                    if system_action.referring_params[param_name] in self.possible_param_values[param_name] :
-                        return False
-            return True
+        #if system_action.action_type == 'confirm_action' and utterance.action_type == 'deny' :
+            ## The user said that something in the goal/params of the 
+            ## system action was wrong. So consider all partitions that 
+            ## don't match with the system action
+            #if system_action.referring_goal is not None :
+                #if system_action.referring_goal in self.possible_goals :
+                    #return False
+            #if system_action.referring_params is not None :
+                #for param_name in system_action.referring_params :
+                    #if system_action.referring_params[param_name] in self.possible_param_values[param_name] :
+                        #return False
+            #return True
             
         # Partition should match info in system action
         if not len(self.possible_goals) == 1 or not system_action.referring_goal == self.possible_goals[0] :

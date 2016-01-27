@@ -67,7 +67,12 @@ class Utterance:
         else :
             hash_tuple = (self.action_type, self.referring_goal, (), self.parse_prob)
         return hash(hash_tuple)
-        
+    
+    # NOTE: Utterance.match() is used to determine whether or not to 
+    # boost the probability of the (partition, utterance) hypothesis.
+    # Hence for a denial, it looks for partitions that differ in some 
+    # way from the system action
+    # NOTE THAT THIS FUNCTIONALITY IS DIFFERENT FROM Partition.match()    
     def match(self, partition, system_action) :
         if self.action_type == 'deny' :
             # Match all partitions that in some way do not match the 
