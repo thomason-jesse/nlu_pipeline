@@ -49,7 +49,13 @@ class UserManager :
         self.user_queue = Queue(MAX_WAITING_USERS) # Using this as it is thread safe
         self.prev_user = None
         rospy.Subscriber("new_user_topic", String, self.add_to_queue)
+        self.listen_thread = Thread(target=self.listen_for_users, args=())
+        self.listen_thread.daemon = True
+        self.listen_thread.start()
         self.lock = Lock()
+    
+    def listen_for_users(self) :
+        rospy.spin()
     
     def get_next_user(self) :
         try :
@@ -101,6 +107,13 @@ class InputFromTopic:
         self.logfile = logfile
         self.current_user = user
         self.last_get = ''  
+        self.lock = Lock()
+        self.listen_thread = Thread(target=self.listen_for_messages, args=())
+        self.listen_thread.daemon = True
+        self.listen_thread.start()
+    
+    def listen_for_messages(self) :
+        rospy.spin()
 
     def get(self):
         print 'In get'
@@ -128,7 +141,6 @@ class InputFromTopic:
             except Empty :
                 pass  
             
-    
     def add_to_queue(self, msg) :
         #print 'Received ', msg.data, 'self.prev_msg = ', self.prev_msg
         if '|' not in msg.data :
@@ -408,6 +420,7 @@ def start(pomdp_agent, static_agent) :
                 # user queue does not get stuck servciing only get requests
                 if wait_time <= 1.0 :
                     wait_time += 0.1
+            rospy.spinonce()
             time.sleep(wait_time)
         except KeyboardInterrupt, SystemExit :
             raise

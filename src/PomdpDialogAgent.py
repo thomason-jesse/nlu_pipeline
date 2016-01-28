@@ -389,13 +389,23 @@ class PomdpDialogAgent :
         sum_exp_conf = 0
         for utterance in self.n_best_utterances :
             sum_exp_conf += utterance.parse_prob
-            
+        
         sum_exp_conf += self.knowledge.obs_by_non_n_best_prob
-        max_prob_utterance = None
+        prob_with_utterances = list()
+        
         for utterance in self.n_best_utterances :
-            if max_prob_utterance is None or utterance.parse_prob > max_prob_utterance.parse_prob :
-                max_prob_utterance = utterance
             utterance.parse_prob /= sum_exp_conf
+            prob_with_utterances.append((utterance.parse_prob, utterance))
+            
+        prob_with_utterances.sort()
+        if len(prob_with_utterances) > 0 :
+            max_prob_utterance = prob_with_utterances[0][1] 
+        else :
+            max_prob_utterance = None
+        if len(prob_with_utterances) > N :
+            self.n_best_utterances = list()
+            for (idx, (prob, utterance)) in enumerate(prob_with_utterances) :
+                self.n_best_utterances.append(utterance)
             
         #print 'max_prob_utterance parse = ', max_prob_utterance.parse_leaves 
         self.max_prob_user_utterances.append(max_prob_utterance)
