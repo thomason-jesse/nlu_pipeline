@@ -72,8 +72,7 @@ class StaticDialogAgent:
 
     # request the user repeat their original goal
     def request_user_initiative(self, args):
-        #self.output.say("Can you restate your question or command?")
-        self.output.say("I\'m sorry but could you repeat or rephrase your command?")
+        self.output.say("Sorry I couldn't understand that. Could you reword your original request?")
         u = self.input.get()
         if u.lower().strip() == 'stop' :
             self.dialogue_stopped = True

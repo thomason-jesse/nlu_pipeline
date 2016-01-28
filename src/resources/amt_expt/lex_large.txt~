@@ -49,11 +49,8 @@ drink :- N : juice
 muffin :- N : muffin
 cupcake :- N : muffin
 alice :- N : alice
-alice ashcraft :- N : alice
-ashcraft :- N : alice
 secretary :- N : alice
 francis foster :- N : frannie
-foster :- N : frannie
 frannie :- N : frannie
 francis :- N : frannie
 robert brown :- N : bob
@@ -79,8 +76,6 @@ eve :- N : eve
 mallory morgan :- N : mallory
 morgan :- N : mallory
 mallory :- N : mallory
-director :- N : mallory
-dr morgan :- N : mallory
 peggy :- N : peggy
 peggy parker :- N : peggy
 parker :- N : peggy

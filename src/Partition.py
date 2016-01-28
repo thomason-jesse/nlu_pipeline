@@ -96,6 +96,13 @@ class Partition:
             elif len(self.possible_param_values[param]) != 1 :
                 return False
         return True
+        
+    def is_like(self, other) :
+        if not checkLists(self.possible_goals, other.possible_goals) :
+            return False
+        elif not checkDicts(self.possible_param_values, other.possible_param_values) :
+            return False
+        return True     
                 
     def is_valid(self, knowledge, grounder) :
         # Basic sanity check - alteast one valid goal
@@ -151,6 +158,8 @@ class Partition:
         return True
     
     def remove_invalid_goals(self, knowledge, grounder) :
+        #print 'In remove_invalid_goals with ', str(self)
+        
         if len(self.possible_goals) <= 1 :
             # Better to have one wrong goal than a malformed partition 
             # object so return
@@ -159,12 +168,27 @@ class Partition:
         for param_name in self.possible_param_values :
             if len(self.possible_param_values[param_name]) == 1 :
                 value = self.possible_param_values[param_name][0]
+                # This partition is certain that 'param_name' has the 
+                # value 'value'
                 goals_to_remove = list()
                 for goal in self.possible_goals :
+                    if value is not None and param_name not in knowledge.param_order[goal] :
+                        #print 'Removing ', goal, ' because ', param_name, ' = ', value 
+                        # This goal doesn't need param name. We don't 
+                        # really need to removing it but pruning always 
+                        # results in speedup
+                        goals_to_remove.append(goal)
                     if not self.param_value_valid(goal, param_name, value, knowledge, grounder) :
+                        # This goal is actually incompatible with the 
+                        # param value
                         goals_to_remove.append(goal)
                 for goal in goals_to_remove :
-                    self.possible_goals.remove(goal)
+                    if len(self.possible_goals) > 1 :
+                        # Don't remove the goal if there is only one 
+                        # because having a logically invalid goal is less
+                        # problematic than having an ill-formed one. It
+                        # will get removed elsewhere anyway
+                        self.possible_goals.remove(goal)
                 
     
     def remove_invalid_params(self, knowledge, grounder) :

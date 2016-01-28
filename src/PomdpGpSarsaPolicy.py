@@ -571,14 +571,21 @@ class PomdpGpSarsaPolicy :
         feature_vector = state.get_feature_vector()
         num_goals = feature_vector[2]
         num_uncertain_params = feature_vector[3]
+        last_utterance_type = feature_vector[6]
         if num_goals == 1 :
             if num_uncertain_params == 0 :
                 if state.top_hypothesis_prob < 0.3 :
                     return 'request_missing_param'
-                elif state.top_hypothesis_prob < 0.99 :
-                    return 'confirm_action'
+                if last_utterance_type == 'affirm' or last_utterance_type == 'deny' :
+                    if state.top_hypothesis_prob < 0.75 :
+                        return 'repeat_goal'      
+                    else :
+                        return 'take_action'
                 else :
-                    return 'take_action'
+                    if state.top_hypothesis_prob < 0.99 :
+                        return 'confirm_action'
+                    else :
+                        return 'take_action'
             else :
                 return 'request_missing_param'
         else :

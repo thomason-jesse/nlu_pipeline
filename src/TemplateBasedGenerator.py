@@ -72,13 +72,13 @@ class TemplateBasedGenerator :
             if system_action.extra_data is not None and 'first' in system_action.extra_data :
                 return 'How can I help?'
             else :
-                return 'I\'m sorry but could you repeat or rephrase your command?'
+                return 'Sorry I couldn\'t understand that. Could you reword your original request?'
                 
         elif system_action.action_type == 'confirm_action' :
             if system_action.referring_goal is None :
                 params = [str(param) for param in system_action.referring_params.values()]
                 if len(params) == 0 :
-                    return 'I\'m sorry, I didn\'t quite understand that. What did you want me to do?'
+                    return 'Sorry I couldn\'t understand that. Could you reword your original request?'
                 elif len(params) == 1 :
                     return 'You want me to take an action with ' + params[0] + '?'
                 else :
@@ -138,7 +138,7 @@ class TemplateBasedGenerator :
                     else :
                         return 'Whom would you like me to bring something to?'
             elif system_action.referring_goal == 'at' :
-                return 'Where would you like me to go?'    
+                return 'Where would you like me to walk to?'    
             else :
                 return 'What is the ' + param_to_confirm + ' of the action you would like me to take?'
                 

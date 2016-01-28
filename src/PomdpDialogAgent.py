@@ -304,40 +304,48 @@ class PomdpDialogAgent :
             if type(answers) == 'str' :
                 answers = [answers]
             for answer in answers :
-                if self.previous_system_action.action_type == 'request_missing_param' and self.previous_system_action.extra_data is not None and len(self.previous_system_action.extra_data) == 1 :
-                    param_name = self.previous_system_action.extra_data[0]
-                else :
-                    param_name = 'patient'
                 goal = self.previous_system_action.referring_goal
                 params = dict()
-                params[param_name] = answer
-                utterance = Utterance('inform', goal, params)      
-                utterances.append(utterance)
+
+                if self.previous_system_action.action_type == 'request_missing_param' and self.previous_system_action.extra_data is not None and len(self.previous_system_action.extra_data) == 1 :
+                    param_name = self.previous_system_action.extra_data[0]
+                    params[param_name] = answer
+                    utterance = Utterance('inform', goal, params)      
+                    utterances.append(utterance)
+                else :
+                    for param_name in self.knowledge.goal_params :
+                        params_copy = copy.deepcopy(params)
+                        params_copy[param_name] = answer
+                        utterance = Utterance('inform', goal, params_copy)      
+                        utterances.append(utterance)
+                
+                
             return utterances
         except TypeError as e :
             print e.message
+
+    def remove_invalid_utterances(self, utterances, grounder) :
+        invalid_utterances = set()
+        for utterance in utterances :
+            if type(utterance) == 'Utterance' and not utterance.is_valid(self.knowledge, grounder) :
+                invalid_utterances.add(utterance)
+        for utterance in invalid_utterances :
+            utterances.remove(utterance)
+        return utterances
             
     def merge_duplicate_utterances(self, utterances) :
-        n = len(utterances)
         merged_utterances = list()
-        
         i = 0
-        while i < n :
-            #print 'n = ', n, ', i = ', i
+        while i < len(utterances) :
             u = utterances[i]
-            n = len(utterances)
             j = i
-            while j < n :
-                #print 'n = ', n, ', j = ', j
+            while j < len(utterances) :
                 u2 = utterances[j]
                 if u2.is_like(u) :
                     u.parse_prob += u2.parse_prob
                     utterances.remove(u2)
-                    n -= 1
                 else :
                     j += 1
-                #print 'n = ', n, ', j = ', j
-                #print
             merged_utterances.append(u)
             i += 1
         
@@ -373,8 +381,10 @@ class PomdpDialogAgent :
                     utterance.parse_prob = math.exp(conf) / len(utterances)
                     self.n_best_utterances.append(utterance)
                     #sum_exp_conf += utterance.parse_prob
-            
-        self.n_best_utterances = self.merge_duplicate_utterances(self.n_best_utterances)    
+        
+        # Clean up by removing duplicates and invalid utterances    
+        self.n_best_utterances = self.merge_duplicate_utterances(self.n_best_utterances)   
+        self.n_best_utterances = self.remove_invalid_utterances(self.n_best_utterances, self.grounder) 
         
         sum_exp_conf = 0
         for utterance in self.n_best_utterances :

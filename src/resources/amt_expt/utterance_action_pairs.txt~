@@ -6,6 +6,10 @@ check frannie's office for eve
 M : searchroom(eve,the(lambda x:e.(hasoffice(frannie,x))))
 searchroom(eve,l3_510)
 
+search for george in eve's office
+M : searchroom(george,the(lambda x:e.(hasoffice(eve,x))))
+searchroom(george,l3_418)
+
 bring chips to george
 M : bring(chips,george)
 bring(chips,george)
@@ -26,3 +30,6 @@ walk to alice's office
 M : at(the(lambda x:e.(hasoffice(alice,x))))
 at(l3_502)
 
+go to mallory's office
+M : at(the(lambda x:e.(hasoffice(mallory,x))))
+at(l3_508)

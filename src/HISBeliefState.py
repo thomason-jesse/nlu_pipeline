@@ -74,8 +74,8 @@ class HISBeliefState:
                     required_params[param_name] = [utterance.referring_params[param_name]]
                 required_params[param_name] = list(set(required_params[param_name]))
                 
-        print "required_goal = ", required_goal        # DEBUG
-        print "required_params = ", required_params    # DEBUG
+        #print "required_goal = ", required_goal        # DEBUG
+        #print "required_params = ", required_params    # DEBUG
         
         # Iterate over the partitions and split any partition that is a 
         # superset of what is required
@@ -150,31 +150,32 @@ class HISBeliefState:
                     #print str(partition)
         #print '----------------------------------------------'
         hypothesis_beliefs = dict()
+
+        # Clean up partitions
+        self.remove_invalid_partitions(grounder)
+        self.merge_duplicate_partitions()
         
-        print 'Updation'
+        #print 'Updation'
         for partition in self.partitions :
             for utterance in n_best_utterances :
-                print '---------------------------------'
-                print str(partition)
-                print str(utterance)
+                #print '---------------------------------'
+                #print str(partition)
+                #print str(utterance)
                
                 hypothesis = (partition, utterance)
                 obs_prob = utterance.parse_prob # Pr(o'/u)
-                print 'obs_prob = ', obs_prob
+                #print 'obs_prob = ', obs_prob
                 type_prob = self.knowledge.action_type_probs[system_action.action_type][utterance.action_type] # Pr(T(u)/T(m))
-                print 'type_prob = ', type_prob 
+                #print 'type_prob = ', type_prob 
                 param_match_prob = int(utterance.match(partition, system_action)) # Pr(M(u)/p,m)
-                print 'param_match_prob = ', param_match_prob 
-                print '---------------------------------'
+                #print 'param_match_prob = ', param_match_prob 
+                #print '---------------------------------'
                 hypothesis_beliefs[hypothesis] = obs_prob * type_prob * param_match_prob * partition.belief 
                     # b(p',u') = k * Pr(o'/u) * Pr(T(u)/T(m)) * Pr(M(u)/p,m) * b(p)
             hypothesis = (partition, '-OTHER-')
             obs_prob = self.knowledge.obs_by_non_n_best_prob
             match_prob = self.knowledge.non_n_best_match_prob
             hypothesis_beliefs[hypothesis] = obs_prob * match_prob * partition.belief 
-        
-        # Remove invalid beliefs
-        self.remove_invalid(grounder)
         
         # Normalize beliefs
         sum_hypothesis_beliefs = 0.0
@@ -202,26 +203,38 @@ class HISBeliefState:
 
         self.hypothesis_beliefs = hypothesis_beliefs
         
-    def remove_invalid(self, grounder) :
-        if self.hypothesis_beliefs is None :
-            return
-        
-        invalid_beliefs = set()  
+    def remove_invalid_partitions(self, grounder) :    
         invalid_partitions = set()  
-        for (partition, utterance) in self.hypothesis_beliefs.keys() :
+        for partition in self.partitions :
+            partition.remove_invalid_params(self.knowledge, grounder)
+            partition.remove_invalid_goals(self.knowledge, grounder) 
             if not partition.is_valid(self.knowledge, grounder) :
-                invalid_beliefs.add((partition, utterance))
                 invalid_partitions.add(partition)
-            elif type(utterance) == 'Utterance' and not utterance.is_valid(self.knowledge, grounder) :
-                invalid_beliefs.add((partition, utterance))
-                
-        for key in invalid_beliefs :
-            if key in self.hypothesis_beliefs :
-                del self.hypothesis_beliefs[key]
-        
         for partition in invalid_partitions :
-            if partition in self.partitions : 
-                self.partitions.remove(partition)    
-        
+            self.partitions.remove(partition)        
+                    
+    def merge_duplicate_partitions(self) :
+        print 'In merge_duplicate_partitions '
+        print 'Before - '
+        print str(self)
+        print '------------------------------------------'
+        i = 0
+        while i < len(self.partitions) :
+            p1 = self.partitions[i]
+            j = i+1
+            while j < len(self.partitions) :
+                p2 = self.partitions[j]
+                if p1.is_like(p2) :
+                    print str(p1)
+                    print str(p2)
+                    print '************************************'
+                    p1.belief += p2.belief
+                    p1.reaching_prob += p2.reaching_prob
+                    self.partitions.remove(p2)
+                else :
+                    j += 1
+            i += 1
             
-            
+        print 'After - '
+        print str(self)
+        print '------------------------------------------'

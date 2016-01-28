@@ -41,12 +41,13 @@ def checkDicts(dict1, dict2) :
     else :
         if type(dict1) != dict or type(dict2) != dict :
             return False
-        if dict1.keys() != dict2.keys() :
+        if set(dict1.keys()) != set(dict2.keys()) :
             return False   
         else :
             for key in dict1.keys() :
-                if type(dict1[key]) == list and not checkLists(dict1[key], dict2[key]) :
-                    return False
+                if type(dict1[key]) == list :
+                    if not checkLists(dict1[key], dict2[key]) :
+                        return False  
                 elif not dict1[key] == dict2[key] :
                     return False
     return True
