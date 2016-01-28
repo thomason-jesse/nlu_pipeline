@@ -215,14 +215,14 @@ class PomdpStaticDialogAgent:
         if action is not None :
             goal = action.name
             if action.params is None :
-                utterance = Utterance('inform', goal)
+                utterance = Utterance('inform_full', goal)
             else :
                 params = dict()
                 for (idx, param_val) in enumerate(action.params) :
                     param_name = self.knowledge.param_order[goal][idx]
                     if param_val != 'UNK_E' :
                         params[param_name] = param_val
-                utterance = Utterance('inform', goal, params)
+                utterance = Utterance('inform_full', goal, params)
         return utterance
 
     def create_utterances_of_parse(self, parse) :
@@ -284,7 +284,7 @@ class PomdpStaticDialogAgent:
                 if goal is not None :
                     param_name = self.knowledge.param_order[goal][idx] 
                 params[param_name] = answer
-                utterance = Utterance('inform', goal, params)      
+                utterance = Utterance('inform_param', goal, params)      
                 utterances.append(utterance)
             return utterances
         except TypeError as e :

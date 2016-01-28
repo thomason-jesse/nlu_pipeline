@@ -19,7 +19,7 @@ class Knowledge:
         self.goal_params_values = [None, 'chips', 'coffee', 'hamburger', 'juice', 'muffin', 'alice', 'frannie', 'bob', 'carol', 'dave', 'george', 'eve', 'mallory', 'peggy', 'walter', 'l3_516', 'l3_508', 'l3_512', 'l3_510', 'l3_402', 'l3_418', 'l3_420', 'l3_432', 'l3_502', 'l3_414b']      
         
         self.system_dialog_actions = ['repeat_goal', 'confirm_action', 'request_missing_param']
-        self.user_dialog_actions = ['inform', 'affirm', 'deny']
+        self.user_dialog_actions = ['inform_param', 'inform_full', 'affirm', 'deny']
 
         self.goal_change_prob = 0.0
 
@@ -145,8 +145,8 @@ class Knowledge:
 
     def set_action_type_probs(self) :
         expected_actions = dict()
-        expected_actions['repeat_goal'] = ['inform']
-        expected_actions['request_missing_param'] = ['inform']
+        expected_actions['repeat_goal'] = ['inform_full']
+        expected_actions['request_missing_param'] = ['inform_param']
         expected_actions['confirm_action'] = ['affirm', 'deny']
         for system_dialog_action in self.system_dialog_actions :
             if system_dialog_action not in self.action_type_probs :
@@ -197,4 +197,3 @@ class Knowledge:
         
         #self.false_constraints['speak_t']['patient'] = ['person', 'room']
         #self.false_constraints['remind']['patient'] = ['person', 'room']
-

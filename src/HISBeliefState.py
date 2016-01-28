@@ -155,21 +155,21 @@ class HISBeliefState:
         self.remove_invalid_partitions(grounder)
         self.merge_duplicate_partitions()
         
-        #print 'Updation'
+        print 'Updation'
         for partition in self.partitions :
             for utterance in n_best_utterances :
-                #print '---------------------------------'
-                #print str(partition)
-                #print str(utterance)
+                print '---------------------------------'
+                print str(partition)
+                print str(utterance)
                
                 hypothesis = (partition, utterance)
                 obs_prob = utterance.parse_prob # Pr(o'/u)
-                #print 'obs_prob = ', obs_prob
-                type_prob = self.knowledge.action_type_probs[system_action.action_type][utterance.action_type] # Pr(T(u)/T(m))
-                #print 'type_prob = ', type_prob 
+                print 'obs_prob = ', obs_prob
+                type_prob = self.knowledge.action_type_probs[system_action.action_type][utterance.action_type]
+                print 'type_prob = ', type_prob # Pr(T(u)/T(m))
                 param_match_prob = int(utterance.match(partition, system_action)) # Pr(M(u)/p,m)
-                #print 'param_match_prob = ', param_match_prob 
-                #print '---------------------------------'
+                print 'param_match_prob = ', param_match_prob 
+                print '---------------------------------'
                 hypothesis_beliefs[hypothesis] = obs_prob * type_prob * param_match_prob * partition.belief 
                     # b(p',u') = k * Pr(o'/u) * Pr(T(u)/T(m)) * Pr(M(u)/p,m) * b(p)
             hypothesis = (partition, '-OTHER-')
@@ -214,10 +214,10 @@ class HISBeliefState:
             self.partitions.remove(partition)        
                     
     def merge_duplicate_partitions(self) :
-        print 'In merge_duplicate_partitions '
-        print 'Before - '
-        print str(self)
-        print '------------------------------------------'
+        #print 'In merge_duplicate_partitions '
+        #print 'Before - '
+        #print str(self)
+        #print '------------------------------------------'
         i = 0
         while i < len(self.partitions) :
             p1 = self.partitions[i]
@@ -225,9 +225,9 @@ class HISBeliefState:
             while j < len(self.partitions) :
                 p2 = self.partitions[j]
                 if p1.is_like(p2) :
-                    print str(p1)
-                    print str(p2)
-                    print '************************************'
+                    #print str(p1)
+                    #print str(p2)
+                    #print '************************************'
                     p1.belief += p2.belief
                     p1.reaching_prob += p2.reaching_prob
                     self.partitions.remove(p2)
@@ -235,6 +235,6 @@ class HISBeliefState:
                     j += 1
             i += 1
             
-        print 'After - '
-        print str(self)
-        print '------------------------------------------'
+        #print 'After - '
+        #print str(self)
+        #print '------------------------------------------'

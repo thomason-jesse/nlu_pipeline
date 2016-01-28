@@ -28,10 +28,10 @@ def test_gp_sarsa_funcs() :
         u = Utterance('affirm', None, None)
     elif a == 'request_missing_param' :
         m = SystemAction('request_missing_param', 'searchroom')
-        u = Utterance('inform', 'searchroom', {'patient':'ray', 'location':'3512'})
+        u = Utterance('inform_full', 'searchroom', {'patient':'ray', 'location':'3512'})
     else :
         m = SystemAction('repeat_goal')    
-        u = Utterance('inform', 'searchroom', {'patient':'ray', 'location':'3512'})
+        u = Utterance('inform_full', 'searchroom', {'patient':'ray', 'location':'3512'})
     
     print '--------------------------------------'    
     print str(m)
@@ -64,7 +64,7 @@ def test_gp_sarsa_resolving_summary_action() :
     knowledge = Knowledge()
     b = HISBeliefState(knowledge)
     m = SystemAction('repeat_goal')    
-    u = Utterance('inform', 'searchroom', {'patient':'ray', 'location':'3512'})
+    u = Utterance('inform_full', 'searchroom', {'patient':'ray', 'location':'3512'})
     b.update(m, [u])
     print str(b)
     s = SummaryState(b)
@@ -90,7 +90,7 @@ if __name__ == '__main__' :
     #print str(b)
     #m1 = SystemAction('confirm_action', 'searchroom', {'patient':'ray', 'location':'3512'})
     #m2 = SystemAction('repeat_goal')    
-    #u1 = Utterance('inform', 'searchroom', {'patient':'ray', 'location':'3512'})
+    #u1 = Utterance('inform_full', 'searchroom', {'patient':'ray', 'location':'3512'})
     #u2 = Utterance('affirm', None, None)
     #u3 = Utterance('deny', None, None)
     #b.update(m1, [u1, u2, u3])
@@ -166,18 +166,18 @@ if __name__ == '__main__' :
     #u[0] = Utterance('affirm', 'searchroom', {'patient':'ray', 'location':'3512'})
     #u[1] = Utterance('affirm', 'searchroom', {'patient':'ray', 'location':'3512'})
     #u[2] = Utterance('deny', 'searchroom', {'patient':'ray', 'location':'3512'})
-    #u[3] = Utterance('inform', 'searchroom', {'patient':'ray', 'location':'3512'})
+    #u[3] = Utterance('inform_full', 'searchroom', {'patient':'ray', 'location':'3512'})
     #u[4] = Utterance('affirm', 'searchroom', {'patient':'ray'})
     #u[5] = Utterance('affirm', 'searchroom', {'patient':'ray', 'recipient':'peter'})
     #u[6] = Utterance('affirm', 'searchroom', {})
-    #u[7] = Utterance('inform', 'searchroom')
+    #u[7] = Utterance('inform_full', 'searchroom')
     #u[8] = Utterance('affirm', 'remind', {'patient':'ray', 'location':'3512'})
     #print str(u[0])
     #for i in xrange(1,9) :
         #print u[0] == u[i]
     
     #u = [0,0,0]
-    #u[0] = Utterance('inform', 'searchroom', {'patient':'ray', 'location':'3512'})
+    #u[0] = Utterance('inform_full', 'searchroom', {'patient':'ray', 'location':'3512'})
     #u[1] = Utterance('affirm')
     #u[2] = Utterance('deny')
     

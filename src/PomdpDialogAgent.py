@@ -183,14 +183,14 @@ class PomdpDialogAgent :
         if action is not None :
             goal = action.name
             if action.params is None :
-                utterance = Utterance('inform', goal)
+                utterance = Utterance('inform_full', goal)
             else :
                 params = dict()
                 for (idx, param_val) in enumerate(action.params) :
                     param_name = self.knowledge.param_order[goal][idx]
                     if param_val != 'UNK_E' :
                         params[param_name] = param_val
-                utterance = Utterance('inform', goal, params)
+                utterance = Utterance('inform_full', goal, params)
         return utterance
 
     def create_utterances_of_parse(self, parse) :
@@ -216,7 +216,7 @@ class PomdpDialogAgent :
                 return []
             params = dict()
             params[param_name] = None
-            utterance = Utterance('inform', goal, params)      
+            utterance = Utterance('inform_param', goal, params)      
             #print '\n'
             return [utterance]
         
@@ -310,13 +310,13 @@ class PomdpDialogAgent :
                 if self.previous_system_action.action_type == 'request_missing_param' and self.previous_system_action.extra_data is not None and len(self.previous_system_action.extra_data) == 1 :
                     param_name = self.previous_system_action.extra_data[0]
                     params[param_name] = answer
-                    utterance = Utterance('inform', goal, params)      
+                    utterance = Utterance('inform_param', goal, params)      
                     utterances.append(utterance)
                 else :
                     for param_name in self.knowledge.goal_params :
                         params_copy = copy.deepcopy(params)
                         params_copy[param_name] = answer
-                        utterance = Utterance('inform', goal, params_copy)      
+                        utterance = Utterance('inform_param', goal, params_copy)      
                         utterances.append(utterance)
                 
                 

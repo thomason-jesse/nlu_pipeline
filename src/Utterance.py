@@ -10,7 +10,7 @@ class Utterance:
     def __init__(self, action_type, referring_goal=None, 
             referring_params=None, parse_prob=0.0):
         # This gives the type of dialog action
-        # Possible types - inform, affirm, deny
+        # Possible types - inform_full, inform_param, affirm, deny
         # In case of affirm and deny, the goal and params will be None
         self.action_type = action_type
         
@@ -127,10 +127,10 @@ class Utterance:
         return True
         
     def is_valid(self, knowledge, grounder) :
-        # Sanity check - only inform type has a goal
-        if self.action_type not in ['inform', 'affirm', 'deny'] :
+        # Sanity check - inform_full must have a goal and affirm and deny do not
+        if self.action_type not in ['inform_full', 'inform_param', 'affirm', 'deny'] :
             return False
-        if self.action_type == 'inform' and self.referring_goal is None :
+        if self.action_type == 'inform_full' and self.referring_goal is None :
             return False
         if self.action_type == 'affirm' and self.referring_goal is not None :
             return False         

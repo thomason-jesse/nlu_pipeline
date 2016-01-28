@@ -160,6 +160,10 @@ class InputFromTopic:
     
     def __del__(self) :
         self.sub.unregister()
+        
+    def close(self) :
+        if self.sub is not None :
+            self.sub.unregister()
 
 class OutputToTopic:
     def __init__(self, user, input_from_topic, logfile=None):
@@ -216,6 +220,11 @@ class OutputToTopic:
 
     def __del__(self) :
         self.pub.unregister()
+        
+    def close(self) :
+        self.msg = None
+        if self.pub is not None :
+            self.pub.unregister()
 
 def init_static_dialog_agent(args) :
     print "reading in Ontology"
@@ -341,6 +350,8 @@ def start(pomdp_agent, static_agent) :
     static_agent.lexical_addition_log = LEXICAL_ADDITION_LOG + '_static.txt'
     
     wait_time = 0
+    u_in  = None
+    u_out = None
     
     while True :
         #print 'Checking for user'
@@ -351,6 +362,10 @@ def start(pomdp_agent, static_agent) :
                 # There is actually a user
                 try :
                     print 'Starting communication with user', user
+                    if u_in is not None :
+                        u_in.close()
+                    if u_out is not None :
+                        u_out.close()
                     user_manager.lock.acquire()
                     # Making this a critical section otherwise sometimes the
                     # dialogue hangs 

@@ -33,7 +33,7 @@ class SummaryState :
     #     - No of params in the top partition required by its action that are uncertain
     #     - Number of dialog turns used so far
     #     - Do the top and second hypothesis use the same partition: yes/no  
-    #     - Type of last user utterance - inform/affirm/deny
+    #     - Type of last user utterance - inform_full/inform_param/affirm/deny
     #     - Goal in top hypothesis partition or 'None' if this is not unique
     # NOTE: PomdpGpSarsaPolicy.py DEPENDS ON THIS ORDERING. 
     def get_feature_vector(self) :

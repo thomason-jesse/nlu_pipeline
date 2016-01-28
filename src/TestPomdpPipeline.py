@@ -111,6 +111,8 @@ save_model(parser, 'parser')
 
 print 'Lexicon - ', parser.lexicon.surface_forms, '\n\n'
 
+#print '\n\nCorrect system running\n\n'
+
 while True:
     A.first_turn = True
     success = A.run_dialog()

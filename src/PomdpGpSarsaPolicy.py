@@ -597,14 +597,14 @@ class PomdpGpSarsaPolicy :
         num_uncertain_params = range(0, len(self.knowledge.goal_params)) + [sys.maxint]
         num_dialog_turns = range(0, 10)
         yes_no = ['yes', 'no']
-        utterance_type = [None, 'inform', 'affirm', 'deny']
+        utterance_type = [None, 'inform_full', 'inform_param', 'affirm', 'deny']
         values = list(itertools.product(*[probs, probs, num_goals, num_uncertain_params, num_dialog_turns, yes_no, utterance_type]))
 
         # Warning: Make sure you have a default value for every param in 
         # Knowledge.goal_params
         default_param_values = dict()
-        default_param_values['patient'] = ['ray']
-        default_param_values['recipient'] = ['peter']
+        default_param_values['patient'] = ['alice']
+        default_param_values['recipient'] = ['hamburger']
         default_param_values['location'] = ['l3_512']
 
         examples = list()
