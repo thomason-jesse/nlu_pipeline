@@ -35,11 +35,17 @@ MAX_TIMEOUT_TO_ADD_USER = 1 # in seconds
 #USER_LOG = 'src/nlu_pipeline/src/log_special/user_list'
 #LEXICAL_ADDITION_LOG = 'src/nlu_pipeline/src/log_special/lexical_addition'
 
-LOGGING_PATH = '../../../../public_html/AMT/log/'
-FINAL_ACTION_PATH = '../../../../public_html/AMT/executed_actions/'
-USER_LOG = '../../../../public_html/AMT/log_special/user_list.txt'
-ERROR_LOG = '../../../../public_html/AMT/log_special/errors.txt'
-LEXICAL_ADDITION_LOG = '../../../../public_html/AMT/log_special/lexical_addition.txt'
+#LOGGING_PATH = '../../../../public_html/AMT/log/'
+#FINAL_ACTION_PATH = '../../../../public_html/AMT/executed_actions/'
+#USER_LOG = '../../../../public_html/AMT/log_special/user_list.txt'
+#ERROR_LOG = '../../../../public_html/AMT/log_special/errors.txt'
+#LEXICAL_ADDITION_LOG = '../../../../public_html/AMT/log_special/lexical_addition.txt'
+
+LOGGING_PATH = '../../../../Trial/AMT/log/'
+FINAL_ACTION_PATH = '../../../../Trial/AMT/executed_actions/'
+USER_LOG = '../../../../Trial/AMT/log_special/user_list.txt'
+ERROR_LOG = '../../../../Trial/AMT/log_special/errors.txt'
+LEXICAL_ADDITION_LOG = '../../../../Trial/AMT/log_special/lexical_addition.txt'
 
 # Fixing the random seed for debugging
 numpy.random.seed(4)
