@@ -20,7 +20,7 @@
 
     // Set up rosbridge connecton
     var ros = new ROSLIB.Ros({
-        url : 'ws://localhost:9090'
+        url : 'ws://128.83.120.240:9090'
     });
 
     ros.on('connection', function() {
@@ -38,14 +38,21 @@
         alert.log('Connection to websocket server closed.');
     });
 
-    // These will point to different topics as the dialogue progresses
-    var publisher = null;
+    // Publishers and subscribers to carry on the dialogue
+    var id_publisher = new ROSLIB.Topic({
+                        ros : ros,
+                        name : '/new_user_topic',
+                        messageType : 'std_msgs/String'
+                    });
+    var conv_publisher = null;
     var subscriber = null;
     
     // Global variables to talk to the publisher
-    var publish_msg = null;
     var publish_interval = 100;
-    var publishing = false;
+    var id_publish_msg = null;
+    var id_publishing = false;
+    var conv_publish_msg = null;
+    var conv_publishing = false;
     var seq_no = 0;
     
     // Global variables for subscriber
@@ -61,7 +68,20 @@
         } else {
             drawRandomSearchTask();
         }
-        
+    }
+    
+    function createPublisherAndSubscriber() {
+        subscriber = new ROSLIB.Topic({
+                            ros : ros,
+                            name : 'python_pub_' + user_id,
+                            messageType : 'std_msgs/String'
+                        });
+
+        conv_publisher = new ROSLIB.Topic({
+                ros : ros,
+                name : 'js_pub_' + user_id,
+                messageType : 'std_msgs/String'
+            });
     }
 
 	//draw a random walk task and return the description to javascript; write the task goal to file for later comparison against command generated
@@ -164,14 +184,25 @@
 		alert('DEBUG: there was an error calling draw_random_task.php');
 	}
     
-    // Publish the current message 
-    function publish() {
-       if (publisher !== null && publish_msg !== null && publishing) {
+    // Publish ID 
+    function idPublish() {
+       if (id_publisher !== null && id_publish_msg !== null && id_publishing) {
             var msg = new ROSLIB.Message({
-                data : publish_msg
+                data : id_publish_msg
             });
             //alert('Publishing ' + publish_msg);
-            publisher.publish(msg);
+            id_publisher.publish(msg);
+       }
+    }
+    
+    // Publish the current message 
+    function convPublish() {
+       if (conv_publisher !== null && conv_publish_msg !== null && conv_publishing) {
+            var msg = new ROSLIB.Message({
+                data : conv_publish_msg
+            });
+            //alert('Publishing ' + publish_msg);
+            conv_publisher.publish(msg);
        }
     }
     
@@ -200,24 +231,15 @@
         //alert('ros = ' + ros + ' user_id = ' + user_id);
 
         // Set up a subscriber to listen to the dialog agent
-        subscriber = new ROSLIB.Topic({
-                            ros : ros,
-                            name : 'python_pub_' + user_id,
-                            messageType : 'std_msgs/String'
-                        });
-
+        createSubscriberAndPublisher()
         subscriber.subscribe(dialogResponseReceiver);
         //alert('Subscriber created');
         
         // Publish id continuously 
-        publisher = new ROSLIB.Topic({
-                        ros : ros,
-                        name : '/new_user_topic',
-                        messageType : 'std_msgs/String'
-                    });
-        publish_msg = user_id
-        publishing = true;
-        setInterval(publish, 100);        
+        id_publish_msg = user_id
+        id_publishing = true;
+        setInterval(idPublish, 100);
+        setInterval(convPublish, 100);        
         //alert('Publishing started');
         
 		return false;
@@ -319,23 +341,10 @@
                invokeDialogAgentError    // handle error
             );
         } else {
-            // Set up a subscriber to listen to the dialog agent
-            subscriber = new ROSLIB.Topic({
-                                ros : ros,
-                                name : 'python_pub_' + user_id,
-                                messageType : 'std_msgs/String'
-                            }); // This is probably unnecessary
-            subscriber.subscribe(dialogResponseReceiver);
-            
             // Publish user response
-            publisher = new ROSLIB.Topic({
-                            ros : ros,
-                            name : 'js_pub_' + user_id,
-                            messageType : 'std_msgs/String'
-                        });
-            publish_msg = seq_no + '|' + user_input
+            conv_publish_msg = seq_no + '|' + user_input
             seq_no = seq_no + 1;
-            publishing = true;     
+            conv_publishing = true;     
         }
 	}
 
@@ -351,20 +360,21 @@
             return;
         }
         
-        if (publish_msg === user_id) {
-            // This is for the first response of a task. Stop publishing id
-            publishing = false;
+        // Slightly bad heuristic but after you get one message, you 
+        // typically don't need the id to be published
+        if (id_publishing) {
+            id_publishing = false;
         }
         
         if (text !== subscriber_prev_msg) {
             // Since js does not have a lock, this could be a problem. 
-            subscriber.unsubscribe();
             subscriber_prev_msg = text;
             //alert('Received ' + text);
             var parts = text.split('|');
             //alert('parts = ' + parts);
             var response_text = parts[1] + '\n' + parts[2];
             //alert('response_text = ' + response_text);
+            conv_publishing = false;
             invokeDialogAgentOutput(response_text);
         }
     }
@@ -427,6 +437,9 @@
 			}
             else
             {
+                id_publisher.unadvertise();
+                conv_publisher.unadvertise();
+                subscriber.unsubscribe();
 				document.getElementById('third_dialog_start_block').style.display = 'block';
 			}
 		}
