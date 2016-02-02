@@ -56,6 +56,8 @@ POMDP AMT Experiment
 
 rosrun nlu_pipeline OnlineRoslibjsPipeline.py src/nlu_pipeline/src/resources/amt_expt/ont.txt src/nlu_pipeline/src/resources/amt_expt/lex.txt src/nlu_pipeline/src/resources/amt_expt/utterance_action_pairs.txt
 
+rosrun nlu_pipeline StrippedOnlineRoslibjsPipeline.py src/nlu_pipeline/src/resources/amt_expt/ont.txt src/nlu_pipeline/src/resources/amt_expt/lex.txt src/nlu_pipeline/src/resources/amt_expt/utterance_action_pairs.txt
+
 Rosbridge server:
 
 roslaunch rosbridge_server rosbridge_websocket.launch

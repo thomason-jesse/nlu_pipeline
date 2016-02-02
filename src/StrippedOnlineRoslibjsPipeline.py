@@ -13,7 +13,6 @@ import StaticDialogPolicy
 import numpy, re, time, rospy
 import os, stat
 import traceback
-import datetime
 
 from TemplateBasedGenerator import TemplateBasedGenerator
 from PomdpStaticDialogPolicy import PomdpStaticDialogPolicy
@@ -368,76 +367,73 @@ def start(pomdp_agent, static_agent) :
     u_out = None
     sleeper = rospy.Rate(10)
     
-    time_check_start = None
-    time_check_end = None
-    
     while True :
+        user = user_manager.get_next_user() 
+        if user is not None :
+            print '\n\nOpened user ', user, '\n\n'
+            qwerty = 1
+            for i in range(0, 10000) :
+                for j in range(0, 10000) :
+                    qwerty += 2
         #print 'Checking for user'
-        try :
-            user = user_manager.get_next_user()    
-            if user is not None :
-                wait_time = 0
-                # There is actually a user
-                
-                time_check_end = datetime.datetime.now()
-                if time_check_start is not None and time_check_end is not None :
-                    print 'Wait time: ', (time_check_end - time_check_start)
-                
-                try :
-                    print 'Starting communication with user', user
-                    if u_in is not None :
-                        u_in.close()
-                    if u_out is not None :
-                        u_out.close()
-                    user_manager.lock.acquire()
-                    # Making this a critical section otherwise sometimes the
-                    # dialogue hangs 
-                    logfile = None
-                    final_action_log = None
-                    try :
-                        logfile = LOGGING_PATH + user + '.txt'
-                        final_action_log = FINAL_ACTION_PATH + user + '.txt'
-                        u_in = InputFromTopic(user, logfile)
-                        u_out = OutputToTopic(user, u_in, logfile)
-                    except :
-                        raise
-                    finally :
-                        user_manager.lock.release()
+        #try :
+            #user = user_manager.get_next_user()    
+            #if user is not None :
+                #wait_time = 0
+                ## There is actually a user
+                #try :
+                    #print 'Starting communication with user', user
+                    #if u_in is not None :
+                        #u_in.close()
+                    #if u_out is not None :
+                        #u_out.close()
+                    #user_manager.lock.acquire()
+                    ## Making this a critical section otherwise sometimes the
+                    ## dialogue hangs 
+                    #logfile = None
+                    #final_action_log = None
+                    #try :
+                        #logfile = LOGGING_PATH + user + '.txt'
+                        #final_action_log = FINAL_ACTION_PATH + user + '.txt'
+                        #u_in = InputFromTopic(user, logfile)
+                        #u_out = OutputToTopic(user, u_in, logfile)
+                    #except :
+                        #raise
+                    #finally :
+                        #user_manager.lock.release()
                     
-                    # Randomly choose an agent
-                    r = numpy.random.random_sample()
-                    if r < 0.5 :   
-                        user_log.write(user + ',static\n')
-                        error_log.write(user + ',static\n') 
-                        static_agent.input = u_in
-                        static_agent.output = u_out
-                        run_static_dialog(static_agent, u_in, u_out, final_action_log)
-                    else :
-                        user_log.write(user + ',pomdp\n')
-                        error_log.write(user + ',pomdp\n')
-                        pomdp_agent.input = u_in
-                        pomdp_agent.output = u_out
-                        run_pomdp_dialog(pomdp_agent, u_in, u_out, final_action_log)
-                    print 'Waiting for a new user '
-                    time_check_start = datetime.datetime.now()
-                    user_log.flush()
-                except RuntimeError as e :
-                    error = str(e)
-                    error_log.write(error + '\n\n\n')
-                    print 'Waiting for a new user '
-                    time_check_start = datetime.datetime.now()
-                    user_log.flush()
-                    error_log.flush()
-        except KeyboardInterrupt, SystemExit :
-            raise
-        except :
-            error = str(sys.exc_info()[0])
-            error_log.write(error + '\n')
-            print traceback.format_exc()
-            error_log.write(traceback.format_exc() + '\n\n\n')
-            error_log.flush()
-        finally :
-            sleeper.sleep()
+                    ## Randomly choose an agent
+                    #r = numpy.random.random_sample()
+                    #if r < 0.5 :   
+                        #user_log.write(user + ',static\n')
+                        #error_log.write(user + ',static\n') 
+                        #static_agent.input = u_in
+                        #static_agent.output = u_out
+                        #run_static_dialog(static_agent, u_in, u_out, final_action_log)
+                    #else :
+                        #user_log.write(user + ',pomdp\n')
+                        #error_log.write(user + ',pomdp\n')
+                        #pomdp_agent.input = u_in
+                        #pomdp_agent.output = u_out
+                        #run_pomdp_dialog(pomdp_agent, u_in, u_out, final_action_log)
+                    #print 'Waiting for a new user '
+                    #user_log.flush()
+                #except RuntimeError as e :
+                    #error = str(e)
+                    #error_log.write(error + '\n\n\n')
+                    #print 'Waiting for a new user '
+                    #user_log.flush()
+                    #error_log.flush()
+        #except KeyboardInterrupt, SystemExit :
+            #raise
+        #except :
+            #error = str(sys.exc_info()[0])
+            #error_log.write(error + '\n')
+            #print traceback.format_exc()
+            #error_log.write(traceback.format_exc() + '\n\n\n')
+            #error_log.flush()
+        #finally :
+            #sleeper.sleep()
                 
     user_log.close()
     error_log.close()
