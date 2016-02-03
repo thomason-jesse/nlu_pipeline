@@ -30,80 +30,99 @@ MAX_WAITING_USERS = 100
 MAX_OUTSTANDING_MESSAGES = 1000
 MAX_TIMEOUT_TO_ADD_USER = 1 # in seconds
 
-#LOGGING_PATH = 'src/nlu_pipeline/src/log/'
-#FINAL_ACTION_PATH = 'src/nlu_pipeline/src/executed_action/'
-#USER_LOG = 'src/nlu_pipeline/src/log_special/user_list'
-#LEXICAL_ADDITION_LOG = 'src/nlu_pipeline/src/log_special/lexical_addition'
+LOGGING_PATH = '../../../../public_html/AMT/log/'
+FINAL_ACTION_PATH = '../../../../public_html/AMT/executed_actions/'
+USER_LOG_FILE = '../../../../public_html/AMT/log_special/user_list.txt'
+ERROR_LOG_FILE = '../../../../public_html/AMT/log_special/errors.txt'
+LEXICAL_ADDITION_LOG = '../../../../public_html/AMT/log_special/lexical_addition.txt'
 
-#LOGGING_PATH = '../../../../public_html/AMT/log/'
-#FINAL_ACTION_PATH = '../../../../public_html/AMT/executed_actions/'
-#USER_LOG = '../../../../public_html/AMT/log_special/user_list.txt'
-#ERROR_LOG = '../../../../public_html/AMT/log_special/errors.txt'
-#LEXICAL_ADDITION_LOG = '../../../../public_html/AMT/log_special/lexical_addition.txt'
-
-LOGGING_PATH = '../../../../Trial/AMT/log/'
-FINAL_ACTION_PATH = '../../../../Trial/AMT/executed_actions/'
-USER_LOG = '../../../../Trial/AMT/log_special/user_list.txt'
-ERROR_LOG = '../../../../Trial/AMT/log_special/errors.txt'
-LEXICAL_ADDITION_LOG = '../../../../Trial/AMT/log_special/lexical_addition.txt'
+#LOGGING_PATH = '../../../../Trial/AMT/log/'
+#FINAL_ACTION_PATH = '../../../../Trial/AMT/executed_actions/'
+#USER_LOG = '../../../../Trial/AMT/log_special/user_list.txt'
+#ERROR_LOG = '../../../../Trial/AMT/log_special/errors.txt'
+#LEXICAL_ADDITION_LOG = '../../../../Trial/AMT/log_special/lexical_addition.txt'
 
 # Fixing the random seed for debugging
 numpy.random.seed(4)
 
+USER_LOG = None
+ERROR_LOG = None
+POMDP_AGENT = None
+STATIC_AGENT = None
+
 class UserManager :
     def __init__(self) :
-        rospy.init_node('dialog_agent_aishwarya')
         self.user_queue = Queue(MAX_WAITING_USERS) # Using this as it is thread safe
         self.prev_user = None
-        rospy.Subscriber("new_user_topic", String, self.add_to_queue, queue_size=1, buff_size=2**24)
-        self.listen_thread = Thread(target=self.listen_for_users, args=())
-        self.listen_thread.daemon = True
-        self.listen_thread.start()
+        rospy.Subscriber("new_user_topic", String, self.on_user_receipt, queue_size=1, buff_size=2**24)
         self.lock = Lock()
     
-    def listen_for_users(self) :
-        rospy.spin()
-    
-    def get_next_user(self) :
-        try :
-            # No need for lock as Queue is thread safe
-            user = self.user_queue.get(True, 0.1) 
-            return user
-        except Empty :
-            return None  
-    
-    def add_to_queue(self, msg) :
+    def on_user_receipt(self, msg) :
+        global USER_LOG, USER_LOG_FILE, ERROR_LOG, ERROR_LOG_FILE, POMDP_AGENT, STATIC_AGENT
+        print 'Received ', msg.data
         if self.prev_user != msg.data :
-            print 'Received ', msg.data
+            #print 'Received ', msg.data
+            print 'New user'
             self.lock.acquire() # Locking is necessary because otherwise 
                                 # the same user could get added twice by
                                 # competing callbacks
             print 'Acquired lock'
+            
+            # Open logs
+            USER_LOG = open(USER_LOG_FILE, 'a')
+            ERROR_LOG = open(ERROR_LOG_FILE, 'a')
+            
             try :
                 if self.prev_user != msg.data :
                     # Check has to be done again because a competing 
                     # callback could have just added the same user 
+                    
                     user = msg.data
-                    self.user_queue.put(user, True, MAX_TIMEOUT_TO_ADD_USER) 
-                        # Ideally this should not need a timeout as it 
-                        # is in a critical section and hence should not 
-                        # suffer from competing puts
+                    print 'Starting communication with user', user
+                    
+                    # Making this a critical section otherwise sometimes the
+                    # dialogue hangs 
+                    logfile = None
+                    final_action_log = None
+                    logfile = LOGGING_PATH + user + '.txt'
+                    final_action_log = FINAL_ACTION_PATH + user + '.txt'
+                    u_in = InputFromTopic(user, logfile)
+                    u_out = OutputToTopic(user, u_in, logfile)
+                    POMDP_AGENT.lexical_addition_log = LEXICAL_ADDITION_LOG + '_pomdp.txt'
+                    STATIC_AGENT.lexical_addition_log = LEXICAL_ADDITION_LOG + '_static.txt'
+                    
+                    # Randomly choose an agent
+                    r = numpy.random.random_sample()
+                    if r < 0.5 :   
+                        USER_LOG.write(user + ',static\n')
+                        ERROR_LOG.write(user + ',static\n') 
+                        STATIC_AGENT.input = u_in
+                        STATIC_AGENT.output = u_out
+                        run_static_dialog(STATIC_AGENT, u_in, u_out, final_action_log)
+                    else :
+                        USER_LOG.write(user + ',pomdp\n')
+                        ERROR_LOG.write(user + ',pomdp\n')
+                        POMDP_AGENT.input = u_in
+                        POMDP_AGENT.output = u_out
+                        run_pomdp_dialog(POMDP_AGENT, u_in, u_out, final_action_log)
+                    
                     self.prev_user = msg.data
                     print 'Processed'
             except KeyboardInterrupt, SystemExit :
                 pass
             except :
                 error = str(sys.exc_info()[0])
-                error_log.write(error + '\n')
+                ERROR_LOG.write(error + '\n')
                 print traceback.format_exc()
-                error_log.write(traceback.format_exc() + '\n\n\n')
-                error_log.flush()
+                ERROR_LOG.write(traceback.format_exc() + '\n\n\n')
+                ERROR_LOG.flush()
             finally :
+                USER_LOG.close()
+                ERROR_LOG.close()
                 self.lock.release()
                 print 'Released lock'
+                
 
-# This class has a lot of similarities to the previous one so may have 
-# been worth making an abstract class for them
 class InputFromTopic:
     def __init__(self, user, logfile=None):
         topic_name = 'js_pub_' + user
@@ -171,10 +190,10 @@ class InputFromTopic:
                 pass
             except :
                 error = str(sys.exc_info()[0])
-                error_log.write(error + '\n')
+                ERROR_LOG.write(error + '\n')
                 print traceback.format_exc()
-                error_log.write(traceback.format_exc() + '\n\n\n')
-                error_log.flush()
+                ERROR_LOG.write(traceback.format_exc() + '\n\n\n')
+                ERROR_LOG.flush()
             finally :
                 self.lock.release()    
     
@@ -223,10 +242,10 @@ class OutputToTopic:
             pass
         except :
             error = str(sys.exc_info()[0])
-            error_log.write(error + '\n')
+            ERROR_LOG.write(error + '\n')
             print traceback.format_exc()
-            error_log.write(traceback.format_exc() + '\n\n\n')
-            error_log.flush()
+            ERROR_LOG.write(traceback.format_exc() + '\n\n\n')
+            ERROR_LOG.flush()
         finally :
             self.lock.release()
 
@@ -359,95 +378,6 @@ def init_pomdp_dialog_agent(args) :
 
     return agent
 
-def start(pomdp_agent, static_agent) :
-    # Set up the user manager which waits for users
-    user_manager = UserManager()
-    print 'Dialog agent ready'
-    
-    user_log = open(USER_LOG, 'a')
-    error_log = open(ERROR_LOG, 'a')
-    pomdp_agent.lexical_addition_log = LEXICAL_ADDITION_LOG + '_pomdp.txt'
-    static_agent.lexical_addition_log = LEXICAL_ADDITION_LOG + '_static.txt'
-    
-    #wait_time = 0
-    u_in  = None
-    u_out = None
-    sleeper = rospy.Rate(10)
-    
-    time_check_start = None
-    time_check_end = None
-    
-    while True :
-        #print 'Checking for user'
-        try :
-            user = user_manager.get_next_user()    
-            if user is not None :
-                wait_time = 0
-                # There is actually a user
-                
-                time_check_end = datetime.datetime.now()
-                if time_check_start is not None and time_check_end is not None :
-                    print 'Wait time: ', (time_check_end - time_check_start)
-                
-                try :
-                    print 'Starting communication with user', user
-                    if u_in is not None :
-                        u_in.close()
-                    if u_out is not None :
-                        u_out.close()
-                    user_manager.lock.acquire()
-                    # Making this a critical section otherwise sometimes the
-                    # dialogue hangs 
-                    logfile = None
-                    final_action_log = None
-                    try :
-                        logfile = LOGGING_PATH + user + '.txt'
-                        final_action_log = FINAL_ACTION_PATH + user + '.txt'
-                        u_in = InputFromTopic(user, logfile)
-                        u_out = OutputToTopic(user, u_in, logfile)
-                    except :
-                        raise
-                    finally :
-                        user_manager.lock.release()
-                    
-                    # Randomly choose an agent
-                    r = numpy.random.random_sample()
-                    if r < 0.5 :   
-                        user_log.write(user + ',static\n')
-                        error_log.write(user + ',static\n') 
-                        static_agent.input = u_in
-                        static_agent.output = u_out
-                        run_static_dialog(static_agent, u_in, u_out, final_action_log)
-                    else :
-                        user_log.write(user + ',pomdp\n')
-                        error_log.write(user + ',pomdp\n')
-                        pomdp_agent.input = u_in
-                        pomdp_agent.output = u_out
-                        run_pomdp_dialog(pomdp_agent, u_in, u_out, final_action_log)
-                    print 'Waiting for a new user '
-                    time_check_start = datetime.datetime.now()
-                    user_log.flush()
-                except RuntimeError as e :
-                    error = str(e)
-                    error_log.write(error + '\n\n\n')
-                    print 'Waiting for a new user '
-                    time_check_start = datetime.datetime.now()
-                    user_log.flush()
-                    error_log.flush()
-        except KeyboardInterrupt, SystemExit :
-            raise
-        except :
-            error = str(sys.exc_info()[0])
-            error_log.write(error + '\n')
-            print traceback.format_exc()
-            error_log.write(traceback.format_exc() + '\n\n\n')
-            error_log.flush()
-        finally :
-            sleeper.sleep()
-                
-    user_log.close()
-    error_log.close()
-
 def run_static_dialog(agent, u_in, u_out, final_action_log=None) :
     u_out.say("How can I help?")
     s = u_in.get()
@@ -473,7 +403,17 @@ def run_pomdp_dialog(agent, u_in, u_out, final_action_log=None) :
         #u_out.say("Happy to help!")
     u_out.say("<END/>")
         
+def main(argv) :        
+    global STATIC_AGENT, POMDP_AGENT
+    rospy.init_node('dialog_agent_aishwarya')
+    user_manager = UserManager()
+    STATIC_AGENT = init_static_dialog_agent(argv)
+    POMDP_AGENT = init_pomdp_dialog_agent(argv)
+    
+    print 'Dialog agent ready'
+    rospy.spin()
+
+
+        
 if __name__ == '__main__' :
-    static_agent = init_static_dialog_agent(sys.argv)
-    pomdp_agent = init_pomdp_dialog_agent(sys.argv)
-    start(pomdp_agent, static_agent)  
+    main(sys.argv)
