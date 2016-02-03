@@ -74,6 +74,10 @@ Or follow other installation instructions for your system at:
 
 http://www.pygame.org/download.shtml
 
+If espeak is not installed, intall it:
+
+$ sudo apt-get install espeak
+
 Finally, navigate to catkin_ws/src/nlu_pipeline/src/speech/ and make the speech node
 
 $ cd catkin_ws/src/nlu_pipeline/src/speech/
