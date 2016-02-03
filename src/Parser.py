@@ -290,7 +290,6 @@ class Parser:
     # tokenizes str and passes it to a function to parse tokens
     # NOTE: In speech branch, this tokenizes the nbest results from Sphinx and returns best one. 
     def parse_expression(self, s, k=None, n=1, allow_UNK_E=True, generator_genlex=None):
-        
         bestParseList = None
         maxScore = None
         bestString = None

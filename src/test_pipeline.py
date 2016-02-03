@@ -96,8 +96,10 @@ learner = LinearLearner.LinearLearner(ont, lex, f_extractor)
 print "instantiating KBGrounder"
 grounder = KBGrounder.KBGrounder(ont)
 
-print "instantiating Parser"
-parser = Parser.Parser(ont, lex, learner, grounder, beam_width=10, safety=True)
+print "instantiating Parser from pickle file"
+pickledParser = open(path + 'parser.pickle', 'r')
+parser = pickle.load(pickledParser)
+#parser = Parser.Parser(ont, lex, learner, grounder, beam_width=10, safety=True)
 
 print "instantiating Generator"
 generator = Generator.Generator(ont, lex, learner, parser, beam_width=sys.maxint, safety=True)
@@ -112,7 +114,7 @@ while True:
 generator.flush_seen_nodes()
 
 print "instantiating DialogAgent"
-u_in = InputFromKeyboard()
+u_in = InputFromSpeechNode()
 u_out = OutputWithSpeech()
 static_policy = StaticDialogPolicy.StaticDialogPolicy()
 A = DialogAgent.DialogAgent(parser, generator, grounder, static_policy, u_in, u_out)

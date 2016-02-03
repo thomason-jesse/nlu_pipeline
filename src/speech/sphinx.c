@@ -167,14 +167,14 @@ int sphinx_n_best_m(int n) {
 		return -1; 
 	}
 
-	//FILE *rawfh = fopen("voice.raw", "rb"); 
-	//ps_decode_raw(ps, rawfh, -1); 
-	//fclose(rawfh); 
-
 	if (!interrupted) {
-		//hyp = ps_get_hyp(ps, &score);
-		//int32 prob = ps_get_prob(ps);
-		//float conf = logmath_exp(ps_get_logmath(ps), prob); 
+
+		//Computes the posterior probability of the top hypothesis. 
+		hyp = ps_get_hyp(ps, &score);
+		int32 prob = ps_get_prob(ps);
+		float conf = logmath_exp(ps_get_logmath(ps), prob); 
+
+		printf("Posterior Probability: %f\n", conf); 
 
 		nbest = ps_nbest(ps, 0, -1, NULL, NULL);
 	
