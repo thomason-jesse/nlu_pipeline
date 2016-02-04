@@ -57,15 +57,6 @@
     
     // Global variables for subscriber
     var subscriber_prev_msg = null;
-    
-    // Client to register the user    
-    var registerUserClient = new ROSLIB.Service({
-        ros : ros,
-        name : '/register_user',
-        serviceType : 'nlu_pipeline/register_user'
-    });
-    
-    var tryingToRegisterUser = null;
 
     function decideTask() {
         var tasks = ['walk', 'deliver', 'search'];
@@ -245,35 +236,14 @@
         subscriber.subscribe(dialogResponseReceiver);
         
         // Publish id continuously 
-        //id_publish_msg = user_id
-        //id_publishing = true;
-        //setInterval(idPublish, 100);
+        id_publish_msg = user_id
+        id_publishing = true;
+        setInterval(idPublish, 100);
         setInterval(convPublish, 100);        
         //alert('Publishing started');
         
-        // Retries registering the user once every 100 ms
-        tryingToRegisterUser = setInterval(registerUser, 100);
-        
 		return false;
 	}
-    
-    function registerUser() {
-        alert('Trying to register user');
-        
-        var request = new ROSLIB.ServiceRequest({
-            user_id : user_id
-        });
-        
-        registerUserClient.callService(request, registerUserCallback);
-    }
-    
-    function registerUserCallback(result) {
-        alert('result = ' + result.accepted);
-        
-        if (result.accepted == true) {
-            clearInterval(tryingToRegisterUser);
-        } 
-    }
     
     function generalError(msg) {
         alert('Error' + msg);
