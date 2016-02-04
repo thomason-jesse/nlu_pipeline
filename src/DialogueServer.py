@@ -47,7 +47,7 @@ numpy.random.seed(4)
 
 class InputFromService:
     def __init__(self, error_log, logfile=None):
-        self.service = rospy.Service('dialogue_js_talk', dialogue_js_talk, self.receive_msg)
+        self.js_talk_service = rospy.Service('dialogue_js_talk', dialogue_js_talk, self.receive_msg)
         self.lock = Lock()
         self.prev_msg = None
         self.logfile = logfile
@@ -65,7 +65,6 @@ class InputFromService:
                 raise RuntimeError('No reply received on websocket for ' + str(timeout_min) + ' minutes. Timing out.')
             if self.prev_msg is not None :
                 text = None
-                
                 # The following critical section is purely precautionary
                 self.lock.acquire()
                 try :
@@ -100,14 +99,16 @@ class InputFromService:
             sleeper.sleep() 
             
     def receive_msg(self, req) :
-        text = req.js_response
+        text = req.js_response[:-1]
+        print 'Received ', text 
         while True :
-            if self.prev_msg is not None :
+            if self.prev_msg is None :
+                print 'self.prev_msg is None'
                 success = False
                 self.lock.acquire() # Locking is only because service 
                                     # calls are on a separate thread
                 try :
-                    if self.prev_msg is not None :
+                    if self.prev_msg is None :
                         # This check is probably unnecessary
                         self.prev_msg = text 
                         success = True
@@ -123,11 +124,13 @@ class InputFromService:
                     self.lock.release()    
                     if success :
                         break
+            else :
+                print 'self.prev_msg = ', self.prev_msg
         return True
     
 class OutputToService:
     def __init__(self, input_from_topic, error_log, logfile=None):
-        self.service = rospy.Service('dialogue_python_talk', dialogue_python_talk, self.send_msg)
+        self.python_talk_service = rospy.Service('dialogue_python_talk', dialogue_python_talk, self.send_msg)
         self.response = None
         self.logfile = logfile  
         self.error_log = error_log  
@@ -147,6 +150,7 @@ class OutputToService:
         self.lock.acquire()
         try :
             self.response = response
+            print 'Saying: ', response
         except KeyboardInterrupt, SystemExit :
             pass
         except :
@@ -183,7 +187,6 @@ class OutputToService:
                 
             msg_poller.sleep()
 
-    
 class DialogueServer :
     def __init__(self) :
         rospy.init_node('dialog_agent_aishwarya')
@@ -194,8 +197,8 @@ class DialogueServer :
         self.static_agent = None
         self.current_user = None
         self.lock = Lock()
-        self.u_in = None
-        self.u_out = None
+        self.u_in = InputFromService(self.error_log)
+        self.u_out = OutputToService(self.u_in, self.error_log)
 
     def init_static_dialog_agent(self, args) :
         print "reading in Ontology"
@@ -365,8 +368,8 @@ class DialogueServer :
                         final_action_log = None
                         logfile = LOGGING_PATH + self.current_user + '.txt'
                         final_action_log = FINAL_ACTION_PATH + self.current_user + '.txt'
-                        self.u_in = InputFromService(self.error_log, logfile)
-                        self.u_out = OutputToService(self.u_in, self.error_log, logfile)
+                        self.u_in.logfile = logfile
+                        self.u_out.logfile = logfile
                         self.pomdp_agent.lexical_addition_log = LEXICAL_ADDITION_LOG + '_pomdp.txt'
                         self.static_agent.lexical_addition_log = LEXICAL_ADDITION_LOG + '_static.txt'
                         

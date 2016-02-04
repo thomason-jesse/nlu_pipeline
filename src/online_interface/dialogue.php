@@ -64,8 +64,17 @@
         name : '/register_user',
         serviceType : 'nlu_pipeline/register_user'
     });
-    
     var tryingToRegisterUser = null;
+    var pythonTalkClient = new ROSLIB.Service({
+        ros : ros,
+        name : '/dialogue_python_talk',
+        serviceType : 'nlu_pipeline/dialogue_python_talk'
+    });
+    var jsTalkClient = new ROSLIB.Service({
+        ros : ros,
+        name : '/dialogue_js_talk',
+        serviceType : 'nlu_pipeline/dialogue_js_talk'
+    });
 
     function decideTask() {
         var tasks = ['walk', 'deliver', 'search'];
@@ -78,21 +87,7 @@
             drawRandomSearchTask();
         }
     }
-    
-    function createPublisherAndSubscriber() {
-        subscriber = new ROSLIB.Topic({
-                            ros : ros,
-                            name : 'python_pub_' + user_id,
-                            messageType : 'std_msgs/String'
-                        });
-
-        conv_publisher = new ROSLIB.Topic({
-                ros : ros,
-                name : 'js_pub_' + user_id,
-                messageType : 'std_msgs/String'
-            });
-    }
-
+   
 	//draw a random walk task and return the description to javascript; write the task goal to file for later comparison against command generated
 	function drawRandomWalkTask()
 	{
@@ -239,18 +234,6 @@
         
         //alert('ros = ' + ros + ' user_id = ' + user_id);
 
-        // Set up a subscriber to listen to the dialog agent
-        createPublisherAndSubscriber();
-        //alert('Subscriber created');
-        subscriber.subscribe(dialogResponseReceiver);
-        
-        // Publish id continuously 
-        //id_publish_msg = user_id
-        //id_publishing = true;
-        //setInterval(idPublish, 100);
-        setInterval(convPublish, 100);        
-        //alert('Publishing started');
-        
         // Retries registering the user once every 100 ms
         tryingToRegisterUser = setInterval(registerUser, 100);
         
@@ -258,7 +241,7 @@
 	}
     
     function registerUser() {
-        alert('Trying to register user');
+        //alert('Trying to register user');
         
         var request = new ROSLIB.ServiceRequest({
             user_id : user_id
@@ -268,10 +251,12 @@
     }
     
     function registerUserCallback(result) {
-        alert('result = ' + result.accepted);
-        
         if (result.accepted == true) {
+            //alert('User accepted');
             clearInterval(tryingToRegisterUser);
+            
+            var request = new ROSLIB.ServiceRequest({});
+            pythonTalkClient.callService(request, invokeDialogAgentOutput);
         } 
     }
     
@@ -329,6 +314,7 @@
 	//run when the user submits a new response to the system
 	function getDialogResponse(form)
 	{
+        event.preventDefault();
         //alert('In getDialogResponse, current_task =  ' + current_task);
 		//get user input and clear text box
 		var user_input_raw = form.user_input_box.value;
@@ -372,51 +358,42 @@
             );
         } else {
             // Publish user response
-            conv_publish_msg = seq_no + '|' + user_input
-            seq_no = seq_no + 1;
-            conv_publishing = true;     
+            //alert('Going to send: ' + user_input);
+            var request = new ROSLIB.ServiceRequest({
+                js_response : user_input + '*'
+            });
+            
+            jsTalkClient.callService(request, jsTalkCallback);
+            //alert('Sent message');
         }
 	}
+    
+    function jsTalkCallback(python_ack) {
+        //alert('In jsTalkCallback python_ack.python_ack = ' + python_ack.python_ack);
+        if (python_ack.python_ack === false) {
+            invokeDialogAgentError();
+        } else {
+            //alert('Going to get python response');
+            var request = new ROSLIB.ServiceRequest({});
+            pythonTalkClient.callService(request, invokeDialogAgentOutput);
+        }
+    }
 
 	// handles drawing an error message
 	function invokeDialogAgentError () {
 		alert('DEBUG: there was an error calling dialog_agent.php');
 	}
 
-    function dialogResponseReceiver(msg) {
-        text = msg.data;
-        if (text.indexOf('|') <= -1) {
-            alert('Malformed string');
-            return;
-        }
-        
-        // Slightly bad heuristic but after you get one message, you 
-        // typically don't need the id to be published
-        if (id_publishing) {
-            id_publishing = false;
-        }
-        
-        if (text !== subscriber_prev_msg) {
-            // Since js does not have a lock, this could be a problem. 
-            subscriber_prev_msg = text;
-            //alert('Received ' + text);
-            var parts = text.split('|');
-            //alert('parts = ' + parts);
-            var response_text = parts[1] + '\n' + parts[2];
-            //alert('response_text = ' + response_text);
-            conv_publishing = false;
-            invokeDialogAgentOutput(response_text);
-        }
-    }
-
 	// handles the response, adds the html
-	function invokeDialogAgentOutput(response_text) {
+	function invokeDialogAgentOutput(response) {
+        response_text = response.python_response;
         //alert('In invokeDialogAgentOutput: Response = ' + response_text);
 		//alert('DEBUG: output from php:\n'.concat(response_text));
 	
 		//split input and output from php response
 		var input_output_pair = response_text.split("\n");
 		user_input = input_output_pair[0]; //sanitized
+        //alert('user_input = ' + user_input);
 		if (user_input == "FAILED")
 		{
 			alert('ERROR: something failed when invoking the dialog agent');
@@ -424,6 +401,7 @@
 			return;
 		}
 		system_output = input_output_pair.slice(1,input_output_pair.length); //system response(s)
+        //alert('system_output = ' + system_output);
 		
 		//append system output to page conversation log
 		var table = document.getElementsByName('history')[0];
@@ -446,6 +424,7 @@
 		//if the dialog has concluded
 		if (system_output[system_output.length-1] == "<END/>")
 		{
+            //alert('Dialogue over');
 			//hide the table's final row (the one with the form for input)
 			
 			//make visible the DIV to start the next task
@@ -467,9 +446,6 @@
 			}
             else
             {
-                id_publisher.unadvertise();
-                conv_publisher.unadvertise();
-                subscriber.unsubscribe();
 				document.getElementById('third_dialog_start_block').style.display = 'block';
 			}
 		}
@@ -728,12 +704,12 @@ width:50%
 
 	<DIV ID="dialog_history_block" style="display:none">
 		<TABLE NAME="history" style="width:100%">
-		<FORM NAME="user_input_form" ACTION="" METHOD="GET">
+		<FORM NAME="user_input_form" type="text" onsubmit="return false;">
 		<TR ID="user_input_table_row">
 			<TD td style="width:15%">YOU</TD>
 			<TD td style="width:85%">
-				<INPUT TYPE="text" NAME="user_input_box" VALUE="" style="width:100%" onkeydown="if (event.keyCode == 13) {document.getElementsByName('user_input_button')[0].click();event.returnValue=false;event.cancel=true;}">
-				<INPUT TYPE="button" NAME="user_input_button" Value="submit" onClick="getDialogResponse(this.form)" style="display:none">
+				<INPUT TYPE="text" NAME="user_input_box" VALUE="" style="width:100%" onkeydown="if (event.keyCode == 13) {document.getElementsByName('user_input_button')[0].click();event.returnValue=false;event.cancel=true;}" onSubmit="function(){return false;}"></INPUT>
+				<BUTTON TYPE="button" NAME="user_input_button" Value="submit" onClick="getDialogResponse(this.form)" onSubmit="getDialogResponse(this.form)" style="display:none"></BUTTON>
 			</TD>
 		</TR>
 		</FORM>
