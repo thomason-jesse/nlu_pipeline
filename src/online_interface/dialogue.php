@@ -188,28 +188,6 @@
 		alert('DEBUG: there was an error calling draw_random_task.php');
 	}
     
-    // Publish ID 
-    function idPublish() {
-       if (id_publisher !== null && id_publish_msg !== null && id_publishing) {
-            var msg = new ROSLIB.Message({
-                data : id_publish_msg
-            });
-            //alert('Publishing ' + publish_msg);
-            id_publisher.publish(msg);
-       }
-    }
-    
-    // Publish the current message 
-    function convPublish() {
-       if (conv_publisher !== null && conv_publish_msg !== null && conv_publishing) {
-            var msg = new ROSLIB.Message({
-                data : conv_publish_msg
-            });
-            //alert('Publishing ' + publish_msg);
-            conv_publisher.publish(msg);
-       }
-    }
-    
     //run to start a dialog with the system for a new user
 	function startDialog()
 	{
@@ -260,23 +238,9 @@
         } 
     }
     
-    function generalError(msg) {
-        alert('Error' + msg);
-    }
-    
-    function onCreateSocket(response) {
-        var response_obj = eval(response)
-        if (response_obj[0] != null) {
-            alert('Error: ' + response_obj[0]);
-            return;
-        }
-        //alert(response_obj[1]);
-        socket = response_obj[1];
-    }
-	
-	function startThirdDialog()
+	function startQuery()
 	{
-		//alert('DEBUG: startThirdDialog() called');
+		//alert('DEBUG: startQuery() called');
 		
 		//change map
 		document.getElementById('task_map').innerHTML = "<b>DIRECTORY</b><p><img src=\"directory.png\" alt=\"Rooms, offices and labs\" style=\"width:60%\"></p>";
@@ -461,8 +425,6 @@
 		document.getElementById('wrap').style.display = 'none';
 		document.getElementById('inst').innerHTML = 'Please fill out this brief survey about your experience with the system.';
 		document.getElementById('survey_block').style.display = 'block';
-        
-        //callPhp('close_socket', [socket], NULL, generalError)
 	}
 	
 	//invoke php to record likert and produce code for MTurk
@@ -552,41 +514,6 @@
 		alert('DEBUG: there was an error calling submit_survey.php');
 	}
     
-    function callPhp(function_name, args, on_success, on_error) {
-        if (typeof on_success != 'function') on_success = function () {};
-		if (typeof on_error!= 'function') on_error = function () {};
-        var params = 'functionname='.concat(function_name)
-        if (args.length > 0) {
-            params = params.concat('&arg1=').concat(args[0])
-        }
-        if (args.length > 1) {
-            params = params.concat('&arg2=').concat(args[1])
-        }
-
-        getRequest(
-			  'dialog_agent.php', // URL for the PHP file
-               params , // parameters for PHP
-			   on_success,  // handle successful request
-			   on_error    // handle error
-		  );
-        //$.ajax({
-            //type: "POST",
-            //url: 'dialog_agent.php',
-            //dataType: 'json',
-            //data: {functionname: function_name, arguments: args},
-
-            //success: function (obj, textstatus) {
-                          //if( !('error' in obj) ) {
-                              //on_success(obj.result);
-                          //}
-                          //else {
-                              //on_error(obj.error);
-                          //}
-                    //}
-        //});
-        
-    }
-	
 	// helper function for cross-browser request object
 	function getRequest(url, params, success, error)
 	{
@@ -718,7 +645,7 @@ width:50%
 	
 	<DIV ID="third_dialog_start_block" style="display:none">
 		<FORM NAME="user_start_third_dialog_form" ACTION="" METHOD="GET">
-			<INPUT TYPE="button" NAME="user_start_third_dialog_button" Value="Next task" onClick="startThirdDialog()">
+			<INPUT TYPE="button" NAME="user_start_third_dialog_button" Value="Next task" onClick="startQuery()">
 		</FORM>
 	</DIV>
 	
