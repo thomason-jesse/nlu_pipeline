@@ -369,6 +369,7 @@ class DialogueServer :
                         logfile = LOGGING_PATH + self.current_user + '.txt'
                         final_action_log = FINAL_ACTION_PATH + self.current_user + '.txt'
                         self.u_in.logfile = logfile
+                        self.u_in.last_get = ''
                         self.u_out.logfile = logfile
                         self.pomdp_agent.lexical_addition_log = LEXICAL_ADDITION_LOG + '_pomdp.txt'
                         self.static_agent.lexical_addition_log = LEXICAL_ADDITION_LOG + '_static.txt'

@@ -78,7 +78,7 @@ elseif (strcmp($task_type,"at") == 0) {
 //draw search task
 elseif (strcmp($task_type,"search") == 0) {
     $searchee = $people[rand(0,count($people)-1)]; // person to search for
-    $owner = $people[rand(0,count($people)-1)]; // owner fo office to search
+    $owner = $people_with_offices[rand(0,count($people)-1)]; // owner fo office to search
     while ($searchee == $owner) {
         // Disallow the case when they are the same as it makes formulating 
         // the prompt tricky
