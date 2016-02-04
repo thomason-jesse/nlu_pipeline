@@ -45,23 +45,15 @@ LEXICAL_ADDITION_LOG = '../../../../public_html/AMT/log_special/lexical_addition
 # Fixing the random seed for debugging
 numpy.random.seed(4)
 
-class InputFromTopic:
-    def __init__(self, user, logfile=None):
-        topic_name = 'js_pub_' + user
-        self.sub = rospy.Subscriber(topic_name, String, self.add_to_queue, queue_size=1, buff_size=2**24)
-        self.msg_queue = Queue(MAX_OUTSTANDING_MESSAGES) # Using this as it is thread safe
+class InputFromService:
+    def __init__(self, error_log, logfile=None):
+        self.service = rospy.Service('dialogue_js_talk', dialogue_js_talk, self.receive_msg)
         self.lock = Lock()
         self.prev_msg = None
         self.logfile = logfile
-        self.current_user = user
+        self.error_log = error_log
         self.last_get = ''  
         self.lock = Lock()
-        self.listen_thread = Thread(target=self.listen_for_messages, args=())
-        self.listen_thread.daemon = True
-        self.listen_thread.start()
-    
-    def listen_for_messages(self) :
-        rospy.spin()
 
     def get(self):
         print 'In get'
@@ -71,79 +63,75 @@ class InputFromTopic:
         while True :
             if time.time() > timeout :
                 raise RuntimeError('No reply received on websocket for ' + str(timeout_min) + ' minutes. Timing out.')
-            try :
-                text = self.msg_queue.get(True, 0.1) 
-                print 'Received: ', text
-                self.last_get = text
-                text = text.lower()
-                regex = re.compile('[\?\.,\;\:]')
-                text = regex.sub('', text)
-                if self.logfile is not None :
-                    mode = stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO 
-                    flags = os.O_CREAT | os.O_APPEND | os.O_WRONLY 
-                    fd = os.open(self.logfile, flags, mode)
-                    f = os.fdopen(fd, 'a')
-                    f.write('USER: ' + text + '\n')
-                    f.close()
-                    os.chmod(self.logfile, mode)
-                return text 
-            except Empty :
-                sleeper.sleep() 
+            if self.prev_msg is not None :
+                text = None
+                
+                # The following critical section is purely precautionary
+                self.lock.acquire()
+                try :
+                    text = self.prev_msg
+                except KeyboardInterrupt, SystemExit :
+                    pass
+                except :
+                    error = str(sys.exc_info()[0])
+                    self.error_log.write(error + '\n')
+                    print traceback.format_exc()
+                    self.error_log.write(traceback.format_exc() + '\n\n\n')
+                    self.error_log.flush()
+                finally :
+                    self.prev_msg = None
+                    self.lock.release()    
+                    
+                if text is not None :
+                    print 'Received: ', text
+                    self.last_get = text
+                    text = text.lower()
+                    regex = re.compile('[\?\.,\;\:]')
+                    text = regex.sub('', text)
+                    if self.logfile is not None :
+                        mode = stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO 
+                        flags = os.O_CREAT | os.O_APPEND | os.O_WRONLY 
+                        fd = os.open(self.logfile, flags, mode)
+                        f = os.fdopen(fd, 'a')
+                        f.write('USER: ' + text + '\n')
+                        f.close()
+                        os.chmod(self.logfile, mode)
+                    return text 
+            sleeper.sleep() 
             
-    def add_to_queue(self, msg) :
-        #print 'Received ', msg.data, 'self.prev_msg = ', self.prev_msg
-        if '|' not in msg.data :
-            print 'Malformed message: ', msg.data
-        elif self.prev_msg != msg.data :
-            self.lock.acquire() # Locking is necessary because otherwise 
-                                # the same message could get added twice 
-                                # by competing callbacks
-            try :
-                if self.prev_msg != msg.data :
-                    # Check has to be done again because a competing 
-                    # callback could have just added the same message 
-                    text = msg.data.split('|')[1]
-                    self.msg_queue.put(text, True, 1) 
-                        # This will actually block till the put gets 
-                        # done but as it is in the critical section,  
-                        # there should be no competing puts
-                    self.prev_msg = msg.data
-            except KeyboardInterrupt, SystemExit :
-                pass
-            except :
-                error = str(sys.exc_info()[0])
-                ERROR_LOG.write(error + '\n')
-                print traceback.format_exc()
-                ERROR_LOG.write(traceback.format_exc() + '\n\n\n')
-                ERROR_LOG.flush()
-            finally :
-                self.lock.release()    
+    def receive_msg(self, req) :
+        text = req.js_response
+        while True :
+            if self.prev_msg is not None :
+                success = False
+                self.lock.acquire() # Locking is only because service 
+                                    # calls are on a separate thread
+                try :
+                    if self.prev_msg is not None :
+                        # This check is probably unnecessary
+                        self.prev_msg = text 
+                        success = True
+                except KeyboardInterrupt, SystemExit :
+                    pass
+                except :
+                    error = str(sys.exc_info()[0])
+                    self.error_log.write(error + '\n')
+                    print traceback.format_exc()
+                    self.error_log.write(traceback.format_exc() + '\n\n\n')
+                    self.error_log.flush()
+                finally :
+                    self.lock.release()    
+                    if success :
+                        break
+        return True
     
-    def __del__(self) :
-        self.sub.unregister()
-        
-    def close(self) :
-        if self.sub is not None :
-            self.sub.unregister()
-
-class OutputToTopic:
-    def __init__(self, user, input_from_topic, logfile=None):
+class OutputToService:
+    def __init__(self, input_from_topic, error_log, logfile=None):
+        self.service = rospy.Service('dialogue_python_talk', dialogue_python_talk, self.send_msg)
         self.response = None
-        topic_name =  'python_pub_' + user
-        self.logfile = logfile    
-        self.current_user = user  
-        #self.pub = rospy.Publisher(topic_name, String, queue_size=MAX_OUTSTANDING_MESSAGES)
-        self.pub = rospy.Publisher(topic_name, String, queue_size=1, tcp_nodelay=True)
-            # The rospy documentation says that a queue size of 1 should
-            # be fine for 10 Hz if you're not sedning a burst of messages
-            # This will prevent a backlog of messages to be cleared in  
-            # case the connection is slow which often happens on Wifi
-        self.msg = None
-        self.seq_no = 0
+        self.logfile = logfile  
+        self.error_log = error_log  
         self.input_from_topic = input_from_topic
-        self.publish_thread = Thread(target=self.publish, args=())
-        self.publish_thread.daemon = True
-        self.publish_thread.start()
         self.lock = Lock()
 
     def say(self, response):
@@ -155,39 +143,47 @@ class OutputToTopic:
             f.write('ROBOT: ' + response + '\n')
             f.close()
             os.chmod(self.logfile, mode)
-        print 'Going to publish: ', response
+            
         self.lock.acquire()
         try :
-            self.msg = str(self.seq_no) + '|' + self.input_from_topic.last_get + '|' + response
-            self.seq_no += 1
+            self.response = response
         except KeyboardInterrupt, SystemExit :
             pass
         except :
             error = str(sys.exc_info()[0])
-            ERROR_LOG.write(error + '\n')
+            self.error_log.write(error + '\n')
             print traceback.format_exc()
-            ERROR_LOG.write(traceback.format_exc() + '\n\n\n')
-            ERROR_LOG.flush()
+            self.error_log.write(traceback.format_exc() + '\n\n\n')
+            self.error_log.flush()
         finally :
             self.lock.release()
 
-    def publish(self) :
-        print 'Publish thread created \n\n\n'
-        r = rospy.Rate(50) # 10hz
-        while not rospy.is_shutdown():
-            if self.msg is not None :
-                self.pub.publish(self.msg)
-            r.sleep()
+    def send_msg(self, req) :
+        msg_poller = rospy.Rate(100)
+        while True :
+            response = None
+            if self.response is not None :
+                self.lock.acquire()
+                try :
+                    response = self.input_from_topic.last_get + '\n' + self.response
+                    self.response = None
+                except KeyboardInterrupt, SystemExit :
+                    pass
+                except :
+                    error = str(sys.exc_info()[0])
+                    self.error_log.write(error + '\n')
+                    print traceback.format_exc()
+                    self.error_log.write(traceback.format_exc() + '\n\n\n')
+                    self.error_log.flush()
+                finally :
+                    self.lock.release()
+            
+            if response is not None :
+                return response
+                
+            msg_poller.sleep()
 
-    def __del__(self) :
-        self.pub.unregister()
-        
-    def close(self) :
-        self.msg = None
-        if self.pub is not None :
-            self.pub.unregister()
-
-
+    
 class DialogueServer :
     def __init__(self) :
         rospy.init_node('dialog_agent_aishwarya')
@@ -369,8 +365,8 @@ class DialogueServer :
                         final_action_log = None
                         logfile = LOGGING_PATH + self.current_user + '.txt'
                         final_action_log = FINAL_ACTION_PATH + self.current_user + '.txt'
-                        self.u_in = InputFromTopic(self.current_user, logfile)
-                        self.u_out = OutputToTopic(self.current_user, self.u_in, logfile)
+                        self.u_in = InputFromService(self.error_log, logfile)
+                        self.u_out = OutputToService(self.u_in, self.error_log, logfile)
                         self.pomdp_agent.lexical_addition_log = LEXICAL_ADDITION_LOG + '_pomdp.txt'
                         self.static_agent.lexical_addition_log = LEXICAL_ADDITION_LOG + '_static.txt'
                         
