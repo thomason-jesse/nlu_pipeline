@@ -313,11 +313,12 @@
 		system_name_cell.style.backgroundColor = system_cell_color;
 
         if (current_task == 'query') {
+            //alert('Query task');
             //submit php request
             getRequest(
               'query_validation.php', // URL for the PHP file
               'task='.concat(current_task).concat('&user_input=').concat(user_input).concat('&user_id=').concat(user_id), // parameters for PHP
-               invokeDialogAgentOutput,  // handle successful request
+               formatQueryResponse,  // handle successful request
                invokeDialogAgentError    // handle error
             );
         } else {
@@ -347,6 +348,13 @@
 	function invokeDialogAgentError () {
 		alert('DEBUG: there was an error calling dialog_agent.php');
 	}
+
+    // Format query response so that it can be handled by invokeDialogAgentOutput
+    function formatQueryResponse(response) {
+        var formatted_response = {python_response:response};
+        //alert('formatted_response.python_response = ' + formatted_response.python_response);
+        invokeDialogAgentOutput(formatted_response);
+    }
 
 	// handles the response, adds the html
 	function invokeDialogAgentOutput(response) {

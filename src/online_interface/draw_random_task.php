@@ -49,6 +49,11 @@ $people_with_offices = array('alice', 'bob', 'eve', 'frannie', 'mallory', 'walte
 $foods = array('muffin', 'chips', 'coffee', 'hamburger', 'juice');
 $foods_to_needs = array('muffin'=>'1','chips'=>'2','coffee'=>'3','hamburger'=>'4','juice'=>'5');
 
+// Hold out 20% of each type of task for test
+$walk_test = array('l3_418', 'l3_510');
+$deliver_test = array('alice' => 'coffee', 'bob' => 'juice', 'carol' => 'muffin', 'dave' => 'muffin', 'eve' => 'coffee', 'frannie' => 'hamburger', 'george' => 'juice', 'mallory' => 'chips', 'peggy' => 'hamburger', 'walter' => 'chips');
+$search_test = array('alice' => array('frannie', 'george'), 'bob' => array('alice', 'eve'), 'eve' => array('bob'), 'frannie'  => array('walter'), 'mallory' => array('dave'), 'walter' => array('mallory'));
+
 //draw deliver task
 if (strcmp($task_type,"deliver") == 0) {
     $person = $people[rand(0,count($people)-1)];
@@ -78,12 +83,12 @@ elseif (strcmp($task_type,"at") == 0) {
 //draw search task
 elseif (strcmp($task_type,"search") == 0) {
     $searchee = $people[rand(0,count($people)-1)]; // person to search for
-    $owner = $people_with_offices[rand(0,count($people)-1)]; // owner fo office to search
+    $owner = $people_with_offices[rand(0,count($people_with_offices)-1)]; // owner fo office to search
     while ($searchee == $owner) {
         // Disallow the case when they are the same as it makes formulating 
         // the prompt tricky
         $searchee = $people[rand(0,count($people)-1)];
-        $owner = $people_with_offices[rand(0,count($people)-1)];
+        $owner = $people_with_offices[rand(0,count($people_with_offices)-1)];
     }    
     // Find the room to be searched
     $room = False;

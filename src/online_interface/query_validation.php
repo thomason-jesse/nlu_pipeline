@@ -13,6 +13,7 @@ if (!isset($_POST['task']))
 	die("FAILED\nno task posted");
 }
 
+
 $user_id = $_POST['user_id'];
 if (strcmp($_POST['task'],'query') == 0) {
 	if (!isset($_POST['user_input']))
@@ -45,7 +46,7 @@ if (strcmp($_POST['task'],'query') == 0) {
 	echo "\n";
 	echo "<END/>";
     //echo $err_str;
-	die();
+	//die();
 } else {
     die('query_validation invoked for a non-query task.');
 }
