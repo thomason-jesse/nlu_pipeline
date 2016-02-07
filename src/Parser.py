@@ -16,7 +16,7 @@ class Parser:
         self.beam_width = beam_width
         self.new_adjectives = []  # cleared before every parsing job
         self.known_unary_expansions = {}  # cleared before every parsing job
-        self.known_binary_expansions = {}  # clared before every parsing job
+        self.known_binary_expansions = {}  # cleared before every parsing job
         self.safety = safety
         self.commutative_idxs = [self.ontology.preds.index('and'), self.ontology.preds.index('or')]
 
@@ -186,69 +186,6 @@ class Parser:
             D.append([tokens, form])
             i += 3
         return D
-
-    # take in a data set D=(x,y) for x tokens and y correct semantic form and update the learner's parameters
-    def train_learner_on_semantic_forms(
-            self, D, epochs=10, k=None, n=3, allow_UNK_E=True, generator=None):
-        if k is None:
-            k = self.beam_width
-        for e in range(0, epochs):
-            print "epoch " + str(e)  # DEBUG
-            T = []
-            num_trainable = 0
-            num_matches = 0
-            num_fails = 0
-            for [x, y] in D:
-                generator_genlex = None if generator is None else [generator, x, y]
-                # print "training on pair "+str(x)+", "+self.print_parse(y, True)  # DEBUG
-                if generator is not None:
-                    generator.flush_seen_nodes()
-                chosen_parse = None
-                correct_parse = None
-                any_parse = False
-                match = False
-                none_max = 0
-                num_examined = 0
-                while none_max <= math.ceil(math.sqrt(len(x))) and correct_parse is None and n-num_examined > 0:
-                    n_best = self.parse_tokens(
-                        x, k, n-num_examined, none_range=[none_max, none_max+1],
-                        allow_UNK_E=allow_UNK_E, generator_genlex=generator_genlex)
-                    if len(n_best) > 0:
-                        any_parse = True
-                        if chosen_parse is None:
-                            chosen_parse = n_best[0]
-                        for i in range(0, len(n_best)):
-                            num_examined += 1
-                            if y.equal_allowing_commutativity(n_best[i][0],
-                                                              self.commutative_idxs, ontology=self.ontology):
-                                correct_parse = n_best[i]
-                                if i == 0 and chosen_parse[0].equal_allowing_commutativity(
-                                        n_best[i][0], self.commutative_idxs):
-                                    match = True
-                                    num_matches += 1
-                                else:
-                                    num_trainable += 1
-                                break
-                    none_max += 1
-                if correct_parse is None:
-                    print "WARNING: could not find correct parse for input sequence "+str(x)
-                    num_fails += 1
-                    continue
-                if not match:
-                    T.append([x, chosen_parse, None,
-                              x, correct_parse, None])
-                if not any_parse:
-                    print "WARNING: could not find valid parse for '" + " ".join(x) + "' during training"
-                    num_fails += 1
-            print "matched "+str(num_matches)+"/"+str(len(D))  # DEBUG
-            print "trained "+str(num_trainable)+"/"+str(len(D))  # DEBUG
-            print "failed "+str(num_fails)+"/"+str(len(D))  # DEBUG
-            if num_trainable == 0:
-                print "WARNING: training converged at epoch " + str(e)
-                break
-            print "training on "+str(len(T))+" examples"  # DEBUG
-            random.shuffle(T)
-            self.learner.learn_from_actions(T)
 
     # iterate over partials and add genlex entries to lexicon
     def add_genlex_entries_to_lexicon_from_partial(self, partial_bracketing):
