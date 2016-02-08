@@ -1,29 +1,35 @@
+fetch peter for ray
+M : bring(peter,ray)
+
 bring peter to ray
-bring(peter,ray)
+M : bring(peter,ray)
 
 bring ray to peter
-bring(ray,peter)
+M : bring(ray,peter)
 
 bring peter ray
-bring(ray,peter)
+M : bring(ray,peter)
 
 bring ray peter
-bring(peter,ray)
+M : bring(peter,ray)
 
-peter's office
-the(lambda x:e.(and(office(x),possesses(peter,x))))
+peter 's office
+N : the(lambda x:e.(and(office(x),possesses(peter,x))))
 
-3506 is ray's office
-declare_equal(3506,the(lambda x:e.(and(office(x),possesses(ray,x)))))
+3506 is ray 's office
+D : declare_equal(3506,the(lambda x:e.(and(office(x),possesses(ray,x)))))
 
-is 3506 ray's office
-equals(3506,the(lambda x:e.(and(office(x),possesses(ray,x)))))
+is 3506 ray 's office
+I : equals(3506,the(lambda x:e.(and(office(x),possesses(ray,x)))))
 
 walk to 3506
-walk(3506)
+M : walk(3506)
 
 bring the heavy blue object to ray
-bring(the(lambda 1:e.(and(and(heavy(1),blue(1)),object(1)))),ray)
+M : bring(the(lambda 1:e.(and(and(heavy(1),blue(1)),object(1)))),ray)
 
 bring the yellow light object to ray
-bring(the(lambda 1:e.(and(and(yellow(1),light(1)),object(1)))),ray)
+M : bring(the(lambda 1:e.(and(and(yellow(1),light(1)),object(1)))),ray)
+
+fetch doctor stone for ray
+M : bring(peter,ray)
