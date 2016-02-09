@@ -23,10 +23,13 @@ of :- N\(N/N)/N : lambda x:e.(lambda P:<e,t>.(lambda y:e.(and(P(y), possesses(x,
 peter :- N : peter
 ray :- N : ray
 3506 :- N : 3506
+bruce :- N : bruce
+aeron chair :- N : aeron_chair
 
 #identifier predicates
 office :- N/N : lambda x:e.(office(x))
 object :- N/N : lambda x:e.(object(x))
+chiar :- N/N : lambda x:e.(chair(x))
 
 #adjectival predicates
 blue :- N/N : lambda x:e.(blue(x))

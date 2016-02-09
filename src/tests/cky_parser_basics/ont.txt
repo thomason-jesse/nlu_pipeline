@@ -6,6 +6,8 @@ no:c
 peter:e
 ray:e
 3506:e
+bruce:e
+aeron_chair:e
 
 #dec preds
 declare_equal:<e,<e,d>>
@@ -33,6 +35,7 @@ predimp:<<e,t>,<<e,t>,t>>
 exists:<<e,t>,t>
 office:<e,t>
 object:<e,t>
+chair:<e,t>
 blue:<e,t>
 heavy:<e,t>
 yellow:<e,t>

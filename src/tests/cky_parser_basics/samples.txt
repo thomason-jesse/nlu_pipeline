@@ -33,3 +33,6 @@ M : bring(the(lambda 1:e.(and(and(yellow(1),light(1)),object(1)))),ray)
 
 fetch doctor stone for ray
 M : bring(peter,ray)
+
+the chair 's office
+N : the(lambda x:e.(and(office(x),possesses(bruce,x))))
