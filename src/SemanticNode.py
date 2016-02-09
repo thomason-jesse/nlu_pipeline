@@ -77,18 +77,7 @@ class SemanticNode:
             [str(self.is_lambda), str(self.type), str(self.lambda_name) if self.is_lambda else str(self.idx)]) + ")"
 
     def __str__(self):
-        s = "(" + ",".join(
-            [str(self.is_lambda), str(self.category), str(self.type), str(self.lambda_name)
-                if self.is_lambda else str(self.idx)]) + ")"
-        if self.children is not None:
-            for c in self.children:
-                s += "\n"
-                curr = self
-                while curr is not None:
-                    s += "\t"
-                    curr = curr.parent
-                s += str(c)
-        return s
+        return str(self.__key())
 
     def renumerate_lambdas(self, lambdas):
         if self.is_lambda:
