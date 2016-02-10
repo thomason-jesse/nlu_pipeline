@@ -40,5 +40,14 @@ NP : the(lambda x:e.(and(office(x),possesses(bruce,x))))
 bring peter to the chair
 M : bring(peter, bruce)
 
-bring the chair to the chair
-M : bring(aeron_chair, bruce)
+bring doctor mooney to the chair
+M : bring(ray, bruce)
+
+fetch the chair for ray
+M : bring(bruce, ray)
+
+ray 's chair
+NP : the(lambda x:e.(and(chair(x),possesses(ray,x))))
+
+the chair 's chair
+NP : the(lambda x:e.(and(chair(x),possesses(bruce,x))))
