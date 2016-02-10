@@ -35,7 +35,8 @@ class SummaryState :
     #     - Do the top and second hypothesis use the same partition: yes/no  
     #     - Type of last user utterance - inform_full/inform_param/affirm/deny
     #     - Goal in top hypothesis partition or 'None' if this is not unique
-    # NOTE: PomdpGpSarsaPolicy.py DEPENDS ON THIS ORDERING. 
+    # NOTE: FILES THAT DEPEND ON THIS ORDERING - PomdpGpSarsaPolicy.py, 
+    #           PomdpKtdqPolicy.py
     def get_feature_vector(self) :
         # Probability of top hypothesis; Probability of second hypothesis
         feature = [self.top_hypothesis_prob, self.second_hypothesis_prob]

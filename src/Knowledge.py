@@ -1,5 +1,6 @@
 __author__ = 'aishwarya'
 
+import itertools
 # TODO: Automate filling as many of these as possible from knowledge base
 
 class Knowledge:
@@ -20,6 +21,7 @@ class Knowledge:
         
         self.system_dialog_actions = ['repeat_goal', 'confirm_action', 'request_missing_param']
         self.user_dialog_actions = ['inform_param', 'inform_full', 'affirm', 'deny']
+        self.summary_system_actions = self.system_dialog_actions + ['take_action']
 
         self.goal_change_prob = 0.0
 
@@ -86,14 +88,42 @@ class Knowledge:
         # Constraints for type checking
         self.set_param_constraints()
         
-        # Component-wise weights for distance metric in summary space
-        # When calculating the distance, a sum of the weighted L2 norm
-        # of the continuous components and weighted misclassification
-        # distance of discrete components is used. If the weight vector
-        # is smaller than the number of features, remaining weights will 
-        # be taken as 0
-        self.summary_space_distance_weights = [1.0, 1.0, 0.1, 0.1, 0.1, 0.1, 0.1]
+        # Parameters for the RL problem
+        self.gamma = 0.1
+        self.correct_action_reward = 100
+        self.wrong_action_reward = -100
+        self.per_turn_reward = -1
+        
+        # Set params for the specific RL-algorithm being used
+        #self.set_params_for_gp_sarsa()
+        self.set_params_for_ktdq()
+    
+    # Settings specifically for the KTD-Q algorithm    
+    def set_params_for_ktdq(self) :
+        self.ktdq_init_theta_std_dev = 0.01
+        self.ktdq_lambda = 1
+        self.ktdq_eta = 0.001
+        self.ktdq_P_n = 0.1
+        self.ktdq_kappa = 1
+        
+        rbf_points = [0.25, 0.5, 0.75]
+        self.ktdq_rbf_centres = list(itertools.product(rbf_points, rbf_points))
+        self.ktdq_rbf_sigma = 0.1
+        
+        # No of turns above which a dialogue is assumed to be long
+        self.knowledge.ktdq_long_dialogue_thresh = 5 
 
+    # Settings specifically for the GP-SARSA algorithm
+    def set_params_for_gp_sarsa(self) :
+        self.gp_sarsa_std_dev = 5
+        self.sparsification_param = 1
+        
+        # Hyperparameters for polynomial kernel - values set from the paper
+        self.kernel_std_dev = 5     # sigma_k in the paper
+        self.kernel_degree = 4      # p in the paper
+        self.kernel_weights = [1, 1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+        #self.kernel_weights = [1, 1, 1, 1, 1, 1, 1]
+        
         # Weight for summary action agreement in GP-SARSA kernel
         # State feature weights in this kernel are the summary space
         # distance weights
@@ -103,25 +133,13 @@ class Knowledge:
         # the same grid point
         self.summary_space_grid_threshold = 0.2
         
-        self.summary_system_actions = self.system_dialog_actions + ['take_action']
-        
-        # Sparsification param nu for GP-SARSA
-        self.sparsification_param = 1
-        
-        # Hyperparameters for polynomial kernel - values set from the paper
-        self.kernel_std_dev = 5     # sigma_k in the paper
-        self.kernel_degree = 4      # p in the paper
-        self.kernel_weights = [1, 1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
-        #self.kernel_weights = [1, 1, 1, 1, 1, 1, 1]
-        
-        # Parameters for the RL problem and GP-SARSA
-        self.gamma = 0.1
-        self.gp_sarsa_std_dev = 5
-        
-        # Rewards
-        self.correct_action_reward = 100
-        self.wrong_action_reward = -100
-        self.per_turn_reward = -1
+        # Component-wise weights for distance metric in summary space
+        # When calculating the distance, a sum of the weighted L2 norm
+        # of the continuous components and weighted misclassification
+        # distance of discrete components is used. If the weight vector
+        # is smaller than the number of features, remaining weights will 
+        # be taken as 0
+        self.summary_space_distance_weights = [1.0, 1.0, 0.1, 0.1, 0.1, 0.1, 0.1]
 
     # This gives a 0-1 value for whether a param is relevant for an action. 
     # Values are taken from param_order
