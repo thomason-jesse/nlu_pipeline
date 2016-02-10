@@ -26,6 +26,6 @@ parser = CKYParser.CKYParser(ont, lex)
 
 print "reading in data and beginning test"
 d = parser.read_in_paired_utterance_semantics(sys.argv[3])
-converged = parser.train_learner_on_semantic_forms(d, 10)
+converged = parser.train_learner_on_semantic_forms(d, 30)
 if not converged:
     raise AssertionError("Training failed to converge to correct values.")

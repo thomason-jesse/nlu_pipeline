@@ -4,25 +4,25 @@ M : bring(peter,ray)
 bring peter to ray
 M : bring(peter,ray)
 
-bring ray to peter
+take ray to peter
 M : bring(ray,peter)
 
 bring peter ray
 M : bring(ray,peter)
 
-bring ray peter
+take ray peter
 M : bring(peter,ray)
 
 peter 's office
-N : the(lambda x:e.(and(office(x),possesses(peter,x))))
+NP : the(lambda x:e.(and(office(x),possesses(peter,x))))
 
-3506 is ray 's office
+room 3506 is ray 's office
 D : declare_equal(3506,the(lambda x:e.(and(office(x),possesses(ray,x)))))
 
-is 3506 ray 's office
+is room 3506 ray 's office
 I : equals(3506,the(lambda x:e.(and(office(x),possesses(ray,x)))))
 
-walk to 3506
+walk to room 3506
 M : walk(3506)
 
 bring the heavy blue object to ray
@@ -35,4 +35,10 @@ fetch doctor stone for ray
 M : bring(peter,ray)
 
 the chair 's office
-N : the(lambda x:e.(and(office(x),possesses(bruce,x))))
+NP : the(lambda x:e.(and(office(x),possesses(bruce,x))))
+
+bring peter to the chair
+M : bring(peter, bruce)
+
+bring the chair to the chair
+M : bring(aeron_chair, bruce)

@@ -20,30 +20,42 @@ class Parameters:
         self._CCG_given_token_counts = self.init_ccg_given_token()
         self._CCG_production_counts = self.init_ccg_production()
         self._lexicon_entry_given_token_counts = self.init_lexicon_entry()
+        self._semantic_counts = self.init_semantic()
+
+        # print "_CCG_given_token_counts: "+str(self._CCG_given_token_counts)  # DEBUG
+        # print "_CCG_production_counts: "+str(self._CCG_production_counts)  # DEBUG
+        # print "_lexicon_entry_counts: "+str(self._lexicon_entry_given_token_counts)  # DEBUG
 
         # calculate probability tables from counts
         # note that this needs to happen every time counts are updated
         self.CCG_given_token = {}
         self.CCG_production = {}
         self.lexicon_entry_given_token = {}
+        self.semantic = {}
+
+        # update probabilities given new counts
         self.update_probabilities()
+
+        # print "CCG_given_token: "+str(self.CCG_given_token)  # DEBUG
+        # print "CCG_production: "+str(self.CCG_production)  # DEBUG
+        # print "lexicon_entry: "+str(self.lexicon_entry_given_token)  # DEBUG
 
     # update the probability tables given counts
     def update_probabilities(self):
 
         for cat_idx in range(0, len(self.lexicon.categories)):
 
-            # get -log probabilities for CCG_given_token ( P(ccg|surface), P(ccg=c|S)=1 )
+            # get log probabilities for CCG_given_token ( P(ccg|surface), P(ccg=c|S)=1 )
             mass = float(sum([self._CCG_given_token_counts[(cat_idx, sf_idx)]
                          for sf_idx in range(0, len(self.lexicon.surface_forms))
                               if (cat_idx, sf_idx) in self._CCG_given_token_counts]))
             for sf_idx in range(0, len(self.lexicon.surface_forms)):
                 key = (cat_idx, sf_idx)
                 if key in self._CCG_given_token_counts:
-                    self.CCG_given_token[key] = -math.log(self._CCG_given_token_counts[key] / mass) \
+                    self.CCG_given_token[key] = math.log(self._CCG_given_token_counts[key] / mass) \
                         if mass > 0 and self._CCG_given_token_counts[key] > 0 else neg_inf
 
-                # get -log probabilities for lexicon_entry_given_token
+                # get log probabilities for lexicon_entry_given_token
                 # ( P(sem|surface), P(sem=s|S)=1 )
                 entry_mass = float(sum([self._lexicon_entry_given_token_counts[(sem_idx, sf_idx)]
                                         for sem_idx in range(0, len(self.lexicon.entries[sf_idx]))
@@ -51,11 +63,11 @@ class Parameters:
                 for sem_idx in range(0, len(self.lexicon.entries[sf_idx])):
                     key = (sem_idx, sf_idx)
                     if key in self._lexicon_entry_given_token_counts:
-                        self.lexicon_entry_given_token[key] = -math.log(self._lexicon_entry_given_token_counts[key]
+                        self.lexicon_entry_given_token[key] = math.log(self._lexicon_entry_given_token_counts[key]
                                                                         / entry_mass) \
                             if entry_mass > 0 and self._lexicon_entry_given_token_counts[key] > 0 else neg_inf
 
-            # get -log probabilities for CCG_production ( P(ccg|(leftcgg, rightccg)), P(ccg=c|LR)=1 )
+            # get log probabilities for CCG_production ( P(ccg|(leftcgg, rightccg)), P(ccg=c|LR)=1 )
             mass = float(sum([self._CCG_production_counts[(cat_idx, l_idx, r_idx)]
                               for l_idx in range(0, len(self.lexicon.categories))
                               for r_idx in range(0, len(self.lexicon.categories))
@@ -64,12 +76,25 @@ class Parameters:
                 for r_idx in range(0, len(self.lexicon.categories)):
                     key = (cat_idx, l_idx, r_idx)
                     if key in self._CCG_production_counts:
-                        self.CCG_production[key] = -math.log(self._CCG_production_counts[key] / mass) \
+                        self.CCG_production[key] = math.log(self._CCG_production_counts[key] / mass) \
                             if mass > 0 and self._CCG_production_counts[key] > 0 else neg_inf
+
+        # get log probabilities for semantic_args ( P(arg|(pred,pos)), P(arg=a|(P, PS))=1
+        for arg_idx in range(0, len(self.ontology.preds)):
+            mass = float(sum([self._semantic_counts[(pred_idx, arg_idx, pos)]
+                              for pred_idx in range(0, len(self.ontology.preds))
+                              for pos in range(0, self.ontology.num_args[pred_idx])
+                              if (pred_idx, arg_idx, pos) in self._semantic_counts]))
+            for pred_idx in range(0, len(self.ontology.preds)):
+                for pos in range(0, self.ontology.num_args[pred_idx]):
+                    key = (pred_idx, arg_idx, pos)
+                    if key in self._semantic_counts:
+                        self.semantic[key] = math.log(self._semantic_counts[key] / mass) \
+                            if mass > 0 and self._semantic_counts[key] > 0 else neg_inf
 
     # indexed by (categories idx, surface forms idx), value parameter weight
     def init_ccg_given_token(self):
-        return {(self.lexicon.semantic_forms[sem_idx].category, sf_idx): 0.0
+        return {(self.lexicon.semantic_forms[sem_idx].category, sf_idx): 1.0
                 for sf_idx in range(0, len(self.lexicon.entries))
                 for sem_idx in self.lexicon.entries[sf_idx]}
 
@@ -87,18 +112,65 @@ class Parameters:
                 else:  # consumes to the right
                     r = child
                     l = self.lexicon.categories.index([cat_idx, d, child])
-                ccg_production[(cat_idx, l, r)] = 0.0
+                ccg_production[(cat_idx, l, r)] = 1.0
 
             # add production rules of form X -> X X for X<>X=X (merge)
-            ccg_production[(cat_idx, cat_idx, cat_idx)] = 0.0
+            ccg_production[(cat_idx, cat_idx, cat_idx)] = 1.0
 
         return ccg_production
 
     # indexed by (surface forms idx, semantic forms idx), value parameter weight
     def init_lexicon_entry(self):
-        return {(sf_idx, sem_idx): 0.0
+        return {(sf_idx, sem_idx): 1.0
                 for sf_idx in range(0, len(self.lexicon.entries))
                 for sem_idx in self.lexicon.entries[sf_idx]}
+
+    # indexed by (pred, arg, pos) tuples, value parameter weight
+    def init_semantic(self):
+        return {}
+
+    # takes in a parse node and returns its log probability
+    def get_semantic_score(self, n):
+
+        counts = self.count_semantics(n)
+        score = 0.0
+        for key in counts:
+            if key in self.semantic:
+                for _ in range(0, counts[key]):
+                    score += self.semantic[key]
+        return score
+
+    # takes in a parse or semantic node and returns the counts of its (pred, arg, pos) entries
+    def count_semantics(self, sn):
+
+        # convert passed ParseNodes to SemanticNode member
+        try:
+            sn = sn.node
+        except AttributeError:
+            pass
+
+        counts = {}
+        if sn.children is not None:
+            pred = sn.idx
+            if sn.is_lambda:
+                pred = "lambda_inst" if sn.is_lambda_instantiation else "lambda"
+            for pos in range(0, len(sn.children)):
+                arg = sn.children[pos].idx
+                if sn.children[pos].is_lambda:
+                    arg = "lambda_inst" if sn.children[pos].is_lambda_instantiation else "lambda"
+                key = (pred, arg, pos)
+                if key not in counts:
+                    counts[key] = 0
+                counts[key] += 1
+
+            for c in sn.children:
+                child_counts = self.count_semantics(c)
+                for ckey in child_counts:
+                    if ckey not in counts:
+                        counts[ckey] = 0
+                    counts[ckey] += child_counts[ckey]
+
+        return counts
 
     # take in examples t=(x,y,z) for x an expression, y an incorrect semantic form, z a correct semantic form
     def update_learned_parameters(self, t):
@@ -130,11 +202,11 @@ class Parameters:
                     # update count data structures given new entry
                     key = (self.lexicon.semantic_forms[sem_idx].category, sf_idx)
                     if key not in self._CCG_given_token_counts:
-                        self._CCG_given_token_counts[key] = 0.0
+                        self._CCG_given_token_counts[key] = 1.0
                     # note that no new CCG production rules can be generated from current procedure
                     key = (sf_idx, sem_idx)
                     if key not in self._lexicon_entry_given_token_counts:
-                        self._lexicon_entry_given_token_counts[key] = 0.0
+                        self._lexicon_entry_given_token_counts[key] = 1.0
 
                     # update form leaves with new surface idx as needed
                     form_leaves = form.get_leaves()
@@ -143,10 +215,12 @@ class Parameters:
                             leaf.surface_form = self.lexicon.surface_forms.index(leaf.surface_form)
 
             # do perceptron-style updates of counts
-            parameter_extractors = [count_ccg_surface_form_pairs, count_ccg_productions, count_lexical_entries]
+            parameter_extractors = [count_ccg_surface_form_pairs, count_ccg_productions,
+                                    count_lexical_entries, self.count_semantics]
             parameter_structures = [self._CCG_given_token_counts,
                                     self._CCG_production_counts,
-                                    self._lexicon_entry_given_token_counts]
+                                    self._lexicon_entry_given_token_counts,
+                                    self._semantic_counts]
             for i in range(0, len(parameter_structures)):
                 y_keys = parameter_extractors[i](y)
                 z_keys = parameter_extractors[i](z)
@@ -160,6 +234,7 @@ class Parameters:
         # print "_CCG_given_token_counts: "+str(self._CCG_given_token_counts)  # DEBUG
         # print "_CCG_production_counts: "+str(self._CCG_production_counts)  # DEBUG
         # print "_lexicon_entry_counts: "+str(self._lexicon_entry_given_token_counts)  # DEBUG
+        print "_semantic_counts: "+str(self._semantic_counts)  # DEBUG
 
         # update probabilities given new counts
         self.update_probabilities()
@@ -167,6 +242,7 @@ class Parameters:
         # print "CCG_given_token: "+str(self.CCG_given_token)  # DEBUG
         # print "CCG_production: "+str(self.CCG_production)  # DEBUG
         # print "lexicon_entry: "+str(self.lexicon_entry_given_token)  # DEBUG
+        print "semantic: "+str(self.semantic)  # DEBUG
 
 
 # take in ParseNode y to calculate (surface forms idx, semantic forms idx) pairs
@@ -221,7 +297,7 @@ class CKYParser:
         # additional linguistic information
         # TODO: read this from configuration files or have user specify it on instantiation
         self.commutative_idxs = [self.ontology.preds.index('and'), self.ontology.preds.index('or')]
-        self.max_multiword_expression = 3
+        self.max_multiword_expression = 2
 
         # behavioral parameters
         self.safety = True  # set to False once confident about node combination functions' correctness
@@ -290,7 +366,9 @@ class CKYParser:
 
     # take in data set d=(x,y) for x strings and y correct semantic forms and calculate training pairs
     # training pairs in t are of form (x, y_chosen, y_correct, chosen_lex_entries, correct_lex_entries)
-    def get_training_pairs(self, d):
+    # k determines how many parses to get for re-ranking
+    # beam determines how many cky_trees to look through before giving up on a given input
+    def get_training_pairs(self, d, k=5, beam=1000):
         t = []
         num_trainable = 0
         num_matches = 0
@@ -299,8 +377,9 @@ class CKYParser:
         for [x, y] in d:
             correct_parse = None
             correct_new_lexicon_entries = []
-            parse_generator = self.most_likely_cky_parse(x, known_root=y)
-            chosen_parse, chosen_new_lexicon_entries = next(parse_generator)
+            cky_parse_generator = self.most_likely_cky_parse(x, known_root=y, max_beam=beam)
+            reranked_parse_generator = self.most_likely_reranked_cky_parse(cky_parse_generator, k=k)
+            chosen_parse, _, chosen_new_lexicon_entries = next(reranked_parse_generator)
             current_parse = chosen_parse
             current_new_lexicon_entries = chosen_new_lexicon_entries
             match = False
@@ -321,21 +400,25 @@ class CKYParser:
                         num_trainable += 1
                     break
                 first = False
-                current_parse, current_new_lexicon_entries = next(parse_generator)
+                current_parse, _, current_new_lexicon_entries = next(reranked_parse_generator)
             if correct_parse is None:
-                print "WARNING: could not find correct parse for input sequence "+str(x)
+                print "WARNING: could not find correct parse for '"+str(x)+"' during training"
                 num_fails += 1
                 continue
-            # print "\tx: "+str(x)  # DEBUG
-            # print "\t\tchosen_parse: "+self.print_parse(chosen_parse.node, show_category=True)  # DEBUG
-            # print "\t\tchosen_new_lexicon_entries: "+str(chosen_new_lexicon_entries)  # DEBUG
+            print "\tx: "+str(x)  # DEBUG
+            print "\t\tchosen_parse: "+self.print_parse(chosen_parse.node, show_category=True)  # DEBUG
+            print "\t\tchosen_new_lexicon_entries: "  # DEBUG
+            for sf, sem in chosen_new_lexicon_entries:  # DEBUG
+                print "\t\t\t'"+sf+"':- "+self.print_parse(sem, show_category=True)  # DEBUG
             if not match or len(correct_new_lexicon_entries) > 0:
                 if len(correct_new_lexicon_entries) > 0:
                     num_genlex_only += 1
-                # print "\ttraining example generated:"  # DEBUG
-                # print "\t\tcorrect_parse: "+self.print_parse(correct_parse.node, show_category=True)  # DEBUG
-                # print "\t\tcorrect_new_lexicon_entries: "+str(correct_new_lexicon_entries)  # DEBUG
-                # print "\t\ty: "+self.print_parse(y, show_category=True)  # DEBUG
+                print "\ttraining example generated:"  # DEBUG
+                print "\t\tcorrect_parse: "+self.print_parse(correct_parse.node, show_category=True)  # DEBUG
+                print "\t\tcorrect_new_lexicon_entries: "  # DEBUG
+                for sf, sem in correct_new_lexicon_entries:  # DEBUG
+                    print "\t\t\t'"+sf+"':- "+self.print_parse(sem, show_category=True)  # DEBUG
+                print "\t\ty: "+self.print_parse(y, show_category=True)  # DEBUG
                 t.append([x, chosen_parse, correct_parse, chosen_new_lexicon_entries, correct_new_lexicon_entries])
         print "\tmatched "+str(num_matches)+"/"+str(len(d))  # DEBUG
         print "\ttrained "+str(num_trainable)+"/"+str(len(d))  # DEBUG
@@ -343,20 +426,63 @@ class CKYParser:
         print "\tfailed "+str(num_fails)+"/"+str(len(d))  # DEBUG
         return t, num_fails
 
+    # yields the next most likely CKY parse generated after discriminative re-ranking of top k
+    # such CKY parses; values yielded are (parse, score, new_lex_entry) tuples
+    def most_likely_reranked_cky_parse(self, cky_parse_generator, k):
+
+        # get up to top k candidates
+        candidates = []
+        candidate = next(cky_parse_generator)
+        for i in range(0, k):
+            if candidate[0] is not None:
+                candidates.append(candidate)
+                candidate = next(cky_parse_generator)
+            else:
+                break
+
+        # use discriminative re-ranker to update scores and find new best candidate
+        scores = []  # from idx to new score
+        for idx in range(0, len(candidates)):
+            scores.append(candidates[idx][1] + self.theta.get_semantic_score(candidates[idx][0]))
+
+        # yield best candidate and replace it through generation
+        best_idx = 0
+        for candidate in cky_parse_generator:
+            for idx in range(0, len(candidates)):
+                if scores[idx] > scores[best_idx]:
+                    best_idx = idx
+            yield candidates[best_idx][0], scores[best_idx], candidates[best_idx][2]
+            del candidates[best_idx]
+            del scores[best_idx]
+            if candidate[0] is not None:
+                candidates.append(candidate)
+                scores.append(candidates[best_idx][1] + self.theta.get_semantic_score(candidates[best_idx][0]))
+            best_idx = 0
+
+        # yield remaining best candidates in order
+        score_dict = {idx: scores[idx] for idx in range(0, len(scores))}
+        for idx, score in sorted(score_dict.items(), key=operator.itemgetter(1), reverse=True):
+            yield candidates[idx][0], score, candidates[idx][2]
+
+        # out of candidates
+        yield None, neg_inf, []
+
     # yields the next most likely CKY parse of tokens tks
     # if the root of the tree is known (during supervised training, for example),
     # providing it as an argument to this method allows top-down generation
     # to find new lexical entries for surface forms not yet recognized
-    def most_likely_cky_parse(self, s, known_root=None):
+    def most_likely_cky_parse(self, s, known_root=None, max_beam=sys.maxint):
 
         tk_seqs = self.tokenize(s)
+        # print "number of token sequences for '"+s+"': "+str(len(tk_seqs))  # DEBUG
         # print "tk_seqs: "+str(tk_seqs)  # DEBUG
 
         ccg_parse_tree_generator = self.most_likely_ccg_parse_tree(tk_seqs)
         # get next most likely CCG parse tree out of CKY algorithm
         ccg_tree, tree_score, tks = next(ccg_parse_tree_generator)
         # ccg_tree indexed by spans (i, j) valued at [CCG category, left span, right span]
-        while ccg_tree is not None:
+        attempts = 0
+        while ccg_tree is not None and attempts < max_beam:
 
             # print "ccg tree: "  # DEBUG
             # for span in ccg_tree:  # DEBUG
@@ -378,21 +504,17 @@ class CKYParser:
                     #     yield parse_tree
                     parse_tree, new_lexicon_entries = next(parse_tree_generator)
                     while parse_tree is not None:
-                        if known_root is None:
-                            yield parse_tree
-                        else:
-                            yield parse_tree, new_lexicon_entries
+                        parse_score = tree_score + leaves_score
+                        yield parse_tree, parse_score, new_lexicon_entries
                         parse_tree, new_lexicon_entries = next(parse_tree_generator)
 
                     parse_leaves, leaves_score = next(semantic_assignment_generator)
 
+            attempts += 1
             ccg_tree, tree_score, tks = next(ccg_parse_tree_generator)
 
         # out of parse trees to try
-        if known_root is None:
-            yield None
-        else:
-            yield None, []
+        yield None, neg_inf, []
 
     # yields the next most likely assignment of semantic values to ccg nodes
     # returns None if leaf assignments cannot propagate to root
@@ -644,6 +766,7 @@ class CKYParser:
 
         ccg_parse_tree_generators = [self.most_likely_ccg_parse_tree_given_tokens(tks) for tks in tk_seqs]
         best_per_seq = [next(ccg_parse_tree_generators[idx]) for idx in range(0, len(tk_seqs))]
+        leaf_sense_limits = [0 for _ in range(0, len(tk_seqs))]
 
         best_idx = 0
         tied_idxs = [0]
@@ -659,18 +782,33 @@ class CKYParser:
                     best_idx = idx
             yield best_per_seq[best_idx][0], best_per_seq[best_idx][1], tk_seqs[best_idx]
             candidate, score = next(ccg_parse_tree_generators[best_idx])
+            empty = True
             if candidate is not None:
                 best_per_seq[best_idx] = [candidate, score]
+                empty = False
             else:
+                if leaf_sense_limits[best_idx] < math.sqrt(len(tk_seqs[best_idx])):
+                    leaf_sense_limits[best_idx] += 1
+                    ccg_parse_tree_generators[best_idx] = self.most_likely_ccg_parse_tree_given_tokens(
+                        tk_seqs[best_idx], new_sense_leaf_limit=leaf_sense_limits[best_idx])
+                    candidate, score = next(ccg_parse_tree_generators[best_idx])
+                    if candidate is not None:
+                        best_per_seq[best_idx] = [candidate, score]
+                        empty = False
+            if empty:
                 del best_per_seq[best_idx]
                 del ccg_parse_tree_generators[best_idx]
+                del leaf_sense_limits[best_idx]
                 del tk_seqs[best_idx]
+                best_idx = 0
+                tied_idxs = [0]
         yield None, neg_inf, None
 
     # yields the next most likely ccg parse tree given a set of tokens
-    def most_likely_ccg_parse_tree_given_tokens(self, tks):
+    def most_likely_ccg_parse_tree_given_tokens(self, tks, new_sense_leaf_limit=0):
 
-        # print tks  # DEBUG
+        # print "most_likely_ccg_parse_tree_given_tokens initialized with tks="+str(tks) + \
+        #       ", new_sense_leaf_limit="+str(new_sense_leaf_limit)  # DEBUG
 
         # indexed by position in span (i, j) in parse tree
         # value is list of tuples [CCG category, [left key, left index], [right key, right index], score]
@@ -681,7 +819,13 @@ class CKYParser:
         # receive arbitrary matching syntax categories given neighbors during CKY
         missing = []
 
+        # values are positions in span (i, j) in parse tree
+        # value is present if span is present in lexicon but eligible to receive arbitrary matching syntax
+        # categories given neighbors during CKY for purposes of multi-sense detection
+        sense_leaf_keys = []
+
         # assign leaf values
+        max_entries = [None, None]  # track which span has the most lexical entries
         for idx in range(0, len(tks)):
             pos = (idx, idx+1)
             chart[pos] = []
@@ -690,10 +834,27 @@ class CKYParser:
                 cats = [self.lexicon.semantic_forms[sem_idx].category for sem_idx in self.lexicon.entries[sf_idx]]
                 for cat in cats:
                     score = self.theta.CCG_given_token[(cat, sf_idx)] \
-                        if (cat, sf_idx) in self.theta.CCG_given_token else 0
+                        if (cat, sf_idx) in self.theta.CCG_given_token else neg_inf
                     chart[pos].append([cat, None, None, score])
+                if max_entries[1] is None or max_entries[1] < len(self.lexicon.entries[sf_idx]):
+                    max_entries[0] = pos
+                    max_entries[1] = len(self.lexicon.entries[sf_idx])
             else:
                 missing.append(pos)
+
+        # assign sense leaves based on max entries
+        for i in range(0, new_sense_leaf_limit):
+            if max_entries[0] is not None:
+                sense_leaf_keys.append(max_entries[0])
+            max_entries = [None, None]
+            for idx in range(0, len(tks)):
+                pos = (idx, idx+1)
+                if pos not in missing:
+                    sf_idx = self.lexicon.surface_forms.index(tks[idx])
+                    if (pos not in sense_leaf_keys and
+                            (max_entries[0] is not None or max_entries[1] < len(self.lexicon.entries[sf_idx]))):
+                        max_entries[0] = pos
+                        max_entries[1] = len(self.lexicon.entries[sf_idx])
 
         # print "leaf chart: "+str(chart)  # DEBUG
         # print "leaf missing: "+str(missing)  # DEBUG
@@ -733,7 +894,8 @@ class CKYParser:
                     for branch_idx in range(0, 2):
                         m_idx = branch_idx
                         p_idx = 0 if branch_idx == 1 else 1
-                        if lr_keys[m_idx] in missing and lr_keys[p_idx] not in missing:
+                        if ((lr_keys[m_idx] in sense_leaf_keys or lr_keys[m_idx] in missing)
+                                and lr_keys[p_idx] not in missing):
                             # print "searching for matches for missing "+str(lr_keys[m_idx]) + \
                             #       " against present "+str(lr_keys[p_idx])  # DEBUG
                             # investigate syntax for leaf m that can consume or be consumed by p
@@ -744,9 +906,12 @@ class CKYParser:
                                 for prod in self.theta.CCG_production:
                                     # leaf m can be be combine with p
                                     if prod[lr_idxs[p_idx]] == p[0]:
-                                        m = [prod[lr_idxs[m_idx]], None, None, 0.0]  # new, even probability entries
+                                        # give zero probability to new entries so they get explored after all
+                                        # known lexical options have been explored
+                                        m_score = neg_inf
+                                        m = [prod[lr_idxs[m_idx]], None, None, m_score]
                                         chart[lr_keys[m_idx]].append(m)
-                                        new_score = self.theta.CCG_production[prod] + p[3]
+                                        new_score = self.theta.CCG_production[prod] + p[3] + m[3]
                                         new_entry = [prod[0], None, None, new_score]
                                         new_entry[lr_idxs[m_idx]] = [lr_keys[m_idx], len(chart[lr_keys[m_idx]])-1]
                                         new_entry[lr_idxs[p_idx]] = [lr_keys[p_idx], idx]
@@ -761,6 +926,7 @@ class CKYParser:
 
         # return most likely trees in order at root
         key = (0, len(tks))
+        # print "\tnumber of roots to yield: "+str(len(chart[key]))  # DEBUG
         while len(chart[key]) > 0:
 
             # pop best root
@@ -786,6 +952,8 @@ class CKYParser:
                 tree[new_key] = tree_add
 
             # yield the current tree and remove the previous root from the structure
+            # print "most_likely_ccg_parse_tree_given_tokens with tks="+str(tks) + \
+            #   ", new_sense_leaf_limit="+str(new_sense_leaf_limit)+" yielding"  # DEBUG
             yield tree, chart[key][best_idx][3]  # return tree and score
             del chart[key][best_idx]
 
@@ -1313,10 +1481,14 @@ class CKYParser:
                 to_cover = range(0, len(str_parts))
                 while i < len(str_parts):
                     span_len = 0
+                    # allows only multi-word spans over unknown tokens
                     unk = True if str_parts[i] not in self.lexicon.surface_forms else False
+                    # if flag set to true, allows multi-word spans over all tokens
+                    allow_known_span = True
                     while (span_len < max_span_length[sp] and i+span_len < len(str_parts)
                            and (" ".join(str_parts[i:i+span_len+1]) in self.lexicon.surface_forms or
-                                (unk and str_parts[i+span_len] not in self.lexicon.surface_forms))):
+                                (unk and str_parts[i+span_len] not in self.lexicon.surface_forms) or
+                                allow_known_span)):
                         span_len += 1
                     if span_len == max_span_length[sp]:
                         tokenization.append(' '.join(str_parts[i:i+span_len]))
