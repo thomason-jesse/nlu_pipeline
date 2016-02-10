@@ -4,10 +4,10 @@ import os
 import sys
 import time
 
-tests = [('cky_parser_basics',
+tests = [('aish',
+          'python tests/aish/main.py tests/aish/ont.txt tests/aish/lex.txt tests/aish/samples.txt'),
+         ('cky_parser_basics',
           'python tests/cky_parser_basics/main.py tests/cky_parser_basics/ont.txt tests/cky_parser_basics/lex.txt tests/cky_parser_basics/samples.txt'),
-         ('parser_basics',
-          'python tests/parser_basics/main.py tests/parser_basics/ont.txt tests/parser_basics/lex.txt tests/parser_basics/samples.txt'),
         ('grounding_recall',
           'rosrun nlu_pipeline src/tests/grounding_recall/main.py tests/grounding_recall/ont.txt tests/grounding_recall/lex.txt tests/grounding_recall/samples.txt'),
         ('action_grounding',

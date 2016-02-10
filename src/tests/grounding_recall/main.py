@@ -4,7 +4,10 @@ __author__ = 'jesse'
 import sys
 
 sys.path.append('.')  # necessary to import local libraries
-import Ontology, Lexicon, FeatureExtractor, LinearLearner, Parser, KBGrounder
+import Ontology
+import Lexicon
+import CKYParser
+import KBGrounder
 
 print "reading in Ontology"
 ont = Ontology.Ontology(sys.argv[1])
@@ -19,17 +22,11 @@ print "categories: " + str(lex.categories)
 print "semantic forms: " + str(lex.semantic_forms)
 print "entries: " + str(lex.entries)
 
-print "instantiating Feature Extractor"
-f_extractor = FeatureExtractor.FeatureExtractor(ont, lex)
-
-print "instantiating Linear Learner"
-learner = LinearLearner.LinearLearner(ont, lex, f_extractor)
-
 print "instantiating KBGrounder"
 grounder = KBGrounder.KBGrounder(ont)
 
 print "instantiating Parser"
-parser = Parser.Parser(ont, lex, learner, grounder, beam_width=100)
+parser = CKYParser.CKYParser(ont, lex, grounder)
 
 f = open(sys.argv[3])
 f_lines = f.readlines()
@@ -47,7 +44,6 @@ while i < len(f_lines):
     g = []
     for [p, spr, trace, s] in k_best:
         print str(s) + ":\nparse: " + parser.print_parse(p)
-        print "Parse Tree:\n" + parser.print_semantic_parse_result(spr) + "\n"
         print "running grounder on parse..."
         new_g = grounder.groundSemanticNode(p, [], [], [])
         print new_g

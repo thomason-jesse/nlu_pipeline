@@ -22,10 +22,10 @@ class Parameters:
         self._lexicon_entry_given_token_counts = self.init_lexicon_entry()
         self._semantic_counts = self.init_semantic()
 
-        print "_CCG_given_token_counts: "+str(self._CCG_given_token_counts)  # DEBUG
-        print "_CCG_production_counts: "+str(self._CCG_production_counts)  # DEBUG
-        print "_lexicon_entry_counts: "+str(self._lexicon_entry_given_token_counts)  # DEBUG
-        print "_semantic_counts: "+str(self._semantic_counts)  # DEBUG
+        # print "_CCG_given_token_counts: "+str(self._CCG_given_token_counts)  # DEBUG
+        # print "_CCG_production_counts: "+str(self._CCG_production_counts)  # DEBUG
+        # print "_lexicon_entry_counts: "+str(self._lexicon_entry_given_token_counts)  # DEBUG
+        # print "_semantic_counts: "+str(self._semantic_counts)  # DEBUG
 
         # calculate probability tables from counts
         # note that this needs to happen every time counts are updated
@@ -37,10 +37,10 @@ class Parameters:
         # update probabilities given new counts
         self.update_probabilities()
 
-        print "CCG_given_token: "+str(self.CCG_given_token)  # DEBUG
-        print "CCG_production: "+str(self.CCG_production)  # DEBUG
-        print "lexicon_entry: "+str(self.lexicon_entry_given_token)  # DEBUG
-        print "semantic: "+str(self.semantic)  # DEBUG
+        # print "CCG_given_token: "+str(self.CCG_given_token)  # DEBUG
+        # print "CCG_production: "+str(self.CCG_production)  # DEBUG
+        # print "lexicon_entry: "+str(self.lexicon_entry_given_token)  # DEBUG
+        # print "semantic: "+str(self.semantic)  # DEBUG
 
     # update the probability tables given counts
     def update_probabilities(self):
@@ -266,26 +266,26 @@ class Parameters:
                         parameter_structures[i][y_key] = 0
                     parameter_structures[i][y_key] += z_val - y_val
 
-        print "_CCG_given_token_counts: "+str(self._CCG_given_token_counts)  # DEBUG
-        print "_CCG_production_counts: "+str(self._CCG_production_counts)  # DEBUG
-        print "_lexicon_entry_counts: "+str(self._lexicon_entry_given_token_counts)  # DEBUG
-        print "_semantic_counts: "+str([str((self.ontology.preds[pred] if type(pred) is int else pred,
-                                             self.ontology.preds[arg] if type(arg) is int else arg,
-                                             str(pos)))+": " +
-                                       str(self._semantic_counts[(pred, arg, pos)])
-                                       for pred, arg, pos in self._semantic_counts])  # DEBUG
+        # print "_CCG_given_token_counts: "+str(self._CCG_given_token_counts)  # DEBUG
+        # print "_CCG_production_counts: "+str(self._CCG_production_counts)  # DEBUG
+        # print "_lexicon_entry_counts: "+str(self._lexicon_entry_given_token_counts)  # DEBUG
+        # print "_semantic_counts: "+str([str((self.ontology.preds[pred] if type(pred) is int else pred,
+        #                                      self.ontology.preds[arg] if type(arg) is int else arg,
+        #                                      str(pos)))+": " +
+        #                                str(self._semantic_counts[(pred, arg, pos)])
+        #                                for pred, arg, pos in self._semantic_counts])  # DEBUG
 
         # update probabilities given new counts
         self.update_probabilities()
 
-        print "CCG_given_token: "+str(self.CCG_given_token)  # DEBUG
-        print "CCG_production: "+str(self.CCG_production)  # DEBUG
-        print "lexicon_entry: "+str(self.lexicon_entry_given_token)  # DEBUG
-        print "semantic: "+str([str((self.ontology.preds[pred] if type(pred) is int else pred,
-                                    self.ontology.preds[arg] if type(arg) is int else arg,
-                                    str(pos)))+": " +
-                                str(self.semantic[(pred, arg, pos)])
-                                for pred, arg, pos in self.semantic])  # DEBUG
+        # print "CCG_given_token: "+str(self.CCG_given_token)  # DEBUG
+        # print "CCG_production: "+str(self.CCG_production)  # DEBUG
+        # print "lexicon_entry: "+str(self.lexicon_entry_given_token)  # DEBUG
+        # print "semantic: "+str([str((self.ontology.preds[pred] if type(pred) is int else pred,
+        #                             self.ontology.preds[arg] if type(arg) is int else arg,
+        #                             str(pos)))+": " +
+        #                         str(self.semantic[(pred, arg, pos)])
+        #                         for pred, arg, pos in self.semantic])  # DEBUG
 
 
 # take in ParseNode y to calculate (surface forms idx, semantic forms idx) pairs
