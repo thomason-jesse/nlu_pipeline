@@ -26,6 +26,9 @@ class SummaryState :
                 self.second_hypothesis_prob = max(inverse)[0]
                 self.second_hypothesis = max(inverse)[1]
 
+    def __str__(self) :
+        return str(self.get_feature_vector())
+
     # Ordered list of features
     #     - Probability of top hypothesis
     #     - Probability of second hypothesis

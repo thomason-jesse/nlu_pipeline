@@ -1,6 +1,10 @@
 __author__ = 'aishwarya'
 
-import sys, random, math, copy
+import sys, random, math, copy, ast
+from os import listdir
+from os.path import isfile, join
+import numpy as np
+
 from Knowledge import Knowledge
 from HISBeliefState import HISBeliefState
 from SummaryState import SummaryState
@@ -12,14 +16,15 @@ from Action import Action
 from TemplateBasedGenerator import TemplateBasedGenerator
 from Utils import *
 
-class PomdpDialogAgent :
+# This class is supposed to read log files and convert them into a form 
+# that can be used for training a policy. It requires the ability to 
+# perform the NL understanding and belief monitoring.
+class PomdpTrainer :
 
-    def __init__(self, parser, grounder, u_input, output, parse_depth=10, load_policy_from_file=False):
+    def __init__(self, parser, grounder, parse_depth=10, load_policy_from_file=False):
         self.parser = parser
         self.grounder = grounder
         self.parse_depth = parse_depth
-        self.input = u_input
-        self.output = output
         self.generator = TemplateBasedGenerator()
 
         self.knowledge = Knowledge()    
@@ -28,98 +33,102 @@ class PomdpDialogAgent :
         self.previous_system_action = SystemAction('repeat_goal')  
         self.n_best_utterances = None
 
-        # define action names and functions they correspond to
-        self.dialog_actions = self.knowledge.system_dialog_actions
-        self.dialog_action_functions = [self.request_user_initiative, self.confirm_action, self.request_missing_param]
-
         self.first_turn = True
         
         # To store data for retraining the parser
         self.parser_train_data = None
         self.max_prob_user_utterances = None
-        
-        # Logging for future use
-        self.final_action_log = None
-        self.lexical_addition_log = None
 
-    # Returns True if the dialog terminates on its own and False if the u
-    # user entered stop
-    def run_dialog(self) :
-        self.state = HISBeliefState(self.knowledge)
-        self.parser_train_data = dict()
-        self.max_prob_user_utterances = list()
-        
-        print 'Belief state: ', str(self.state) 
-        summary_state = SummaryState(self.state)
-        (dialog_action, dialog_action_arg) = self.policy.get_initial_action(summary_state)    
-        
-        while True :
-            self.state.increment_dialog_turns()
-            if dialog_action == 'take_action' :
-                # Submit the action given by the policy
-                action = dialog_action_arg
-                #self.output.say("Action: " + str(action))
-                output = self.generator.get_action_sentence(action, self.final_action_log)
-                self.output.say(output + " Was this the correct action?")
-                response = self.input.get().lower()  
-                if response == '<ERROR/>' :
-                    return False  
-                if response.lower() == 'y' or response.lower() == 'yes' :
-                    self.policy.update_final_reward(self.knowledge.correct_action_reward)
-                    self.train_parser_from_dialogue(action)
-                else :
-                    self.policy.update_final_reward(self.knowledge.wrong_action_reward)
-                    return False
-                return True
+    def train_from_old_logs(self, success_dir, fail_dir) :
+        success_files = [f for f in listdir(success_dir) if isfile(join(success_dir, f))]
+        fail_files = [f for f in listdir(fail_dir) if isfile(join(fail_dir, f))]
+        success_idx = 0
+        fail_idx = 0
+        while success_idx < len(success_files) or fail_idx < len(fail_files) :
+            r = np.random.uniform()
+            if r < 0.5 :
+                fname = success_dir + '/' + success_files[success_idx]
+                self.train_policy_from_single_old_log(fname, True)
+                success_idx += 1
             else :
-                self.previous_system_action = dialog_action_arg
-                print 'System action - '
-                print str(self.previous_system_action)
-                # Take the dialog action
-                response = self.dialog_action_functions[self.dialog_actions.index(dialog_action)]()
-                if response == '<ERROR/>' :
-                    return False
-                if response == 'stop' :
-                    self.policy.update_final_reward(self.knowledge.wrong_action_reward)
-                    return False
-                # Belief monitoring - update belief based on the response
-                self.update_state(response)
-                print 'Belief state: ', str(self.state) 
-                
-                reward = self.knowledge.per_turn_reward
-                summary_state = SummaryState(self.state)
-                # Get the next action from the policy
-                (dialog_action, dialog_action_arg) = self.policy.get_next_action(reward, summary_state)
-                #print 'dialog_action = ', dialog_action
-                #print str(dialog_action_arg)
-            self.first_turn = False
+                fname = fail_dir + '/' + fail_files[fail_idx]
+                self.train_policy_from_single_old_log(fname, False)
+                fail_idx += 1
+            
+
+    # Train the policy using logs from the IJCAI 2015 experiment
+    # This makes assumptions on the formatting of the logs
+    def train_policy_from_single_old_log(self, conv_log_name, dialogue_successful=True) :
+        conv_log = open(conv_log_name, 'r')
+        self.max_prob_user_utterances = list()
+        self.parser_train_data = dict()
+        for line in conv_log :
+            parts = line.split('\t')
+            print '---------------------------------------'
+            print 'parts = ', parts
+            print '---------------------------------------'
+            if parts[0] == 'USER' :
+                if self.previous_system_action is not None :
+                    prev_state = SummaryState(self.state)
+                    response = parts[1]
+                    print 'Updating state for response :', response
+                    self.update_state(response)
+                    next_state = SummaryState(self.state)
+                    print '---------------------------------------'
+                    print '---------------------------------------'
+                    print 'prev_state : ', str(prev_state)
+                    print '---------------------------------------'
+                    print 'action : ', str(self.previous_system_action)
+                    print '---------------------------------------'
+                    print 'next_state : ', str(next_state)
+                    print '---------------------------------------'
+                    self.policy.train(prev_state, self.previous_system_action.action_type, next_state, self.knowledge.per_turn_reward)
+                    self.previous_system_action = None
+            else :
+                if len(parts) != 6 :
+                    continue
+                # Create system action and set as prev system action
+                if parts[4] == 'user_initiative' :
+                    self.previous_system_action = SystemAction('repeat_goal')
+                elif parts[4] == 'system_initiative' :
+                    # Disambiguate between confirm and request missing param
+                    details = ast.literal_eval(parts[3])
+                    goal = None
+                    params = dict()
+                    if details[0] == 'at' :
+                        goal = 'at'
+                        if details[2] is not None :
+                            params['location'] = details[2].strip().split(':')[0]
+                    elif details[0] == 'served' :
+                        goal = 'bring'
+                        if details[1] is not None :
+                            params['patient'] = details[1].strip().split(':')[0]
+                        if details[2] is not None :
+                            params['recipient'] = details[2].strip().split(':')[0]
+                    target = parts[5].strip()
+                    details_header = ['action', 'patient', 'recipient']
+                    if target in details_header :
+                        if details[details_header.index(target)] is None :
+                            action_type = 'request_missing_param'
+                        else :
+                            action_type = 'confirm_action'
+                        self.previous_system_action = SystemAction(action_type, goal, params)
+                    else :
+                        self.previous_system_action = None
+                else :
+                    # Not useful dialogue steps. Mostly robot politeness
+                    self.previous_system_action = None
+                print '---------------------------------------'
+                print 'action : ', str(self.previous_system_action)
+                print '---------------------------------------'
         
-    # Request the user to state/repeat their goal
-    def request_user_initiative(self):
-        if self.first_turn :
-            self.previous_system_action.extra_data = ['first']
-        output = self.generator.get_sentence(self.previous_system_action)
-        print 'output = ', output
-        self.output.say(output)
-        response = self.input.get()
-        if 'full' in self.parser_train_data :
-            self.parser_train_data['full'].append(response)
+        # Need to feed it with terminal reward
+        prev_state = SummaryState(self.state)
+        if dialogue_successful :
+            self.policy.train(prev_state, 'take_action', None, self.knowledge.correct_action_reward)
         else :
-            self.parser_train_data['full'] = [response]
-        return response
-
-    # Request a missing action parameter
-    def request_missing_param(self):
-        output = self.generator.get_sentence(self.previous_system_action)
-        self.output.say(output)
-        response = self.input.get()
-        param_name = self.previous_system_action.extra_data[0]
-        if param_name in self.parser_train_data :
-            self.parser_train_data[param_name].append(response)
-        else :
-            self.parser_train_data[param_name] = [response]
-        return response
-
+            self.policy.train(prev_state, 'take_action', None, self.knowledge.wrong_action_reward)
+             
     # Parse the user response and update belief state
     def update_state(self, response) :
         # get n best parses for confirmation
@@ -153,29 +162,6 @@ class PomdpDialogAgent :
                 print '\tParse = ', self.parser.print_parse(utterance.parse)
             self.state.update(self.previous_system_action, self.n_best_utterances, self.grounder)
             print 'Updated'
-
-    # Confirm a (possibly partial) action
-    def confirm_action(self):
-        # with reverse parsing, want to confirm(a.name(a.params))
-        # for now, just use a.name and a.params raw
-        #system_action = self.previous_system_action
-        #params = []
-        #goal = system_action.referring_goal
-        #if system_action.referring_params is not None :
-            #param_order = self.knowledge.param_order[goal]
-            #for param_name in param_order :
-                #if param_name in system_action.referring_params :
-                    #params.append(system_action.referring_params[param_name])
-        #if goal is None :
-            #self.output.say("I should take action involving " +
-                        #','.join([str(p) for p in params if p is not None]) + "?")
-        #else :
-            #self.output.say("I should take action " + goal +" involving " +
-                        #','.join([str(p) for p in params if p is not None]) + "?")
-        output = self.generator.get_sentence(self.previous_system_action)
-        self.output.say(output)                        
-        response = self.input.get()
-        return response
 
     # Converts an object of type Action to type Utterance assuming it is
     # informing the system of goal and param details

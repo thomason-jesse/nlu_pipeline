@@ -33,7 +33,7 @@ class PomdpKtdqPolicy :
         self.knowledge = knowledge
         
         # Calculate number of features
-        self.n = 5
+        self.n = 3
         self.n += len(self.knowledge.ktdq_rbf_centres)
         self.n += len(self.knowledge.goal_actions)
         self.n += len(self.knowledge.goal_params) + 1
@@ -50,6 +50,10 @@ class PomdpKtdqPolicy :
         self.P_n = self.knowledge.ktdq_P_n
         self.kappa = self.knowledge.ktdq_kappa
         self.gamma = self.knowledge.gamma 
+        
+        self.cleaning_epsilon = self.knowledge.ktdq_cleaning_epsilon
+        self.alpha = self.knowledge.ktdq_alpha
+        self.beta = self.knowledge.ktdq_beta
 
     # Convert the summary state feature vector b to the features used by
     # the algorithm and get feature vector for the case when action is a
@@ -85,9 +89,8 @@ class PomdpKtdqPolicy :
         
         # Do the top and second hypothesis use the same partition: yes/no  
         s6 = orig_feature_vector[5]
-        # Delta function for each possible value
-        for value in ['yes', 'no'] :
-            new_state_feature_vector.append(int(s6 == value))
+        # 0-1 : Do the top and second hypothesis use the same partition?
+        new_state_feature_vector.append(int(s6 == 'yes'))
 
         # Type of last user utterance - inform_full/inform_param/affirm/deny        
         s7 = orig_feature_vector[6]
@@ -113,6 +116,8 @@ class PomdpKtdqPolicy :
     # Calculate Q(b, a) using current parameters
     def calc_q(self, b, a) :
         f = self.get_feature_vector(b, a)
+        print 'f = ', f.shape
+        print 'self.theta = ', self.theta.shape
         return (f.T * self.theta).item(0, 0)
                 
     # Pick a random action that is valid for the current state 
@@ -157,16 +162,21 @@ class PomdpKtdqPolicy :
     
     # Defines the current policy
     def pi(self, b) :
-        candidate_actions = self.get_candidate_actions(b)
-        max_q = -sys.maxint
-        best_action = None
-        for a in candidate_actions :
-            q = self.calc_q(b, a)
-            if q >= max_q :
-                max_q = q
-                best_action = a
-        # Greedy policy            
-        return best_action        
+        r = np.random.uniform()
+        if r < self.knowledge.ktdq_epsilon :
+            # Pick random action
+            return self.get_random_action(b)
+        else :
+            candidate_actions = self.get_candidate_actions(b)
+            max_q = -sys.maxint
+            best_action = None
+            for a in candidate_actions :
+                q = self.calc_q(b, a)
+                if q >= max_q :
+                    max_q = q
+                    best_action = a
+            # Greedy action            
+            return best_action        
     
     def get_initial_action(self, initial_state) :
         a = 'repeat_goal'
@@ -176,52 +186,131 @@ class PomdpKtdqPolicy :
         a = self.pi(current_state)
         return (a, self.get_system_action_requirements(a, current_state))
     
+    def update_final_reward(self, reward) :
+        pass
+    
+    def check_covariance_matrix(self, m) :
+        n = m.shape[0]
+        #for i in range(n) :
+            #if m[i, i] < 0 :
+                #print 'Diagonal element is < 0'
+                #print 'C = ', self.C
+                #sys.exit(1)
+        for i in range(n) :
+            for j in range(n) :
+                if m[i, j] != m[j, i] :
+                    print 'Matrix not symmetric'
+                    sys.exit(1)
+        (eig_vals, eig_vectors) = np.linalg.eig(m)
+        for eig_val in eig_vals :
+            if type(eig_val) in [np.complex_, np.complex64, np.complex128] :
+                print 'Complex eigen value'
+                #print 'C = ', self.C
+                sys.exit(1)
+            elif eig_val < -0.0001 :
+                print 'Negative eigen value'
+                sys.exit(1)
+   
+    def compute_sigma_points(self) :
+        theta = list()
+        w = list()
+        
+        ktdq_lambda = (self.alpha ** 2) * (self.n + self.kappa) - self.n
+        
+        matrix_to_decompose = (self.n + ktdq_lambda) * self.P
+        #print 'matrix_to_decompose = ', matrix_to_decompose
+        #self.check_covariance_matrix(matrix_to_decompose)
+        cholesky_decomposition = np.linalg.cholesky(matrix_to_decompose)
+        
+        for j in range(0, 2 * self.n + 1) :
+            if j == 0 :
+                theta_j = self.theta
+                #w_j = self.kappa / (self.n + self.kappa)
+                #w_j = (w_j / (self.alpha * self.alpha)) + (1.0 / (self.alpha * self.alpha)) - 1
+                w_j = ktdq_lambda / self.n + ktdq_lambda
+            elif j <= self.n :
+                # Add j^th column of cholesky decomposition
+                theta_j = self.theta + cholesky_decomposition[:, j-1]
+                #w_j = 1.0 / (self.n + self.kappa)
+                #w_j = (w_j / (self.alpha * self.alpha))
+                w_j = 1.0 / 2 * (self.n + ktdq_lambda)
+            else :
+                # Subtract (j-n)^th column of cholesky decomposition
+                theta_j = self.theta - cholesky_decomposition[:, j-self.n-1]
+                #w_j = 1.0 / 2 * (self.n + self.kappa)
+                #w_j = (w_j / (self.alpha * self.alpha))
+                w_j = 1.0 / 2 * (self.n + ktdq_lambda)
+                
+            #theta_j = self.theta + self.alpha * (theta_j - self.theta)
+                
+            theta.append(theta_j)
+            w.append(w_j)
+                
+            #a = np.random.multivariate_normal(np.array(self.theta.flatten()).flatten(), self.P)
+            #theta.append(np.matrix(np.reshape(a, (a.size, 1))))
+            #w.append(1)    
+        return (theta, w)
+    
     # Train on a single example (b, a, b', r)
-    # b' is actually not necessary and will be None if the episode 
-    # terminates with action a at b
     def train(self, b, a, b_prime, r) :
+        #print 'theta = ', self.theta
+        #print 'P = ', self.P
+        #raw_input()
+        
         # Prediction step
         P_v = self.eta * self.P     
         self.P = self.P + P_v       
-        
-        matrix_to_decompose = (self.n + self.kappa) * self.P
-        cholesky_decomposition = np.linalg.cholesky(matrix_to_decompose)
         
         # Calculate sigma points - thetas, weights - w for unscented transform
         # Calculate statistics at the same time
         r_hat = 0
         P_theta_r = self.get_zero_vector(self.n)
         P_r = self.P_n
+        (theta, w) = self.compute_sigma_points()
         for j in range(0, 2 * self.n + 1) :
+            f = self.get_feature_vector(b, a)
+            r_j = (f.T * theta[j]).item(0, 0)
+            
+            if b_prime is not None :
+                # If it is a non-terminal state account for future rewards
+                max_q = -sys.maxint
+                for a_prime in self.get_candidate_actions(b_prime) :
+                    f = self.get_feature_vector(b_prime, a_prime)            
+                    q = (f.T * theta[j]).item(0, 0)
+                    if q > max_q :
+                        max_q = q
+                f = self.get_feature_vector(b, a)        
+                r_j -= self.gamma * max_q
+            
+            r_hat += r_j * w[j]
+
             if j == 0 :
-                theta_j = self.theta
-                w_j = self.kappa / (self.n + self.kappa)
-            elif j <= self.n :
-                # Add j^th column of cholesky decomposition
-                theta_j = self.theta + cholesky_decomposition[:, j-1]
-                w_j = 1.0 / (self.n + self.kappa)
+                P_r += (w[j] + 1 - (self.alpha ** 2) + self.beta) * (r_j - r_hat) * (r_j - r_hat)
+                P_theta_r += ((w[j] + 1 - (self.alpha ** 2) + self.beta) * (r_j - r_hat)) * (theta[j] - self.theta)
             else :
-                # Subtract (j-n)^th column of cholesky decomposition
-                theta_j = self.theta - cholesky_decomposition[:, j-self.n-1]
-                w_j = 1.0 / (self.n + self.kappa)
-            
-            max_q = -sys.maxint
-            for a_prime in self.get_candidate_actions(b) :
-                f = self.get_feature_vector(b, a_prime)            
-                q = (f.T * theta_j).item(0, 0)
-                if q > max_q :
-                    max_q = q
-            f = self.get_feature_vector(b, a)        
-            r_j = (f.T * theta_j).item(0, 0) - self.gamma * max_q
-            
-            r_hat += r_j * w_j
-            P_theta_r += (w_j * (r_j - r_hat)) * (theta_j - self.theta)
-            P_r += w_j * (r_j - r_hat) * (r_j - r_hat)
+                P_r += w[j] * (r_j - r_hat) * (r_j - r_hat)
+                P_theta_r += (w[j] * (r_j - r_hat)) * (theta[j] - self.theta)
         
+        #print 'P_r = ', P_r
+        #raw_input()
+        #print 'P_theta_r = ', P_theta_r
+        #raw_input()
         # Correction step    
         K = (1.0 / P_r) * P_theta_r
+        #print 'K = ', K
+        #raw_input()
         self.theta += K * (r - r_hat)
         self.P -= P_r * (K * K.T)
+        #print 'theta = ', self.theta
+        #raw_input()
+        #print 'P = ', self.P
+        #raw_input()
+        
+        # Clean up to keep P positive definite
+        #self.P = 0.5 * self.P + 0.5 * self.P.T
+        #self.P = self.P + self.cleaning_epsilon * np.eye(self.n)
+        
+        self.save_vars()
 
     # A util to get a zero vector because the command is non-intuitive        
     def get_zero_vector(self, size) :

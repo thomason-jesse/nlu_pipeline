@@ -102,16 +102,21 @@ class Knowledge:
     def set_params_for_ktdq(self) :
         self.ktdq_init_theta_std_dev = 0.01
         self.ktdq_lambda = 1
-        self.ktdq_eta = 0.001
-        self.ktdq_P_n = 0.1
-        self.ktdq_kappa = 1
+        self.ktdq_eta = 0
+        self.ktdq_P_n = 1
+        self.ktdq_kappa = 0
         
         rbf_points = [0.25, 0.5, 0.75]
         self.ktdq_rbf_centres = list(itertools.product(rbf_points, rbf_points))
         self.ktdq_rbf_sigma = 0.1
+        self.ktdq_epsilon = 0.1
         
         # No of turns above which a dialogue is assumed to be long
-        self.knowledge.ktdq_long_dialogue_thresh = 5 
+        self.ktdq_long_dialogue_thresh = 5 
+        
+        self.ktdq_cleaning_epsilon = 0.01
+        self.ktdq_alpha = 0.001
+        self.ktdq_beta = 2
 
     # Settings specifically for the GP-SARSA algorithm
     def set_params_for_gp_sarsa(self) :
