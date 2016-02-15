@@ -6,6 +6,8 @@ import sys
 import Action
 import StaticDialogState
 
+# TODO: Need to put a space before 's when you get a text before 
+# calling the parser
 
 class DialogAgent:
 

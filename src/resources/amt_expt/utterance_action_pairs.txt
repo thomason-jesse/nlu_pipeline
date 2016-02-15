@@ -1,8 +1,8 @@
-search walter's office for bob
+search walter 's office for bob
 M : searchroom(bob,the(lambda x:e.(hasoffice(walter,x))))
 searchroom(bob,l3_512)
 
-check frannie's office for eve
+check frannie 's office for eve
 M : searchroom(eve,the(lambda x:e.(hasoffice(frannie,x))))
 searchroom(eve,l3_510)
 
@@ -22,7 +22,7 @@ walk to 3512
 M : at(l3_512)
 at(l3_512)
 
-walk to alice's office
+walk to alice 's office
 M : at(the(lambda x:e.(hasoffice(alice,x))))
 at(l3_502)
 
