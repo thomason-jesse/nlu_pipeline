@@ -3,21 +3,3 @@ lambda x:e.(and(mug(x),brown(x)))
 
 the hollow cylindrical brown cup
 lambda x:e.(and(cup(x),and(brown(x),and(cylindrical(x),hollow(x)))))
-
-the handle-less brown mug
-lambda x:e.(and(mug(x),and(brown(x),handle-less(x))))
-
-the light brown cup
-lambda x:e.(and(cup(x),and(brown(x),light(x))))
-
-the ceramic cup
-lambda x:e.(and(cup(x),ceramic(x)))
-
-the brown toothbrush cup
-lambda x:e.(and(cup(x),and(toothbrush(x),brown(x))))
-
-the cup is brown and cylindrical
-lambda x:e.(and(cylindrical(x),and(brown(x),cup(x))))
-
-the brown toothbrush holder
-lambda x:e.(and(holder(x),and(toothbrush(x),brown(x))))

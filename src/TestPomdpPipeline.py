@@ -26,7 +26,6 @@ class InputFromKeyboard:
         text = regex.sub('', text)
         return text 
 
-
 class OutputToStdout:
     def __init__(self):
         pass
@@ -81,8 +80,7 @@ generator = Generator.Generator(ont, lex, learner, parser, beam_width=100)
 print "instantiating DialogAgent"
 u_in = InputFromKeyboard()
 u_out = OutputToStdout()
-#static_policy = StaticDialogPolicy.StaticDialogPolicy()
-#A = DialogAgent.DialogAgent(parser, grounder, static_policy, u_in, u_out)
+
 A = PomdpDialogAgent(parser, grounder, u_in, u_out)
 
 print "reading in data and training parser from actions"
