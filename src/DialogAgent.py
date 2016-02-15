@@ -9,9 +9,8 @@ import StaticDialogState
 
 class DialogAgent:
 
-    def __init__(self, parser, generator, grounder, policy, u_input, output, parse_depth=10):
+    def __init__(self, parser, grounder, policy, u_input, output, parse_depth=10):
         self.parser = parser
-        self.generator = generator
         self.grounder = grounder
         self.parse_depth = parse_depth
         self.state = None
