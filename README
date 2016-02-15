@@ -54,13 +54,11 @@ rosrun nlu_pipeline TestPomdpPipeline.py src/nlu_pipeline/src/resources/amt_expt
 
 POMDP AMT Experiment
 
-rosrun nlu_pipeline OnlineRoslibjsPipeline.py src/nlu_pipeline/src/resources/amt_expt/ont.txt src/nlu_pipeline/src/resources/amt_expt/lex.txt src/nlu_pipeline/src/resources/amt_expt/utterance_action_pairs.txt
-
-rosrun nlu_pipeline StrippedOnlineRoslibjsPipeline.py src/nlu_pipeline/src/resources/amt_expt/ont.txt src/nlu_pipeline/src/resources/amt_expt/lex.txt src/nlu_pipeline/src/resources/amt_expt/utterance_action_pairs.txt
-
-rosrun nlu_pipeline CallbackBasedOnlineRoslibjsPipeline.py src/nlu_pipeline/src/resources/amt_expt/ont.txt src/nlu_pipeline/src/resources/amt_expt/lex.txt src/nlu_pipeline/src/resources/amt_expt/utterance_action_pairs.txt
-
 rosrun nlu_pipeline DialogueServer.py src/nlu_pipeline/src/resources/amt_expt/ont.txt src/nlu_pipeline/src/resources/amt_expt/lex.txt src/nlu_pipeline/src/resources/amt_expt/utterance_action_pairs.txt
+
+Training POMDP :
+
+rosrun nlu_pipeline TrainPomdpPipeline.py src/nlu_pipeline/src/resources/amt_expt/ont.txt src/nlu_pipeline/src/resources/amt_expt/lex.txt src/nlu_pipeline/src/resources/amt_expt/utterance_action_pairs.txt
 
 Rosbridge server:
 
