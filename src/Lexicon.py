@@ -126,7 +126,6 @@ class Lexicon:
                 return []
 
     def read_lex_from_file(self, fname, allow_expanding_ont):
-
         surface_forms = []
         semantic_forms = []
         entries = []
@@ -140,7 +139,6 @@ class Lexicon:
 
     def expand_lex_from_strs(
             self, lines, surface_forms, semantic_forms, entries, pred_to_surface, allow_expanding_ont=False):
-
         for line_idx in range(0, len(lines)):
             line = lines[line_idx]
 
@@ -158,7 +156,7 @@ class Lexicon:
                 sur_idx = len(surface_forms)
                 surface_forms.append(surface_form)
                 entries.append([])
-
+                
             cat_idx, semantic_form = self.read_syn_sem(rhs, allow_expanding_ont=allow_expanding_ont)
             try:
                 sem_idx = semantic_forms.index(semantic_form)
@@ -241,7 +239,6 @@ class Lexicon:
         return idx
 
     def read_semantic_form_from_str(self, s, category, parent, scoped_lambdas, allow_expanding_ont):
-
         # the node to be instantiated and returned
         s = s.strip()
 
@@ -345,3 +342,30 @@ class Lexicon:
         if not node.validate_tree_structure():
             sys.exit("ERROR: read in invalidly linked semantic node from string '"+s+"'")  # DEBUG
         return node
+
+    def delete_semantic_form_for_surface_form(self, surface_form, ont_idx) :
+        if surface_form not in self.surface_forms :
+            return
+        matching_semantic_form = None
+        for semantic_form in self.semantic_forms :
+            if semantic_form.idx == ont_idx :
+                matching_semantic_form = semantic_form
+                break
+        if matching_semantic_form is None :
+            return
+            
+        sur_idx = self.surface_forms.index(surface_form)
+        sem_idx = self.semantic_forms.index(matching_semantic_form)
+        
+        if sur_idx in self.entries :
+            if sem_idx in self.entries[sur_idx] :
+                self.entries[sur_idx].remove(sem_idx)
+                
+        if ont_idx in self.pred_to_surface :
+            if sur_idx in self.pred_to_surface[ont_idx] :
+                self.pred_to_surface.remove(sur_idx)
+                
+        if sem_idx in self.reverse_entries :
+            if sur_idx in self.reverse_entries[sem_idx] :
+                self.reverse_entries.remove(sur_idx)
+        

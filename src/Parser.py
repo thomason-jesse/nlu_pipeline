@@ -198,7 +198,7 @@ class Parser:
             num_fails = 0
             for [x, y] in D:
                 generator_genlex = None if generator is None else [generator, x, y]
-                # print "training on pair "+str(x)+", "+self.print_parse(y, True)  # DEBUG
+                print "training on pair "+str(x)+", "+self.print_parse(y, True)  # DEBUG
                 if generator is not None:
                     generator.flush_seen_nodes()
                 chosen_parse = None
@@ -211,6 +211,7 @@ class Parser:
                     n_best = self.parse_tokens(
                         x, k, n-num_examined, none_range=[none_max, none_max+1],
                         allow_UNK_E=allow_UNK_E, generator_genlex=generator_genlex)
+                    print 'x = ', x, 'n_best = ', n_best
                     if len(n_best) > 0:
                         any_parse = True
                         if chosen_parse is None:
@@ -316,7 +317,6 @@ class Parser:
         null_assignments_allowed = none_range[0]
         full_parses = []  # contains both truly full parses and lists of trees such that all but one are leaves
         while len(full_parses) < n and null_assignments_allowed < none_range[1]:
-
             # initialize set of partial parses to each token assigned each possible meaning
             # a parse is represented as a vector of trees whose leaves in order are the tokens to mark
             # a complete parse is a single tree
@@ -339,8 +339,10 @@ class Parser:
             # and remove it from partial
             bad_partial_parses = []
             scores = [self.learner.score_parse(tokens, [pp[0], pp[1], None]) for pp in partial_parses]  # score without history during parsing
+
             while (len(full_parses) < n and len(partial_parses) - len(used_partials) > 0 and
                     iterations < iterations_limit*(1+len(full_parses))):
+                
                 iterations += 1
                 # print "partial parses:\t"+str(len(partial_parses)-len(used_partials))  # DEBUG
                 # print "bad parses:\t"+str(len(bad_partial_parses))  # DEBUG
@@ -350,10 +352,12 @@ class Parser:
                 parse_trace = [[partial_parses[max_score_idx][0],
                                partial_parses[max_score_idx][1]]]
                 next_idx = partial_parses[max_score_idx][2]
+                
                 while next_idx is not None:
                     parse_trace.append([partial_parses[next_idx][0],
                                         partial_parses[next_idx][1]])
                     next_idx = partial_parses[next_idx][2]
+                
                 if (null_assignments_allowed == len(
                         tokens) - 1):  # no FA to be done, so just add highest scoring parse to full parses
                     pp = [None if p is None else self.lexicon.semantic_forms[p] for p in
@@ -364,18 +368,22 @@ class Parser:
                     # print [self.print_parse(self.lexicon.semantic_forms[p] if type(p) is int else p, True)  # DEBUG
                     #        for p in partial_parses[max_score_idx][0]]  # DEBUG
                     # print self.print_semantic_parse_result(partial_parses[max_score_idx][1])  # DEBUG
+                    
                     new_partials = [[cpp, cpsp, max_score_idx] for [cpp, cpsp] in
                                 self.expand_partial_parse(
                                     partial_parses[max_score_idx], allow_UNK_E=allow_UNK_E,
                                     generator_genlex=generator_genlex) if
                                 cpp not in bad_partial_parses]
                     # print "num new partials: "+str(len(new_partials))  # DEBUG
+                    
                     if len(new_partials) == 0:  # then this parse is a bad partial
                         bad_partial_parses.append(partial_parses[max_score_idx])
+                        
                     # score new parses and add to partials / full where appropriate
                     new_partials_scores = [self.learner.score_parse(
                         tokens, [npp[0], npp[1], None]) for npp in new_partials]  # score without history during parsing
                     new_partials_beam_size = 0
+                    
                     while new_partials_beam_size < k and len(new_partials) > 0:
                         max_new_score_idx = new_partials_scores.index(max(new_partials_scores))
                         num_internal_trees = sum([1 if p is not None else 0 for p
@@ -392,12 +400,13 @@ class Parser:
                             new_partials_beam_size += 1
                         del new_partials[max_new_score_idx]
                         del new_partials_scores[max_new_score_idx]
+                        
                 # remove from partials list so we don't waste time expanding again
                 used_partials.append(max_score_idx)
                 scores[max_score_idx] = -sys.maxint
 
             null_assignments_allowed += 1
-
+        
         # if len(full_parses) < n:
         #     print "WARNING: exceeded parser iterations limit "+str(iterations_limit)+" for parse of "+\
         #         str(tokens)+" with only "+str(len(full_parses))+"/"+str(n)+" candidates"
@@ -419,7 +428,9 @@ class Parser:
     # given partial parse
     # expand via function application (forwards and backwards), type-raising, and merge operations
     # attempt to escape un-parsable situations through `parsing with unknowns'
-    def expand_partial_parse(self, p, allow_UNK_E, generator_genlex):
+    def expand_partial_parse(self, p, allow_UNK_E, generator_genlex, print_stuff=False):
+        if print_stuff :
+            print 'In expand_partial_parse'
         generator = None if generator_genlex is None else generator_genlex[0]
         known_tokens = None if generator_genlex is None else generator_genlex[1]
         known_root = None if generator_genlex is None else generator_genlex[2]
@@ -626,24 +637,24 @@ class Parser:
         # ontology of predicates, since perception should eventually merge/split these appropriately
         # liberally add new adjective predicate SemanticNode to the lexicon and a surface->semantic entry
         # TODO: separate KB and perceptual predicates, only fire this procedure to prevent synonym perceptuals
-        if possible_adjective:
-            if token not in self.new_adjectives:
-                self.ontology.preds.append(token)
-                self.ontology.entries.append(self.ontology.read_type_from_str("<e,t>"))
-                # print self.ontology.preds  # DEBUG
-                # print self.ontology.entries  # DEBUG
-                self.ontology.num_args.append(1)
-                new_lex = [token + " :- DESC : " + token]
-                # print "adding adjective " + str(new_lex)  # DEBUG
-                self.lexicon.expand_lex_from_strs(new_lex, self.lexicon.surface_forms,
-                                                  self.lexicon.semantic_forms, self.lexicon.entries,
-                                                  self.lexicon.pred_to_surface, False)
-                self.lexicon.update_support_structures()
-                # print "surface forms: "+str(self.lexicon.surface_forms)  # DEBUG
-                # print "entries: "+str(self.lexicon.entries)  # DEBUG
-                self.new_adjectives.append(token)
-            adj_idx = self.lexicon.entries[self.lexicon.surface_forms.index(token)][0]
-            candidates.append([self.lexicon.semantic_forms[adj_idx], adj_idx])
+        #if possible_adjective:
+            #if token not in self.new_adjectives:
+                #self.ontology.preds.append(token)
+                #self.ontology.entries.append(self.ontology.read_type_from_str("<e,t>"))
+                ## print self.ontology.preds  # DEBUG
+                ## print self.ontology.entries  # DEBUG
+                #self.ontology.num_args.append(1)
+                #new_lex = [token + " :- DESC : " + token]
+                ## print "adding adjective " + str(new_lex)  # DEBUG
+                #self.lexicon.expand_lex_from_strs(new_lex, self.lexicon.surface_forms,
+                                                  #self.lexicon.semantic_forms, self.lexicon.entries,
+                                                  #self.lexicon.pred_to_surface, False)
+                #self.lexicon.update_support_structures()
+                ## print "surface forms: "+str(self.lexicon.surface_forms)  # DEBUG
+                ## print "entries: "+str(self.lexicon.entries)  # DEBUG
+                #self.new_adjectives.append(token)
+            #adj_idx = self.lexicon.entries[self.lexicon.surface_forms.index(token)][0]
+            #candidates.append([self.lexicon.semantic_forms[adj_idx], adj_idx])
 
         return candidates
 
