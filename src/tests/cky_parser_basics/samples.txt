@@ -1,7 +1,7 @@
 fetch peter for ray
 M : bring(peter,ray)
 
-bring peter to ray
+bring ray peter
 M : bring(peter,ray)
 
 take ray to peter
@@ -51,3 +51,9 @@ NP : the(lambda x:e.(and(chair(x),possesses(ray,x))))
 
 the chair 's chair
 NP : the(lambda x:e.(and(chair(x),possesses(bruce,x))))
+
+bring peter to ray
+M : bring(peter,ray)
+
+bring ray to peter
+M : bring(ray,peter)

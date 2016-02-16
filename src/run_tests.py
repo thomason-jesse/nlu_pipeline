@@ -7,11 +7,15 @@ import time
 tests = [('aish',
           'python tests/aish/main.py tests/aish/ont.txt tests/aish/lex.txt tests/aish/samples.txt'),
          ('cky_parser_basics',
-          'python tests/cky_parser_basics/main.py tests/cky_parser_basics/ont.txt tests/cky_parser_basics/lex.txt tests/cky_parser_basics/samples.txt'),
-        ('grounding_recall',
-          'rosrun nlu_pipeline src/tests/grounding_recall/main.py tests/grounding_recall/ont.txt tests/grounding_recall/lex.txt tests/grounding_recall/samples.txt'),
-        ('action_grounding',
-          'rosrun nlu_pipeline src/tests/action_grounding/main.py tests/action_grounding/ont.txt tests/action_grounding/lex.txt tests/action_grounding/utterance_action_pairs.txt')]
+          'python tests/cky_parser_basics/main.py tests/cky_parser_basics/ont.txt \
+          tests/cky_parser_basics/lex.txt tests/cky_parser_basics/samples.txt \
+          tests/cky_parser_basics/test.txt'),
+         ('grounding_recall',
+         'rosrun nlu_pipeline src/tests/grounding_recall/main.py tests/grounding_recall/ont.txt \
+          tests/grounding_recall/lex.txt tests/grounding_recall/samples.txt'),
+         ('action_grounding',
+         'rosrun nlu_pipeline src/tests/action_grounding/main.py tests/action_grounding/ont.txt \
+          tests/action_grounding/lex.txt tests/action_grounding/utterance_action_pairs.txt')]
 
 # read command line arguments
 tests_to_run = [t[0] for t in tests]

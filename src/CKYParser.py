@@ -337,12 +337,13 @@ class CKYParser:
         # model parameter values
         self.theta = Parameters(ont, lex)
 
-        # additional linguistic information
+        # additional linguistic information and parameters
         # TODO: read this from configuration files or have user specify it on instantiation
         self.commutative_idxs = [self.ontology.preds.index('and'), self.ontology.preds.index('or')]
-        self.max_multiword_expression = 2
-        self.max_new_senses_per_utterance = 2
+        self.max_multiword_expression = 2  # max span of a multi-word expression to be considered during tokenization
+        self.max_new_senses_per_utterance = 2  # max number of new word senses that can be induced on a training example
         self.max_cky_trees_per_token_sequence_beam = 1000  # for tokenization of an utterance, max cky trees considered
+        self.skip_word_penalty = 2  # inversely proportional to probability of correctness given skipped words
 
         # behavioral parameters
         self.safety = True  # set to False once confident about node combination functions' correctness
@@ -423,8 +424,9 @@ class CKYParser:
             correct_parse = None
             correct_new_lexicon_entries = []
             cky_parse_generator = self.most_likely_cky_parse(x, reranker_beam=reranker_beam, known_root=y)
-            chosen_parse, _, chosen_new_lexicon_entries = next(cky_parse_generator)
+            chosen_parse, chosen_score, chosen_new_lexicon_entries = next(cky_parse_generator)
             current_parse = chosen_parse
+            correct_score = chosen_score
             current_new_lexicon_entries = chosen_new_lexicon_entries
             match = False
             first = True
@@ -444,13 +446,14 @@ class CKYParser:
                         num_trainable += 1
                     break
                 first = False
-                current_parse, _, current_new_lexicon_entries = next(cky_parse_generator)
+                current_parse, correct_score, current_new_lexicon_entries = next(cky_parse_generator)
             if correct_parse is None:
                 print "WARNING: could not find correct parse for '"+str(x)+"' during training"
                 num_fails += 1
                 continue
             print "\tx: "+str(x)  # DEBUG
             print "\t\tchosen_parse: "+self.print_parse(chosen_parse.node, show_category=True)  # DEBUG
+            print "\t\tchosen_score: "+str(chosen_score)  # DEBUG
             print "\t\tchosen_new_lexicon_entries: "  # DEBUG
             for sf, sem in chosen_new_lexicon_entries:  # DEBUG
                 print "\t\t\t'"+sf+"':- "+self.print_parse(sem, show_category=True)  # DEBUG
@@ -459,6 +462,7 @@ class CKYParser:
                     num_genlex_only += 1
                 print "\ttraining example generated:"  # DEBUG
                 print "\t\tcorrect_parse: "+self.print_parse(correct_parse.node, show_category=True)  # DEBUG
+                print "\t\tcorrect_score: "+str(correct_score)  # DEBUG
                 print "\t\tcorrect_new_lexicon_entries: "  # DEBUG
                 for sf, sem in correct_new_lexicon_entries:  # DEBUG
                     print "\t\t\t'"+sf+"':- "+self.print_parse(sem, show_category=True)  # DEBUG
@@ -470,7 +474,7 @@ class CKYParser:
         print "\tfailed "+str(num_fails)+"/"+str(len(d))  # DEBUG
         return t, num_fails
 
-    # yields the next most likely CKY parse of tokens tks
+    # yields the next most likely CKY parse of input string s
     # if the root of the tree is known (during supervised training, for example),
     # providing it as an argument to this method allows top-down generation
     # to find new lexical entries for surface forms not yet recognized
@@ -480,7 +484,8 @@ class CKYParser:
         # print "number of token sequences for '"+s+"': "+str(len(tk_seqs))  # DEBUG
         # print "tk_seqs: "+str(tk_seqs)  # DEBUG
 
-        ccg_parse_tree_generator = self.most_likely_ccg_parse_tree(tk_seqs)
+        ccg_parse_tree_generator = self.most_likely_ccg_parse_tree(tk_seqs,
+                                                                   root_is_known=False if known_root is None else True)
         # get next most likely CCG parse tree out of CKY algorithm
         ccg_tree, tree_score, tks = next(ccg_parse_tree_generator)
         # ccg_tree indexed by spans (i, j) valued at [CCG category, left span, right span]
@@ -499,6 +504,7 @@ class CKYParser:
                                                                        reranker_beam, known_root=known_root)
             parse_tree, parse_score, new_lexicon_entries = next(parse_tree_generator)
             while parse_tree is not None:
+                print tks  # DEBUG
                 yield parse_tree, parse_score, new_lexicon_entries
                 parse_tree, parse_score, new_lexicon_entries = next(parse_tree_generator)
 
@@ -792,25 +798,59 @@ class CKYParser:
     # yields the next most likely ccg parse tree given a set of possible token sequences
     # finds the best parse tree given each token sequence and returns in-order the one
     # with the highest score
-    def most_likely_ccg_parse_tree(self, tk_seqs):
+    def most_likely_ccg_parse_tree(self, tk_seqs, root_is_known=False):
 
-        ccg_parse_tree_generators = [self.most_likely_ccg_parse_tree_given_tokens(tks) for tks in tk_seqs]
-        best_per_seq = [next(ccg_parse_tree_generators[idx]) for idx in range(0, len(tk_seqs))]
-        leaf_sense_limits = [0 for _ in range(0, len(tk_seqs))]
+        stripped_tks = [[t for t in tks if t in self.lexicon.surface_forms or root_is_known]
+                        for tks in tk_seqs]
+        ccg_parse_tree_generators = [self.most_likely_ccg_parse_tree_given_tokens(tks, root_is_known=root_is_known)
+                                     for tks in stripped_tks]
+        best_per_seq = [next(ccg_parse_tree_generators[idx])
+                        if len(stripped_tks[idx]) > 0 else [None, neg_inf]
+                        for idx in range(0, len(stripped_tks))]
+        leaf_sense_limits = [0 for _ in range(0, len(stripped_tks))]
+
+        # remove candidates for which we have no surface forms at all
+        while [None, neg_inf] in best_per_seq:
+            idx = best_per_seq.index([None, neg_inf])
+            del best_per_seq[idx]
+            del ccg_parse_tree_generators[idx]
+            del leaf_sense_limits[idx]
+            del stripped_tks[idx]
+            del tk_seqs[idx]
 
         best_idx = 0
+        best_score = neg_inf
         tied_idxs = [0]
         while len(best_per_seq) > 0:
-            for idx in range(0, len(tk_seqs)):  # select the highest-scoring ccg parse(s)
-                if best_per_seq[idx][1] > best_per_seq[best_idx][1]:
+            min_complete_score = 0
+            for idx in range(0, len(stripped_tks)):  # get the current minimum raw score
+                if min_complete_score > best_per_seq[idx][1]:
+                    min_complete_score = best_per_seq[idx][1]
+            for idx in range(0, len(stripped_tks)):  # select the highest-scoring ccg parse(s)
+                # additional skip score assigns p(stripped_tokens|tokens) = |st|/|t|
+                # this is basically a heuristic that says skipping half the words makes your parse half
+                # as likely to be correct; 2/3 of the words, 1/3 as likely to be correct, etc
+                # the minimum score from a complete parse is added to ensure no skipping parse is ranked
+                # more highly than a complete parse
+                print len(stripped_tks[idx]), (len(tk_seqs[idx])+1), min_complete_score  # DEBUG
+                skip_score = math.log(len(stripped_tks[idx])/float(len(tk_seqs[idx])+1))+min_complete_score \
+                    if len(stripped_tks[idx]) != len(tk_seqs[idx]) else 0
+                print "most_likely_ccg_parse_tree: considering " + \
+                    str(best_per_seq[idx][0])+" with score "+str(best_per_seq[idx][1]+skip_score) + \
+                    " from tokens "+str(tk_seqs[idx])+", stripped "+str(stripped_tks[idx])  # DEBUG
+                if best_per_seq[idx][1]+skip_score > best_score:
                     best_idx = idx
                     tied_idxs = [idx]
-                elif best_per_seq[idx][1] == best_per_seq[best_idx][1]:
+                    best_score = best_per_seq[idx][1]+skip_score
+                elif best_per_seq[idx][1]+skip_score == best_score:
                     tied_idxs.append(idx)
             for idx in tied_idxs:  # among those tied in score, select ccg parse with most tokens (fewest multi-word)
-                if len(tk_seqs[idx]) > len(tk_seqs[best_idx]):
+                if len(stripped_tks[idx]) > len(stripped_tks[best_idx]):
                     best_idx = idx
-            yield best_per_seq[best_idx][0], best_per_seq[best_idx][1], tk_seqs[best_idx]
+            print "most_likely_ccg_parse_tree: yielding " + \
+                  str(best_per_seq[best_idx][0])+" with score "+str(best_score) + \
+                  " from tokens "+str(tk_seqs[best_idx])+", stripped "+str(stripped_tks[best_idx])  # DEBUG
+            yield best_per_seq[best_idx][0], best_score, stripped_tks[best_idx]
             candidate, score = next(ccg_parse_tree_generators[best_idx])
             empty = True
             if candidate is not None:
@@ -820,7 +860,8 @@ class CKYParser:
                 if leaf_sense_limits[best_idx] < self.max_new_senses_per_utterance:
                     leaf_sense_limits[best_idx] += 1
                     ccg_parse_tree_generators[best_idx] = self.most_likely_ccg_parse_tree_given_tokens(
-                        tk_seqs[best_idx], new_sense_leaf_limit=leaf_sense_limits[best_idx])
+                        stripped_tks[best_idx], new_sense_leaf_limit=leaf_sense_limits[best_idx],
+                        root_is_known=root_is_known)
                     candidate, score = next(ccg_parse_tree_generators[best_idx])
                     if candidate is not None:
                         best_per_seq[best_idx] = [candidate, score]
@@ -830,12 +871,13 @@ class CKYParser:
                 del ccg_parse_tree_generators[best_idx]
                 del leaf_sense_limits[best_idx]
                 del tk_seqs[best_idx]
+                del stripped_tks[best_idx]
                 best_idx = 0
                 tied_idxs = [0]
         yield None, neg_inf, None
 
     # yields the next most likely ccg parse tree given a set of tokens
-    def most_likely_ccg_parse_tree_given_tokens(self, tks, new_sense_leaf_limit=0):
+    def most_likely_ccg_parse_tree_given_tokens(self, tks, new_sense_leaf_limit=0, root_is_known=False):
 
         # print "most_likely_ccg_parse_tree_given_tokens initialized with tks="+str(tks) + \
         #       ", new_sense_leaf_limit="+str(new_sense_leaf_limit)  # DEBUG
@@ -918,35 +960,36 @@ class CKYParser:
                                     new_score = self.theta.CCG_production[prod] + l[3] + r[3]
                                     chart[key].append([prod[0], [l_key, l_idx], [r_key, r_idx], new_score])
                                     # print "new chart entry "+str(key)+" : "+str(chart[key][-1])  # DEBUG
-                    lr_keys = [l_key, r_key]
-                    lr_dirs = [left, right]
-                    lr_idxs = [1, 2]
-                    for branch_idx in range(0, 2):
-                        m_idx = branch_idx
-                        p_idx = 0 if branch_idx == 1 else 1
-                        if ((lr_keys[m_idx] in sense_leaf_keys or lr_keys[m_idx] in missing)
-                                and lr_keys[p_idx] not in missing):
-                            # print "searching for matches for missing "+str(lr_keys[m_idx]) + \
-                            #       " against present "+str(lr_keys[p_idx])  # DEBUG
-                            # investigate syntax for leaf m that can consume or be consumed by p
-                            # because of rewriting the CCG rules in CNF form, if a production rule is present
-                            # it means that a consumation or merge can happen and we can be agnostic to how
-                            for idx in range(0, len(lr_dirs[p_idx])):
-                                p = lr_dirs[p_idx][idx]
-                                for prod in self.theta.CCG_production:
-                                    # leaf m can be be combine with p
-                                    if prod[lr_idxs[p_idx]] == p[0]:
-                                        # give zero probability to new entries so they get explored after all
-                                        # known lexical options have been explored
-                                        m_score = neg_inf
-                                        m = [prod[lr_idxs[m_idx]], None, None, m_score]
-                                        chart[lr_keys[m_idx]].append(m)
-                                        new_score = self.theta.CCG_production[prod] + p[3] + m[3]
-                                        new_entry = [prod[0], None, None, new_score]
-                                        new_entry[lr_idxs[m_idx]] = [lr_keys[m_idx], len(chart[lr_keys[m_idx]])-1]
-                                        new_entry[lr_idxs[p_idx]] = [lr_keys[p_idx], idx]
-                                        chart[key].append(new_entry)
-                                        # print "new chart entry "+str(key)+" : "+str(chart[key][-1])  # DEBUG
+                    if root_is_known:
+                        lr_keys = [l_key, r_key]
+                        lr_dirs = [left, right]
+                        lr_idxs = [1, 2]
+                        for branch_idx in range(0, 2):
+                            m_idx = branch_idx
+                            p_idx = 0 if branch_idx == 1 else 1
+                            if ((lr_keys[m_idx] in sense_leaf_keys or lr_keys[m_idx] in missing)
+                                    and lr_keys[p_idx] not in missing):
+                                # print "searching for matches for missing "+str(lr_keys[m_idx]) + \
+                                #       " against present "+str(lr_keys[p_idx])  # DEBUG
+                                # investigate syntax for leaf m that can consume or be consumed by p
+                                # because of rewriting the CCG rules in CNF form, if a production rule is present
+                                # it means that a consumation or merge can happen and we can be agnostic to how
+                                for idx in range(0, len(lr_dirs[p_idx])):
+                                    p = lr_dirs[p_idx][idx]
+                                    for prod in self.theta.CCG_production:
+                                        # leaf m can be be combine with p
+                                        if prod[lr_idxs[p_idx]] == p[0]:
+                                            # give zero probability to new entries so they get explored after all
+                                            # known lexical options have been explored
+                                            m_score = neg_inf
+                                            m = [prod[lr_idxs[m_idx]], None, None, m_score]
+                                            chart[lr_keys[m_idx]].append(m)
+                                            new_score = self.theta.CCG_production[prod] + p[3] + m[3]
+                                            new_entry = [prod[0], None, None, new_score]
+                                            new_entry[lr_idxs[m_idx]] = [lr_keys[m_idx], len(chart[lr_keys[m_idx]])-1]
+                                            new_entry[lr_idxs[p_idx]] = [lr_keys[p_idx], idx]
+                                            chart[key].append(new_entry)
+                                            # print "new chart entry "+str(key)+" : "+str(chart[key][-1])  # DEBUG
 
                     # print "chart: "+str(chart)  # DEBUG
                     # _ = raw_input()  # DEBUG
@@ -984,7 +1027,8 @@ class CKYParser:
 
             # yield the current tree and remove the previous root from the structure
             # print "most_likely_ccg_parse_tree_given_tokens with tks="+str(tks) + \
-            #   ", new_sense_leaf_limit="+str(new_sense_leaf_limit)+" yielding"  # DEBUG
+            #  ", new_sense_leaf_limit=" + str(new_sense_leaf_limit)+", score="+str(chart[key][best_idx][3]) +\
+            #  " yielding"  # DEBUG
             yield tree, chart[key][best_idx][3]  # return tree and score
             del chart[key][best_idx]
             roots_yielded += 1
@@ -1523,7 +1567,8 @@ class CKYParser:
                                 allow_known_span)):
                         span_len += 1
                     if span_len == max_span_length[sp]:
-                        tokenization.append(' '.join(str_parts[i:i+span_len]))
+                        entry = ' '.join(str_parts[i:i+span_len])
+                        tokenization.append(entry)
                         for j in range(i, i+span_len):
                             del to_cover[to_cover.index(j)]
                         i += span_len
