@@ -3,11 +3,9 @@ __author__ = 'jesse'
 import random
 import copy
 import sys
+import re
 import Action
 import StaticDialogState
-
-# TODO: Need to put a space before 's when you get a text before 
-# calling the parser
 
 class DialogAgent:
 
@@ -130,8 +128,9 @@ class DialogAgent:
         self.state.update_requested_user_turn()
 
         # get n best parses for utterance
-        n_best_parses = self.parser.parse_expression(u, n=self.parse_depth)
-        print 'n_best_parses - ', n_best_parses
+        #n_best_parses = self.parser.parse_expression(u, n=self.parse_depth)
+        #print 'n_best_parses - ', n_best_parses
+        self.get_n_best_parses(u)
 
         # try to digest parses to action request
         success = False
@@ -331,6 +330,18 @@ class DialogAgent:
                 return True
             self.parser.learner.learn_from_actions(train_data)
         return False
+
+    def get_n_best_parses(self, response) :
+        # Parser expects a space between 's and the thing it is applied 
+        # to, for example "alice 's" rather than "alice's"
+        response = re.sub("'s", " 's", response)
+        parse_generator = self.parser.most_likely_cky_parse(response)
+        n = 5
+        for i in range(0, n) :
+            parse = parse_generator.next()
+            print 'parse = ', parse 
+        x = raw_input()
+        # Use parser.most_likely_cky_parse which is a generator
 
     def get_action_from_parse(self, root):
 	# print "Inside get_action_from_parse"
