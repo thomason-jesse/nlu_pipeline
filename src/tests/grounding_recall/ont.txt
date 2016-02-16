@@ -44,7 +44,7 @@ ingdc:<e,t>
 know:<e,<e,t>>
 canknow:<e,<e,t>>
 inmeeting:<e,<e,t>>
-meeting:<e,<e,t>>
+meeting:<e,t>
 ingroup:<e,<e,t>>
 group:<e,t>
 inmeetingornowhere:<e,<e,t>>

@@ -351,6 +351,49 @@ class CKYParser:
         # cache
         self.cached_combinations = {}  # indexed by left, then right node, value at result
 
+        # type-raise bare nouns in lexicon
+        self.type_raise_bare_nouns()
+
+    # perform type-raising on leaf-level lexicon entries
+    # this alters the given lexicon
+    def type_raise_bare_nouns(self):
+        bare_noun_cat_idx = self.lexicon.categories.index('N')
+        raised_cat_idx = self.lexicon.categories.index([bare_noun_cat_idx, 1, bare_noun_cat_idx])
+        e_idx = self.ontology.types.index('e')
+        e_to_t_idx = self.ontology.types.index([self.ontology.types.index('e'), self.ontology.types.index('t')])
+        to_add = []
+        for sf_idx in range(0, len(self.lexicon.surface_forms)):
+            for sem_idx in self.lexicon.entries[sf_idx]:
+                sem = self.lexicon.semantic_forms[sem_idx]
+                if (sem.category == bare_noun_cat_idx and not sem.is_lambda and
+                        self.ontology.entries[sem.idx] == e_to_t_idx and sem.children is None):
+                    # ensure there isn't already a raised predicate matching this bare noun
+                    already_raised = False
+                    for alt_idx in self.lexicon.entries[sf_idx]:
+                        alt = self.lexicon.semantic_forms[alt_idx]
+                        if (alt.category == raised_cat_idx and alt.is_lambda and
+                                alt.type == e_idx and
+                                not alt.children[0].is_lambda and
+                                self.ontology.entries[alt.children[0].idx] == e_to_t_idx and
+                                alt.children[0].children[0].is_lambda_instantiation):
+                            already_raised = True
+                            break
+                    if not already_raised:
+                        raised_sem = SemanticNode.SemanticNode(None, e_idx, raised_cat_idx,
+                                                               True, lambda_name=0, is_lambda_instantiation=True)
+                        raised_pred = copy.deepcopy(sem)
+                        raised_pred.parent = raised_sem
+                        lambda_inst = SemanticNode.SemanticNode(raised_pred, e_idx, bare_noun_cat_idx,
+                                                                True, lambda_name=0, is_lambda_instantiation=False)
+                        raised_pred.children = [lambda_inst]
+                        raised_sem.children = [raised_pred]
+                        to_add.append([sf_idx, raised_sem])
+        for sf_idx, sem in to_add:
+            print "type_raise_bare_nouns raising: '"+self.lexicon.surface_forms[sf_idx] + \
+                  "':- "+self.print_parse(sem, show_category=True)  # DEBUG
+            self.lexicon.semantic_forms.append(sem)
+            self.lexicon.entries[sf_idx].append(len(self.lexicon.semantic_forms)-1)
+
     # print a SemanticNode as a string using the known ontology
     def print_parse(self, p, show_category=False, show_non_lambda_types=False):
         if p is None:
@@ -510,6 +553,8 @@ class CKYParser:
                 ordered_skip_sequences = None
                 if skips_allowed == 0:
                     ordered_skip_sequences = [tk_seqs[seq_idx][:]]
+                elif skips_allowed == len(tk_seqs[seq_idx]):
+                    ordered_skip_sequences = []  # no valid subset of this sequence; all tokens would be skipped
                 elif skips_allowed == 1:
                     skip_sequences = []
                     for idx, score in sorted(skip_scores[seq_idx].items(), key=operator.itemgetter(1), reverse=True):

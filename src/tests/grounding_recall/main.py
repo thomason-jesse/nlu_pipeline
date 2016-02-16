@@ -26,7 +26,7 @@ print "instantiating KBGrounder"
 grounder = KBGrounder.KBGrounder(ont)
 
 print "instantiating Parser"
-parser = CKYParser.CKYParser(ont, lex, grounder)
+parser = CKYParser.CKYParser(ont, lex)
 
 f = open(sys.argv[3])
 f_lines = f.readlines()
@@ -39,15 +39,20 @@ while i < len(f_lines):
     u = f_lines[i].strip()
     d = [entry.strip() for entry in f_lines[i + 1].strip().split(";")]
     print "running parser on '" + u + "' expected denotations " + str(d)
-    k_best = parser.parse_expression(u, n=100)
-    print "k_best = " + str(k_best)
+    parse_generator = parser.most_likely_cky_parse(u)
     g = []
-    for [p, spr, trace, s] in k_best:
-        print str(s) + ":\nparse: " + parser.print_parse(p)
+    l = 10  # limit how many parse possibilities we consider before testing against known denotations
+    for p, s, _ in parse_generator:
+        if p is None:
+            break
+        print str(s) + ":\nparse: " + parser.print_parse(p.node, show_category=True)
         print "running grounder on parse..."
-        new_g = grounder.groundSemanticNode(p, [], [], [])
+        new_g = grounder.groundSemanticNode(p.node, [], [], [])
         print new_g
         g.extend([str(ng) for ng in new_g])
+        l -= 1
+        if l == 0:
+            break
     for denotation_instance in d:
         if denotation_instance not in g:
             raise AssertionError(
