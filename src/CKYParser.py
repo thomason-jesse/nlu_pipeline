@@ -547,7 +547,8 @@ class CKYParser:
                     #         "," + str(ccg_tree[span][1]) + "," + str(ccg_tree[span][2]) + "]"  # DEBUG
 
                     # get next most likely assignment of semantics to given CCG categories
-                    semantic_assignment_generator = self.most_likely_semantic_leaves(tks, ccg_tree)
+                    semantic_assignment_generator = self.most_likely_semantic_leaves(tks, ccg_tree,
+                                                                                     known_root=known_root)
 
                     # use discriminative re-ranking to pull next most likely cky parse given leaf generator
                     parse_tree_generator = self.most_likely_reranked_cky_parse(ccg_tree, semantic_assignment_generator,
@@ -655,7 +656,10 @@ class CKYParser:
                     candidate_parse_leaves = parse_leaves[:]
                     for idx in range(0, len(candidate_parse_leaves)):
                         if candidate_parse_leaves[idx].node is None:
-                            new_lex_entries.append([candidate_parse_leaves[idx].surface_form, topdown_leaves[idx].node])
+                            sf = candidate_parse_leaves[idx].surface_form if \
+                                type(candidate_parse_leaves[idx].surface_form) is str else \
+                                self.lexicon.surface_forms[candidate_parse_leaves[idx].surface_form]
+                            new_lex_entries.append([sf, topdown_leaves[idx].node])
                             candidate_parse_leaves[idx] = topdown_leaves[idx]
                             continue
                         if candidate_parse_leaves[idx].node.category != topdown_leaves[idx].node.category:
@@ -795,7 +799,7 @@ class CKYParser:
             yield children, score
 
     # yields next most likely assignment of semantic values to ccg tree leaves
-    def most_likely_semantic_leaves(self, tks, ccg_tree):
+    def most_likely_semantic_leaves(self, tks, ccg_tree, known_root=None):
 
         # get syntax categories for tree leaves
         leaf_categories = [ccg_tree[(idx, idx+1)][0] for idx in range(0, len(tks))]
@@ -805,12 +809,21 @@ class CKYParser:
         semantic_candidates = []
         for idx in range(0, len(tks)):
             if tks[idx] in self.lexicon.surface_forms:
-                semantic_candidates.append([sem_idx
-                                            for sem_idx
+                semantic_candidates.append([sem_idx for sem_idx
                                             in self.lexicon.entries[self.lexicon.surface_forms.index(tks[idx])]
                                             if self.lexicon.semantic_forms[sem_idx].category == leaf_categories[idx]])
             else:  # unknown surface form
-                semantic_candidates.append([])
+                # if the root is known, semantic candidates will be generated after the fact top-down
+                if known_root is not None:
+                    semantic_candidates.append([])
+                # if the root isn't known, the best we can do is try all semantic forms that match the given
+                # syntax; ie look for synonyms in the lexicon; search space is less restricted
+                else:
+                    semantic_candidates.append([sem_idx for sem_idx
+                                                in range(0, len(self.lexicon.semantic_forms))
+                                                if self.lexicon.semantic_forms[sem_idx].category
+                                                == leaf_categories[idx]])
+                    semantic_candidates[-1].append(None)
 
         # print "semantic_candidates: "+str(semantic_candidates)  # DEBUG
 
@@ -829,9 +842,12 @@ class CKYParser:
                 else:
                     assignment_idx = curr % len(semantic_candidates[idx])
                     assignments.append(assignment_idx)
-                    key = (self.lexicon.surface_forms.index(tks[idx]), semantic_candidates[idx][assignment_idx])
-                    score += self.theta.lexicon_entry_given_token[key] \
-                        if key in self.theta.lexicon_entry_given_token else neg_inf
+                    if tks[idx] in self.lexicon.surface_forms:  # surface form is in lexicon
+                        key = (self.lexicon.surface_forms.index(tks[idx]), semantic_candidates[idx][assignment_idx])
+                        score += self.theta.lexicon_entry_given_token[key] \
+                            if key in self.theta.lexicon_entry_given_token else neg_inf
+                    else:  # surface form not in lexicon; we're just grasping at synonyms
+                        score += neg_inf  # TODO: could use prior over semantic assignments given category
                     if assignment_idx < len(semantic_candidates[idx])-1:
                         finished = False
                     curr /= len(semantic_candidates[idx])
@@ -843,11 +859,13 @@ class CKYParser:
             nodes = [ParseNode.ParseNode(None,
                                          copy.deepcopy(self.lexicon.semantic_forms[
                                                        semantic_candidates[idx][assignment[idx]]])
-                                         if assignment[idx] is not None else None,
+                                         if assignment[idx] is not None and
+                                         semantic_candidates[idx][assignment[idx]] is not None else None,
                                          surface_form=self.lexicon.surface_forms.index(tks[idx])
-                                         if assignment[idx] is not None else tks[idx],
+                                         if tks[idx] in self.lexicon.surface_forms else tks[idx],
                                          semantic_form=semantic_candidates[idx][assignment[idx]]
-                                         if assignment[idx] is not None else None)
+                                         if assignment[idx] is not None and
+                                         semantic_candidates[idx][assignment[idx]] is not None else None)
                      for idx in range(0, len(tks))]
             yield nodes, score
 
@@ -996,36 +1014,35 @@ class CKYParser:
                                     new_score = self.theta.CCG_production[prod] + l[3] + r[3]
                                     chart[key].append([prod[0], [l_key, l_idx], [r_key, r_idx], new_score])
                                     # print "new chart entry "+str(key)+" : "+str(chart[key][-1])  # DEBUG
-                    if root_is_known:
-                        lr_keys = [l_key, r_key]
-                        lr_dirs = [left, right]
-                        lr_idxs = [1, 2]
-                        for branch_idx in range(0, 2):
-                            m_idx = branch_idx
-                            p_idx = 0 if branch_idx == 1 else 1
-                            if ((lr_keys[m_idx] in sense_leaf_keys or lr_keys[m_idx] in missing)
-                                    and lr_keys[p_idx] not in missing):
-                                # print "searching for matches for missing "+str(lr_keys[m_idx]) + \
-                                #       " against present "+str(lr_keys[p_idx])  # DEBUG
-                                # investigate syntax for leaf m that can consume or be consumed by p
-                                # because of rewriting the CCG rules in CNF form, if a production rule is present
-                                # it means that a consumation or merge can happen and we can be agnostic to how
-                                for idx in range(0, len(lr_dirs[p_idx])):
-                                    p = lr_dirs[p_idx][idx]
-                                    for prod in self.theta.CCG_production:
-                                        # leaf m can be be combine with p
-                                        if prod[lr_idxs[p_idx]] == p[0]:
-                                            # give zero probability to new entries so they get explored after all
-                                            # known lexical options have been explored
-                                            m_score = neg_inf
-                                            m = [prod[lr_idxs[m_idx]], None, None, m_score]
-                                            chart[lr_keys[m_idx]].append(m)
-                                            new_score = self.theta.CCG_production[prod] + p[3] + m[3]
-                                            new_entry = [prod[0], None, None, new_score]
-                                            new_entry[lr_idxs[m_idx]] = [lr_keys[m_idx], len(chart[lr_keys[m_idx]])-1]
-                                            new_entry[lr_idxs[p_idx]] = [lr_keys[p_idx], idx]
-                                            chart[key].append(new_entry)
-                                            # print "new chart entry "+str(key)+" : "+str(chart[key][-1])  # DEBUG
+                    lr_keys = [l_key, r_key]
+                    lr_dirs = [left, right]
+                    lr_idxs = [1, 2]
+                    for branch_idx in range(0, 2):
+                        m_idx = branch_idx
+                        p_idx = 0 if branch_idx == 1 else 1
+                        if ((lr_keys[m_idx] in sense_leaf_keys or lr_keys[m_idx] in missing)
+                                and lr_keys[p_idx] not in missing):
+                            # print "searching for matches for missing "+str(lr_keys[m_idx]) + \
+                            #       " against present "+str(lr_keys[p_idx])  # DEBUG
+                            # investigate syntax for leaf m that can consume or be consumed by p
+                            # because of rewriting the CCG rules in CNF form, if a production rule is present
+                            # it means that a consumation or merge can happen and we can be agnostic to how
+                            for idx in range(0, len(lr_dirs[p_idx])):
+                                p = lr_dirs[p_idx][idx]
+                                for prod in self.theta.CCG_production:
+                                    # leaf m can be be combine with p
+                                    if prod[lr_idxs[p_idx]] == p[0]:
+                                        # give zero probability to new entries so they get explored after all
+                                        # known lexical options have been explored
+                                        m_score = neg_inf
+                                        m = [prod[lr_idxs[m_idx]], None, None, m_score]
+                                        chart[lr_keys[m_idx]].append(m)
+                                        new_score = self.theta.CCG_production[prod] + p[3] + m[3]
+                                        new_entry = [prod[0], None, None, new_score]
+                                        new_entry[lr_idxs[m_idx]] = [lr_keys[m_idx], len(chart[lr_keys[m_idx]])-1]
+                                        new_entry[lr_idxs[p_idx]] = [lr_keys[p_idx], idx]
+                                        chart[key].append(new_entry)
+                                        # print "new chart entry "+str(key)+" : "+str(chart[key][-1])  # DEBUG
 
                     # print "chart: "+str(chart)  # DEBUG
                     # _ = raw_input()  # DEBUG

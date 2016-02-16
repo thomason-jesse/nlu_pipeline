@@ -52,7 +52,7 @@ NP : the(lambda x:e.(and(chair(x),possesses(ray,x))))
 the chair 's chair
 NP : the(lambda x:e.(and(chair(x),possesses(bruce,x))))
 
-bring peter to ray
+please bring peter to ray
 M : bring(peter,ray)
 
 bring ray to peter

@@ -35,9 +35,16 @@ d = parser.read_in_paired_utterance_semantics(sys.argv[4])
 for [x, y] in d:
     print "testing on '"+x+"' targeting "+parser.print_parse(y, show_category=True)
     parse_generator = parser.most_likely_cky_parse(x, reranker_beam=10)
-    best, score, _ = next(parse_generator)
-    if best is None:
-        raise AssertionError("Testing failed on example '"+x+"' for which no parse was generated")
-    if not y.equal_allowing_commutativity(best.node, parser.commutative_idxs, ontology=ont):
-        raise AssertionError("Testing failed on example '" + x + "' which gave form: " +
-                             parser.print_parse(best.node, show_category=True) + " with score " + str(score))
+    correct = False
+    for i in range(0, 10):
+        best, score, _ = next(parse_generator)
+        if best is None:
+            raise AssertionError("Testing failed on example '"+x+"' for which no more parses remain")
+        if y.equal_allowing_commutativity(best.node, parser.commutative_idxs, ontology=ont):
+            correct = True
+            break
+        else:
+            print "...generated incorrect parse "+parser.print_parse(best.node, show_category=True) + \
+                " with score "+str(score)
+    if not correct:
+        raise AssertionError("Testing failed on example '" + x + "' while failed to give correct form in beam")
