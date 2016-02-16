@@ -1,7 +1,5 @@
 #imperative
 search :- M/PP/N : lambda r:e.(lambda p:e.(searchroom(p,r)))
-ask :- M/PP/N : lambda p1:e.(lambda p2:e.(askperson(p1,p2)))
-remind :- M/PP/PP/N : lambda p:e.(lambda m:e.(lambda r:e.(remind(p,m,r))))
 bring :- M/N/N : lambda y:e.(lambda x:e.(bring(x,y)))
 bring :- M/PP/N : lambda x:e.(lambda y:e.(bring(x,y)))
 walk :- M/PP : lambda x:e.(at(x))
@@ -21,22 +19,11 @@ none :- C : none
 's office :- N\N : lambda x:e.(the(lambda y:e.(hasoffice(x,y))))
 office of :- N/N : lambda x:e.(lambda y:e.(hasoffice(x,y)))
 
-#other interrogatives
-is :- M/I : lambda x:t.(speak_t(x))
-is :- M/DESC/N : lambda x:e.(lambda P:<e,t>.(speak_t(P(x))))
-is :- M/(N/N)/N : lambda x:e.(lambda P:<e,t>.(speak_t(P(x))))
-is :- M/N/N : lambda x:e.(lambda y:e.(speak_t(equals(x,y))))
-in :- I/N\N : lambda p:e.(lambda r:e.(inroom(p,r)))
-in :- I\N : lambda p:e.(inoffice(p))
-where is :- M/N : lambda x:e.(speak_e(x))
-who is :- M/N : lambda x:e.(speak_e(x))
-which is :- M/N : lambda x:e.(speak_e(x))
-
 #entity descriptor words
 #can be type-raised to N/N : lambda x:e.(pred(x))
 room :- DESC : room
 person :- DESC : person
-group :- DESC : group
+item :- DESC : item
 
 #closed category
 and :- I/I\I : lambda x:t.(lambda y:t.(and(x,y)))
@@ -51,19 +38,21 @@ a :- (N/N)/(N/N) : lambda P:<e,t>.(P)
 a :- N/N : lambda x:e.(x)
 
 #atoms
-peter :- N : peter
-ray :- N : ray
-dana :- N : dana
-kazunori :- N : kazunori
-matteo :- N : matteo
-shiqi :- N : shiqi
-jivko :- N : jivko
-stacy :- N : stacy
-yuqian :- N : yuqian
-max :- N : max
-pato :- N : pato
-bwi :- N : bwi
-bwi meeting :- N : bwi_m
+chips :- N : chips
+coffee :- N : coffee
+hamburger :- N : hamburger
+juice :- N : juice
+muffin :- N : muffin
+alice :- N : alice
+frannie :- N : frannie
+bob :- N : bob
+carol :- N : carol
+dave :- N : dave
+george :- N : george
+eve :- N : eve
+mallory :- N : mallory
+peggy :- N : peggy
+walter :- N : walter
 3516 :- N : l3_516
 3508 :- N : l3_508
 3512 :- N : l3_512

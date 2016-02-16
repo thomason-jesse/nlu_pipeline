@@ -31,6 +31,12 @@
    actions prematurely this way and if they are not running, either the simulator is not up or there is a bug and you need to talk to someone who 
    knows the code.
 
+5. Errors in online interfaces - Logs are available at /u/www/logs/www.cs.utexas.edu but they are common so have logs mixed up from several 
+   machines. In geenral not useful.
+
+6. If rviz crashes in the bwi simulation, kill the rest of the simulation using Ctrl+C, then execute
+	rm -rf ~/.rviz
+   and retry. 
 
 
          

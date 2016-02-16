@@ -50,10 +50,9 @@ class HISBeliefState:
     # Warning: This function only creates matching partitions in the sense
     # that they match in goal and params. In the case of a confirm system
     # action, it does not check whether the user said yes or no    
-    def make_all_matching_partitions(self, system_action, utterance) :
-        if system_action.action_type == 'confirm_action' :
-            if utterance.action_type != 'affirm' :
-                return # If the user did not confirm, then no need to split any partition
+    def make_all_matching_partitions(self, system_action, utterance, grounder) :
+        #print 'In make_all_matching_partitions'
+        #print '**********************************************'
         required_goal = None
         if system_action.referring_goal != None :
             required_goal = system_action.referring_goal
@@ -63,16 +62,18 @@ class HISBeliefState:
         if system_action.referring_params != None :
             for param_name in system_action.referring_params :
                 if param_name in required_params :
-                    required_params[param_name] = required_params[param_name] + system_action.referring_params[param_name]
+                    required_params[param_name] = required_params[param_name] + [system_action.referring_params[param_name]]
                 else :
                     required_params[param_name] = [system_action.referring_params[param_name]]
+                required_params[param_name] = list(set(required_params[param_name]))
         if utterance.referring_params != None :
             for param_name in utterance.referring_params :
                 if param_name in required_params :
-                    required_params[param_name] = required_params[param_name] + utterance.referring_params[param_name]
+                    required_params[param_name] = required_params[param_name] + [utterance.referring_params[param_name]]
                 else :
                     required_params[param_name] = [utterance.referring_params[param_name]]
-
+                required_params[param_name] = list(set(required_params[param_name]))
+                
         #print "required_goal = ", required_goal        # DEBUG
         #print "required_params = ", required_params    # DEBUG
         
@@ -80,11 +81,18 @@ class HISBeliefState:
         # superset of what is required
         new_partitions = list()
         for partition in self.partitions :
+            #print '#########################'
+            #print str(partition)
+            #print 'Superset : ', partition.is_superset(required_goal, required_params)
+            #print 'Equal : ', partition.is_equal(required_goal, required_params)
+            #print '#########################'
             if partition.is_superset(required_goal, required_params) and not partition.is_equal(required_goal, required_params) :
+                #print 'Entered if'
+                #print '#########################'
                 # This is a partition to be split
                 goal_split_partitions = list()
                 if required_goal != None :  # Split based on goal
-                    goal_split_partitions = partition.split_by_goal(required_goal, self.knowledge)
+                    goal_split_partitions = partition.split_by_goal(required_goal, self.knowledge, grounder)
                 else :
                     goal_split_partitions = [partition]
 
@@ -104,7 +112,7 @@ class HISBeliefState:
                     for (param_name, param_value) in param_value_pairs :
                         resultant_partitions = list()
                         for partition in partitions_to_split :
-                            resultant_partitions = resultant_partitions + partition.split_by_param(param_name, param_value, self.knowledge)
+                            resultant_partitions = resultant_partitions + partition.split_by_param(param_name, param_value, self.knowledge, grounder)
                         partitions_to_split = resultant_partitions
                         
                     new_partitions = new_partitions + resultant_partitions
@@ -118,51 +126,65 @@ class HISBeliefState:
                 # required goal and params so don't split it
                 new_partitions = new_partitions + [partition]    
         self.partitions = new_partitions
+        #print '**********************************************'
 
     # Perform belief monitoring update using the system action and n best 
     # parses
-    def update(self, system_action, n_best_utterances) :
+    def update(self, system_action, n_best_utterances, grounder) :
+        #print 'In update'
+        #print '----------------------------------------------'
+        #print str(system_action)
         for utterance in n_best_utterances :
+            #print str(utterance)
             # Check whether there are partitions that exactly match the 
             # system action-utterance pair
             matching_partitions = self.get_matching_partitions(system_action, utterance)
+            #print 'len(matching_partitions) = ', len(matching_partitions)
             if len(matching_partitions) == 0 :
                 # if there are no matching partitions, split all partitions
                 # that are supersets of the goal and param values of this 
                 # pair to obtain matching partitions
-                self.make_all_matching_partitions(system_action, utterance)
-        
+                self.make_all_matching_partitions(system_action, utterance, grounder)
+            #else :
+                #for partition in matching_partitions :
+                    #print str(partition)
+        #print '----------------------------------------------'
         hypothesis_beliefs = dict()
-        sum_hypothesis_beliefs = 0.0
+
+        # Clean up partitions
+        self.remove_invalid_partitions(grounder)
+        self.merge_duplicate_partitions()
         
-        #print 'Updation'
+        print 'Updation'
         for partition in self.partitions :
             for utterance in n_best_utterances :
-                #print '---------------------------------'
-                #print str(partition)
-                #print str(utterance)
+                print '---------------------------------'
+                print str(partition)
+                print str(utterance)
                
                 hypothesis = (partition, utterance)
                 obs_prob = utterance.parse_prob # Pr(o'/u)
-                #print 'obs_prob = ', obs_prob
-                type_prob = self.knowledge.action_type_probs[system_action.action_type][utterance.action_type] # Pr(T(u)/T(m))
-                #print 'type_prob = ', type_prob 
+                print 'obs_prob = ', obs_prob
+                type_prob = self.knowledge.action_type_probs[system_action.action_type][utterance.action_type]
+                print 'type_prob = ', type_prob # Pr(T(u)/T(m))
                 param_match_prob = int(utterance.match(partition, system_action)) # Pr(M(u)/p,m)
-                #print 'param_match_prob = ', param_match_prob 
-                #print '---------------------------------'
+                print 'param_match_prob = ', param_match_prob 
+                print '---------------------------------'
                 hypothesis_beliefs[hypothesis] = obs_prob * type_prob * param_match_prob * partition.belief 
                     # b(p',u') = k * Pr(o'/u) * Pr(T(u)/T(m)) * Pr(M(u)/p,m) * b(p)
-                sum_hypothesis_beliefs += hypothesis_beliefs[hypothesis] # For normalization
             hypothesis = (partition, '-OTHER-')
             obs_prob = self.knowledge.obs_by_non_n_best_prob
             match_prob = self.knowledge.non_n_best_match_prob
             hypothesis_beliefs[hypothesis] = obs_prob * match_prob * partition.belief 
+        
+        # Normalize beliefs
+        sum_hypothesis_beliefs = 0.0
+        for hypothesis in hypothesis_beliefs.keys() :
             sum_hypothesis_beliefs += hypothesis_beliefs[hypothesis]
-            
+                
         partitionwise_sum = dict()
         #print 'Hypotheses - '
         for (partition, utterance) in hypothesis_beliefs.keys() :
-           # Normalize beliefs
            hypothesis_beliefs[(partition, utterance)] /= sum_hypothesis_beliefs
            #print '---------------------------------'
            #print str(partition)
@@ -180,3 +202,39 @@ class HISBeliefState:
             partition.belief = partitionwise_sum[partition]
 
         self.hypothesis_beliefs = hypothesis_beliefs
+        
+    def remove_invalid_partitions(self, grounder) :    
+        invalid_partitions = set()  
+        for partition in self.partitions :
+            partition.remove_invalid_params(self.knowledge, grounder)
+            partition.remove_invalid_goals(self.knowledge, grounder) 
+            if not partition.is_valid(self.knowledge, grounder) :
+                invalid_partitions.add(partition)
+        for partition in invalid_partitions :
+            self.partitions.remove(partition)        
+                    
+    def merge_duplicate_partitions(self) :
+        #print 'In merge_duplicate_partitions '
+        #print 'Before - '
+        #print str(self)
+        #print '------------------------------------------'
+        i = 0
+        while i < len(self.partitions) :
+            p1 = self.partitions[i]
+            j = i+1
+            while j < len(self.partitions) :
+                p2 = self.partitions[j]
+                if p1.is_like(p2) :
+                    #print str(p1)
+                    #print str(p2)
+                    #print '************************************'
+                    p1.belief += p2.belief
+                    p1.reaching_prob += p2.reaching_prob
+                    self.partitions.remove(p2)
+                else :
+                    j += 1
+            i += 1
+            
+        #print 'After - '
+        #print str(self)
+        #print '------------------------------------------'

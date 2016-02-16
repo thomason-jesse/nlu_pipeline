@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+rm -f *.pyc
+rm -f *~
+rm -f src/*.pyc
+rm -f src/*~
+rm -f src/online_interface/*~
+rm -f srv/*~
+rm -f src/not_in_use/*~
+rm -f src/resources/*~
+rm -f src/resources/amt_expt/*~
+rm -f src/resources/amt_expt/other_changes/*~
+rm -f src/resources/amt_expt/other_changes/domain_amt/*~
+rm -f src/Parser_test.txt
+rm -f src/run_tests_data.txt
+rm -f src/Testing.txt
+git add -A
+git commit -m "$*"
+git push origin master
