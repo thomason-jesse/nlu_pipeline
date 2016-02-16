@@ -18,4 +18,3 @@ M : at(l3_512)
 
 walk to alice 's office
 M : at(the(lambda x:e.(hasoffice(alice,x))))
-
