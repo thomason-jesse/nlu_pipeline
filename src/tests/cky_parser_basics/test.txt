@@ -22,6 +22,9 @@ D : declare_equal(3506,the(lambda x:e.(and(office(x),possesses(ray,x)))))
 ray 's office is room 3506 and room 3506 is peter 's office
 D : and_dec(declare_equal(the(lambda x:e.(and(office(x),possesses(ray,x)))),3506),declare_equal(3506,the(lambda x:e.(and(office(x),possesses(peter,x))))))
 
+bring peter to is noise ray
+M : bring(peter,ray)
+
 is room 3506 ray 's office
 I : equals(3506,the(lambda x:e.(and(office(x),possesses(ray,x)))))
 

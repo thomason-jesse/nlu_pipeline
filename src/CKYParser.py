@@ -484,30 +484,87 @@ class CKYParser:
         # print "number of token sequences for '"+s+"': "+str(len(tk_seqs))  # DEBUG
         # print "tk_seqs: "+str(tk_seqs)  # DEBUG
 
-        ccg_parse_tree_generator = self.most_likely_ccg_parse_tree(tk_seqs,
-                                                                   root_is_known=False if known_root is None else True)
-        # get next most likely CCG parse tree out of CKY algorithm
-        ccg_tree, tree_score, tks = next(ccg_parse_tree_generator)
-        # ccg_tree indexed by spans (i, j) valued at [CCG category, left span, right span]
-        while ccg_tree is not None:
+        # calculate skip scores of each token in each sequence
+        skip_scores = []
+        for tks in tk_seqs:
+            skip_score = {}
+            for idx in range(0, len(tks)):
+                if tks[idx] in self.lexicon.surface_forms:
+                    skip_score[idx] = neg_inf  # TODO: could parameterize prior on surface forms
+                else:
+                    skip_score[idx] = 0  # no penalty when skipping totally unknown tokens
+                    sub_tokens = tks[idx].split(' ')
+                    for st in sub_tokens:
+                        if st in self.lexicon.surface_forms:
+                            skip_score[idx] = neg_inf  # again, could parameterize
+            skip_scores.append(skip_score)
+        # print "skip_scores: "+str(skip_scores)  # DEBUG
 
-            # print "ccg tree: "  # DEBUG
-            # for span in ccg_tree:  # DEBUG
-            #     print str(span) + ": [" + self.lexicon.compose_str_from_category(ccg_tree[span][0]) + \
-            #         "," + str(ccg_tree[span][1]) + "," + str(ccg_tree[span][2]) + "]"  # DEBUG
+        skips_allowed = 0
+        while skips_allowed < 2:  # skip at most one token in a given sequence at a time
 
-            # get next most likely assignment of semantics to given CCG categories
-            semantic_assignment_generator = self.most_likely_semantic_leaves(tks, ccg_tree)
+            # calculate token sequence variations with number of skips allowed
+            tk_seqs_with_skips = []
+            for seq_idx in range(0, len(tk_seqs)):
+                # add an entry for each combination of skipped tokens ordered by score
+                ordered_skip_sequences = None
+                if skips_allowed == 0:
+                    ordered_skip_sequences = [tk_seqs[seq_idx][:]]
+                elif skips_allowed == 1:
+                    skip_sequences = []
+                    for idx, score in sorted(skip_scores[seq_idx].items(), key=operator.itemgetter(1), reverse=True):
+                        skip_sequences.append([tk_seqs[seq_idx][t]
+                                              for t in range(0, len(tk_seqs[seq_idx]))
+                                              if t != idx])
+                    ordered_skip_sequences = skip_sequences
+                tk_seqs_with_skips.append(ordered_skip_sequences)
 
-            # use discriminative re-ranking to pull next most likely cky parse given leaf generator
-            parse_tree_generator = self.most_likely_reranked_cky_parse(ccg_tree, semantic_assignment_generator,
-                                                                       reranker_beam, known_root=known_root)
-            parse_tree, parse_score, new_lexicon_entries = next(parse_tree_generator)
-            while parse_tree is not None:
-                yield parse_tree, parse_score, new_lexicon_entries
-                parse_tree, parse_score, new_lexicon_entries = next(parse_tree_generator)
+            curr_tk_seqs = None
+            while curr_tk_seqs is None or len(curr_tk_seqs) > 0:
 
-            ccg_tree, tree_score, tks = next(ccg_parse_tree_generator)
+                # pop first most likely skip from each possibility
+                curr_tk_seqs = []
+                for idx in range(0, len(tk_seqs)):
+                    if len(tk_seqs_with_skips[idx]) > 0:
+                        curr_tk_seqs.append(tk_seqs_with_skips[idx].pop(0))
+                if len(curr_tk_seqs) == 0:
+                    continue
+                # print "curr_tk_seqs: "+str(curr_tk_seqs)  # DEBUG
+
+                # create generator for current sequence set and get most likely parses
+
+                ccg_parse_tree_generator = self.most_likely_ccg_parse_tree(curr_tk_seqs,
+                                                                           root_is_known=False
+                                                                           if known_root is None else True)
+                # get next most likely CCG parse tree out of CKY algorithm
+                ccg_tree, tree_score, tks = next(ccg_parse_tree_generator)
+                # ccg_tree indexed by spans (i, j) valued at [CCG category, left span, right span]
+                while ccg_tree is not None:
+
+                    # print "ccg tree: "  # DEBUG
+                    # for span in ccg_tree:  # DEBUG
+                    #     print str(span) + ": [" + self.lexicon.compose_str_from_category(ccg_tree[span][0]) + \
+                    #         "," + str(ccg_tree[span][1]) + "," + str(ccg_tree[span][2]) + "]"  # DEBUG
+
+                    # get next most likely assignment of semantics to given CCG categories
+                    semantic_assignment_generator = self.most_likely_semantic_leaves(tks, ccg_tree)
+
+                    # use discriminative re-ranking to pull next most likely cky parse given leaf generator
+                    parse_tree_generator = self.most_likely_reranked_cky_parse(ccg_tree, semantic_assignment_generator,
+                                                                               reranker_beam, known_root=known_root)
+                    parse_tree, parse_score, new_lexicon_entries = next(parse_tree_generator)
+                    while parse_tree is not None:
+                        yield parse_tree, parse_score, new_lexicon_entries
+                        parse_tree, parse_score, new_lexicon_entries = next(parse_tree_generator)
+
+                    ccg_tree, tree_score, tks = next(ccg_parse_tree_generator)
+
+            skips_allowed += 1
+
+            # if we know the root, we don't need to use skipping at all since we'll use generation techniques
+            # to fill in missing entries for training; so we break here
+            if known_root is not None:
+                break
 
         # out of parse trees to try
         yield None, neg_inf, []
@@ -799,14 +856,11 @@ class CKYParser:
     # with the highest score
     def most_likely_ccg_parse_tree(self, tk_seqs, root_is_known=False):
 
-        stripped_tks = [[t for t in tks if t in self.lexicon.surface_forms or root_is_known]
-                        for tks in tk_seqs]
         ccg_parse_tree_generators = [self.most_likely_ccg_parse_tree_given_tokens(tks, root_is_known=root_is_known)
-                                     for tks in stripped_tks]
+                                     for tks in tk_seqs]
         best_per_seq = [next(ccg_parse_tree_generators[idx])
-                        if len(stripped_tks[idx]) > 0 else [None, neg_inf]
-                        for idx in range(0, len(stripped_tks))]
-        leaf_sense_limits = [0 for _ in range(0, len(stripped_tks))]
+                        for idx in range(0, len(tk_seqs))]
+        leaf_sense_limits = [0 for _ in range(0, len(tk_seqs))]
 
         # remove candidates for which we have no surface forms at all
         while [None, neg_inf] in best_per_seq:
@@ -814,41 +868,26 @@ class CKYParser:
             del best_per_seq[idx]
             del ccg_parse_tree_generators[idx]
             del leaf_sense_limits[idx]
-            del stripped_tks[idx]
             del tk_seqs[idx]
 
         best_idx = 0
         best_score = neg_inf
         tied_idxs = [0]
         while len(best_per_seq) > 0:
-            min_complete_score = 0
-            for idx in range(0, len(stripped_tks)):  # get the current minimum raw score
-                if min_complete_score > best_per_seq[idx][1]:
-                    min_complete_score = best_per_seq[idx][1]
-            for idx in range(0, len(stripped_tks)):  # select the highest-scoring ccg parse(s)
-                # additional skip score assigns p(stripped_tokens|tokens) = |st|/|t|
-                # this is basically a heuristic that says skipping half the words makes your parse half
-                # as likely to be correct; 2/3 of the words, 1/3 as likely to be correct, etc
-                # the minimum score from a complete parse is added to ensure no skipping parse is ranked
-                # more highly than a complete parse
-                skip_score = math.log(len(stripped_tks[idx])/float(len(tk_seqs[idx])+1))+min_complete_score \
-                    if len(stripped_tks[idx]) != len(tk_seqs[idx]) else 0
-                # print "most_likely_ccg_parse_tree: considering " + \
-                #     str(best_per_seq[idx][0])+" with score "+str(best_per_seq[idx][1]+skip_score) + \
-                #     " from tokens "+str(tk_seqs[idx])+", stripped "+str(stripped_tks[idx])  # DEBUG
-                if best_per_seq[idx][1]+skip_score > best_score:
+            for idx in range(0, len(tk_seqs)):  # select the highest-scoring ccg parse(s)
+                if best_per_seq[idx][1] > best_score:
                     best_idx = idx
                     tied_idxs = [idx]
-                    best_score = best_per_seq[idx][1]+skip_score
-                elif best_per_seq[idx][1]+skip_score == best_score:
+                    best_score = best_per_seq[idx][1]
+                elif best_per_seq[idx][1] == best_score:
                     tied_idxs.append(idx)
             for idx in tied_idxs:  # among those tied in score, select ccg parse with most tokens (fewest multi-word)
-                if len(stripped_tks[idx]) > len(stripped_tks[best_idx]):
+                if len(tk_seqs[idx]) > len(tk_seqs[best_idx]):
                     best_idx = idx
             # print "most_likely_ccg_parse_tree: yielding " + \
             #       str(best_per_seq[best_idx][0])+" with score "+str(best_score) + \
-            #       " from tokens "+str(tk_seqs[best_idx])+", stripped "+str(stripped_tks[best_idx])  # DEBUG
-            yield best_per_seq[best_idx][0], best_score, stripped_tks[best_idx]
+            #       " from tokens "+str(tk_seqs[best_idx])  # DEBUG
+            yield best_per_seq[best_idx][0], best_score, tk_seqs[best_idx]
             candidate, score = next(ccg_parse_tree_generators[best_idx])
             empty = True
             if candidate is not None:
@@ -858,7 +897,7 @@ class CKYParser:
                 if leaf_sense_limits[best_idx] < self.max_new_senses_per_utterance:
                     leaf_sense_limits[best_idx] += 1
                     ccg_parse_tree_generators[best_idx] = self.most_likely_ccg_parse_tree_given_tokens(
-                        stripped_tks[best_idx], new_sense_leaf_limit=leaf_sense_limits[best_idx],
+                        tk_seqs[best_idx], new_sense_leaf_limit=leaf_sense_limits[best_idx],
                         root_is_known=root_is_known)
                     candidate, score = next(ccg_parse_tree_generators[best_idx])
                     if candidate is not None:
@@ -869,7 +908,6 @@ class CKYParser:
                 del ccg_parse_tree_generators[best_idx]
                 del leaf_sense_limits[best_idx]
                 del tk_seqs[best_idx]
-                del stripped_tks[best_idx]
                 best_idx = 0
                 tied_idxs = [0]
         yield None, neg_inf, None
