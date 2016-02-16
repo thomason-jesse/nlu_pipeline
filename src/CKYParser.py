@@ -504,7 +504,6 @@ class CKYParser:
                                                                        reranker_beam, known_root=known_root)
             parse_tree, parse_score, new_lexicon_entries = next(parse_tree_generator)
             while parse_tree is not None:
-                print tks  # DEBUG
                 yield parse_tree, parse_score, new_lexicon_entries
                 parse_tree, parse_score, new_lexicon_entries = next(parse_tree_generator)
 
@@ -832,12 +831,11 @@ class CKYParser:
                 # as likely to be correct; 2/3 of the words, 1/3 as likely to be correct, etc
                 # the minimum score from a complete parse is added to ensure no skipping parse is ranked
                 # more highly than a complete parse
-                print len(stripped_tks[idx]), (len(tk_seqs[idx])+1), min_complete_score  # DEBUG
                 skip_score = math.log(len(stripped_tks[idx])/float(len(tk_seqs[idx])+1))+min_complete_score \
                     if len(stripped_tks[idx]) != len(tk_seqs[idx]) else 0
-                print "most_likely_ccg_parse_tree: considering " + \
-                    str(best_per_seq[idx][0])+" with score "+str(best_per_seq[idx][1]+skip_score) + \
-                    " from tokens "+str(tk_seqs[idx])+", stripped "+str(stripped_tks[idx])  # DEBUG
+                # print "most_likely_ccg_parse_tree: considering " + \
+                #     str(best_per_seq[idx][0])+" with score "+str(best_per_seq[idx][1]+skip_score) + \
+                #     " from tokens "+str(tk_seqs[idx])+", stripped "+str(stripped_tks[idx])  # DEBUG
                 if best_per_seq[idx][1]+skip_score > best_score:
                     best_idx = idx
                     tied_idxs = [idx]
@@ -847,9 +845,9 @@ class CKYParser:
             for idx in tied_idxs:  # among those tied in score, select ccg parse with most tokens (fewest multi-word)
                 if len(stripped_tks[idx]) > len(stripped_tks[best_idx]):
                     best_idx = idx
-            print "most_likely_ccg_parse_tree: yielding " + \
-                  str(best_per_seq[best_idx][0])+" with score "+str(best_score) + \
-                  " from tokens "+str(tk_seqs[best_idx])+", stripped "+str(stripped_tks[best_idx])  # DEBUG
+            # print "most_likely_ccg_parse_tree: yielding " + \
+            #       str(best_per_seq[best_idx][0])+" with score "+str(best_score) + \
+            #       " from tokens "+str(tk_seqs[best_idx])+", stripped "+str(stripped_tks[best_idx])  # DEBUG
             yield best_per_seq[best_idx][0], best_score, stripped_tks[best_idx]
             candidate, score = next(ccg_parse_tree_generators[best_idx])
             empty = True
