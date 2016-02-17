@@ -98,7 +98,8 @@ class InputFromSpeech:
         text1 = font.render("Click this window to activate recorder", 1, (255,255,255))
         text2 = font.render("Press [SPACEBAR] to record", 1, (255,255,255))
         text3 = font.render("Press [Ctrl-C] to interrupt", 1, (255,255,255))
-        
+	recordText = font.render("RECORDING", 1, (255, 255, 255))        
+
 
         #Renders instructions on screen. 
         screen.blit(text1, (0,0))
@@ -116,7 +117,9 @@ class InputFromSpeech:
             keys = pygame.key.get_pressed()
 
             if keys[pygame.K_SPACE]:
-                print "Recording"
+                screen.fill((0, 150, 0))
+		screen.blit(recordText, (125, 40))
+		pygame.display.update()
 
                 #Starts recording from mic to file. 
                 self.libHandle.startRecord()
