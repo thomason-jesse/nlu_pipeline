@@ -1,6 +1,6 @@
 __author__ = 'aishwarya'
 
-import sys, random, math, copy
+import sys, random, math, copy, re
 from Knowledge import Knowledge
 from HISBeliefState import HISBeliefState
 from SummaryState import SummaryState
@@ -124,8 +124,8 @@ class PomdpDialogAgent :
     def update_state(self, response) :
         # get n best parses for confirmation
         #print 'response = ', response
-        n_best_parses = self.parser.parse_expression(response, n=self.parse_depth)
-        print 'Parsed'
+        #n_best_parses = self.parser.parse_expression(response, n=self.parse_depth)
+        #print 'Parsed'
         #print 'n_best_parses = '
         #for [parse, parse_tree, parse_trace, conf] in n_best_parses :
             #print 'parse = ', self.parser.print_parse(parse)
@@ -136,6 +136,8 @@ class PomdpDialogAgent :
             #print 'len(parse_trace) = ', len(parse_trace)
             #print 'conf = ', conf 
             #print '-------------------------------'
+
+        n_best_parses = self.get_n_best_parses(response)
 
         # Create an n-best list of Utterance objects along with probabiltiies 
         # obtained from their confidences
@@ -150,7 +152,7 @@ class PomdpDialogAgent :
             print 'Utterances - '
             for utterance in self.n_best_utterances :
                 print str(utterance)
-                print '\tParse = ', self.parser.print_parse(utterance.parse)
+                #print '\tParse = ', self.parser.print_parse(utterance.parse)
             self.state.update(self.previous_system_action, self.n_best_utterances, self.grounder)
             print 'Updated'
 
@@ -181,6 +183,7 @@ class PomdpDialogAgent :
         return utterance
 
     def create_utterances_of_parse(self, parse) :
+        parse = parse.node
         #print 'Creating utterances of parse '
         #print 'parse = ', parse
         #print 'type(parse) = ', type(parse)
@@ -337,14 +340,32 @@ class PomdpDialogAgent :
             i += 1
         
         return merged_utterances    
+    
+    def get_n_best_parses(self, response, n=None) :
+        if n is None :
+            n = self.parse_depth
+        # Parser expects a space between 's and the thing it is applied 
+        # to, for example "alice 's" rather than "alice's"
+        response = re.sub("'s", " 's", response)
+        parse_generator = self.parser.most_likely_cky_parse(response)
+        k = 0
+        parses = list()
+        for (parse, score, _) in parse_generator :
+            print 'parse = ', self.parser.print_parse(parse.node, show_category=True), ', score = ', score 
+            parses.append((parse, score))
+            k += 1
+            if k == n :
+                break
+        return parses 
             
     def get_n_best_utterances_from_parses(self, n_best_parses) :
         #print "In get_n_best_utterances_from_parses"
         #print "No of parses = ", len(n_best_parses)
         sum_exp_conf = 0.0
         self.n_best_utterances = []
-        N = self.parser.beam_width
-        for [parse, parse_tree, parse_trace, conf] in n_best_parses :
+        #N = self.parser.beam_width
+        N = 10
+        for [parse, conf] in n_best_parses :
             #print "\nParsing ", self.parser.print_parse(parse)
             #print 'conf = ', conf
             #print '-------------------------------'
@@ -360,12 +381,10 @@ class PomdpDialogAgent :
             if utterances is not None and len(utterances) > 0:
                 #print "Got ", len(utterances), " utterances"
                 for utterance in utterances :
-                    utterance.parse_leaves = parse_trace[-1]
                     utterance.parse = parse
-                    utterance.parse_tree = parse_tree
-                    utterance.parse_trace = parse_trace
                     #print str(utterance)
-                    utterance.parse_prob = math.exp(conf) / len(utterances)
+                    #utterance.parse_prob = math.exp(conf) / len(utterances)
+                    utterance.parse_prob = conf 
                     self.n_best_utterances.append(utterance)
                     #sum_exp_conf += utterance.parse_prob
         

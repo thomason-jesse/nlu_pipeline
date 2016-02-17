@@ -2,9 +2,6 @@ __author__ = 'aishwarya'
 
 from Utils import *
 
-# For pretty printing only
-import Parser
-
 class Utterance:
 
     def __init__(self, action_type, referring_goal=None, 

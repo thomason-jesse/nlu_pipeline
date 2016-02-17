@@ -75,7 +75,8 @@ class DialogAgent:
         self.state.update_requested_user_turn()
 
         # get n best parses for confirmation
-        n_best_parses = self.parser.parse_expression(u, n=self.parse_depth)
+        #n_best_parses = self.parser.parse_expression(u, n=self.parse_depth)
+        n_best_parses = self.get_n_best_parses(u)
 
         # try to digest parses to confirmation
         success = False
@@ -106,7 +107,8 @@ class DialogAgent:
         self.state.update_requested_user_turn()
 
         # get n best parses for confirmation
-        n_best_parses = self.parser.parse_expression(c, n=self.parse_depth)
+        #n_best_parses = self.parser.parse_expression(c, n=self.parse_depth)
+        n_best_parses = self.get_n_best_parses(u)
 
         # try to digest parses to confirmation
         success = False
@@ -130,7 +132,7 @@ class DialogAgent:
         # get n best parses for utterance
         #n_best_parses = self.parser.parse_expression(u, n=self.parse_depth)
         #print 'n_best_parses - ', n_best_parses
-        self.get_n_best_parses(u)
+        n_best_parses = self.get_n_best_parses(u)
 
         # try to digest parses to action request
         success = False
@@ -154,7 +156,7 @@ class DialogAgent:
 
         # get action, if any, from the given parse
         try:
-            p_action = self.get_action_from_parse(p)
+            p_action = self.get_action_from_parse(p.node)
         except SystemError:
             p_action = None
         # print "Tried getting action from parse"
@@ -177,7 +179,7 @@ class DialogAgent:
                         and curr.type == self.parser.ontology.types.index('e')):
                     curr.children[i] = self.parser.create_unk_node()
         try:
-            p_unk_action = self.get_action_from_parse(UNK_root)
+            p_unk_action = self.get_action_from_parse(UNK_root.node)
         except SystemError:
             p_unk_action = None
         if p_unk_action is not None:
@@ -224,7 +226,7 @@ class DialogAgent:
                     try:
                         # print "parse: " + self.parser.print_parse(n_best_parses[i][0])  # DEBUG
                         # print self.parser.print_semantic_parse_result(n_best_parses[i][1])  # DEBUG
-                        a_candidate = self.get_action_from_parse(n_best_parses[i][0])
+                        a_candidate = self.get_action_from_parse(n_best_parses[i][0].node)
                         # print "candidate: "+str(a_candidate)  # DEBUG
                     except SystemError:
                         a_candidate = Action.Action()
@@ -269,7 +271,7 @@ class DialogAgent:
                     try:
                         # print "parse: " + self.parser.print_parse(n_best_parses[i][0])  # DEBUG
                         # print self.parser.print_semantic_parse_result(n_best_parses[i][1])  # DEBUG
-                        a_candidate = self.get_action_from_parse(n_best_parses[i][0])
+                        a_candidate = self.get_action_from_parse(n_best_parses[i][0].node)
                         # print "candidate: "+str(a_candidate)  # DEBUG
                     except SystemError:
                         a_candidate = Action.Action()
@@ -331,19 +333,22 @@ class DialogAgent:
             self.parser.learner.learn_from_actions(train_data)
         return False
 
-    def get_n_best_parses(self, response) :
+    def get_n_best_parses(self, response, n=None) :
+        if n is None :
+            n = self.parse_depth
         # Parser expects a space between 's and the thing it is applied 
         # to, for example "alice 's" rather than "alice's"
         response = re.sub("'s", " 's", response)
         parse_generator = self.parser.most_likely_cky_parse(response)
-        n = 0
+        k = 0
+        parses = list()
         for (parse, score, _) in parse_generator :
             print 'parse = ', self.parser.print_parse(parse.node, show_category=True), ', score = ', score 
-            n += 1
-            if n == 5 :
+            parses.append((parse, score))
+            k += 1
+            if k == n :
                 break
-        sys.exit(1)
-        # Use parser.most_likely_cky_parse which is a generator
+        return parses 
 
     def get_action_from_parse(self, root):
 	# print "Inside get_action_from_parse"

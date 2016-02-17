@@ -4,12 +4,8 @@ __author__ = 'aishwarya'
 import sys
 import Ontology
 import Lexicon
-import FeatureExtractor
-import LinearLearner
 import KBGrounder
-import Parser
-import Generator
-import DialogAgent
+import CKYParser
 import numpy, re
 
 from PomdpDialogAgent import PomdpDialogAgent
@@ -49,67 +45,23 @@ print "categories: " + str(lex.categories)
 print "semantic forms: " + str(lex.semantic_forms)
 print "entries: " + str(lex.entries)
 
-print "instantiating Feature Extractor"
-f_extractor = FeatureExtractor.FeatureExtractor(ont, lex)
-
-print "instantiating Linear Learner"
-learner = LinearLearner.LinearLearner(ont, lex, f_extractor)
-
 print "instantiating KBGrounder"
 grounder = KBGrounder.KBGrounder(ont)
 
 print "instantiating Parser"
-parser = Parser.Parser(ont, lex, learner, grounder, beam_width=10)
-#parser = load_model('parser')
-grounder.parser = parser
-grounder.ontology = parser.ontology
-
-#print '\n\n', predicate_holds('room', 'l3_432', grounder), '\n\n'
-
-print "instantiating Generator"
-generator = Generator.Generator(ont, lex, learner, parser, beam_width=100)
-#print "testing Generator:"
-#while True:
-#    s = raw_input()
-#    if s == 'stop':
-#        break
-#    form = lex.read_semantic_form_from_str(s, None, None, [])
-#    token_responses = generator.reverse_parse_semantic_form(form, k=3, n=1)
-#    print "token responses: "+str(token_responses)
+#parser = CKYParser.CKYParser(ont, lex)
+#d = parser.read_in_paired_utterance_semantics(sys.argv[3])
+#converged = parser.train_learner_on_semantic_forms(d, 10, reranker_beam=10)
+#if not converged:
+    #raise AssertionError("Training failed to converge to correct values.")
+#save_model(parser, 'parser')
+parser = load_model('parser')
 
 print "instantiating DialogAgent"
 u_in = InputFromKeyboard()
 u_out = OutputToStdout()
 
 A = PomdpDialogAgent(parser, grounder, u_in, u_out)
-
-print "reading in data and training parser from actions"
-D = A.read_in_utterance_action_pairs(sys.argv[3])
-converged = A.train_parser_from_utterance_action_pairs(D, epochs=10, parse_beam=30)
-print "theta: "+str(parser.learner.theta)
-save_model(parser, 'parser')
-#print 'Parser ontology : ', parser.ontology.preds
-
-# Testing typechecking
-#idx = grounder.ontology.preds.index('ray')
-#person_idx = grounder.ontology.preds.index('person')
-#child = SemanticNode(None, 9, 15, False, idx)
-#parent = SemanticNode(None, 9, 15, False, person_idx, children=[child])
-#child.parent = parent  
-#print "Grounding ", parser.print_parse(parent)
-#g = grounder.groundSemanticNode(parent, [], [], [])
-#answers = grounder.grounding_to_answer_set(g)
-#print 'answers = ', answers
-#print '--------------------------------'
-#print predicate_holds('person', 'ray', grounder)
-#print predicate_holds('person', 'l3_512', grounder)
-#print predicate_holds('room', 'ray', grounder)
-#print predicate_holds('room', 'l3_512', grounder)
-#sys.exit(1)
-
-print 'Lexicon - ', parser.lexicon.surface_forms, '\n\n'
-
-#print '\n\nCorrect system running\n\n'
 
 while True:
     A.first_turn = True
@@ -125,11 +77,3 @@ while True:
         if response.lower() == 'n' or response.lower() == 'no' :
             break 
 
-#print "testing Generator:"
-#while True:
-#    s = raw_input()
-#    if s == 'stop':
-#        break
-#    form = lex.read_semantic_form_from_str(s, None, None, [])
-#    token_responses = generator.reverse_parse_semantic_form(form, k=3, n=3)
-#    print "token responses: "+str(token_responses)
