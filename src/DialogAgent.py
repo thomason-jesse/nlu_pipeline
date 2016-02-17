@@ -336,11 +336,13 @@ class DialogAgent:
         # to, for example "alice 's" rather than "alice's"
         response = re.sub("'s", " 's", response)
         parse_generator = self.parser.most_likely_cky_parse(response)
-        n = 5
-        for i in range(0, n) :
-            parse = parse_generator.next()
-            print 'parse = ', parse 
-        x = raw_input()
+        n = 0
+        for (parse, score, _) in parse_generator :
+            print 'parse = ', self.parser.print_parse(parse.node, show_category=True), ', score = ', score 
+            n += 1
+            if n == 5 :
+                break
+        sys.exit(1)
         # Use parser.most_likely_cky_parse which is a generator
 
     def get_action_from_parse(self, root):

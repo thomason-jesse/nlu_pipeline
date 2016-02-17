@@ -600,7 +600,7 @@ class CKYParser:
                                                                                reranker_beam, known_root=known_root)
                     parse_tree, parse_score, new_lexicon_entries = next(parse_tree_generator)
                     while parse_tree is not None:
-                        yield parse_tree, parse_score, new_lexicon_entries
+                        yield parse_tree, parse_score + tree_score, new_lexicon_entries
                         parse_tree, parse_score, new_lexicon_entries = next(parse_tree_generator)
 
                     ccg_tree, tree_score, tks = next(ccg_parse_tree_generator)
@@ -629,7 +629,7 @@ class CKYParser:
             for curr_tree, curr_new_lex in curr_generator:
                 # print "...added candidate"  # DEBUG
                 candidates.append(curr_tree)
-                scores.append(self.theta.get_semantic_score(curr_tree))
+                scores.append(self.theta.get_semantic_score(curr_tree) + curr_leaves_score)
                 new_lex.append(curr_new_lex)
             if len(candidates) > k:
                 break
@@ -651,7 +651,7 @@ class CKYParser:
                 del scores[idx]
                 del new_lex[idx]
                 candidates.append(curr_tree)
-                scores.append(self.theta.get_semantic_score(curr_tree))
+                scores.append(self.theta.get_semantic_score(curr_tree) + curr_leaves_score)
                 new_lex.append(curr_new_lex)
 
         # yield remaining best candidates in order
