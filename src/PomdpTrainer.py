@@ -128,6 +128,23 @@ class PomdpTrainer :
             self.policy.train(prev_state, 'take_action', None, self.knowledge.correct_action_reward)
         else :
             self.policy.train(prev_state, 'take_action', None, self.knowledge.wrong_action_reward)
+    
+    def get_n_best_parses(self, response, n=None) :
+        if n is None :
+            n = self.parse_depth
+        # Parser expects a space between 's and the thing it is applied 
+        # to, for example "alice 's" rather than "alice's"
+        response = re.sub("'s", " 's", response)
+        parse_generator = self.parser.most_likely_cky_parse(response)
+        k = 0
+        parses = list()
+        for (parse, score, _) in parse_generator :
+            print 'parse = ', self.parser.print_parse(parse.node, show_category=True), ', score = ', score 
+            parses.append((parse, score))
+            k += 1
+            if k == n :
+                break
+        return parses
              
     # Parse the user response and update belief state
     def update_state(self, response) :
@@ -181,12 +198,7 @@ class PomdpTrainer :
         return utterance
 
     def create_utterances_of_parse(self, parse) :
-        #print 'Creating utterances of parse '
-        #print 'parse = ', parse
-        #print 'type(parse) = ', type(parse)
-        #print 'self.parser.print_parse(parse) = ', self.parser.print_parse(parse)
-        #print 'lexical form = ', self.parser.print_parse(self.parser.lexicon.semantic_forms[54])
-        #print 'Parser ontology: ', self.parser.ontology.preds
+        parse = parse.node
         # First check if it is a confirmation or denial
         if parse.idx == self.parser.ontology.preds.index('yes'):
             #print 'Is affirm'
@@ -329,7 +341,7 @@ class PomdpTrainer :
             while j < len(utterances) :
                 u2 = utterances[j]
                 if u2.is_like(u) :
-                    u.parse_prob += u2.parse_prob
+                    u.parse_prob = add_log_probs(u.parse_prob, u2.parse_prob)
                     utterances.remove(u2)
                 else :
                     j += 1
@@ -337,22 +349,13 @@ class PomdpTrainer :
             i += 1
         
         return merged_utterances    
-            
+              
     def get_n_best_utterances_from_parses(self, n_best_parses) :
         #print "In get_n_best_utterances_from_parses"
         #print "No of parses = ", len(n_best_parses)
-        sum_exp_conf = 0.0
         self.n_best_utterances = []
-        N = self.parser.beam_width
-        for [parse, parse_tree, parse_trace, conf] in n_best_parses :
-            #print "\nParsing ", self.parser.print_parse(parse)
-            #print 'conf = ', conf
-            #print '-------------------------------'
-            #print 'parse = ', parse
-            #print 'parse_tree = ', parse_tree
-            #print 'parse_trace = ', parse_trace
-            #print 'conf = ', conf 
-
+        N = self.parse_depth
+        for [parse, conf] in n_best_parses :
             utterances = self.create_utterances_of_parse(parse)
             if utterances is not None and len(utterances) >= N :
                 continue
@@ -360,28 +363,25 @@ class PomdpTrainer :
             if utterances is not None and len(utterances) > 0:
                 #print "Got ", len(utterances), " utterances"
                 for utterance in utterances :
-                    utterance.parse_leaves = parse_trace[-1]
                     utterance.parse = parse
-                    utterance.parse_tree = parse_tree
-                    utterance.parse_trace = parse_trace
                     #print str(utterance)
-                    utterance.parse_prob = math.exp(conf) / len(utterances)
+                    #utterance.parse_prob = math.exp(conf) / len(utterances)
+                    utterance.parse_prob = conf 
                     self.n_best_utterances.append(utterance)
-                    #sum_exp_conf += utterance.parse_prob
         
         # Clean up by removing duplicates and invalid utterances    
         self.n_best_utterances = self.merge_duplicate_utterances(self.n_best_utterances)   
         self.n_best_utterances = self.remove_invalid_utterances(self.n_best_utterances, self.grounder) 
         
-        sum_exp_conf = 0
+        sum_exp_conf = float('-inf')
         for utterance in self.n_best_utterances :
-            sum_exp_conf += utterance.parse_prob
+            sum_exp_conf = add_log_probs(sum_exp_conf, utterance.parse_prob)
         
-        sum_exp_conf += self.knowledge.obs_by_non_n_best_prob
+        sum_exp_conf = add_log_probs(sum_exp_conf, np.log(self.knowledge.obs_by_non_n_best_prob))
         prob_with_utterances = list()
         
         for utterance in self.n_best_utterances :
-            utterance.parse_prob /= sum_exp_conf
+            utterance.parse_prob -= sum_exp_conf
             prob_with_utterances.append((utterance.parse_prob, utterance))
             
         prob_with_utterances.sort()
@@ -394,7 +394,6 @@ class PomdpTrainer :
             for (idx, (prob, utterance)) in enumerate(prob_with_utterances) :
                 self.n_best_utterances.append(utterance)
             
-        #print 'max_prob_utterance parse = ', max_prob_utterance.parse_leaves 
         self.max_prob_user_utterances.append(max_prob_utterance)
         #print "N-best utterances: "
         #for utterance in self.n_best_utterances :

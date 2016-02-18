@@ -53,9 +53,6 @@ class Knowledge:
         # N-best list
         self.obs_by_non_n_best_prob = 0.01
         
-        # Additional amount to boost probability of terminal partitions
-        self.boost_for_terminal_partition = 0
-        
         # Probability that an utterance not in the N-best list matches 
         # the partition and system_action - This can probably be 
         # calculated exactly but it will be hard to do so.

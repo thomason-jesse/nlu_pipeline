@@ -1,6 +1,6 @@
 __author__ = 'aishwarya'
 
-import pickle
+import pickle, numpy
 
 # For typechecking
 from SemanticNode import SemanticNode
@@ -15,6 +15,18 @@ def load_model(name):
             return pickle.load(f)
     except :
         return None
+
+# Source: https://en.wikipedia.org/wiki/Log_probability
+def add_log_probs(logprob1, logprob2) :
+    if logprob1 == float('-inf') and logprob2 == float('-inf') :
+        return float('-inf')
+    if logprob2 > logprob1 :
+        temp = logprob1
+        logprob1 = logprob2
+        logprob2 = temp 
+    res = logprob1 + numpy.log1p(numpy.exp(logprob2 - logprob1))
+    return res
+    
         
 def checkLists(list1, list2) :
     if list1 == None and list2 == None :

@@ -2,7 +2,7 @@ __author__ = 'aishwarya'
 
 import random
 import copy
-import sys
+import sys, re
 import Action
 import StaticDialogState
 from TemplateBasedGenerator import TemplateBasedGenerator
@@ -13,9 +13,8 @@ from StaticDialogStateWithTypechecking import StaticDialogStateWithTypechecking
 
 class StaticDialogAgent:
 
-    def __init__(self, parser, generator, grounder, policy, u_input, output, parse_depth=10):
+    def __init__(self, parser, grounder, policy, u_input, output, parse_depth=10):
         self.parser = parser
-        self.generator = generator
         self.grounder = grounder
         self.parse_depth = parse_depth
         self.state = None
@@ -138,14 +137,14 @@ class StaticDialogAgent:
         self.state.update_requested_user_turn()
 
         # get n best parses for confirmation
-        n_best_parses = self.parser.parse_expression(u, n=self.parse_depth)
+        n_best_parses = self.get_n_best_parses(u)
 
         # try to digest parses to confirmation
         success = False
         for i in range(0, len(n_best_parses)):
             # print self.parser.print_parse(n_best_parses[i][0])  # DEBUG
             # print self.parser.print_semantic_parse_result(n_best_parses[i][1])  # DEBUG
-            g = self.grounder.groundSemanticNode(n_best_parses[i][0], [], [], [])
+            g = self.grounder.groundSemanticNode(n_best_parses[i][0].node, [], [], [])
             answer = self.grounder.grounding_to_answer_set(g)
             if len(answer) == 1:
                 success = True
@@ -201,17 +200,17 @@ class StaticDialogAgent:
         self.state.update_requested_user_turn()
 
         # get n best parses for confirmation
-        n_best_parses = self.parser.parse_expression(c, n=self.parse_depth)
+        n_best_parses = self.get_n_best_parses(c)
 
         # try to digest parses to confirmation
         success = False
         for i in range(0, len(n_best_parses)):
             # print self.parser.print_parse(n_best_parses[i][0])  # DEBUG
             # print self.parser.print_semantic_parse_result(n_best_parses[i][1])  # DEBUG
-            if n_best_parses[i][0].idx == self.parser.ontology.preds.index('yes'):
+            if n_best_parses[i][0].node.idx == self.parser.ontology.preds.index('yes'):
                 success = True
                 self.state.update_from_action_confirmation(a, True)
-            elif n_best_parses[i][0].idx == self.parser.ontology.preds.index('no'):
+            elif n_best_parses[i][0].node.idx == self.parser.ontology.preds.index('no'):
                 success = True
                 self.state.update_from_action_confirmation(a, False)
         if not success:
@@ -223,8 +222,7 @@ class StaticDialogAgent:
         self.state.update_requested_user_turn()
 
         # get n best parses for utterance
-        n_best_parses = self.parser.parse_expression(u, n=self.parse_depth)
-        #print 'n_best_parses - ', n_best_parses
+        n_best_parses = self.get_n_best_parses(u)
 
         # try to digest parses to action request
         success = False
@@ -232,7 +230,7 @@ class StaticDialogAgent:
             #print "Digesting parse ", i
             #print self.parser.print_parse(n_best_parses[i][0])  # DEBUG
             #print self.parser.print_semantic_parse_result(n_best_parses[i][1])  # DEBUG
-            success = self.update_state_from_action_parse(n_best_parses[i][0])
+            success = self.update_state_from_action_parse(n_best_parses[i][0].node)
             if success:
                 break
         # print "Finished trying to digest parses" 
@@ -424,6 +422,25 @@ class StaticDialogAgent:
                 return True
             self.parser.learner.learn_from_actions(train_data)
         return False
+
+    def get_n_best_parses(self, response, n=None) :
+        if n is None :
+            n = self.parse_depth
+        # Parser expects a space between 's and the thing it is applied 
+        # to, for example "alice 's" rather than "alice's"
+        response = re.sub("'s", " 's", response)
+        parse_generator = self.parser.most_likely_cky_parse(response)
+        k = 0
+        parses = list()
+        for (parse, score, _) in parse_generator :
+            if parse is None :
+                break
+            print 'parse = ', self.parser.print_parse(parse.node, show_category=True), ', score = ', score 
+            parses.append((parse, score))
+            k += 1
+            if k == n :
+                break
+        return parses 
 
     def get_action_from_parse(self, root):
 	# print "Inside get_action_from_parse"

@@ -1,19 +1,19 @@
 __author__ = 'aishwarya'
 
-import copy 
+import copy, numpy 
 from Utils import *
+
+# NOTE: All probabilities are in log space
 
 class Partition:
 
-    def __init__(self, possible_goals=None, possible_param_values=None, belief=0.0, reaching_prob=1.0):
+    def __init__(self, possible_goals=None, possible_param_values=None, belief=float('-inf')):
         # This partition includes all belief states which are a tuple 
         # of one action in this possible_goals and one value of each 
         # param in possible_param_values which is a dict
         self.possible_goals = possible_goals
         self.possible_param_values = possible_param_values
         self.belief = belief
-        self.reaching_prob = reaching_prob      # Pr(this partition/root) = 
-                                                # Pr(this partition / its parent)Pr(its parent/its grandparent)...
 
     def __str__(self):
         strForm = 'States: {' + ','.join(self.possible_goals) + '}\n'
@@ -21,14 +21,13 @@ class Partition:
             strParamValues = [str(v) for v in self.possible_param_values[param_name]]
             strForm = strForm + param_name + ': {' + ','.join(strParamValues) + '}\n'
         strForm = strForm + 'Belief:' + str(self.belief) + '\n'
-        #strForm = strForm + 'Partition prob:' + str(self.reaching_prob) + '\n'
         return strForm
         
     def __hash__(self):
         dict_tuple = ()
         if self.possible_param_values is not None :
             dict_tuple = tuple([(k, tuple(v)) for (k, v) in self.possible_param_values.items()])
-        return hash((tuple(self.possible_goals), dict_tuple, self.belief, self.reaching_prob))
+        return hash((tuple(self.possible_goals), dict_tuple, self.belief))
         
     # Assumes elements of possible_goals and possible_param_values[key] for all keys
     # are atomic
@@ -38,8 +37,6 @@ class Partition:
         elif not checkDicts(self.possible_param_values, other.possible_param_values) :
             return False
         elif not self.belief == other.belief :
-            return False
-        elif not self.reaching_prob == other.reaching_prob :
             return False
         return True     
         
@@ -53,19 +50,6 @@ class Partition:
     # V.IMP. NOTE: Do not use this to determine whether to boost the 
     # probability of the (partition, utterance) pair
     def match(self, system_action, utterance) :
-        #if system_action.action_type == 'confirm_action' and utterance.action_type == 'deny' :
-            ## The user said that something in the goal/params of the 
-            ## system action was wrong. So consider all partitions that 
-            ## don't match with the system action
-            #if system_action.referring_goal is not None :
-                #if system_action.referring_goal in self.possible_goals :
-                    #return False
-            #if system_action.referring_params is not None :
-                #for param_name in system_action.referring_params :
-                    #if system_action.referring_params[param_name] in self.possible_param_values[param_name] :
-                        #return False
-            #return True
-            
         # Partition should match info in system action
         if not len(self.possible_goals) == 1 or not system_action.referring_goal == self.possible_goals[0] :
             return False          
@@ -290,22 +274,12 @@ class Partition:
         else :
             p1 = Partition([new_goal], copy.deepcopy(self.possible_param_values))
             split_prob = knowledge.partition_split_goal_probs[new_goal]
-            p1.reaching_prob = self.reaching_prob * split_prob
-            p1.belief = self.belief * split_prob
-            if p1.is_terminal(knowledge) :
-                # Boosting probability if it is a valid terminal task
-                p1.belief = min(p1.belief + knowledge.boost_for_terminal_partition, 1)    
-                #pass
+            p1.belief = self.belief + numpy.log(split_prob)
             p1.remove_invalid_params(knowledge, grounder)    
                 
             other_goals = [goal for goal in self.possible_goals if goal != new_goal]
             p2 = Partition(other_goals, copy.deepcopy(self.possible_param_values))
-            p2.reaching_prob = self.reaching_prob * (1 - split_prob)
-            p2.belief = self.belief * (1 - split_prob)
-            if p2.is_terminal(knowledge) :
-                # Boosting probability if it is a valid terminal task
-                p2.belief = min(p2.belief + knowledge.boost_for_terminal_partition, 1)    
-                #pass
+            p2.belief = self.belief + numpy.log(1 - split_prob)
             p2.remove_invalid_params(knowledge, grounder)
             
             # Check that both partitions are valid. If not, return only 
@@ -337,17 +311,10 @@ class Partition:
                     p2_param_values[param_name] = [param_value for param_value in self.possible_param_values[split_param_name] if param_value != split_param_value]
             p1 = Partition(copy.deepcopy(self.possible_goals), p1_param_values)
             p2 = Partition(copy.deepcopy(self.possible_goals), p2_param_values)
+
             split_prob = knowledge.partition_split_param_probs[split_param_name][split_param_value]
-            p1.reaching_prob = self.reaching_prob * split_prob
-            p1.belief = self.belief * split_prob
-            if p1.is_terminal(knowledge) :
-                p1.belief = min(p1.belief + knowledge.boost_for_terminal_partition, 1)    
-                pass
-            p2.reaching_prob = self.reaching_prob * (1 - split_prob)
-            p2.belief = self.belief * (1 - split_prob)
-            if p2.is_terminal(knowledge) :
-                p2.belief = min(p2.belief + knowledge.boost_for_terminal_partition, 1)    
-                pass
+            p1.belief = self.belief + numpy.log(split_prob)
+            p2.belief = self.belief + numpy.log(1 - split_prob)
                 
             p1.remove_invalid_goals(knowledge, grounder)
             p2.remove_invalid_goals(knowledge, grounder)

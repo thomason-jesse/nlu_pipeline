@@ -10,8 +10,8 @@ import CKYParser
 import StaticDialogPolicy
 import ActionSender
 from TemplateBasedGenerator import TemplateBasedGenerator
-#from StaticDialogAgent import StaticDialogAgent
-from DialogAgent import DialogAgent
+from StaticDialogAgent import StaticDialogAgent
+#from DialogAgent import DialogAgent
 from Utils import *
 
 class InputFromKeyboard:
@@ -61,8 +61,8 @@ print "instantiating DialogAgent"
 u_in = InputFromKeyboard()
 u_out = OutputToStdout()
 static_policy = StaticDialogPolicy.StaticDialogPolicy()
-#A = StaticDialogAgent(parser, grounder, static_policy, u_in, u_out)
-A = DialogAgent(parser, grounder, static_policy, u_in, u_out)
+A = StaticDialogAgent(parser, grounder, static_policy, u_in, u_out)
+#A = DialogAgent(parser, grounder, static_policy, u_in, u_out)
 
 response_generator = TemplateBasedGenerator()
 
@@ -72,4 +72,5 @@ while True:
     if s == 'stop':
         break
     a = A.initiate_dialog_to_get_action(s)
-    print response_generator.get_action_sentence(a)
+    if a is not None :
+        print response_generator.get_action_sentence(a)

@@ -83,7 +83,7 @@ class DialogAgent:
         for i in range(0, len(n_best_parses)):
             # print self.parser.print_parse(n_best_parses[i][0])  # DEBUG
             # print self.parser.print_semantic_parse_result(n_best_parses[i][1])  # DEBUG
-            g = self.grounder.groundSemanticNode(n_best_parses[i][0], [], [], [])
+            g = self.grounder.groundSemanticNode(n_best_parses[i][0].node, [], [], [])
             answer = self.grounder.grounding_to_answer_set(g)
             if len(answer) == 1:
                 success = True
@@ -108,17 +108,17 @@ class DialogAgent:
 
         # get n best parses for confirmation
         #n_best_parses = self.parser.parse_expression(c, n=self.parse_depth)
-        n_best_parses = self.get_n_best_parses(u)
+        n_best_parses = self.get_n_best_parses(c)
 
         # try to digest parses to confirmation
         success = False
         for i in range(0, len(n_best_parses)):
             # print self.parser.print_parse(n_best_parses[i][0])  # DEBUG
             # print self.parser.print_semantic_parse_result(n_best_parses[i][1])  # DEBUG
-            if n_best_parses[i][0].idx == self.parser.ontology.preds.index('yes'):
+            if n_best_parses[i][0].node.idx == self.parser.ontology.preds.index('yes'):
                 success = True
                 self.state.update_from_action_confirmation(a, True)
-            elif n_best_parses[i][0].idx == self.parser.ontology.preds.index('no'):
+            elif n_best_parses[i][0].node.idx == self.parser.ontology.preds.index('no'):
                 success = True
                 self.state.update_from_action_confirmation(a, False)
         if not success:
@@ -140,7 +140,7 @@ class DialogAgent:
             #print "Digesting parse ", i
             #print self.parser.print_parse(n_best_parses[i][0])  # DEBUG
             #print self.parser.print_semantic_parse_result(n_best_parses[i][1])  # DEBUG
-            success = self.update_state_from_action_parse(n_best_parses[i][0])
+            success = self.update_state_from_action_parse(n_best_parses[i][0].node)
             if success:
                 break
         # print "Finished trying to digest parses" 
@@ -156,7 +156,7 @@ class DialogAgent:
 
         # get action, if any, from the given parse
         try:
-            p_action = self.get_action_from_parse(p.node)
+            p_action = self.get_action_from_parse(p)
         except SystemError:
             p_action = None
         # print "Tried getting action from parse"
@@ -179,7 +179,7 @@ class DialogAgent:
                         and curr.type == self.parser.ontology.types.index('e')):
                     curr.children[i] = self.parser.create_unk_node()
         try:
-            p_unk_action = self.get_action_from_parse(UNK_root.node)
+            p_unk_action = self.get_action_from_parse(UNK_root)
         except SystemError:
             p_unk_action = None
         if p_unk_action is not None:
@@ -343,6 +343,8 @@ class DialogAgent:
         k = 0
         parses = list()
         for (parse, score, _) in parse_generator :
+            if parse is None :
+                break
             print 'parse = ', self.parser.print_parse(parse.node, show_category=True), ', score = ', score 
             parses.append((parse, score))
             k += 1
