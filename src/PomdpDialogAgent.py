@@ -206,62 +206,62 @@ class PomdpDialogAgent :
             #print 'Got an action. Will convert and return'
             return [self.convert_action_to_utterance(p_action)]
 
-        #print 'Did not get a fully specified action' 
+        ##print 'Did not get a fully specified action' 
 
-        # if this failed, try again allowing missing lambdas to become UNK without token ties
-        # print "Going to retry parsing"
+        ## if this failed, try again allowing missing lambdas to become UNK without token ties
+        ## print "Going to retry parsing"
         
-        if parse.idx == self.parser.ontology.preds.index('speak_e') or parse.idx == self.parser.ontology.preds.index('speak_t'):
-            # Don't want UNK parses for speak actions
-            return []
+        #if parse.idx == self.parser.ontology.preds.index('speak_e') or parse.idx == self.parser.ontology.preds.index('speak_t'):
+            ## Don't want UNK parses for speak actions
+            #return []
         
-        if parse.idx != None and self.parser.ontology.preds[parse.idx] in ['speak_e', 'speak_t'] :
-            # Don't want UNK parses for speak actions
-            return []
-        if parse.children is not None and len(parse.children) >= 1 :
-            if parse.children[0].idx is not None and self.parser.ontology.preds[parse.children[0].idx] in ['speak_e', 'speak_t'] :
-                # Don't want UNK parses for speak actions
-                return []
+        #if parse.idx != None and self.parser.ontology.preds[parse.idx] in ['speak_e', 'speak_t'] :
+            ## Don't want UNK parses for speak actions
+            #return []
+        #if parse.children is not None and len(parse.children) >= 1 :
+            #if parse.children[0].idx is not None and self.parser.ontology.preds[parse.children[0].idx] in ['speak_e', 'speak_t'] :
+                ## Don't want UNK parses for speak actions
+                #return []
 
-        #print 'Going to try creating an UNK parse'
-        UNK_root = copy.deepcopy(parse)
-        curr = UNK_root
-        heading_lambdas = []
-        if curr.is_lambda and curr.is_lambda_instantiation:
-            heading_lambdas.append(curr.lambda_name)
-            curr = curr.children[0]
-        if curr.children is not None:
-            for i in range(0, len(curr.children)):
-                if curr.children[i].is_lambda and curr.children[i].lambda_name in heading_lambdas:
-                    curr.children[i] = self.parser.create_unk_node()
-        try:
-            #print 'Trying to get UNK action'
-            p_unk_action = self.get_action_from_parse(UNK_root)
-        except SystemError:
-            p_unk_action = None
-        except TypeError as e:
-            return []
-            print '--------------------------------'
-            print e.message
-            print '--------------------------------'
-            print self.parser.print_parse(parse)
-            print '--------------------------------'
-            print 'parse.idx = ', parse.idx
-            if parse.idx != None :
-                print 'self.parser.ontology.preds[parse.idx] = ', self.parser.ontology.preds[parse.idx]
-            if parse.children is not None and len(parse.children) >= 1 :
-                print 'parse.children[0].idx = ', parse.children[0].idx
-                if parse.children[0].idx is not None :
-                    print 'self.parser.ontology.preds[parse.children[0].idx] = ', self.parser.ontology.preds[parse.children[0].idx]
-            #print 'parse.children = '
-            #for c in parse.children :
-                #print self.parser.print_parse(c)
-                #print '\n'
-            print '--------------------------------'
+        ##print 'Going to try creating an UNK parse'
+        #UNK_root = copy.deepcopy(parse)
+        #curr = UNK_root
+        #heading_lambdas = []
+        #if curr.is_lambda and curr.is_lambda_instantiation:
+            #heading_lambdas.append(curr.lambda_name)
+            #curr = curr.children[0]
+        #if curr.children is not None:
+            #for i in range(0, len(curr.children)):
+                #if curr.children[i].is_lambda and curr.children[i].lambda_name in heading_lambdas:
+                    #curr.children[i] = self.parser.create_unk_node()
+        #try:
+            ##print 'Trying to get UNK action'
+            #p_unk_action = self.get_action_from_parse(UNK_root)
+        #except SystemError:
+            #p_unk_action = None
+        #except TypeError as e:
+            #return []
+            #print '--------------------------------'
+            #print e.message
+            #print '--------------------------------'
+            #print self.parser.print_parse(parse)
+            #print '--------------------------------'
+            #print 'parse.idx = ', parse.idx
+            #if parse.idx != None :
+                #print 'self.parser.ontology.preds[parse.idx] = ', self.parser.ontology.preds[parse.idx]
+            #if parse.children is not None and len(parse.children) >= 1 :
+                #print 'parse.children[0].idx = ', parse.children[0].idx
+                #if parse.children[0].idx is not None :
+                    #print 'self.parser.ontology.preds[parse.children[0].idx] = ', self.parser.ontology.preds[parse.children[0].idx]
+            ##print 'parse.children = '
+            ##for c in parse.children :
+                ##print self.parser.print_parse(c)
+                ##print '\n'
+            #print '--------------------------------'
             
-        if p_unk_action is not None :
-            #print 'Got UNK action. Going to convert and return'
-            return [self.convert_action_to_utterance(p_unk_action)]
+        #if p_unk_action is not None :
+            ##print 'Got UNK action. Going to convert and return'
+            #return [self.convert_action_to_utterance(p_unk_action)]
             
         # Getting a complete action failed so assume this is a param  
         #print 'Trying to ground as param value'
@@ -366,15 +366,20 @@ class PomdpDialogAgent :
         self.n_best_utterances = self.merge_duplicate_utterances(self.n_best_utterances)   
         self.n_best_utterances = self.remove_invalid_utterances(self.n_best_utterances, self.grounder) 
         
-        sum_exp_conf = float('-inf')
+        sum_log_prob = float('-inf')
         for utterance in self.n_best_utterances :
-            sum_exp_conf = add_log_probs(sum_exp_conf, utterance.parse_prob)
-        
-        sum_exp_conf = add_log_probs(sum_exp_conf, numpy.log(self.knowledge.obs_by_non_n_best_prob))
+            sum_log_prob = add_log_probs(sum_log_prob, utterance.parse_prob)
+
+        sum_prob = math.exp(sum_log_prob)
+        non_n_best_prob = max(self.knowledge.min_obs_by_non_n_best_prob,
+            self.knowledge.max_obs_by_non_n_best_prob - sum_prob)
+        other_utterance = Utterance('-OTHER-', parse_prob=non_n_best_prob)
+        self.n_best_utterances.append(other_utterance)
+        sum_log_prob = add_log_probs(sum_log_prob, math.log(non_n_best_prob))
         prob_with_utterances = list()
         
         for utterance in self.n_best_utterances :
-            utterance.parse_prob -= sum_exp_conf
+            utterance.parse_prob -= sum_log_prob
             prob_with_utterances.append((utterance.parse_prob, utterance))
             
         prob_with_utterances.sort()
