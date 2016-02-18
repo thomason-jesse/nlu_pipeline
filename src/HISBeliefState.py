@@ -1,7 +1,8 @@
 __author__ = 'aishwarya'
 
-import itertools
+import itertools, numpy
 from Partition import Partition
+from Utils import *
 
 class HISBeliefState:
 
@@ -26,7 +27,7 @@ class HISBeliefState:
         possible_param_values['patient'] = knowledge.goal_params_values
         possible_param_values['location'] = knowledge.goal_params_values
         possible_param_values['recipient'] = knowledge.goal_params_values
-        complete_partition = Partition(possible_actions, possible_param_values, 1.0)
+        complete_partition = Partition(possible_actions, possible_param_values, 0.0)
         self.partitions = [complete_partition]	
         
         # Hypotheses currently being tracked
@@ -165,27 +166,27 @@ class HISBeliefState:
                 hypothesis = (partition, utterance)
                 obs_prob = utterance.parse_prob # Pr(o'/u)
                 print 'obs_prob = ', obs_prob
-                type_prob = self.knowledge.action_type_probs[system_action.action_type][utterance.action_type]
+                type_prob = numpy.log(self.knowledge.action_type_probs[system_action.action_type][utterance.action_type])
                 print 'type_prob = ', type_prob # Pr(T(u)/T(m))
-                param_match_prob = int(utterance.match(partition, system_action)) # Pr(M(u)/p,m)
+                param_match_prob = numpy.log(int(utterance.match(partition, system_action))) # Pr(M(u)/p,m)
                 print 'param_match_prob = ', param_match_prob 
                 print '---------------------------------'
-                hypothesis_beliefs[hypothesis] = obs_prob * type_prob * param_match_prob * partition.belief 
-                    # b(p',u') = k * Pr(o'/u) * Pr(T(u)/T(m)) * Pr(M(u)/p,m) * b(p)
+                hypothesis_beliefs[hypothesis] = obs_prob + type_prob + param_match_prob + partition.belief 
+                    # b(p,u') = k * Pr(o'/u) * Pr(T(u)/T(m)) * Pr(M(u)/p,m) * b(p)
             hypothesis = (partition, '-OTHER-')
-            obs_prob = self.knowledge.obs_by_non_n_best_prob
-            match_prob = self.knowledge.non_n_best_match_prob
-            hypothesis_beliefs[hypothesis] = obs_prob * match_prob * partition.belief 
+            obs_prob = numpy.log(self.knowledge.obs_by_non_n_best_prob)
+            match_prob = numpy.log(self.knowledge.non_n_best_match_prob)
+            hypothesis_beliefs[hypothesis] = obs_prob + match_prob + partition.belief 
         
         # Normalize beliefs
-        sum_hypothesis_beliefs = 0.0
+        sum_hypothesis_beliefs = float('-inf')
         for hypothesis in hypothesis_beliefs.keys() :
-            sum_hypothesis_beliefs += hypothesis_beliefs[hypothesis]
+            sum_hypothesis_beliefs = add_log_probs(sum_hypothesis_beliefs, hypothesis_beliefs[hypothesis])
                 
         partitionwise_sum = dict()
         #print 'Hypotheses - '
         for (partition, utterance) in hypothesis_beliefs.keys() :
-           hypothesis_beliefs[(partition, utterance)] /= sum_hypothesis_beliefs
+           hypothesis_beliefs[(partition, utterance)] -= sum_hypothesis_beliefs
            #print '---------------------------------'
            #print str(partition)
            #print str(utterance)
@@ -194,7 +195,7 @@ class HISBeliefState:
            if partition not in partitionwise_sum :
                partitionwise_sum[partition] = hypothesis_beliefs[(partition, utterance)]
            else : 
-               partitionwise_sum[partition] += hypothesis_beliefs[(partition, utterance)]
+               partitionwise_sum[partition] = add_log_probs(partitionwise_sum[partition], hypothesis_beliefs[(partition, utterance)])
            
         # Reset partition beliefs for next round
         # b(p) = \sum_u b(p,u)
@@ -214,10 +215,6 @@ class HISBeliefState:
             self.partitions.remove(partition)        
                     
     def merge_duplicate_partitions(self) :
-        #print 'In merge_duplicate_partitions '
-        #print 'Before - '
-        #print str(self)
-        #print '------------------------------------------'
         i = 0
         while i < len(self.partitions) :
             p1 = self.partitions[i]
@@ -225,16 +222,8 @@ class HISBeliefState:
             while j < len(self.partitions) :
                 p2 = self.partitions[j]
                 if p1.is_like(p2) :
-                    #print str(p1)
-                    #print str(p2)
-                    #print '************************************'
-                    p1.belief += p2.belief
-                    p1.reaching_prob += p2.reaching_prob
+                    p1.belief = add_log_probs(p1.belief, p2.belief)
                     self.partitions.remove(p2)
                 else :
                     j += 1
             i += 1
-            
-        #print 'After - '
-        #print str(self)
-        #print '------------------------------------------'

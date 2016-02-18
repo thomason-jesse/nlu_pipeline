@@ -1,6 +1,6 @@
 __author__ = 'aishwarya'
 
-import sys, random, math, copy
+import sys, random, math, copy, re, numpy
 from Knowledge import Knowledge
 from HISBeliefState import HISBeliefState
 from SummaryState import SummaryState
@@ -41,6 +41,7 @@ class PomdpDialogAgent :
         # Logging for future use
         self.final_action_log = None
         self.lexical_addition_log = None
+        
 
     # Returns True if the dialog terminates on its own and False if the u
     # user entered stop
@@ -124,18 +125,8 @@ class PomdpDialogAgent :
     def update_state(self, response) :
         # get n best parses for confirmation
         #print 'response = ', response
-        n_best_parses = self.parser.parse_expression(response, n=self.parse_depth)
-        print 'Parsed'
-        #print 'n_best_parses = '
-        #for [parse, parse_tree, parse_trace, conf] in n_best_parses :
-            #print 'parse = ', self.parser.print_parse(parse)
-            #print 'parse_tree = ', self.parser.print_parse(parse_tree[0])
-            #print 'parse_trace[-1] = ', parse_trace[-1]
-            #print 'parse_trace = ', parse_trace
-            #print 'type(parse_trace) = ', type(parse_trace)
-            #print 'len(parse_trace) = ', len(parse_trace)
-            #print 'conf = ', conf 
-            #print '-------------------------------'
+
+        n_best_parses = self.get_n_best_parses(response)
 
         # Create an n-best list of Utterance objects along with probabiltiies 
         # obtained from their confidences
@@ -150,7 +141,7 @@ class PomdpDialogAgent :
             print 'Utterances - '
             for utterance in self.n_best_utterances :
                 print str(utterance)
-                print '\tParse = ', self.parser.print_parse(utterance.parse)
+                #print '\tParse = ', self.parser.print_parse(utterance.parse)
             self.state.update(self.previous_system_action, self.n_best_utterances, self.grounder)
             print 'Updated'
 
@@ -181,12 +172,7 @@ class PomdpDialogAgent :
         return utterance
 
     def create_utterances_of_parse(self, parse) :
-        #print 'Creating utterances of parse '
-        #print 'parse = ', parse
-        #print 'type(parse) = ', type(parse)
-        #print 'self.parser.print_parse(parse) = ', self.parser.print_parse(parse)
-        #print 'lexical form = ', self.parser.print_parse(self.parser.lexicon.semantic_forms[54])
-        #print 'Parser ontology: ', self.parser.ontology.preds
+        parse = parse.node
         # First check if it is a confirmation or denial
         if parse.idx == self.parser.ontology.preds.index('yes'):
             #print 'Is affirm'
@@ -329,7 +315,7 @@ class PomdpDialogAgent :
             while j < len(utterances) :
                 u2 = utterances[j]
                 if u2.is_like(u) :
-                    u.parse_prob += u2.parse_prob
+                    u.parse_prob = add_log_probs(u.parse_prob, u2.parse_prob)
                     utterances.remove(u2)
                 else :
                     j += 1
@@ -337,22 +323,32 @@ class PomdpDialogAgent :
             i += 1
         
         return merged_utterances    
+    
+    def get_n_best_parses(self, response, n=None) :
+        if n is None :
+            n = self.parse_depth
+        # Parser expects a space between 's and the thing it is applied 
+        # to, for example "alice 's" rather than "alice's"
+        response = re.sub("'s", " 's", response)
+        parse_generator = self.parser.most_likely_cky_parse(response)
+        k = 0
+        parses = list()
+        for (parse, score, _) in parse_generator :
+            if parse is None :
+                break
+            print 'parse = ', self.parser.print_parse(parse.node, show_category=True), ', score = ', score 
+            parses.append((parse, score))
+            k += 1
+            if k == n :
+                break
+        return parses 
             
     def get_n_best_utterances_from_parses(self, n_best_parses) :
         #print "In get_n_best_utterances_from_parses"
         #print "No of parses = ", len(n_best_parses)
-        sum_exp_conf = 0.0
         self.n_best_utterances = []
-        N = self.parser.beam_width
-        for [parse, parse_tree, parse_trace, conf] in n_best_parses :
-            #print "\nParsing ", self.parser.print_parse(parse)
-            #print 'conf = ', conf
-            #print '-------------------------------'
-            #print 'parse = ', parse
-            #print 'parse_tree = ', parse_tree
-            #print 'parse_trace = ', parse_trace
-            #print 'conf = ', conf 
-
+        N = self.parse_depth
+        for [parse, conf] in n_best_parses :
             utterances = self.create_utterances_of_parse(parse)
             if utterances is not None and len(utterances) >= N :
                 continue
@@ -360,28 +356,25 @@ class PomdpDialogAgent :
             if utterances is not None and len(utterances) > 0:
                 #print "Got ", len(utterances), " utterances"
                 for utterance in utterances :
-                    utterance.parse_leaves = parse_trace[-1]
                     utterance.parse = parse
-                    utterance.parse_tree = parse_tree
-                    utterance.parse_trace = parse_trace
                     #print str(utterance)
-                    utterance.parse_prob = math.exp(conf) / len(utterances)
+                    #utterance.parse_prob = math.exp(conf) / len(utterances)
+                    utterance.parse_prob = conf 
                     self.n_best_utterances.append(utterance)
-                    #sum_exp_conf += utterance.parse_prob
         
         # Clean up by removing duplicates and invalid utterances    
         self.n_best_utterances = self.merge_duplicate_utterances(self.n_best_utterances)   
         self.n_best_utterances = self.remove_invalid_utterances(self.n_best_utterances, self.grounder) 
         
-        sum_exp_conf = 0
+        sum_exp_conf = float('-inf')
         for utterance in self.n_best_utterances :
-            sum_exp_conf += utterance.parse_prob
+            sum_exp_conf = add_log_probs(sum_exp_conf, utterance.parse_prob)
         
-        sum_exp_conf += self.knowledge.obs_by_non_n_best_prob
+        sum_exp_conf = add_log_probs(sum_exp_conf, numpy.log(self.knowledge.obs_by_non_n_best_prob))
         prob_with_utterances = list()
         
         for utterance in self.n_best_utterances :
-            utterance.parse_prob /= sum_exp_conf
+            utterance.parse_prob -= sum_exp_conf
             prob_with_utterances.append((utterance.parse_prob, utterance))
             
         prob_with_utterances.sort()
@@ -394,31 +387,11 @@ class PomdpDialogAgent :
             for (idx, (prob, utterance)) in enumerate(prob_with_utterances) :
                 self.n_best_utterances.append(utterance)
             
-        #print 'max_prob_utterance parse = ', max_prob_utterance.parse_leaves 
         self.max_prob_user_utterances.append(max_prob_utterance)
         #print "N-best utterances: "
         #for utterance in self.n_best_utterances :
             #print str(utterance)
 
-    #def read_in_utterance_action_pairs(self, fname):
-        #f = open(fname,'r')
-        #f_lines = f.readlines()
-        #pairs = []
-        #for i in range(0,len(f_lines),3):
-            #print i
-            #t = self.parser.tokenize(f_lines[i].strip())
-            #a_str = f_lines[i+1].strip()
-            #a_name, a_params_str = a_str.strip(')').split('(')
-            #a_params = a_params_str.split(',')
-            #for j in range(0, len(a_params)):
-                #if a_params[j] == "True":
-                    #a_params[j] = True
-                #elif a_params[j] == "False":
-                    #a_params[j] = False
-            #pairs.append([t, Action(a_name, a_params)])
-        #f.close()
-        #return pairs
-        
     def read_in_utterance_action_pairs(self, fname):
         f = open(fname, 'r')
         f_lines = f.readlines()
@@ -437,47 +410,6 @@ class PomdpDialogAgent :
             pairs.append([t, r, Action(a_name, a_params)])
         f.close()
         return pairs
-
-    #def train_parser_from_utterance_action_pairs(self, pairs, epochs=10, parse_beam=10):
-        #for e in range(0, epochs):
-            #print "training epoch "+str(e)
-            #random.shuffle(pairs)
-            #train_data = []
-            #num_correct = 0
-            #for t, a in pairs:
-                #n_best_parses = self.parser.parse_tokens(t, n=parse_beam)
-                #if len(n_best_parses) == 0:
-                    #print "WARNING: no parses found for tokens "+str(t)
-                    #continue
-                #a_chosen = None
-                #a_candidate = None
-                #correct_found = False
-                #for i in range(0, len(n_best_parses)):
-                    #try:
-                        ## print "parse: " + self.parser.print_parse(n_best_parses[i][0])  # DEBUG
-                        ## print self.parser.print_semantic_parse_result(n_best_parses[i][1])  # DEBUG
-                        #a_candidate = self.get_action_from_parse(n_best_parses[i][0])
-                        ## print "candidate: "+str(a_candidate)  # DEBUG
-                    #except SystemError:
-                        #a_candidate = Action()
-                    #if i == 0:
-                        #a_chosen = a_candidate
-                    #if a_candidate.__eq__(a):
-                        #correct_found = True
-                        #self.parser.add_genlex_entries_to_lexicon_from_partial(n_best_parses[i][1])
-                        #break  # the action matches gold and this parse should be used in training
-                #if not correct_found:
-                    #print "WARNING: could not find correct action '"+str(a)+"' for tokens "+str(t)
-                #if a_chosen != a_candidate:
-                    #train_data.append([t, n_best_parses[0], a_chosen, n_best_parses[i], a])
-                #else:
-                    #num_correct += 1
-            #print "\t"+str(num_correct)+"/"+str(len(pairs))+" top choices"
-            #if num_correct == len(pairs):
-                #print "WARNING: training converged at epoch "+str(e)+"/"+str(epochs)
-                #return True
-            #self.parser.learner.learn_from_actions(train_data)
-        #return False
 
     def train_parser_from_utterance_action_pairs(self, pairs, epochs=10, parse_beam=10):
         for e in range(0, epochs):

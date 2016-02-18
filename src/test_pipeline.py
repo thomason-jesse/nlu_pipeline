@@ -11,8 +11,8 @@ import StaticDialogPolicy
 import ActionSender
 from TemplateBasedGenerator import TemplateBasedGenerator
 from StaticDialogAgent import StaticDialogAgent
-
-from DialogAgent import DialogAgent
+#from DialogAgent import DialogAgent
+from Utils import *
 
 class InputFromKeyboard:
     def __init__(self):
@@ -49,18 +49,20 @@ print "instantiating KBGrounder"
 grounder = KBGrounder.KBGrounder(ont)
 
 print "instantiating Parser"
-parser = CKYParser.CKYParser(ont, lex)
-d = parser.read_in_paired_utterance_semantics(sys.argv[3])
-converged = parser.train_learner_on_semantic_forms(d, 10, reranker_beam=10)
-if not converged:
-    raise AssertionError("Training failed to converge to correct values.")
+#parser = CKYParser.CKYParser(ont, lex)
+#d = parser.read_in_paired_utterance_semantics(sys.argv[3])
+#converged = parser.train_learner_on_semantic_forms(d, 10, reranker_beam=10)
+#if not converged:
+    #raise AssertionError("Training failed to converge to correct values.")
+#save_model(parser, 'parser')
+parser = load_model('parser')
 
 print "instantiating DialogAgent"
 u_in = InputFromKeyboard()
 u_out = OutputToStdout()
 static_policy = StaticDialogPolicy.StaticDialogPolicy()
-#A = StaticDialogAgent(parser, grounder, static_policy, u_in, u_out)
-A = DialogAgent(parser, grounder, static_policy, u_in, u_out)
+A = StaticDialogAgent(parser, grounder, static_policy, u_in, u_out)
+#A = DialogAgent(parser, grounder, static_policy, u_in, u_out)
 
 response_generator = TemplateBasedGenerator()
 
@@ -70,4 +72,5 @@ while True:
     if s == 'stop':
         break
     a = A.initiate_dialog_to_get_action(s)
-    print response_generator.get_action_sentence(a)
+    if a is not None :
+        print response_generator.get_action_sentence(a)

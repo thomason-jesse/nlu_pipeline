@@ -2,9 +2,6 @@ __author__ = 'aishwarya'
 
 from Utils import *
 
-# For pretty printing only
-import Parser
-
 class Utterance:
 
     def __init__(self, action_type, referring_goal=None, 
@@ -21,13 +18,10 @@ class Utterance:
         self.referring_params = referring_params 
         
         # Probability of the utterance given the most recent observation
+        # in log space
         self.parse_prob = parse_prob
         
-        # Some extra parse info
-        self.parse_leaves = None
         self.parse = None
-        self.parse_tree = None
-        self.parse_trace = None
         
     def __str__(self):
         str_form = 'Utterance: '+ str(self.action_type) + '\n'
