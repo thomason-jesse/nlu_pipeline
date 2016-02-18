@@ -5,7 +5,7 @@ from Utils import *
 class Utterance:
 
     def __init__(self, action_type, referring_goal=None, 
-            referring_params=None, parse_prob=0.0):
+            referring_params=None, parse_prob=float('-inf')):
         # This gives the type of dialog action
         # Possible types - inform_full, inform_param, affirm, deny
         # In case of affirm and deny, the goal and params will be None

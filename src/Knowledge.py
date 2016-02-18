@@ -50,8 +50,10 @@ class Knowledge:
         self.set_action_type_probs()
         
         # Probability that the obs is due to an utterance not in the 
-        # N-best list
-        self.obs_by_non_n_best_prob = 0.01
+        # N-best list. The actual probability will be this minus the sum 
+        # of probabilities of N-best parses
+        self.max_obs_by_non_n_best_prob = 0.5
+        self.min_obs_by_non_n_best_prob = 0.01
         
         # Probability that an utterance not in the N-best list matches 
         # the partition and system_action - This can probably be 
