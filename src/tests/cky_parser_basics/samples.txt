@@ -1,7 +1,7 @@
-fetch peter for ray
+bring ray peter
 M : bring(peter,ray)
 
-bring ray peter
+fetch peter for ray
 M : bring(peter,ray)
 
 take ray to peter
