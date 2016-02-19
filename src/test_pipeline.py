@@ -11,7 +11,7 @@ import StaticDialogPolicy
 import ActionSender
 from TemplateBasedGenerator import TemplateBasedGenerator
 from StaticDialogAgent import StaticDialogAgent
-#from DialogAgent import DialogAgent
+from DialogAgent import DialogAgent
 from Utils import *
 
 class InputFromKeyboard:
@@ -48,7 +48,7 @@ print "entries: " + str(lex.entries)
 print "instantiating KBGrounder"
 grounder = KBGrounder.KBGrounder(ont)
 
-print "instantiating Parser"
+#print "instantiating Parser"
 #parser = CKYParser.CKYParser(ont, lex)
 #d = parser.read_in_paired_utterance_semantics(sys.argv[3])
 #converged = parser.train_learner_on_semantic_forms(d, 10, reranker_beam=10)
@@ -61,8 +61,8 @@ print "instantiating DialogAgent"
 u_in = InputFromKeyboard()
 u_out = OutputToStdout()
 static_policy = StaticDialogPolicy.StaticDialogPolicy()
-A = StaticDialogAgent(parser, grounder, static_policy, u_in, u_out)
-#A = DialogAgent(parser, grounder, static_policy, u_in, u_out)
+#A = StaticDialogAgent(parser, grounder, static_policy, u_in, u_out)
+A = DialogAgent(parser, grounder, static_policy, u_in, u_out)
 
 response_generator = TemplateBasedGenerator()
 

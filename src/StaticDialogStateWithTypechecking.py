@@ -5,7 +5,7 @@ from Utils import *
 
 class StaticDialogStateWithTypechecking:
 
-    def __init__(self):
+    def __init__(self, grounder):
 
         self.num_user_turns = 0
         self.user_action_belief = {}
@@ -13,6 +13,7 @@ class StaticDialogStateWithTypechecking:
         self.user_action_parameters_belief = []  # dict for each parameter in order of patient, recipient, location
         self.previous_action = None
         self.knowledge = Knowledge()
+        self.grounder = grounder
 
     def __str__(self):
 
@@ -29,7 +30,7 @@ class StaticDialogStateWithTypechecking:
         return
 
     # update state given Action a and SemanticNode parse root p
-    def update_from_action(self, a, p, grounder):
+    def update_from_action(self, a, p):
 
         # update action belief
         self.user_action_belief[a.name] = 0.9
@@ -42,7 +43,7 @@ class StaticDialogStateWithTypechecking:
             if len(self.user_action_parameters_belief) == i:
                 self.user_action_parameters_belief.append({})
             if a.params[i] != "UNK_E":
-                if self.param_valid(i, a.params[i], grounder) :
+                if self.param_valid(i, a.params[i]) :
                     self.user_action_parameters_belief[i][a.params[i]] = 0.9
             for param in self.user_action_parameters_belief[i]:
                 if param != a.params[i]:
@@ -74,19 +75,19 @@ class StaticDialogStateWithTypechecking:
         return max(inverse)[1]
 
     # update state given a previously missing parameter at action param idx
-    def update_from_missing_param(self, param, idx, grounder):
-        if self.param_valid(idx, param, grounder) :
+    def update_from_missing_param(self, param, idx):
+        if self.param_valid(idx, param) :
             self.user_action_parameters_belief[idx][param] = 1
 
-    def param_valid(self, idx, param, grounder) :
+    def param_valid(self, idx, param) :
         goal = self.get_max_belief_action()
         param_order = self.knowledge.param_order[goal]
         true_constraints = self.knowledge.true_constraints[goal][param_order[idx]]
         false_constraints = self.knowledge.false_constraints[goal][param_order[idx]]
         for pred in true_constraints :
-            if not predicate_holds(pred, param, grounder) :
+            if not predicate_holds(pred, param, self.grounder) :
                 return False
         for pred in false_constraints :
-            if predicate_holds(pred, param, grounder) :
+            if predicate_holds(pred, param, self.grounder) :
                 return False
         return True
