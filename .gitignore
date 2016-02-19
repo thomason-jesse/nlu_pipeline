@@ -3,3 +3,4 @@ src/log/
 src/log_special/
 src/executed_action/
 src/models/
+src/resources/new_parser

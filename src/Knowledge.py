@@ -16,8 +16,8 @@ class Knowledge:
         # This is kept as a single vector common to all values so that hopefully 
         # some operaitons involving them can be made matrix operations and implemented
         # efficiently using numpy
-        #self.goal_params_values = [None, 'peter', 'ray', 'dana', 'kazunori', 'matteo', 'shiqi', 'jivko', 'stacy', 'yuqian', 'max', 'pato', 'bwi', 'bwi_m', 'l3_516', 'l3_508', 'l3_512', 'l3_510', 'l3_402', 'l3_418', 'l3_420', 'l3_432', 'l3_502', 'l3_414b', True, False]
-        self.goal_params_values = [None, 'chips', 'coffee', 'hamburger', 'juice', 'muffin', 'alice', 'frannie', 'bob', 'carol', 'dave', 'george', 'eve', 'mallory', 'peggy', 'walter', 'l3_516', 'l3_508', 'l3_512', 'l3_510', 'l3_402', 'l3_418', 'l3_420', 'l3_432', 'l3_502', 'l3_414b']      
+        self.goal_params_values = [None, 'peter', 'ray', 'dana', 'kazunori', 'matteo', 'shiqi', 'jivko', 'stacy', 'yuqian', 'max', 'pato', 'bwi', 'bwi_m', 'l3_516', 'l3_508', 'l3_512', 'l3_510', 'l3_402', 'l3_418', 'l3_420', 'l3_432', 'l3_502', 'l3_414b', True, False]
+        #self.goal_params_values = [None, 'chips', 'coffee', 'hamburger', 'juice', 'muffin', 'alice', 'frannie', 'bob', 'carol', 'dave', 'george', 'eve', 'mallory', 'peggy', 'walter', 'l3_516', 'l3_508', 'l3_512', 'l3_510', 'l3_402', 'l3_418', 'l3_420', 'l3_432', 'l3_502', 'l3_414b']      
         
         self.system_dialog_actions = ['repeat_goal', 'confirm_action', 'request_missing_param']
         self.user_dialog_actions = ['inform_param', 'inform_full', 'affirm', 'deny']
