@@ -434,8 +434,8 @@ class PomdpDialogAgent :
         
         # Clean up by removing duplicates and invalid utterances    
         self.n_best_utterances = self.merge_duplicate_utterances(self.n_best_utterances)   
-        self.n_best_utterances = self.remove_invalid_utterances(self.n_best_utterances, self.grounder) 
         self.n_best_utterances = self.cluster_utterances(self.n_best_utterances)
+        self.n_best_utterances = self.remove_invalid_utterances(self.n_best_utterances, self.grounder) 
         
         sum_log_prob = float('-inf')
         for utterance in self.n_best_utterances :
