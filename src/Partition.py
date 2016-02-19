@@ -20,7 +20,7 @@ class Partition:
         for param_name in self.possible_param_values :
             strParamValues = [str(v) for v in self.possible_param_values[param_name]]
             strForm = strForm + param_name + ': {' + ','.join(strParamValues) + '}\n'
-        strForm = strForm + 'Belief:' + str(self.belief) + '\n'
+        strForm = strForm + 'Belief:' + str(numpy.exp(self.belief)) + '\n'
         return strForm
         
     def __hash__(self):

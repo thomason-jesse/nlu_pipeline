@@ -52,8 +52,8 @@ class Knowledge:
         # Probability that the obs is due to an utterance not in the 
         # N-best list. The actual probability will be this minus the sum 
         # of probabilities of N-best parses
-        self.max_obs_by_non_n_best_prob = 0.5
-        self.min_obs_by_non_n_best_prob = 0.01
+        self.max_obs_by_non_n_best_prob = 0.0001
+        self.min_obs_by_non_n_best_prob = 0.00001
         
         # Probability that an utterance not in the N-best list matches 
         # the partition and system_action - This can probably be 
