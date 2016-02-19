@@ -22,10 +22,10 @@ class Parameters:
         self._lexicon_entry_given_token_counts = self.init_lexicon_entry()
         self._semantic_counts = self.init_semantic()
 
-        print "_CCG_given_token_counts: "+str(self._CCG_given_token_counts)  # DEBUG
-        print "_CCG_production_counts: "+str(self._CCG_production_counts)  # DEBUG
-        print "_lexicon_entry_counts: "+str(self._lexicon_entry_given_token_counts)  # DEBUG
-        print "_semantic_counts: "+str(self._semantic_counts)  # DEBUG
+        # print "_CCG_given_token_counts: "+str(self._CCG_given_token_counts)  # DEBUG
+        # print "_CCG_production_counts: "+str(self._CCG_production_counts)  # DEBUG
+        # print "_lexicon_entry_counts: "+str(self._lexicon_entry_given_token_counts)  # DEBUG
+        # print "_semantic_counts: "+str(self._semantic_counts)  # DEBUG
 
         # calculate probability tables from counts
         # note that this needs to happen every time counts are updated
@@ -37,10 +37,10 @@ class Parameters:
         # update probabilities given new counts
         self.update_probabilities()
 
-        print "CCG_given_token: "+str(self.CCG_given_token)  # DEBUG
-        print "CCG_production: "+str(self.CCG_production)  # DEBUG
-        print "lexicon_entry: "+str(self.lexicon_entry_given_token)  # DEBUG
-        print "semantic: "+str(self.semantic)  # DEBUG
+        # print "CCG_given_token: "+str(self.CCG_given_token)  # DEBUG
+        # print "CCG_production: "+str(self.CCG_production)  # DEBUG
+        # print "lexicon_entry: "+str(self.lexicon_entry_given_token)  # DEBUG
+        # print "semantic: "+str(self.semantic)  # DEBUG
 
     # update the probability tables given counts
     def update_probabilities(self):
@@ -278,9 +278,9 @@ class Parameters:
                         parameter_structures[i][y_key] = 0
                     parameter_structures[i][y_key] += z_val - y_val
 
-        print "_CCG_given_token_counts: "+str(self._CCG_given_token_counts)  # DEBUG
-        print "_CCG_production_counts: "+str(self._CCG_production_counts)  # DEBUG
-        print "_lexicon_entry_counts: "+str(self._lexicon_entry_given_token_counts)  # DEBUG
+        # print "_CCG_given_token_counts: "+str(self._CCG_given_token_counts)  # DEBUG
+        # print "_CCG_production_counts: "+str(self._CCG_production_counts)  # DEBUG
+        # print "_lexicon_entry_counts: "+str(self._lexicon_entry_given_token_counts)  # DEBUG
         # print "_semantic_counts: "+str([str((self.ontology.preds[pred] if type(pred) is int else pred,
         #                                      self.ontology.preds[arg] if type(arg) is int else arg,
         #                                      str(pos)))+": " +
@@ -290,9 +290,9 @@ class Parameters:
         # update probabilities given new counts
         self.update_probabilities()
 
-        print "CCG_given_token: "+str(self.CCG_given_token)  # DEBUG
-        print "CCG_production: "+str(self.CCG_production)  # DEBUG
-        print "lexicon_entry: "+str(self.lexicon_entry_given_token)  # DEBUG
+        # print "CCG_given_token: "+str(self.CCG_given_token)  # DEBUG
+        # print "CCG_production: "+str(self.CCG_production)  # DEBUG
+        # print "lexicon_entry: "+str(self.lexicon_entry_given_token)  # DEBUG
         # print "semantic: "+str([str((self.ontology.preds[pred] if type(pred) is int else pred,
         #                             self.ontology.preds[arg] if type(arg) is int else arg,
         #                             str(pos)))+": " +
@@ -355,7 +355,7 @@ class CKYParser:
         self.max_multiword_expression = 2  # max span of a multi-word expression to be considered during tokenization
         self.max_new_senses_per_utterance = 2  # max number of new word senses that can be induced on a training example
         self.max_cky_trees_per_token_sequence_beam = 1000  # for tokenization of an utterance, max cky trees considered
-        self.skip_word_penalty = 2  # inversely proportional to probability of correctness given skipped words
+        self.max_hypothesis_categories_for_unknown_token_beam = 10  # for unknown token, max syntax categories tried
 
         # behavioral parameters
         self.safety = True  # set to False once confident about node combination functions' correctness
@@ -543,16 +543,17 @@ class CKYParser:
         skip_scores = []
         for tks in tk_seqs:
             skip_score = {}
-            for idx in range(0, len(tks)):
-                if tks[idx] in self.lexicon.surface_forms:
-                    # TODO: could parameterize prior on surface forms
-                    skip_score[idx] = math.log((len(tks)-1)/float(len(tks)))
-                else:
-                    skip_score[idx] = 0  # no penalty when skipping totally unknown tokens
-                    sub_tokens = tks[idx].split(' ')
-                    for st in sub_tokens:
-                        if st in self.lexicon.surface_forms:
-                            skip_score[idx] = math.log((len(tks)-1)/float(len(tks)))
+            if len(tks) > 1:
+                for idx in range(0, len(tks)):
+                    if tks[idx] in self.lexicon.surface_forms:
+                        # TODO: could parameterize prior on surface forms
+                        skip_score[idx] = math.log((len(tks)-1)/float(len(tks)))
+                    else:
+                        skip_score[idx] = 0  # no penalty when skipping totally unknown tokens
+                        sub_tokens = tks[idx].split(' ')
+                        for st in sub_tokens:
+                            if st in self.lexicon.surface_forms:
+                                skip_score[idx] = math.log((len(tks)-1)/float(len(tks)))
             skip_scores.append(skip_score)
         # print "skip_scores: "+str(skip_scores)  # DEBUG
 
@@ -566,7 +567,7 @@ class CKYParser:
                 ordered_skip_sequences = None
                 if skips_allowed == 0:
                     ordered_skip_sequences = [tk_seqs[seq_idx][:]]
-                elif skips_allowed == len(tk_seqs[seq_idx]):
+                elif skips_allowed >= len(tk_seqs[seq_idx]):
                     ordered_skip_sequences = []  # no valid subset of this sequence; all tokens would be skipped
                 elif skips_allowed == 1:
                     skip_sequences = []
@@ -1019,8 +1020,8 @@ class CKYParser:
     # yields the next most likely ccg parse tree given a set of tokens
     def most_likely_ccg_parse_tree_given_tokens(self, tks, new_sense_leaf_limit=0, root_is_known=False):
 
-        print "most_likely_ccg_parse_tree_given_tokens initialized with tks="+str(tks) + \
-              ", new_sense_leaf_limit="+str(new_sense_leaf_limit)  # DEBUG
+        # print "most_likely_ccg_parse_tree_given_tokens initialized with tks="+str(tks) + \
+        #       ", new_sense_leaf_limit="+str(new_sense_leaf_limit)  # DEBUG
 
         # indexed by position in span (i, j) in parse tree
         # value is list of tuples [CCG category, [left key, left index], [right key, right index], score]
@@ -1120,10 +1121,10 @@ class CKYParser:
                             # it means that a consumation or merge can happen and we can be agnostic to how
                             for idx in range(0, len(lr_dirs[p_idx])):
                                 p = lr_dirs[p_idx][idx]
-                                for prod in self.theta.CCG_production:
-                                    # TODO: to speed up building CKY tree, could get keys of CCG_production
-                                    # TODO: in random order, then limit the number of additions we make at
-                                    # TODO: each entry here with another beam
+                                hypothesis_categories_added = 0
+                                ccg_productions = self.theta.CCG_production.keys()[:]
+                                random.shuffle(ccg_productions)
+                                for prod in ccg_productions:
                                     # leaf m can be be combine with p
                                     if prod[lr_idxs[p_idx]] == p[0]:
                                         # give probability of unknown token assigned to this CCG category
@@ -1136,6 +1137,10 @@ class CKYParser:
                                         new_entry[lr_idxs[p_idx]] = [lr_keys[p_idx], idx]
                                         chart[key].append(new_entry)
                                         # print "new chart entry "+str(key)+" : "+str(chart[key][-1])  # DEBUG
+                                        hypothesis_categories_added += 1
+                                        if hypothesis_categories_added == \
+                                                self.max_hypothesis_categories_for_unknown_token_beam:
+                                            break
 
                     # print "chart: "+str(chart)  # DEBUG
                     # _ = raw_input()  # DEBUG
@@ -1145,7 +1150,7 @@ class CKYParser:
 
         # return most likely trees in order at root
         key = (0, len(tks))
-        print "\tnumber of roots to yield: "+str(len(chart[key]))  # DEBUG
+        # print "\tnumber of roots to yield: "+str(len(chart[key]))  # DEBUG
         roots_yielded = 0
         while len(chart[key]) > 0 and roots_yielded < self.max_cky_trees_per_token_sequence_beam:
 
