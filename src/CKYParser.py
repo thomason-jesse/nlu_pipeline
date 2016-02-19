@@ -364,6 +364,7 @@ class CKYParser:
         self.cached_combinations = {}  # indexed by left, then right node, value at result
 
         # type-raise bare nouns in lexicon
+        self.type_raised = {}  # map from semantic form idx to their type-raised form idx
         self.type_raise_bare_nouns()
 
     # perform type-raising on leaf-level lexicon entries
@@ -399,12 +400,13 @@ class CKYParser:
                                                                 True, lambda_name=0, is_lambda_instantiation=False)
                         raised_pred.children = [lambda_inst]
                         raised_sem.children = [raised_pred]
-                        to_add.append([sf_idx, raised_sem])
-        for sf_idx, sem in to_add:
+                        to_add.append([sf_idx, sem_idx, raised_sem])
+        for sf_idx, sem_idx, sem in to_add:
             print "type_raise_bare_nouns raising: '"+self.lexicon.surface_forms[sf_idx] + \
                   "':- "+self.print_parse(sem, show_category=True)  # DEBUG
             self.lexicon.semantic_forms.append(sem)
             self.lexicon.entries[sf_idx].append(len(self.lexicon.semantic_forms)-1)
+            self.type_raised[sem_idx] = len(self.lexicon.semantic_forms)-1
 
     # print a SemanticNode as a string using the known ontology
     def print_parse(self, p, show_category=False, show_non_lambda_types=False):
@@ -1301,9 +1303,11 @@ class CKYParser:
                 c_obj = copy.deepcopy(self.lexicon.semantic_forms[c]) if type(c) is int else c
                 copy_obj = SemanticNode.SemanticNode(None, None, None, False, 0)
                 copy_obj.copy_attributes(c_obj, preserve_parent=True)
-                # TODO: figure out how to re-integrate once unary rules are re-integrated
-                # if self.can_perform_type_raising(copy_obj) == "DESC->N/N":
-                #     copy_obj = self.perform_adjectival_type_raise(c_obj)
+                if (copy_obj in self.lexicon.semantic_forms and
+                        self.lexicon.semantic_forms.index(copy_obj) in self.type_raised):
+                    copy_obj.copy_attributes(self.lexicon.semantic_forms[
+                                             self.type_raised[self.lexicon.semantic_forms.index(copy_obj)]],
+                                             preserve_parent=True)
                 a_new.children[i] = self.perform_fa(copy_obj, b, renumerate=False)
                 a_new.children[i].set_return_type(self.ontology)
                 a_new.children[i].parent = a_new
@@ -1344,10 +1348,11 @@ class CKYParser:
                         c = b_new.children[i]
                         c.parent = None
                         c_obj = copy.deepcopy(self.lexicon.semantic_forms[c]) if type(c) is int else c
-                        # TODO: figure out how to re-integrate once unary rules are re-integrated
-                        # if self.can_perform_type_raising(c_obj) == "DESC->N/N":
-                        #     c_obj = self.perform_adjectival_type_raise(c_obj)
-                        #     raised = True
+                        if (c_obj in self.lexicon.semantic_forms and
+                                self.lexicon.semantic_forms.index(c_obj) in self.type_raised):
+                            c_obj.copy_attributes(self.lexicon.semantic_forms[
+                                                  self.type_raised[self.lexicon.semantic_forms.index(c_obj)]])
+                            raised = True
                         b_new.children[i] = self.perform_fa(c_obj, curr.children[0], renumerate=False)
                         b_new.children[i].increment_lambdas(inc=deepest_lambda)
                         b_new.children[i].parent = curr
