@@ -1,5 +1,6 @@
 __author__ = 'aishwarya'
 
+import math
 from Utils import *
 
 class Utterance:
@@ -30,7 +31,7 @@ class Utterance:
             str_form = str_form + '\tParams: ' + ','.join([str(k) + ':' + str(v) for (k, v) in self.referring_params.items()]) + '\n'
         else:
             str_form = str_form + '\tParams:None\n'
-        str_form = str_form + '\tProb:' + str(self.parse_prob) + '\n'
+        str_form = str_form + '\tProb:' + str(math.exp(self.parse_prob)) + '\n'
         return str_form        
 
     # assumes elements of referring_params list are atomic
@@ -132,18 +133,19 @@ class Utterance:
             return False
         
         # Check that if a relevant param has a value, it is valid
-        goal = self.possible_goals[0]
-        relevant_params = knowledge.param_order[goal]
-        for param_name in relevant_params :
-            if param_name in self.referring_params :
-                argument = self.referring_params[param_name]
-                for true_pred in knowledge.true_constraints[goal][param_name] :
-                    if not predicate_holds(true_pred, argument, grounder) :
-                        # A predicate that should hold does not
-                        return False
-                for false_pred in knowledge.false_constraints[goal][param_name] :
-                    if predicate_holds(false_pred, argument, grounder) :
-                        # A predicate that should not hold does
-                        return False
+        goal = self.referring_goal
+        if goal is not None :
+            relevant_params = knowledge.param_order[goal]
+            for param_name in relevant_params :
+                if param_name in self.referring_params :
+                    argument = self.referring_params[param_name]
+                    for true_pred in knowledge.true_constraints[goal][param_name] :
+                        if not predicate_holds(true_pred, argument, grounder) :
+                            # A predicate that should hold does not
+                            return False
+                    for false_pred in knowledge.false_constraints[goal][param_name] :
+                        if predicate_holds(false_pred, argument, grounder) :
+                            # A predicate that should not hold does
+                            return False
         return True
         

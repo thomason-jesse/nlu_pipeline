@@ -1,6 +1,6 @@
 __author__ = 'aishwarya'
 
-import sys, random, math, copy, re, numpy
+import sys, random, math, copy, re, numpy, itertools
 from Knowledge import Knowledge
 from HISBeliefState import HISBeliefState
 from SummaryState import SummaryState
@@ -50,7 +50,7 @@ class PomdpDialogAgent :
         self.parser_train_data = dict()
         self.max_prob_user_utterances = list()
         
-        print 'Belief state: ', str(self.state) 
+        #print 'Belief state: ', str(self.state) 
         summary_state = SummaryState(self.state)
         (dialog_action, dialog_action_arg) = self.policy.get_initial_action(summary_state)    
         
@@ -85,7 +85,7 @@ class PomdpDialogAgent :
                     return False
                 # Belief monitoring - update belief based on the response
                 self.update_state(response)
-                print 'Belief state: ', str(self.state) 
+                #print 'Belief state: ', str(self.state) 
                 
                 reward = self.knowledge.per_turn_reward
                 summary_state = SummaryState(self.state)
@@ -135,13 +135,9 @@ class PomdpDialogAgent :
         
         if len(self.n_best_utterances) > 0 :
             # Update the belief state
-            print '\nGoing to update belief state'
-            print 'Previous system action - ', str(self.previous_system_action)
-            #print 'Utterances - ', '\n'.join([str(utterance) for utterance in self.n_best_utterances])
-            print 'Utterances - '
-            for utterance in self.n_best_utterances :
-                print str(utterance)
-                #print '\tParse = ', self.parser.print_parse(utterance.parse)
+            #print '\nGoing to update belief state'
+            #print 'Previous system action - ', str(self.previous_system_action)
+            print 'Utterances - ', '\n'.join([str(utterance) for utterance in self.n_best_utterances])
             self.state.update(self.previous_system_action, self.n_best_utterances, self.grounder)
             print 'Updated'
 
@@ -300,7 +296,7 @@ class PomdpDialogAgent :
     def remove_invalid_utterances(self, utterances, grounder) :
         invalid_utterances = set()
         for utterance in utterances :
-            if type(utterance) == 'Utterance' and not utterance.is_valid(self.knowledge, grounder) :
+            if not utterance.is_valid(self.knowledge, grounder) :
                 invalid_utterances.add(utterance)
         for utterance in invalid_utterances :
             utterances.remove(utterance)
@@ -342,6 +338,80 @@ class PomdpDialogAgent :
             if k == n :
                 break
         return parses 
+    
+    # A helper function for cluster_utterances()
+    def get_utterance_type(self, utterance) :
+        return utterance.action_type
+        
+    # A helper function for cluster_utterances()
+    def get_utterance_goal(self, utterance) :
+        return utterance.referring_goal
+    
+    # Calculate sum of log probs of utterances
+    def get_sum_prob(self, utterances) :
+        sum_log_prob = float('-inf')
+        for utterance in utterances :
+            sum_log_prob = add_log_probs(sum_log_prob, utterance.parse_prob)
+        return sum_log_prob
+    
+    # If self.n_best_utterances has a lot of utterances that differ only
+    # in one parameter, group them into a single utterance marking that
+    # parameter as unknown
+    # num_to_merge is the number of such utterances that need to match 
+    # in this manner in order to be clustered
+    def cluster_utterances(self, utterances, num_to_merge=3) :
+        # Group utterances by type
+        sorted_utterances = sorted(utterances, key=self.get_utterance_type)
+        replacement_pairs = list()
+        for utterance_type, group in itertools.groupby(sorted_utterances, self.get_utterance_type) :
+            considered_utterances = list(group)
+            if len(considered_utterances) >= num_to_merge :
+                # If there are enough utterances of some type, group
+                # them by goal
+                sorted_considered_utterances = sorted(considered_utterances, key=self.get_utterance_goal)
+                for goal, group in itertools.groupby(sorted_considered_utterances, self.get_utterance_goal) :
+                    candidates = list(group)
+                    if len(candidates) >= num_to_merge and goal is not None:
+                        # If there are enough utterances of this type 
+                        # having the same goal 
+                        param_order = self.knowledge.param_order[goal]
+                        values = dict()
+                        diagreeing_params = set()
+                        for utterance in candidates :
+                            for param_name in param_order :
+                                param_value = None
+                                if param_name in utterance.referring_params :
+                                    param_value = utterance.referring_params[param_name]
+                                if param_name not in values :
+                                    values[param_name] = set([param_value])
+                                else :
+                                    values[param_name].add(param_value)
+                                if len(values[param_name]) > 1 :
+                                    diagreeing_params.add(param_name)
+                        if len(diagreeing_params) == 1 :
+                            # There is exactly one param on whose value 
+                            # these parses differ 
+                            clustered_utterance = Utterance(utterance_type, goal)
+                            # Create an utterance with the current type and goal
+                            # Add all params values which are not the 
+                            # disagreeing param        
+                            params = dict()
+                            for param_name in param_order :
+                                if param_name not in diagreeing_params :
+                                    params[param_name] = values[param_name][0]
+                                    # values[param_name] will have exactly
+                                    # one element if param_name is not a
+                                    # disagreeing param
+                            clustered_utterance.referring_params = params
+                            clustered_utterance.parse_prob = self.get_sum_prob(candidates)
+                            replacement_pairs.append((candidates, clustered_utterance))
+        for (candidates, clustered_utterance) in replacement_pairs :
+            # Remove candidates from utterances and add clustered_utterance
+            for utterance in candidates :
+                if utterance in utterances :
+                    utterances.remove(utterance)
+            utterances.append(clustered_utterance)
+        return utterances
             
     def get_n_best_utterances_from_parses(self, n_best_parses) :
         #print "In get_n_best_utterances_from_parses"
@@ -364,6 +434,7 @@ class PomdpDialogAgent :
         
         # Clean up by removing duplicates and invalid utterances    
         self.n_best_utterances = self.merge_duplicate_utterances(self.n_best_utterances)   
+        self.n_best_utterances = self.cluster_utterances(self.n_best_utterances)
         self.n_best_utterances = self.remove_invalid_utterances(self.n_best_utterances, self.grounder) 
         
         sum_log_prob = float('-inf')
@@ -371,11 +442,13 @@ class PomdpDialogAgent :
             sum_log_prob = add_log_probs(sum_log_prob, utterance.parse_prob)
 
         sum_prob = math.exp(sum_log_prob)
-        non_n_best_prob = max(self.knowledge.min_obs_by_non_n_best_prob,
-            self.knowledge.max_obs_by_non_n_best_prob - sum_prob)
-        other_utterance = Utterance('-OTHER-', parse_prob=non_n_best_prob)
+        print 'sum_prob = ', sum_prob
+        print 'self.knowledge.min_obs_by_non_n_best_prob = ', self.knowledge.min_obs_by_non_n_best_prob
+        non_n_best_prob = max(self.knowledge.min_obs_by_non_n_best_prob, self.knowledge.max_obs_by_non_n_best_prob - sum_prob)
+        print 'non_n_best_prob = ', non_n_best_prob
+        other_utterance = Utterance('-OTHER-', parse_prob=numpy.log(non_n_best_prob))
         self.n_best_utterances.append(other_utterance)
-        sum_log_prob = add_log_probs(sum_log_prob, math.log(non_n_best_prob))
+        sum_log_prob = add_log_probs(sum_log_prob, numpy.log(non_n_best_prob))
         prob_with_utterances = list()
         
         for utterance in self.n_best_utterances :
