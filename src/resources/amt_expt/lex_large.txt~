@@ -1,0 +1,101 @@
+#imperative
+search :- M/PP/NP : lambda r:e.(lambda p:e.(searchroom(p,r)))
+bring :- M/N/NP : lambda y:e.(lambda x:e.(bring(x,y)))
+bring :- M/PP/NP : lambda x:e.(lambda y:e.(bring(x,y)))
+walk :- M/PP : lambda x:e.(at(x))
+
+#prepositional arguments to commands
+for :- PP/NP : lambda x:e.(x)
+of :- PP/NP : lambda x:e.(x)
+in :- PP/NP : lambda x:e.(x)
+about :- PP/NP : lambda x:e.(x)
+
+#confirmations
+yes :- C : yes
+no :- C : no
+none :- C : none
+
+#these are weird now bc there's some implicit knowledge in hasoffice that the second arg is an office
+'s office :- NP\NP : lambda x:e.(the(lambda y:e.(hasoffice(x,y))))
+office of :- N/NP : lambda x:e.(lambda y:e.(hasoffice(x,y)))
+
+#entity descriptor words
+#can be type-raised to N/N : lambda x:e.(pred(x))
+room :- DESC : room
+person :- DESC : person
+item :- DESC : item
+
+#closed category
+and :- I/I\I : lambda x:t.(lambda y:t.(and(x,y)))
+or :- I/I\I : lambda x:t.(lambda y:t.(or(x,y)))
+not :- I/I : lambda x:t.(not(x))
+the :- N/DESC : lambda P:<e,t>.(the(lambda x:e.(P(x))))
+the :- N/N : lambda P:<e,t>.(the(P))
+the :- N/N : lambda x:e.(x)
+a :- N/DESC : lambda P:<e,t>.(a(lambda x:e.(P(x))))
+a :- DESC/DESC : lambda P:<e,t>.(P)
+a :- (N/N)/(N/N) : lambda P:<e,t>.(P)
+a :- N/N : lambda x:e.(x)
+
+#atoms
+chips :- N : chips
+bag of chips :- N : chips
+coffee :- N : coffee
+cup of coffee :- N : coffee
+hamburger :- N : hamburger
+burger :- N : hamburger
+juice :- N : juice
+drink :- N : juice
+muffin :- N : muffin
+cupcake :- N : muffin
+alice :- N : alice
+alice ashcraft :- N : alice
+ashcraft :- N : alice
+secretary :- N : alice
+francis foster :- N : frannie
+foster :- N : frannie
+frannie :- N : frannie
+francis :- N : frannie
+robert brown :- N : bob
+brown :- N : bob
+bob :- N : bob
+bob brown :- N : bob
+robert :- N : bob
+carol :- N : carol
+carol clark :- N : carol
+clark :- N : carol
+dave :- N : dave
+dave daniel :- N : dave
+daniel :- N : dave
+george :- N : george
+george green :- N : george
+green :- N : george
+intern :- N : george
+evelyn :- N : eve
+evelyn eckhart :- N : eve
+eve eckhart :- N : eve
+eckhart :- N : eve
+eve :- N : eve
+mallory morgan :- N : mallory
+morgan :- N : mallory
+mallory :- N : mallory
+director :- N : mallory
+dr morgan :- N : mallory
+peggy :- N : peggy
+peggy parker :- N : peggy
+parker :- N : peggy
+walter :- N : walter
+walter ward :- N : walter
+ward :- N : walter
+supervisor :- N : walter
+3516 :- N : l3_516
+3508 :- N : l3_508
+3512 :- N : l3_512
+3510 :- N : l3_510
+3402 :- N : l3_402
+3418 :- N : l3_418
+3420 :- N : l3_420
+3432 :- N : l3_432
+3502 :- N : l3_502
+3414b :- N : l3_414b
+

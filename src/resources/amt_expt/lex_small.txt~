@@ -30,29 +30,29 @@ the :- NP/(N/N) : lambda P:<e,t>.(the(lambda x:e.(P(x))))
 a :- NP/(N/N) : lambda P:<e,t>.(a(lambda x:e.(P(x))))
 
 #atoms
-chips :- NP : chips
-coffee :- NP : coffee
-hamburger :- NP : hamburger
-juice :- NP : juice
-muffin :- NP : muffin
-alice :- NP : alice
-frannie :- NP : frannie
-bob :- NP : bob
-carol :- NP : carol
-dave :- NP : dave
-george :- NP : george
-eve :- NP : eve
-mallory :- NP : mallory
-peggy :- NP : peggy
-walter :- NP : walter
-3516 :- NP : l3_516
-3508 :- NP : l3_508
-3512 :- NP : l3_512
-3510 :- NP : l3_510
-3402 :- NP : l3_402
-3418 :- NP : l3_418
-3420 :- NP : l3_420
-3432 :- NP : l3_432
-3502 :- NP : l3_502
-3414b :- NP : l3_414b
+chips :- N : chips
+coffee :- N : coffee
+hamburger :- N : hamburger
+juice :- N : juice
+muffin :- N : muffin
+alice :- N : alice
+frannie :- N : frannie
+bob :- N : bob
+carol :- N : carol
+dave :- N : dave
+george :- N : george
+eve :- N : eve
+mallory :- N : mallory
+peggy :- N : peggy
+walter :- N : walter
+3516 :- N : l3_516
+3508 :- N : l3_508
+3512 :- N : l3_512
+3510 :- N : l3_510
+3402 :- N : l3_402
+3418 :- N : l3_418
+3420 :- N : l3_420
+3432 :- N : l3_432
+3502 :- N : l3_502
+3414b :- N : l3_414b
 

@@ -168,7 +168,21 @@ class StaticDialogAgent(DialogAgent):
         
         self.update_state_from_action_confirmation(c, a)
 
+    # Creates (text, denotation) pairs and retrains parser
     def train_parser_from_dialogue(self, final_action) :
+        print 'Lexicon - ', self.parser.lexicon.surface_forms
+        print 'self.parser_train_data = ', self.parser_train_data
+
+        answers = dict()
+        answers['full'] = str(final_action)
+        goal = final_action.name
+        for (idx, param_name) in enumerate(self.knowledge.param_order[goal]) :
+            answers[param_name] = final_action.params[idx]
+        
+        print 'answers = ', answers
+
+
+    #def train_parser_from_dialogue(self, final_action) :
         #print 'Lexicon - ', self.parser.lexicon.surface_forms
         
         #print 'self.parser_train_data = ', self.parser_train_data
@@ -306,5 +320,5 @@ class StaticDialogAgent(DialogAgent):
 
         #print 'Finished retraining parser'
 
-        self.parser_train_data = dict()
-        save_model(self.parser, 'static_parser')
+        #self.parser_train_data = dict()
+        #save_model(self.parser, 'static_parser')
