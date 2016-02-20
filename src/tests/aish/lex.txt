@@ -1,14 +1,14 @@
 #imperative
-search :- M/PP/N : lambda r:e.(lambda p:e.(searchroom(p,r)))
-bring :- M/N/N : lambda y:e.(lambda x:e.(bring(x,y)))
-bring :- M/PP/N : lambda x:e.(lambda y:e.(bring(x,y)))
+search :- M/PP/NP : lambda r:e.(lambda p:e.(searchroom(p,r)))
+bring :- M/NP/NP : lambda y:e.(lambda x:e.(bring(x,y)))
+bring :- M/PP/NP : lambda x:e.(lambda y:e.(bring(x,y)))
 walk :- M/PP : lambda x:e.(at(x))
 
 #prepositional arguments to commands
-for :- PP/N : lambda x:e.(x)
-of :- PP/N : lambda x:e.(x)
-in :- PP/N : lambda x:e.(x)
-about :- PP/N : lambda x:e.(x)
+for :- PP/NP : lambda x:e.(x)
+of :- PP/NP : lambda x:e.(x)
+in :- PP/NP : lambda x:e.(x)
+about :- PP/NP : lambda x:e.(x)
 
 #confirmations
 yes :- C : yes
@@ -16,51 +16,43 @@ no :- C : no
 none :- C : none
 
 #these are weird now bc there's some implicit knowledge in hasoffice that the second arg is an office
-'s office :- N\N : lambda x:e.(the(lambda y:e.(hasoffice(x,y))))
-office of :- N/N : lambda x:e.(lambda y:e.(hasoffice(x,y)))
+'s office :- NP\NP : lambda x:e.(the(lambda y:e.(hasoffice(x,y))))
+office of :- N/NP : lambda x:e.(lambda y:e.(hasoffice(x,y)))
 
 #entity descriptor words
 #can be type-raised to N/N : lambda x:e.(pred(x))
-room :- DESC : room
-person :- DESC : person
-item :- DESC : item
+room :- N : room
+person :- N : person
+item :- N : item
 
 #closed category
-and :- I/I\I : lambda x:t.(lambda y:t.(and(x,y)))
-or :- I/I\I : lambda x:t.(lambda y:t.(or(x,y)))
-not :- I/I : lambda x:t.(not(x))
-the :- N/DESC : lambda P:<e,t>.(the(lambda x:e.(P(x))))
-the :- N/N : lambda P:<e,t>.(the(P))
-the :- N/N : lambda x:e.(x)
-a :- N/DESC : lambda P:<e,t>.(a(lambda x:e.(P(x))))
-a :- DESC/DESC : lambda P:<e,t>.(P)
-a :- (N/N)/(N/N) : lambda P:<e,t>.(P)
-a :- N/N : lambda x:e.(x)
+the :- NP/(N/N) : lambda P:<e,t>.(the(lambda x:e.(P(x))))
+a :- NP/(N/N) : lambda P:<e,t>.(a(lambda x:e.(P(x))))
 
 #atoms
-chips :- N : chips
-coffee :- N : coffee
-hamburger :- N : hamburger
-juice :- N : juice
-muffin :- N : muffin
-alice :- N : alice
-frannie :- N : frannie
-bob :- N : bob
-carol :- N : carol
-dave :- N : dave
-george :- N : george
-eve :- N : eve
-mallory :- N : mallory
-peggy :- N : peggy
-walter :- N : walter
-3516 :- N : l3_516
-3508 :- N : l3_508
-3512 :- N : l3_512
-3510 :- N : l3_510
-3402 :- N : l3_402
-3418 :- N : l3_418
-3420 :- N : l3_420
-3432 :- N : l3_432
-3502 :- N : l3_502
-3414b :- N : l3_414b
+chips :- NP : chips
+coffee :- NP : coffee
+hamburger :- NP : hamburger
+juice :- NP : juice
+muffin :- NP : muffin
+alice :- NP : alice
+frannie :- NP : frannie
+bob :- NP : bob
+carol :- NP : carol
+dave :- NP : dave
+george :- NP : george
+eve :- NP : eve
+mallory :- NP : mallory
+peggy :- NP : peggy
+walter :- NP : walter
+3516 :- NP : l3_516
+3508 :- NP : l3_508
+3512 :- NP : l3_512
+3510 :- NP : l3_510
+3402 :- NP : l3_402
+3418 :- NP : l3_418
+3420 :- NP : l3_420
+3432 :- NP : l3_432
+3502 :- NP : l3_502
+3414b :- NP : l3_414b
 
