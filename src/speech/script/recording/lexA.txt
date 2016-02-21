@@ -1,13 +1,13 @@
-<T>: Title
------------
+<C>
+<T>
 doctor
 dr
 mr
 ms 
 professor
-
-<PS>: Position
---------------
+</C>
+<C>
+<PS>
 advisor : ray
 chair : bruce
 director : ray
@@ -20,9 +20,9 @@ secretary : peggy
 student : walter
 ta : carol
 undergrad : francis 
-
-<P>: Place 
------------
+</C>
+<C>
+<P> 
 kitchen : kitchen
 lab : lab
 office : office
@@ -37,11 +37,11 @@ room 3510 : l_3510
 room 3512 : l_3512
 room 3516 : l_3516
 sink : kitchen
-
-<FN>: Full Name
-----------------
-bruce porter : bruce
+</C>
+<C>
+<FN>
 alice ashcraft : alice
+bruce porter : bruce
 carol daniel : carol
 dana ballard : dana
 dave eckhart : dave
@@ -62,62 +62,63 @@ shiqi : shiqi
 stacy morgan : stacy
 walter ward : walter
 yuqian : yuqian
-
-<I>: Item 
-----------
-an apple : apple
+</C>
+<C>
+<I> 
 a bag of chips : chips
-the basket : basket
 a beverage : beverage
-the binder : binder
-the book : book
-the box : box
-the bread : bread
 a burger : burger
-the cake : cake
-the calendar : calendar
-the cellphone : cellphone
 a cheeseburger : cheeseburger
-the chips : chips
-some coffee : coffee
 a coffee cup : coffee
-some coffee to go : coffee
-some coke : coke
-the container : container
-the crisps : chips
 a cup of coffee : coffee
 a cupcake : cupcake
-the dessert : dessert
-the diary : diary
-the doritos : doritos
 a drink : drink
-the dustbin : trashcan
 a glass : glass
 a glass of juice : juice
 a hamburger : burger
 a hammer : hammer
+a muffin : muffin
+a notebook : notebook
+a pencil : pencil
+a phone : phone
+a pillow : pillow
+a salad : salad
+a sandwich : sandwich
+a snack : snack
+a watch : watch
+an apple : apple
+an organizer : organizer
+some coffee : coffee
+some coffee to go : coffee
+some coke : coke
+some soda : coke
+some tea : tea
+some water : water
+something to drink : coke
+the basket : basket
+the binder : binder
+the book : book
+the box : box
+the bread : bread
+the cake : cake
+the calendar : calendar
+the cellphone : cellphone
+the chips : chips
+the container : container
+the crisps : chips
+the dessert : dessert
+the diary : diary
+the doritos : doritos
+the dustbin : trashcan
 the juice : juice
 the laptop : laptop
 the lays : chips
 the ledger : ledger
 the letter : letter
 the milk : milk
-a muffin : muffin
-a notebook : notebook
-an organizer : organizer
-a pencil : pencil
-a phone : phone
-a pillow : pillow
 the pizza : pizza
 the planner : planner
 the potato chips : chips
-a salad : salad
-a sandwich : sandwich
-a snack : snack
-some soda : coke
-something to drink : coke
-some tea : tea
 the trashcan : trashcan
-a watch : watch
-some water : water
 yourself : me
+</C>

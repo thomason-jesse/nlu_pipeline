@@ -1,145 +1,116 @@
 <C>
-<T>
-doctor
-dr
-mr
-ms 
-professor
-</C>
-<C>
-<LN>
-ashcraft
-ballard
-brown
-clark
-daniel
-eckhart
-foster
-green
-mooney
-morgan
-parker
-stone
-ward
-</C>
-<C>
 <PS>
-the advisor
-the chair
-the director
-the grad student
-the intern
-the pi
-the postdoc 
-the professor
-the secretary
-the student
-the ta
-the undergrad
-</C>
-<C>
-<NN>
-bob
-eve 
-frannie
+the advisor : ray
+the chair : bruce
+the director : ray
+the grad student : jesse
+the intern : robert
+the pi : peter
+the postdoc : jivko
+the professor : ray
+the secretary : peggy
+the student : walter
+the ta : carol
+the undergrad : francis 
 </C>
 <C>
 <P>
-the kitchen
-the lab
-the office 
-room 3402
-room 3414b
-room 3418
-room 3420
-room 3432
-room 3502
-room 3508
-room 3510
-room 3512
-room 3516
-the sink
+the kitchen : kitchen
+the lab : lab
+the office : office
+room 3402 : l_3402
+room 3414b : l_3414b
+room 3418 : l_3418
+room 3420 : l_3420
+room 3432 : l_3432
+room 3502 : l_3502
+room 3508 : l_3508
+room 3510 : l_3510
+room 3512 : l_3512
+room 3516 : l_3516
+sink : kitchen
 </C>
 <C>
 <FN>
-alice
-carol
-dana
-dave
-evelyn
-francis
-george
-jivko
-kazunori
-mallory
-matteo
-max
-pato
-peggy
-peter
-ray
-robert
-shiqi
-stacy
-walter
-yuqian
+bruce-NA-porter : doctor_dr_mr_professor : bruce
+alice-NA-ashcraft : doctor_dr_ms_professor : alice
+carol-NA-daniel : doctor_dr_ms_professor : carol
+dana-NA-ballard : dr_doctor_mr_professor : dana
+dave-NA-eckhart : doctor_dr_mr_professor : dave
+evelyn-eve-foster : doctor_dr_ms_professor : evelyn
+francis-frannie-parker : doctor_dr_ms_professor : francis
+george-NA-green : dr_doctor_professor_mr : george
+jivko-NA-NA : mr : jivko
+kazunori-NA-NA: mr : kazunori
+mallory-NA-clark : ms : mallory
+matteo-NA-NA: mr : matteo
+max-NA-NA: mr : max
+pato-NA-NA: mr : pato
+peggy-NA-NA: ms : peggy
+peter-NA-stone : doctor_professor_dr_mr : peter
+ray-NA-mooney : doctor_dr_professor_mr : ray
+robert-bob-brown : mr: robert
+shiqi-NA-NA: mr : shiqi
+stacy-NA-morgan : ms : stacy
+walter-NA-ward : mr : walter
+yuqian-NA-NA: ms : yuqian
 </C>
 <C>
 <I> 
-an apple
-a bag of chips
-a basket
-a beverage
-the binder
-the book
-the box
-the bread
-a burger
-the cake
-a calendar
-the cellphone
-a cheeseburger
-the chips
-the coffee
-the coffee cup
-coffee to go
-the coke
-the container
-the crisps
-a cup of coffee
-a cupcake
-the dessert
-the diary
-the doritos
-a drink
-the dustbin
-a glass
-a glass of juice
-a hamburger
-a hammer
-some juice
-the laptop
-the lays
-the ledger
-the letter
-the milk
-a muffin
-a notebook
-an organizer
-a pencil
-the phone
-a pillow
-the pizza
-a planner
-the potato chips
-a salad
-a sandwich
-a snack
-the soda
-something to drink
-the tea
-the trashcan
-the watch
-some water
-yourself
+an apple : apple
+a bag of chips : chips
+the basket : basket
+a beverage : beverage
+the binder : binder
+the book : book
+the box : box
+the bread : bread
+a burger : burger
+the cake : cake
+the calendar : calendar
+the cellphone : cellphone
+a cheeseburger : cheeseburger
+the chips : chips
+some coffee : coffee
+a coffee cup : coffee
+some coffee to go : coffee
+some coke : coke
+the container : container
+the crisps : chips
+a cup of coffee : coffee
+a cupcake : cupcake
+the dessert : dessert
+the diary : diary
+the doritos : doritos
+a drink : drink
+the dustbin : trashcan
+a glass : glass
+a glass of juice : juice
+a hamburger : burger
+a hammer : hammer
+the juice : juice
+the laptop : laptop
+the lays : chips
+the ledger : ledger
+the letter : letter
+the milk : milk
+a muffin : muffin
+a notebook : notebook
+an organizer : organizer
+a pencil : pencil
+a phone : phone
+a pillow : pillow
+the pizza : pizza
+the planner : planner
+the potato chips : chips
+a salad : salad
+a sandwich : sandwich
+a snack : snack
+some soda : coke
+something to drink : coke
+some tea : tea
+the trashcan : trashcan
+a watch : watch
+some water : water
+yourself : me
 </C>

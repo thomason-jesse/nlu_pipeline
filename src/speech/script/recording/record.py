@@ -19,7 +19,8 @@ class ScriptGenerator:
         self.user_id = user_id
         self.phrase_num = 0
         self.phrase = None
-        self.denotation = None
+        self.denotations = {} #Keeps specific word denotations.
+        self.denotation = None # keeps denotation for entire phrase. 
         self.semantic_form = None
 
         #Sets font for displaying text. 
@@ -32,15 +33,15 @@ class ScriptGenerator:
     def genPhrase(self, screen):
         self.phrase = self.genCommand()    
 
-        phraseText = self.font.render(command, 1, self.textColor)
+        self.phraseText = self.font.render(self.phrase, 1, self.textColor)
 
         screen.fill(self.background)
-        screen.blit(phraseText, self.calcPos())
+        screen.blit(self.phraseText, self.calcPos())
         pygame.display.update()
 
     def calcPos(self):
-        width = self.phrase.get_width()
-        height = self.phrase.get_height()
+        width = self.phraseText.get_width()
+        height = self.phraseText.get_height()
 
         diff_w = self.screen_w - width
         diff_h = self.screen_h - height
@@ -86,70 +87,121 @@ class ScriptGenerator:
     #Generates templates from files. 
     def genTemplates(self):
         #Templates are all held in lists. 
-        self.templates.append([line for line in open('walkTemplates.txt', 'r')])
-        self.templates.append([line for line in open('searchTemplates.txt', 'r')])
-        self.templates.append([line for line in open('bringTemplates.txt', 'r')])
+        self.templates.append(["walk", [line for line in open('walkTemplates.txt', 'r')]])
+        self.templates.append(["search", [line for line in open('searchTemplates.txt', 'r')]])
+        self.templates.append(["bring", [line for line in open('bringTemplates.txt', 'r')]])
 
     #Generates list of all possible references to people. 
-    def genNames(self):
+    def genNames(self): 
         #Adds positions by themselves. 
         for position in self.tags["<PS>"]:
-            self.names.append(position)
+            splitList = position.split(':')
+            position = splitList[0].strip()
+            denotation = splitList[1].strip()
 
-        #Adds nicknames. 
-        for nickname in self.tags["<NN>"]:
-            self.names.append(nickname)
+            self.names.append([position, denotation])
 
-        #Adds first names. 
-        for f_name in self.tags["<FN>"]:
-            self.names.append(f_name)
+        for fullName in self.tags["<FN>"]:
+            splitList = fullName.split(':')
+            name = splitList[0].strip().split('-')
+            titles = splitList[1].strip().split('_')
+            denotation = splitList[2].strip()
 
-        #Adds title, first, last. 
-        for title in self.tags["<T>"]:
-            for f_name in self.tags["<FN>"]:
-                for l_name in self.tags["<LN>"]:
-                    self.names.append(title + " " + f_name + " " + l_name)
+            #Adds first name by itself. 
+            if not name[0] == "NA":
+                self.names.append([name[0], denotation])
 
-        #Adds first, last.
-        for f_name in self.tags["<FN>"]:
-            for l_name in self.tags["<LN>"]:
-                self.names.append(f_name + " " + l_name)
+            #Adds nickname by itself. 
+            if not name[1] == "NA":
+                self.names.append([name[1], denotation])
 
-        #Adds nickname, last.
-        for nickname in self.tags["<NN>"]:
-            for l_name in self.tags["<LN>"]:
-                self.names.append(nickname + " " + l_name)
+            #Adds title, first, last
+            for title in titles:
+                if not name[2] == "NA":
+                    nameString = title + " " + name[0] + " " + name[2]
+                else:
+                    nameString = title + " " + name[0]
 
-        #Adds title, last. 
-        for title in self.tags["<T>"]:
-            for l_name in self.tags["<LN>"]:
-                self.names.append(title + " " + l_name)
+                self.names.append([nameString, denotation])
+
+            #Adds first, last. 
+            if not name[2] == "NA":
+                self.names.append([name[0] + " " + name[2], denotation])
+
+            #Adds nickname, last.
+            if not name[1] == "NA" and not name[2] == "NA":
+                self.names.append([name[1] + " " + name[2], denotation]) 
+
+            #Adds title, last. 
+            if not name[2] == "NA":
+                for title in titles:
+                    self.names.append([title + " " + name[2], denotation])
+
 
     def genCommand(self):
         #Picks a random action to take. 
-        templateType = self.templates[random.randint(0, len(self.templates) -1)]
-        
-        #TODO generate denotation and semantic forms!!!
+        templateListIndex = random.randint(0, len(self.templates) -1) 
+        templateType = self.templates[templateListIndex][0]
+        templateList = self.templates[templateListIndex][1]
 
         #Picks a random template from that action's templates. 
-        templateIndex = random.randint(0, len(templateType) - 1)
-        template = templateType[templateIndex]
+        templateIndex = random.randint(0, len(templateList) - 1)
+        template = templateList[templateIndex]
 
         command = []
 
         for word in template.split():
             command.append(self.processWord(word))
 
+        print "DENOTATIONS"
+        print self.denotations
+
+        self.genSemanticForm(templateType)
+        self.genDenotation(templateType)
+
         return ' '.join(command)
+
+    def genSemanticForm(self, templateType):
+        #TODO
+        pass
+
+
+    def genDenotation(self, templateType):
+        if templateType == "walk":
+            self.denotation = "walk(" + self.denotations["<P>"] + ")"
+        elif templateType == "bring":
+            self.denotation = "bring("
+            self.denotation += self.denotations["<I>"] + ","
+            self.denotation += self.denotations["<N>"] + ")"
+        elif templateType == "search":
+            self.denotation = "searchroom("
+            self.denotation += self.denotations["<N>"] + ","
+            self.denotation += self.denotations["<P>"] + ")"
+            
 
     def processWord(self, word):
         if word in self.tags:
             expansionIndex = random.randint(0, len(self.tags[word]) - 1)
+            expansionList = self.tags[word][expansionIndex].split(':')
+            expansion = expansionList[0].strip()
+            denotation = expansionList[1].strip()
 
-            return self.tags[word][expansionIndex]
-        #Name can be expanded using first, last, nickname, title, and position. 
+            #Stores denotation. 
+            self.denotations[word] = denotation
+
+            return expansion
+
+        #Expands name from name list of names that was built. 
         elif word == "<N>":
-            return self.names[random.randint(0, len(self.names) - 1)]
+            nameList = self.names[random.randint(0, len(self.names) - 1)]
+            name = nameList[0]
+            denotation = nameList[1]
+
+            #Stores denotation
+            self.denotations[word] = denotation
+
+            return name
+
         else:
             return word
 
@@ -161,12 +213,15 @@ class ScriptGenerator:
         #Writes data. 
         phraseFile.write(self.phrase)
         denotationFile.write(self.denotation)
-        semanticFile.write(self.semantic_form)
+        semanticFile.write(self.denotation) #TODO actually generate semantic form. 
 
         #Closes file. 
         phraseFile.close()
         denotationFile.close()
         semanticFile.close()
+
+        #Updates phrase number. 
+        self.phrase_num += 1
 
 class Recorder:
     def __init__(self, user_id):
@@ -178,7 +233,8 @@ class Recorder:
             self.libHandle = ctypes.CDLL(path)
 
         self.user_id = user_id
-        self.phraseNum = 0
+        self.phrase_num = 0
+        self.scriptGenerator = None
 
         #Initialize microphone. 
         self.libHandle.initMic()
@@ -188,8 +244,10 @@ class Recorder:
 
     def record(self):
         while not self.libHandle.isInterrupted():
-            self.libHandle.record1600Hz(self.userId + "_" + str(self.phraseNum))
-            self.phraseNum += 1
+            self.libHandle.record1600Hz("results/recordings/" + self.user_id + "_recording_" + str(self.phrase_num))
+            self.phrase_num += 1
+
+            print "Recorded something" 
 
     def recordToggle(self):
         #Initializes pygame window to read spacebar presses. 
@@ -212,8 +270,8 @@ class Recorder:
         running = True
 
         #Creates the phrase generating object. 
-        scriptGenerator = ScriptGenerator(displayInfo, self.user_id)
-        scriptGenerator.genPhrase(screen)
+        self.scriptGenerator = ScriptGenerator(displayInfo, self.user_id)
+        self.scriptGenerator.genPhrase(screen)
 
         while running:
             pygame.event.pump()
@@ -257,7 +315,7 @@ class Recorder:
                 recording = False
 
                 #Saves phrase, denotation, and semantic form to file. 
-                scriptGenerator.saveData()
+                self.scriptGenerator.saveData()
 
                 #Waits for user to get next phrase.     
                 while not keys[pygame.K_RIGHT]:
@@ -269,7 +327,7 @@ class Recorder:
                     pygame.event.pump()
                     keys = pygame.key.get_pressed()
 
-                scriptGenerator.genPhrase(screen)
+                self.scriptGenerator.genPhrase(screen)
 
             #Sleeps to free up cpu.
             pygame.time.wait(100)
