@@ -24,6 +24,10 @@ void interruptRecord() {
 	interrupted = 1; 
 }
 
+int isInterrupted() {
+	return interrupted; 
+}
+
 int initMic(){
 	int rc = 0; 
 
@@ -133,9 +137,9 @@ void closeMic() {
   		free(mp.buffer);
 }
 
-int record1600Hz() {
+int record1600Hz(char * fileName) {
 	int rc = 0; 
-	FILE *file = fopen("voice.raw", "w");
+	FILE *file = fopen(fileName, "w");
 
 	if (!file) {
 		printf("record.c: Error opening voice.raw!");

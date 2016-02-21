@@ -47,50 +47,79 @@ frannie
 -----------
 kitchen
 lab
-office
-room
+office 
+room 3402
+room 3414b
+room 3418
+room 3420
+room 3432
+room 3502
+room 3508
+room 3510
+room 3512
+room 3516
 sink
 
 <FN>: First Name
 ----------------
+alice
 carol
+dana
 dave
 evelyn
 francis
 george
+jivko
+kazunori
 mallory
+matteo
+max
+pato
 peggy
-robert
-walter
-alice
-dana
 peter
 ray
+robert
+shiqi
+stacy
+walter
+yuqian
 
 <I>: Item 
 ----------
 apple
+bag of chips
 basket
+beverage
 binder
 book
 box
 bread
 burger
+cake
 calendar
 cellphone
 cheeseburger
 chips
 coffee
+coffee cup
+coffee to go
 coke
 container
+crisps
+cup of coffee
+cupcake
+dessert
 diary
 doritos
+drink
 dustbin
 glass
+glass of juice
 hamburger
 hammer
 juice
 laptop
+lays
 ledger
 letter
 milk
@@ -102,9 +131,12 @@ phone
 pillow
 pizza
 planner
+potato chips
 salad
 sandwich
+snack
 soda
+something to drink
 tea
 trashcan
 watch

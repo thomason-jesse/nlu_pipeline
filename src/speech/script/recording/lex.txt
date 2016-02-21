@@ -24,90 +24,122 @@ ward
 </C>
 <C>
 <PS>
-advisor
-chair
-director
-grad student
-intern
-pi
-postdoc 
-professor
-secretary
-student
-ta
-undergrad
+the advisor
+the chair
+the director
+the grad student
+the intern
+the pi
+the postdoc 
+the professor
+the secretary
+the student
+the ta
+the undergrad
 </C>
 <C>
-<NN> 
+<NN>
 bob
 eve 
 frannie
 </C>
 <C>
 <P>
-kitchen
-lab
-office
-room
-sink
+the kitchen
+the lab
+the office 
+room 3402
+room 3414b
+room 3418
+room 3420
+room 3432
+room 3502
+room 3508
+room 3510
+room 3512
+room 3516
+the sink
 </C>
 <C>
 <FN>
+alice
 carol
+dana
 dave
 evelyn
 francis
 george
+jivko
+kazunori
 mallory
+matteo
+max
+pato
 peggy
-robert
-walter
-alice
-dana
 peter
 ray
+robert
+shiqi
+stacy
+walter
+yuqian
 </C>
 <C>
-<I>
-apple
-basket
-binder
-book
-box
-bread
-burger
-calendar
-cellphone
-cheeseburger
-chips
-coffee
-coke
-container
-diary
-doritos
-dustbin
-glass
-hamburger
-hammer
-juice
-laptop
-ledger
-letter
-milk
-muffin
-notebook
-organizer
-pencil
-phone
-pillow
-pizza
-planner
-salad
-sandwich
-soda
-tea
-trashcan
-watch
-water
+<I> 
+an apple
+a bag of chips
+a basket
+a beverage
+the binder
+the book
+the box
+the bread
+a burger
+the cake
+a calendar
+the cellphone
+a cheeseburger
+the chips
+the coffee
+the coffee cup
+coffee to go
+the coke
+the container
+the crisps
+a cup of coffee
+a cupcake
+the dessert
+the diary
+the doritos
+a drink
+the dustbin
+a glass
+a glass of juice
+a hamburger
+a hammer
+some juice
+the laptop
+the lays
+the ledger
+the letter
+the milk
+a muffin
+a notebook
+an organizer
+a pencil
+the phone
+a pillow
+the pizza
+a planner
+the potato chips
+a salad
+a sandwich
+a snack
+the soda
+something to drink
+the tea
+the trashcan
+the watch
+some water
 yourself
 </C>
