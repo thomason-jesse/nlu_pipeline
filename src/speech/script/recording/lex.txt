@@ -30,30 +30,31 @@ room 3512 : l_3512
 room 3516 : l_3516
 sink : kitchen
 </C>
+Full namem : titles : denotation : office (if any)
 <C>
 <FN>
-bruce-NA-porter : doctor_dr_mr_professor : bruce
-alice-NA-ashcraft : doctor_dr_ms_professor : alice
-carol-NA-daniel : doctor_dr_ms_professor : carol
-dana-NA-ballard : dr_doctor_mr_professor : dana
-dave-NA-eckhart : doctor_dr_mr_professor : dave
-evelyn-eve-foster : doctor_dr_ms_professor : evelyn
-francis-frannie-parker : doctor_dr_ms_professor : francis
-george-NA-green : dr_doctor_professor_mr : george
-jivko-NA-NA : mr : jivko
-kazunori-NA-NA: mr : kazunori
-mallory-NA-clark : ms : mallory
-matteo-NA-NA: mr : matteo
-max-NA-NA: mr : max
-pato-NA-NA: mr : pato
-peggy-NA-NA: ms : peggy
-peter-NA-stone : doctor_professor_dr_mr : peter
-ray-NA-mooney : doctor_dr_professor_mr : ray
-robert-bob-brown : mr: robert
-shiqi-NA-NA: mr : shiqi
-stacy-NA-morgan : ms : stacy
-walter-NA-ward : mr : walter
-yuqian-NA-NA: ms : yuqian
+bruce-NA-porter : doctor_dr_mr_professor : bruce : NA
+alice-NA-ashcraft : doctor_dr_ms_professor : alice : NA
+carol-NA-daniel : doctor_dr_ms_professor : carol : NA
+dana-NA-ballard : dr_doctor_mr_professor : dana : l_3510
+dave-NA-eckhart : doctor_dr_mr_professor : dave : NA
+evelyn-eve-foster : doctor_dr_ms_professor : evelyn : NA
+francis-frannie-parker : doctor_dr_ms_professor : francis : NA
+george-NA-green : dr_doctor_professor_mr : george : NA
+jivko-NA-NA : mr : jivko : l_3432
+kazunori-NA-NA: mr : kazunori : NA
+mallory-NA-clark : ms : mallory : NA
+matteo-NA-NA: mr : matteo : NA
+max-NA-NA: mr : max : NA
+pato-NA-NA: mr : pato : NA
+peggy-NA-NA: ms : peggy : NA
+peter-NA-stone : doctor_professor_dr_mr : peter : l_3508
+ray-NA-mooney : doctor_dr_professor_mr : ray : l_3512
+robert-bob-brown : mr: robert : NA
+shiqi-NA-NA: mr : shiqi : NA
+stacy-NA-morgan : ms : stacy : NA
+walter-NA-ward : mr : walter : NA
+yuqian-NA-NA: ms : yuqian : NA
 </C>
 <C>
 <I> 

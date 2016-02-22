@@ -10,6 +10,7 @@ class ScriptGenerator:
         self.templates = []
         self.tags = {}
         self.names = []
+        self.names_possessive = []
 
         self.genTags()
         self.genTemplates()
@@ -22,6 +23,7 @@ class ScriptGenerator:
         self.denotations = {} #Keeps specific word denotations.
         self.denotation = None # keeps denotation for entire phrase. 
         self.semantic_form = None
+        self.semantic_data = None
 
         #Sets font for displaying text. 
         self.font = pygame.font.SysFont('monospace', 15)
@@ -90,6 +92,7 @@ class ScriptGenerator:
         self.templates.append(["walk", [line for line in open('walkTemplates.txt', 'r')]])
         self.templates.append(["search", [line for line in open('searchTemplates.txt', 'r')]])
         self.templates.append(["bring", [line for line in open('bringTemplates.txt', 'r')]])
+        self.templates.append(["walk_possessive", [line for line in open('walkPossessiveTemplates.txt', 'r')]])
 
     #Generates list of all possible references to people. 
     def genNames(self): 
@@ -106,37 +109,64 @@ class ScriptGenerator:
             name = splitList[0].strip().split('-')
             titles = splitList[1].strip().split('_')
             denotation = splitList[2].strip()
+            office = splitList[3].strip()
+
+            #Names in person's full name.
+            first_name = name[0]
+            nickname = name[1]
+            last_name = name[2]
 
             #Adds first name by itself. 
-            if not name[0] == "NA":
-                self.names.append([name[0], denotation])
+            if not first_name == "NA":
+                self.names.append([first_name, denotation])
+                
+                if not office == "NA":
+                    self.names_possessive.append([first_name + "'s", denotation, office])
 
             #Adds nickname by itself. 
-            if not name[1] == "NA":
-                self.names.append([name[1], denotation])
+            if not nickname == "NA":
+                self.names.append([nickname, denotation])
+
+                if not office == "NA":
+                    self.names_possessive.append([nickname + "'s", denotation, office])
 
             #Adds title, first, last
             for title in titles:
-                if not name[2] == "NA":
-                    nameString = title + " " + name[0] + " " + name[2]
+                if not last_name == "NA":
+                    nameString = title + " " + first_name + " " + last_name
                 else:
-                    nameString = title + " " + name[0]
+                    nameString = title + " " + first_name
 
                 self.names.append([nameString, denotation])
+                
+                if not office == "NA":
+                    self.names_possessive.append([nameString + "'s", denotation, office])
 
             #Adds first, last. 
-            if not name[2] == "NA":
-                self.names.append([name[0] + " " + name[2], denotation])
+            if not last_name == "NA":
+                nameString = first_name + " " + last_name
+                self.names.append([nameString, denotation])
+                
+                if not office == "NA":
+                    self.names_possessive.append([nameString + "'s", denotation, office]) 
 
             #Adds nickname, last.
-            if not name[1] == "NA" and not name[2] == "NA":
-                self.names.append([name[1] + " " + name[2], denotation]) 
+            if not nickname == "NA" and not last_name == "NA":
+                nameString = nickname + " " + last_name
+                self.names.append([nameString, denotation])
+                
+                if not office == "NA":
+                    self.names_possessive.append([nameString + "'s", denotation, office])
 
             #Adds title, last. 
-            if not name[2] == "NA":
+            if not last_name == "NA":
                 for title in titles:
-                    self.names.append([title + " " + name[2], denotation])
-
+                    nameString = title + " " + last_name
+                    self.names.append([nameString, denotation])
+                    
+                    if not office == "NA":
+                        self.names_possessive.append([nameString + "'s", denotation, office])
+    
 
     def genCommand(self):
         #Picks a random action to take. 
@@ -153,31 +183,37 @@ class ScriptGenerator:
         for word in template.split():
             command.append(self.processWord(word))
 
-        print "DENOTATIONS"
-        print self.denotations
-
-        self.genSemanticForm(templateType)
         self.genDenotation(templateType)
+        self.genSemanticForm(templateType)
 
         return ' '.join(command)
 
     def genSemanticForm(self, templateType):
-        #TODO
-        pass
+        if templateType == "walk_possessive":
+            name = self.semantic_data
+
+            self.semantic_form = "walk(the(lambda x:e.(and(office(x), possesses(x, "
+            self.semantic_form += name + ")))"
 
 
+    #Generates denotation for phrase.
+    #Also generates semantic form if case matches. 
     def genDenotation(self, templateType):
         if templateType == "walk":
             self.denotation = "walk(" + self.denotations["<P>"] + ")"
+            self.semantic_form = self.denotation
         elif templateType == "bring":
             self.denotation = "bring("
             self.denotation += self.denotations["<I>"] + ","
             self.denotation += self.denotations["<N>"] + ")"
+            self.semantic_form = self.denotation
         elif templateType == "search":
             self.denotation = "searchroom("
             self.denotation += self.denotations["<N>"] + ","
             self.denotation += self.denotations["<P>"] + ")"
-            
+            self.semantic_form = self.denotation
+        elif templateType == "walk_possessive":
+            self.denotation = "walk(" + self.denotations["<PP>"] + ")"
 
     def processWord(self, word):
         if word in self.tags:
@@ -201,7 +237,19 @@ class ScriptGenerator:
             self.denotations[word] = denotation
 
             return name
+        elif word == "<PP>":
+            nameList = self.names_possessive[random.randint(0, len(self.names_possessive) - 1)]
+            name = nameList[0]
+            denotation = nameList[1]
+            office = nameList[2]
 
+            #Stores denotation. 
+            self.denotations[word] = office
+
+            #Saves name for semantic form. 
+            self.semantic_data = denotation
+
+            return name
         else:
             return word
 
@@ -213,7 +261,13 @@ class ScriptGenerator:
         #Writes data. 
         phraseFile.write(self.phrase)
         denotationFile.write(self.denotation)
-        semanticFile.write(self.denotation) #TODO actually generate semantic form. 
+        semanticFile.write(self.semantic_form)
+
+        print "----------------------------------"
+        print "PHRASE: " + self.phrase
+        print "DENOTATION: " + self.denotation
+        print "SEMANTIC FORM: " + self.semantic_form
+        print "----------------------------------"
 
         #Closes file. 
         phraseFile.close()
