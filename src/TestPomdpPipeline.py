@@ -48,20 +48,21 @@ print "entries: " + str(lex.entries)
 print "instantiating KBGrounder"
 grounder = KBGrounder.KBGrounder(ont)
 
-print "instantiating Parser"
-parser = CKYParser.CKYParser(ont, lex)
-d = parser.read_in_paired_utterance_semantics(sys.argv[3])
-converged = parser.train_learner_on_semantic_forms(d, 10, reranker_beam=10)
-if not converged:
-    raise AssertionError("Training failed to converge to correct values.")
-save_model(parser, 'parser')
-#parser = load_model('parser')
+#print "instantiating Parser"
+#parser = CKYParser.CKYParser(ont, lex)
+#d = parser.read_in_paired_utterance_semantics(sys.argv[3])
+#converged = parser.train_learner_on_semantic_forms(d, 10, reranker_beam=10)
+#if not converged:
+    #raise AssertionError("Training failed to converge to correct values.")
+#save_model(parser, 'parser')
+parser = load_model('parser')
 
 print "instantiating DialogAgent"
 u_in = InputFromKeyboard()
 u_out = OutputToStdout()
 
 A = PomdpDialogAgent(parser, grounder, u_in, u_out)
+A.dialog_objects_logfile = 'src/nlu_pipeline/src/models/trial_log.pkl'
 
 while True:
     A.first_turn = True

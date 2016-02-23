@@ -8,6 +8,11 @@ from SemanticNode import SemanticNode
 def save_model(obj, name):
     with open('src/nlu_pipeline/src/models/'+ str(name) + '.pkl', 'wb') as f:
         pickle.dump(obj, f, pickle.HIGHEST_PROTOCOL)
+        
+def save_obj_general(obj, name):
+    print 'Saving log'
+    with open(str(name), 'wb') as f:
+        pickle.dump(obj, f, pickle.HIGHEST_PROTOCOL)
 
 def load_model(name):
     try :
