@@ -126,24 +126,20 @@ class DialogAgent:
 
     # update state after asking user-initiative (open-ended) question about user goal
     def update_state_from_user_initiative(self, u):
-        # print "Inside update_state_from_user_initiative"
         self.state.update_requested_user_turn()
 
         # get n best parses for utterance
-        #n_best_parses = self.parser.parse_expression(u, n=self.parse_depth)
-        #print 'n_best_parses - ', n_best_parses
+        #print 'n_best_parses - ', n_best_parses #DEBUG
         n_best_parses = self.get_n_best_parses(u)
 
         # try to digest parses to action request
         success = False
         for i in range(0, len(n_best_parses)):
-            #print "Digesting parse ", i
             #print self.parser.print_parse(n_best_parses[i][0])  # DEBUG
             #print self.parser.print_semantic_parse_result(n_best_parses[i][1])  # DEBUG
             success = self.update_state_from_action_parse(n_best_parses[i][0].node)
             if success:
                 break
-        # print "Finished trying to digest parses" 
 
         # no parses could be resolved into actions for state update
         if not success:
@@ -152,16 +148,13 @@ class DialogAgent:
 
     # get dialog state under assumption that utterance is an action
     def update_state_from_action_parse(self, p):
-        # print "Inside update_state_from_action_parse"         
-
         # get action, if any, from the given parse
         try:
             p_action = self.get_action_from_parse(p)
         except SystemError:
             p_action = None
-        # print "Tried getting action from parse"
         if p_action is not None:
-            # print "Going to update state from action"
+            print 'Here'
             self.state.update_from_action(p_action, p)
             return True
 

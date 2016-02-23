@@ -3,21 +3,27 @@ __author__ = 'aishwarya'
 import sys, random, math, copy, re, numpy, itertools
 from HISBeliefState import HISBeliefState
 from SummaryState import SummaryState
-from PomdpKtdqPolicy import PomdpKtdqPolicy
 from SystemAction import SystemAction
 from Utterance import Utterance
-from StaticDialogAgent import StaticDialogAgent
+from DialogAgent import DialogAgent
+from TemplateBasedGenerator import TemplateBasedGenerator
+from Knowledge import Knowledge
 from Utils import *
 
 # This dialog agent maintains a much richer state and hence has to 
 # process system actions and user responses more elaborately. It extends
 # StaticDialogAgent primarily to reuse code
-class PomdpDialogAgent(StaticDialogAgent) :
+class PomdpDialogAgent(DialogAgent) :
 
-    def __init__(self, parser, grounder, u_input, output, parse_depth=10, load_policy_from_file=False):
-        StaticDialogAgent.__init__(self, parser, grounder, None, u_input, output, parse_depth)
+    def __init__(self, parser, grounder, policy, u_input, output, parse_depth=10):
+        DialogAgent.__init__(self, parser, grounder, policy, u_input, output, parse_depth)
+        self.policy = policy
 
-        self.policy = PomdpKtdqPolicy(self.knowledge, load_policy_from_file)
+        # To convert system actions to understandable English
+        self.response_generator = TemplateBasedGenerator()
+        # For typechecking information
+        self.knowledge = Knowledge()    
+
         self.state = HISBeliefState(self.knowledge)  
         self.previous_system_action = SystemAction('repeat_goal')  
         self.n_best_utterances = None
@@ -31,6 +37,11 @@ class PomdpDialogAgent(StaticDialogAgent) :
         # Logging for future use
         self.final_action_log = None
         self.lexical_addition_log = None
+        # Pickle and store system action and user response at each turn
+        # with some other information useful for retraining
+        self.dialog_objects_logfile = None 
+        self.dialog_objects_log = None
+        self.cur_turn_log = None
         
     # Returns True if the dialog terminates on its own and False if the u
     # user entered stop
@@ -40,7 +51,7 @@ class PomdpDialogAgent(StaticDialogAgent) :
         self.max_prob_user_utterances = list()
         self.dialog_objects_log = list()
         
-        #print 'Belief state: ', str(self.state) 
+        print 'Belief state: ', str(self.state) 
         summary_state = SummaryState(self.state)
         (dialog_action, dialog_action_arg) = self.policy.get_initial_action(summary_state)    
         
@@ -94,7 +105,7 @@ class PomdpDialogAgent(StaticDialogAgent) :
                     return False
                 # Belief monitoring - update belief based on the response
                 self.update_state(response)
-                #print 'Belief state: ', str(self.state) # DEBUG
+                print 'Belief state: ', str(self.state) # DEBUG
                 
                 reward = self.knowledge.per_turn_reward
                 self.dialog_objects_log.append(self.cur_turn_log)
@@ -212,6 +223,10 @@ class PomdpDialogAgent(StaticDialogAgent) :
             return [self.convert_action_to_utterance(p_action)]
             
         # Getting a complete action failed so assume this is a param  
+        if parse.is_lambda and parse.is_lambda_instantiation :
+            # Lambda headed parse - unlikely to give a valid param
+            # value
+            return []
         print 'Trying to ground as param value'
         try :
             print "Grounding ", self.parser.print_parse(parse)
@@ -394,5 +409,35 @@ class PomdpDialogAgent(StaticDialogAgent) :
             self.n_best_utterances = list()
             for (idx, (prob, utterance)) in enumerate(prob_with_utterances) :
                 self.n_best_utterances.append(utterance)
-            
+        
+        if self.max_prob_user_utterances is None :
+            self.max_prob_user_utterances = list()    
         self.max_prob_user_utterances.append(max_prob_utterance)
+
+    # Creates (text, denotation) pairs and retrains parser
+    def train_parser_from_dialogue(self, final_action) :
+        print 'Lexicon - ', self.parser.lexicon.surface_forms
+        print 'self.parser_train_data = ', self.parser_train_data
+
+        answers = dict()
+        answers['full'] = str(final_action)
+        goal = final_action.name
+        for (idx, param_name) in enumerate(self.knowledge.param_order[goal]) :
+            # Pair answers to requesting of a param to the value of the 
+            # param in the final action
+            answers[param_name] = final_action.params[idx]
+        
+        print 'answers = ', answers
+        
+        training_pairs = list()
+        for key in self.parser_train_data :
+            if key in answers :
+                for item in self.parser_train_data[key] :
+                    training_pairs.append((item, answers[key]))
+
+        print 'training_pairs = ', training_pairs
+
+        # TODO: Use training pairs to retrain parser
+        
+        # Re-initialize the data structure for next dialogue    
+        self.parser_train_data = dict()

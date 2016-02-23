@@ -29,6 +29,9 @@ class OutputToStdout:
     def say(self, s):
         print "SYSTEM: "+s
 
+# Fixing the random seed for debugging
+numpy.random.seed(10)
+
 print "calling ROSpy init"
 rospy.init_node('test_NLU_pipeline')
 

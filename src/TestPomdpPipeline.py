@@ -8,6 +8,8 @@ import KBGrounder
 import CKYParser
 import numpy, re
 
+from Knowledge import Knowledge
+from PomdpKtdqPolicy import PomdpKtdqPolicy
 from PomdpDialogAgent import PomdpDialogAgent
 from Utils import *
 
@@ -56,12 +58,15 @@ grounder = KBGrounder.KBGrounder(ont)
     #raise AssertionError("Training failed to converge to correct values.")
 #save_model(parser, 'parser')
 parser = load_model('parser')
+parser.max_new_senses_per_utterance = 5
 
 print "instantiating DialogAgent"
 u_in = InputFromKeyboard()
 u_out = OutputToStdout()
 
-A = PomdpDialogAgent(parser, grounder, u_in, u_out)
+knowledge = Knowledge()
+policy = PomdpKtdqPolicy(knowledge, False)
+A = PomdpDialogAgent(parser, grounder, policy, u_in, u_out)
 A.dialog_objects_logfile = 'src/nlu_pipeline/src/models/trial_log.pkl'
 
 while True:

@@ -4,35 +4,22 @@ import random
 import copy
 import sys, re
 import Action
-from TemplateBasedGenerator import TemplateBasedGenerator
-from SystemAction import SystemAction
-from Knowledge import Knowledge
-from Utils import *
-from StaticDialogStateWithTypechecking import StaticDialogStateWithTypechecking
-from DialogAgent import DialogAgent
 
-# Extends DialogAgent and adds type-checking, parser learning and uses 
-# TemplateBasedGenerator to ask system questions in a more natural form
-class StaticDialogAgent(DialogAgent):
+from SystemAction import SystemAction
+from Utils import *
+from UtteranceBasedStaticDialogState import UtteranceBasedStaticDialogState
+from PomdpDialogAgent import PomdpDialogAgent
+
+# This is logically an extension of DialogAgent but with type-checking,
+# parser learning and the use of TemplateBasedGenerator to ask system 
+# questions in a more natural form
+# It inherits from PomdpDialogAgent rather than DialogAgent as there is
+# functionality there that is useful to have inherited
+class StaticDialogAgent(PomdpDialogAgent):
 
     def __init__(self, parser, grounder, policy, u_input, output, parse_depth=10):
-        DialogAgent.__init__(self, parser, grounder, policy, u_input, output, parse_depth)    
-
-        # To convert system actions to understandable English
-        self.response_generator = TemplateBasedGenerator() 
-        
-        self.knowledge = Knowledge()    # For typechecking information
+        PomdpDialogAgent.__init__(self, parser, grounder, policy, u_input, output, parse_depth)    
         self.dialogue_stopped = False
-        
-        # Logging
-        self.final_action_log = None
-        self.lexical_addition_log = None
-        
-        # Pickle and store system action and user response at each turn
-        # with some other information useful for retraining
-        self.dialog_objects_logfile = None 
-        self.dialog_objects_log = None
-        self.cur_turn_log = None 
 
     # initiate a new dialog with the agent with initial utterance u
     def initiate_dialog_to_get_action(self, u):
@@ -40,12 +27,12 @@ class StaticDialogAgent(DialogAgent):
         self.parser_train_data = dict()
         self.parser_train_data['full'] = [u]
 
-        self.state = StaticDialogStateWithTypechecking(self.grounder)
+        self.state = UtteranceBasedStaticDialogState()
         
         self.cur_turn_log = [self.state, 'repeat_goal', u]
         self.dialog_objects_log = [self.cur_turn_log]
 
-        self.update_state_from_user_initiative(u)
+        self.update_state(u)
 
         # select next action from state
         action = None
@@ -78,11 +65,11 @@ class StaticDialogAgent(DialogAgent):
 
     # request the user repeat their original goal
     def request_user_initiative(self, args):
-        system_action = SystemAction('repeat_goal')
-        output = self.response_generator.get_sentence(system_action)
+        self.previous_system_action = SystemAction('repeat_goal')
+        output = self.response_generator.get_sentence(self.previous_system_action)
         self.output.say(output)
         u = self.input.get()
-        self.cur_turn_log = [system_action, u]
+        self.cur_turn_log = [self.previous_system_action, u]
         self.dialog_objects_log.append(self.cur_turn_log)
         if u.lower().strip() == 'stop' :
             self.dialogue_stopped = True
@@ -91,88 +78,62 @@ class StaticDialogAgent(DialogAgent):
             self.parser_train_data['full'].append(u)
         else :
             self.parser_train_data['full'] = [u]
-        self.update_state_from_user_initiative(u)
+        self.update_state(u)
 
     # request a missing action parameter
     def request_missing_param(self, args):
+        idx = args[0]
         # Using a bad approximation to generate an understandable prompt
         max_belief_action = None
         for goal in self.state.user_action_belief :
             if max_belief_action is None or self.state.user_action_belief[max_belief_action] < self.state.user_action_belief[goal] :
                 max_belief_action = goal
         
-        system_action = SystemAction('request_missing_param', max_belief_action)
+        self.previous_system_action = SystemAction('request_missing_param', max_belief_action)
         param_order = self.knowledge.param_order[max_belief_action]
-        system_action.extra_data = param_order[idx]
+        self.previous_system_action.extra_data = param_order[idx]
         
-        response = self.response_generator.get_sentence(system_action)    
+        response = self.response_generator.get_sentence(self.previous_system_action)    
         self.output.say(response)
         u = self.input.get()
-        self.cur_turn_log = [system_action, u]
+        self.cur_turn_log = [self.previous_system_action, u]
         self.dialog_objects_log.append(self.cur_turn_log)
         
         if u.lower().strip() == 'stop' :
             self.dialogue_stopped = True
             return
         
-        if theme == 'agent' :
-            theme = 'patient'
+        theme = self.previous_system_action.extra_data
         if theme in self.parser_train_data :
             self.parser_train_data[theme].append(u)
         else :
             self.parser_train_data[theme] = [u]
         
-        self.update_state_from_missing_param(u, idx)
+        self.update_state(u)
 
     # confirm a (possibly partial) action
     def confirm_action(self, args):
         a = args[0]
         
-        system_action = SystemAction('confirm_action', a.name)
-        system_action.referring_params = dict()
+        self.previous_system_action = SystemAction('confirm_action', a.name)
+        self.previous_system_action.referring_params = dict()
         goal = a.name 
         if goal in self.knowledge.param_order :
             param_order = self.knowledge.param_order[goal]
             for (idx, param_name) in enumerate(param_order) :
                 if len(a.params) > idx :
-                    system_action.referring_params[param_name] = a.params[idx]
+                    self.previous_system_action.referring_params[param_name] = a.params[idx]
         
-        response = self.response_generator.get_sentence(system_action)    
+        response = self.response_generator.get_sentence(self.previous_system_action)    
         self.output.say(response)
         c = self.input.get()
-        self.cur_turn_log = [system_action, c]
+        self.cur_turn_log = [self.previous_system_action, c]
         self.dialog_objects_log.append(self.cur_turn_log)
         
         if c.lower().strip() == 'stop' :
             self.dialogue_stopped = True
             return
         
-        self.update_state_from_action_confirmation(c, a)
+        self.update_state(c)
 
-    # Creates (text, denotation) pairs and retrains parser
-    def train_parser_from_dialogue(self, final_action) :
-        print 'Lexicon - ', self.parser.lexicon.surface_forms
-        print 'self.parser_train_data = ', self.parser_train_data
-
-        answers = dict()
-        answers['full'] = str(final_action)
-        goal = final_action.name
-        for (idx, param_name) in enumerate(self.knowledge.param_order[goal]) :
-            # Pair answers to requesting of a param to the value of the 
-            # param in the final action
-            answers[param_name] = final_action.params[idx]
-        
-        print 'answers = ', answers
-        
-        training_pairs = list()
-        for key in self.parser_train_data :
-            if key in answers :
-                for item in self.parser_train_data[key] :
-                    training_pairs.append((item, answers[key]))
-
-        print 'training_pairs = ', training_pairs
-
-        # TODO: Use training pairs to retrain parser
-        
-        # Re-initialize the data structure for next dialogue    
-        self.parser_train_data = dict()
+    
