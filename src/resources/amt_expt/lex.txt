@@ -1,5 +1,6 @@
 #imperative
 search :- M/PP/NP : lambda r:e.(lambda p:e.(searchroom(p,r)))
+search :- M/PP/PP : lambda p:e.(lambda r:e.(searchroom(p,r)))
 bring :- M/NP/NP : lambda y:e.(lambda x:e.(bring(x,y)))
 bring :- M/PP/NP : lambda x:e.(lambda y:e.(bring(x,y)))
 walk :- M/PP : lambda x:e.(at(x))
@@ -9,6 +10,7 @@ for :- PP/NP : lambda x:e.(x)
 of :- PP/NP : lambda x:e.(x)
 in :- PP/NP : lambda x:e.(x)
 about :- PP/NP : lambda x:e.(x)
+to :- PP/NP : lambda x:e.(x)
 
 #confirmations
 yes :- C : yes

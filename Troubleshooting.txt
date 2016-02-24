@@ -38,5 +38,6 @@
 	rm -rf ~/.rviz
    and retry. 
 
+7. If the parser seems to be giving bad parses, try retraining it. It might be reloading from a pickle made long ago. 
 
          
