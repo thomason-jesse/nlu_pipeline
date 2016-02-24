@@ -58,7 +58,7 @@ grounder = KBGrounder.KBGrounder(ont)
     #raise AssertionError("Training failed to converge to correct values.")
 #save_model(parser, 'parser')
 parser = load_model('parser')
-parser.max_new_senses_per_utterance = 5
+parser.max_hypothesis_categories_for_unknown_token_beam = 5
 
 print "instantiating DialogAgent"
 u_in = InputFromKeyboard()
