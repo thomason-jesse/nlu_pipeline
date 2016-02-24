@@ -346,6 +346,10 @@ class CKYParser:
         self.ontology = ont
         self.lexicon = lex
 
+        # type-raise bare nouns in lexicon
+        self.type_raised = {}  # map from semantic form idx to their type-raised form idx
+        self.type_raise_bare_nouns()
+
         # model parameter values
         self.theta = Parameters(ont, lex)
 
@@ -355,17 +359,13 @@ class CKYParser:
         self.max_multiword_expression = 2  # max span of a multi-word expression to be considered during tokenization
         self.max_new_senses_per_utterance = 2  # max number of new word senses that can be induced on a training example
         self.max_cky_trees_per_token_sequence_beam = 1000  # for tokenization of an utterance, max cky trees considered
-        self.max_hypothesis_categories_for_unknown_token_beam = 1  # for unknown token, max syntax categories tried
+        self.max_hypothesis_categories_for_unknown_token_beam = 5  # for unknown token, max syntax categories tried
 
         # behavioral parameters
         self.safety = True  # set to False once confident about node combination functions' correctness
 
         # cache
         self.cached_combinations = {}  # indexed by left, then right node, value at result
-
-        # type-raise bare nouns in lexicon
-        self.type_raised = {}  # map from semantic form idx to their type-raised form idx
-        self.type_raise_bare_nouns()
 
     # perform type-raising on leaf-level lexicon entries
     # this alters the given lexicon
@@ -536,6 +536,9 @@ class CKYParser:
     # providing it as an argument to this method allows top-down generation
     # to find new lexical entries for surface forms not yet recognized
     def most_likely_cky_parse(self, s, reranker_beam=1, known_root=None):
+
+        if len(s) == 0:
+            raise AssertionError("Cannot parse provided string of length zero")
 
         tk_seqs = self.tokenize(s)
         # print "number of token sequences for '"+s+"': "+str(len(tk_seqs))  # DEBUG
@@ -1336,8 +1339,8 @@ class CKYParser:
                 deepest_lambda = curr.lambda_name
             # an instance of lambda_A to be replaced by B
             elif curr.is_lambda and not curr.is_lambda_instantiation and curr.lambda_name == a.lambda_name:
-                # print "substituting '"+self.print_parse(B,True)+"' for '"+self.print_parse(curr, True) + \
-                # "' with lambda offset "+str(deepest_lambda) #DEBUG
+                # print "substituting '"+self.print_parse(b, True)+"' for '"+self.print_parse(curr, True) + \
+                #     "' with lambda offset "+str(deepest_lambda)  # DEBUG
                 if (not b.is_lambda and self.ontology.preds[b.idx] == 'and'
                         and curr.children is not None and b.children is not None):
                     # print "entering B substitution of curr taking curr's args"  # DEBUG
@@ -1360,9 +1363,9 @@ class CKYParser:
                     if curr.parent.is_lambda_instantiation:  # eg. 1(2) taking and(pred,pred) -> and(pred(2),pred(2)
                         b_new_arg = b_new.children[0]
                         while self.ontology.preds[b_new_arg.idx] == 'and':
-                            # print "B_new_arg: "+self.print_parse(B_new_arg)  # DEBUG
+                            # print "B_new_arg: "+self.print_parse(b_new_arg)  # DEBUG
                             b_new_arg = b_new_arg.children[0]
-                        # print "setting curr parent lambda name to child of "+self.print_parse(B_new_arg)  # DEBUG
+                        # print "setting curr parent lambda name to child of "+self.print_parse(b_new_arg)  # DEBUG
                         curr.parent.lambda_name = b_new_arg.children[0].lambda_name
                     if raised:
                         b_new.set_category(self.lexicon.categories.index(
@@ -1374,7 +1377,7 @@ class CKYParser:
                 elif curr.parent is None:
                     # print "entering None parent for curr"  # DEBUG
                     if curr.children is None:
-                        # print "...whole tree is instance" #DEBUG
+                        # print "...whole tree is instance"  # DEBUG
                         curr.copy_attributes(b)  # instance is whole tree; add nothing more and loop will now exit
                     elif b.children is None:
                         # print "...instance heads tree; preserve children taking B"
@@ -1390,7 +1393,7 @@ class CKYParser:
                         if not curr.parent.children[curr_parent_matching_idx] != curr:  # find matching address
                             break
                     if curr.children is None:
-                        # print "...instance of B ("+self.print_parse(B)+") will preserve its children" #DEBUG
+                        # print "...instance of B ("+self.print_parse(b)+") will preserve its children"  # DEBUG
                         # lambda instance is a leaf
                         curr.parent.children[curr_parent_matching_idx].copy_attributes(b, deepest_lambda,
                                                                                        preserve_parent=True)
@@ -1399,27 +1402,28 @@ class CKYParser:
                                      self.print_parse(curr.parent.children[curr_parent_matching_idx], True))  # DEBUG
                     else:
                         if b.children is None:
-                            # print "...instance of B will keep children from A" #DEBUG
+                            # print "...instance of B will keep children from A"  # DEBUG
                             curr.parent.children[curr_parent_matching_idx].copy_attributes(b, deepest_lambda,
                                                                                            preserve_parent=True,
                                                                                            preserve_children=True)
                         else:
-                            # print "...instance of A and B have matching lambda headers to be merged" #DEBUG
+                            # print "...instance of A and B have matching lambda headers to be merged"  # DEBUG
                             b_without_lambda_headers = b
-                            num_leading_lambdas = 0
+                            lambda_arg = 0
                             while (b_without_lambda_headers.is_lambda and
                                     b_without_lambda_headers.is_lambda_instantiation):
+                                lambda_arg = b_without_lambda_headers.is_lambda_instantiation
                                 b_without_lambda_headers = b_without_lambda_headers.children[0]
-                                num_leading_lambdas += 1
                             curr.parent.children[curr_parent_matching_idx].copy_attributes(b_without_lambda_headers,
-                                                                                           num_leading_lambdas,
+                                                                                           lambda_arg,
                                                                                            preserve_parent=True,
                                                                                            preserve_children=False)
                     curr.parent.children[curr_parent_matching_idx].set_return_type(self.ontology)
+                    # print "substitution created "+self.print_parse(curr, True)  # DEBUG
             if not entire_replacement and curr.children is not None:
                 to_traverse.extend([[c, deepest_lambda] for c in curr.children])
         if renumerate:
-            # print "renumerating "+self.print_parse(A_FA_B)  # DEBUG
+            # print "renumerating "+self.print_parse(ab)  # DEBUG
             ab.renumerate_lambdas([])
         try:
             ab.set_return_type(self.ontology)
