@@ -156,7 +156,7 @@ class PomdpDialogAgent(DialogAgent) :
         if len(self.n_best_utterances) > 0 :
             # Update the belief state
             #print 'Previous system action - ', str(self.previous_system_action) # DEBUG
-            print 'Utterances - ', '\n'.join([str(utterance) for utterance in self.n_best_utterances])
+            #print 'Utterances - ', '\n'.join([str(utterance) for utterance in self.n_best_utterances])
             self.state.update(self.previous_system_action, self.n_best_utterances, self.grounder)
             print 'Updated'
 

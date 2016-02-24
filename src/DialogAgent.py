@@ -243,6 +243,8 @@ class DialogAgent:
         return False
 
     def get_n_best_parses(self, response, n=None) :
+        if len(response) == 0 :
+            return []
         if n is None :
             n = self.parse_depth
         # Parser expects a space between 's and the thing it is applied 
@@ -259,6 +261,7 @@ class DialogAgent:
             k += 1
             if k == n :
                 break
+        x = raw_input()
         return parses 
 
     def get_action_from_parse(self, root):
