@@ -9,18 +9,20 @@ import ParseNode
 import SemanticNode
 
 neg_inf = float('-inf')
-random.seed(100)
+
 
 class Parameters:
-    def __init__(self, ont, lex):
+    def __init__(self, ont, lex, use_language_model=False):
         self.ontology = ont
         self.lexicon = lex
+        self.use_language_model = use_language_model
 
         # get initial count data structures
+        self._token_given_token_counts = {}
         self._CCG_given_token_counts = self.init_ccg_given_token()
         self._CCG_production_counts = self.init_ccg_production()
         self._lexicon_entry_given_token_counts = self.init_lexicon_entry()
-        self._semantic_counts = self.init_semantic()
+        self._semantic_counts = {}
 
         # print "_CCG_given_token_counts: "+str(self._CCG_given_token_counts)  # DEBUG
         # print "_CCG_production_counts: "+str(self._CCG_production_counts)  # DEBUG
@@ -29,6 +31,7 @@ class Parameters:
 
         # calculate probability tables from counts
         # note that this needs to happen every time counts are updated
+        self.token_given_token = {}
         self.CCG_given_token = {}
         self.CCG_production = {}
         self.lexicon_entry_given_token = {}
@@ -45,8 +48,32 @@ class Parameters:
     # update the probability tables given counts
     def update_probabilities(self):
 
+        min_token_given_token = 0
         min_ccg_given_token = 0
         min_lexicon_entry = 0
+
+        language_model_surface_forms = range(0, len(self.lexicon.surface_forms))
+        if self.use_language_model:
+            # get log probabilities for token_given_token ( P(sf|sf), P(sf=s|S)=1 )
+            # use special indices -2 for start, -3 for end, -1 for unknown token
+            language_model_surface_forms.extend([-2, -3])
+            for sf_idx in language_model_surface_forms:
+                nums = [self._token_given_token_counts[(sf_idx, next_idx)]
+                        for next_idx in language_model_surface_forms
+                        if (sf_idx, next_idx) in self._token_given_token_counts]
+                num_min = 0
+                mass = 0
+                if len(nums) > 0:
+                    num_min = float(min(nums))
+                    mass = float(sum(nums)) - num_min*len(nums)
+                for next_idx in language_model_surface_forms:
+                    key = (sf_idx, next_idx)
+                    if key in self._token_given_token_counts:
+                        self.token_given_token[key] = math.log((1+self._token_given_token_counts[key]-num_min) / mass) \
+                            if mass > 0 else math.log(1.0 / len(nums))
+                        if self.token_given_token[key] < min_token_given_token:
+                            min_token_given_token = self.token_given_token[key]
+
         for cat_idx in range(0, len(self.lexicon.categories)):
 
             # get log probabilities for CCG_given_token ( P(ccg|surface), P(ccg=c|S)=1 )
@@ -125,6 +152,12 @@ class Parameters:
         for sem_idx in range(0, len(self.lexicon.semantic_forms)):
             self.lexicon_entry_given_token[(sem_idx, -1)] = math.log(1.0/len(self.lexicon.semantic_forms)) + \
                 min_lexicon_entry
+        if self.use_language_model:
+            for sf_idx in language_model_surface_forms:
+                self.token_given_token[(sf_idx, -1)] = \
+                    math.log(1.0/len(language_model_surface_forms))+min_token_given_token
+                self.token_given_token[(-1, sf_idx)] = \
+                    math.log(1.0/len(language_model_surface_forms))+min_token_given_token
 
     # indexed by (categories idx, surface forms idx), value parameter weight
     def init_ccg_given_token(self):
@@ -159,10 +192,6 @@ class Parameters:
                 for sf_idx in range(0, len(self.lexicon.entries))
                 for sem_idx in self.lexicon.entries[sf_idx]}
 
-    # indexed by (pred, arg, pos) tuples, value parameter weight
-    def init_semantic(self):
-        return {}
-
     # takes in a parse node and returns its log probability
     def get_semantic_score(self, n):
 
@@ -173,6 +202,24 @@ class Parameters:
                 for _ in range(0, counts[key]):
                     score += self.semantic[key]
         return score
+
+    # take in ParseNode y and calculate bigram token counts as dictionary
+    def count_token_bigrams(self, y):
+        t = [l.surface_form for l in y.get_leaves()]
+        for t_idx in range(0, len(t)):
+            if type(t[t_idx]) is str:
+                t[t_idx] = self.lexicon.surface_forms.index(t[t_idx])
+            if t[t_idx] is None:
+                sys.exit("Leaf parse node has None surface form "+str(y))
+        b = {}
+        t.insert(0, -2)  # beginning of sentence token
+        t.append(-3)  # end of sentence token
+        for t_idx in range(0, len(t)-1):
+            key = (t[t_idx], t[t_idx+1])
+            if key not in b:
+                b[key] = 0
+            b[key] += 1
+        return b
 
     # takes in a parse or semantic node and returns the counts of its (pred, arg, pos) entries
     def count_semantics(self, sn):
@@ -242,11 +289,11 @@ class Parameters:
                     if key not in self._lexicon_entry_given_token_counts:
                         self._lexicon_entry_given_token_counts[key] = 1.0
 
-                    # update form leaves with new surface idx as needed
-                    form_leaves = form.get_leaves()
-                    for leaf in form_leaves:
-                        if type(leaf.surface_form) is str:
-                            leaf.surface_form = self.lexicon.surface_forms.index(leaf.surface_form)
+                # update form leaves with new surface idx as needed
+                form_leaves = form.get_leaves()
+                for leaf in form_leaves:
+                    if type(leaf.surface_form) is str:
+                        leaf.surface_form = self.lexicon.surface_forms.index(leaf.surface_form)
 
             # do perceptron-style updates of counts
             parameter_extractors = [count_ccg_surface_form_pairs, count_ccg_productions,
@@ -255,6 +302,9 @@ class Parameters:
                                     self._CCG_production_counts,
                                     self._lexicon_entry_given_token_counts,
                                     self._semantic_counts]
+            if self.use_language_model:
+                parameter_extractors.append(self.count_token_bigrams)
+                parameter_structures.append(self._token_given_token_counts)
             for i in range(0, len(parameter_structures)):
                 y_keys = parameter_extractors[i](y)
                 z_keys = parameter_extractors[i](z)
@@ -278,6 +328,7 @@ class Parameters:
                         parameter_structures[i][y_key] = 0
                     parameter_structures[i][y_key] += z_val - y_val
 
+        # print "_token_given_token_counts: "+str(self._token_given_token_counts)  # DEBUG
         # print "_CCG_given_token_counts: "+str(self._CCG_given_token_counts)  # DEBUG
         # print "_CCG_production_counts: "+str(self._CCG_production_counts)  # DEBUG
         # print "_lexicon_entry_counts: "+str(self._lexicon_entry_given_token_counts)  # DEBUG
@@ -290,6 +341,7 @@ class Parameters:
         # update probabilities given new counts
         self.update_probabilities()
 
+        # print "token_given_token: "+str(self.token_given_token)  # DEBUG
         # print "CCG_given_token: "+str(self.CCG_given_token)  # DEBUG
         # print "CCG_production: "+str(self.CCG_production)  # DEBUG
         # print "lexicon_entry: "+str(self.lexicon_entry_given_token)  # DEBUG
@@ -340,14 +392,19 @@ def count_ccg_surface_form_pairs(y):
 
 
 class CKYParser:
-    def __init__(self, ont, lex):
+    def __init__(self, ont, lex, use_language_model=False):
 
         # resources given on instantiation
         self.ontology = ont
         self.lexicon = lex
+        self.use_language_model = use_language_model
+
+        # type-raise bare nouns in lexicon
+        self.type_raised = {}  # map from semantic form idx to their type-raised form idx
+        self.type_raise_bare_nouns()
 
         # model parameter values
-        self.theta = Parameters(ont, lex)
+        self.theta = Parameters(ont, lex, use_language_model=use_language_model)
 
         # additional linguistic information and parameters
         # TODO: read this from configuration files or have user specify it on instantiation
@@ -355,7 +412,7 @@ class CKYParser:
         self.max_multiword_expression = 2  # max span of a multi-word expression to be considered during tokenization
         self.max_new_senses_per_utterance = 2  # max number of new word senses that can be induced on a training example
         self.max_cky_trees_per_token_sequence_beam = 1000  # for tokenization of an utterance, max cky trees considered
-        self.max_hypothesis_categories_for_unknown_token_beam = 1  # for unknown token, max syntax categories tried
+        self.max_hypothesis_categories_for_unknown_token_beam = 5  # for unknown token, max syntax categories tried
 
         # behavioral parameters
         self.safety = True  # set to False once confident about node combination functions' correctness
@@ -363,9 +420,20 @@ class CKYParser:
         # cache
         self.cached_combinations = {}  # indexed by left, then right node, value at result
 
-        # type-raise bare nouns in lexicon
-        self.type_raised = {}  # map from semantic form idx to their type-raised form idx
-        self.type_raise_bare_nouns()
+    # access language model parameters to get a language score for a given parse node y
+    # parse node leaves with string semantic forms are assumed to be unknown tokens
+    def get_language_model_score(self, y):
+        t = [l.surface_form for l in y.get_leaves()]
+        for t_idx in range(0, len(t)):
+            if type(t[t_idx]) is str:
+                t[t_idx] = -1
+        score = 0
+        t.insert(0, -2)
+        t.append(-3)
+        for t_idx in range(0, len(t)-1):
+            key = (t[t_idx], t[t_idx+1])
+            score += self.theta.token_given_token[key] if key in self.theta.token_given_token else 0.0
+        return score
 
     # perform type-raising on leaf-level lexicon entries
     # this alters the given lexicon
@@ -537,6 +605,9 @@ class CKYParser:
     # to find new lexical entries for surface forms not yet recognized
     def most_likely_cky_parse(self, s, reranker_beam=1, known_root=None):
 
+        if len(s) == 0:
+            raise AssertionError("Cannot parse provided string of length zero")
+
         tk_seqs = self.tokenize(s)
         # print "number of token sequences for '"+s+"': "+str(len(tk_seqs))  # DEBUG
         # print "tk_seqs: "+str(tk_seqs)  # DEBUG
@@ -684,18 +755,18 @@ class CKYParser:
     def most_likely_tree_generator(self, parse_leaves, ccg_tree, sem_root=None):
 
         # print "most_likely_tree_generator: called for ccg_tree: "+str(ccg_tree)  # DEBUG
-        parse_leaves, parse_leaves_keys = self.form_root_from_leaves(parse_leaves, ccg_tree)
+        parse_roots, parse_leaves_keys = self.form_root_from_leaves(parse_leaves, ccg_tree)
         # print "parse_leaves: "+str(parse_leaves)  # DEBUG
 
         # yield parse and total score (leaves+syntax) if structure matches
         # set of new lexical entries required is empty in this case
-        if len(parse_leaves) == 1:
-            yield parse_leaves[0], []  # the ParseNode root of the finished parse tree
+        if len(parse_roots) == 1:
+            yield parse_roots[0], []  # the ParseNode root of the finished parse tree
 
         # if structure does not match and there are None nodes, perform top-down generation from
         # supervised root (if available) to fill in unknown semantic gaps given CKY structure of
         # the ccg_tree
-        parse_leaves_nodes = [pl.node for pl in parse_leaves]
+        parse_leaves_nodes = [pl.node for pl in parse_roots]
         if sem_root is not None and None in parse_leaves_nodes:
 
             # print "trying top-down parsing..."  # DEBUG
@@ -714,9 +785,9 @@ class CKYParser:
 
                 new_lex_entries = []  # values (surface form str, sem node)
                 topdown_leaves = topdown_root.get_leaves()
-                if len(topdown_leaves) == len(parse_leaves):  # possible match was found in reverse parsing
+                if len(topdown_leaves) == len(parse_roots):  # possible match was found in reverse parsing
                     match = True
-                    candidate_parse_leaves = parse_leaves[:]
+                    candidate_parse_leaves = parse_roots[:]
                     for idx in range(0, len(candidate_parse_leaves)):
                         if candidate_parse_leaves[idx].node is None:
                             sf = candidate_parse_leaves[idx].surface_form if \
@@ -724,6 +795,7 @@ class CKYParser:
                                 self.lexicon.surface_forms[candidate_parse_leaves[idx].surface_form]
                             new_lex_entries.append([sf, topdown_leaves[idx].node])
                             candidate_parse_leaves[idx] = topdown_leaves[idx]
+                            candidate_parse_leaves[idx].surface_form = sf
                             continue
                         if candidate_parse_leaves[idx].node.category != topdown_leaves[idx].node.category:
                             match = False
@@ -1336,8 +1408,8 @@ class CKYParser:
                 deepest_lambda = curr.lambda_name
             # an instance of lambda_A to be replaced by B
             elif curr.is_lambda and not curr.is_lambda_instantiation and curr.lambda_name == a.lambda_name:
-                # print "substituting '"+self.print_parse(B,True)+"' for '"+self.print_parse(curr, True) + \
-                # "' with lambda offset "+str(deepest_lambda) #DEBUG
+                # print "substituting '"+self.print_parse(b, True)+"' for '"+self.print_parse(curr, True) + \
+                #     "' with lambda offset "+str(deepest_lambda)  # DEBUG
                 if (not b.is_lambda and self.ontology.preds[b.idx] == 'and'
                         and curr.children is not None and b.children is not None):
                     # print "entering B substitution of curr taking curr's args"  # DEBUG
@@ -1360,9 +1432,9 @@ class CKYParser:
                     if curr.parent.is_lambda_instantiation:  # eg. 1(2) taking and(pred,pred) -> and(pred(2),pred(2)
                         b_new_arg = b_new.children[0]
                         while self.ontology.preds[b_new_arg.idx] == 'and':
-                            # print "B_new_arg: "+self.print_parse(B_new_arg)  # DEBUG
+                            # print "B_new_arg: "+self.print_parse(b_new_arg)  # DEBUG
                             b_new_arg = b_new_arg.children[0]
-                        # print "setting curr parent lambda name to child of "+self.print_parse(B_new_arg)  # DEBUG
+                        # print "setting curr parent lambda name to child of "+self.print_parse(b_new_arg)  # DEBUG
                         curr.parent.lambda_name = b_new_arg.children[0].lambda_name
                     if raised:
                         b_new.set_category(self.lexicon.categories.index(
@@ -1374,7 +1446,7 @@ class CKYParser:
                 elif curr.parent is None:
                     # print "entering None parent for curr"  # DEBUG
                     if curr.children is None:
-                        # print "...whole tree is instance" #DEBUG
+                        # print "...whole tree is instance"  # DEBUG
                         curr.copy_attributes(b)  # instance is whole tree; add nothing more and loop will now exit
                     elif b.children is None:
                         # print "...instance heads tree; preserve children taking B"
@@ -1390,7 +1462,7 @@ class CKYParser:
                         if not curr.parent.children[curr_parent_matching_idx] != curr:  # find matching address
                             break
                     if curr.children is None:
-                        # print "...instance of B ("+self.print_parse(B)+") will preserve its children" #DEBUG
+                        # print "...instance of B ("+self.print_parse(b)+") will preserve its children"  # DEBUG
                         # lambda instance is a leaf
                         curr.parent.children[curr_parent_matching_idx].copy_attributes(b, deepest_lambda,
                                                                                        preserve_parent=True)
@@ -1399,27 +1471,28 @@ class CKYParser:
                                      self.print_parse(curr.parent.children[curr_parent_matching_idx], True))  # DEBUG
                     else:
                         if b.children is None:
-                            # print "...instance of B will keep children from A" #DEBUG
+                            # print "...instance of B will keep children from A"  # DEBUG
                             curr.parent.children[curr_parent_matching_idx].copy_attributes(b, deepest_lambda,
                                                                                            preserve_parent=True,
                                                                                            preserve_children=True)
                         else:
-                            # print "...instance of A and B have matching lambda headers to be merged" #DEBUG
+                            # print "...instance of A and B have matching lambda headers to be merged"  # DEBUG
                             b_without_lambda_headers = b
-                            num_leading_lambdas = 0
+                            lambda_arg = 0
                             while (b_without_lambda_headers.is_lambda and
                                     b_without_lambda_headers.is_lambda_instantiation):
+                                lambda_arg = b_without_lambda_headers.is_lambda_instantiation
                                 b_without_lambda_headers = b_without_lambda_headers.children[0]
-                                num_leading_lambdas += 1
                             curr.parent.children[curr_parent_matching_idx].copy_attributes(b_without_lambda_headers,
-                                                                                           num_leading_lambdas,
+                                                                                           lambda_arg,
                                                                                            preserve_parent=True,
                                                                                            preserve_children=False)
                     curr.parent.children[curr_parent_matching_idx].set_return_type(self.ontology)
+                    # print "substitution created "+self.print_parse(curr, True)  # DEBUG
             if not entire_replacement and curr.children is not None:
                 to_traverse.extend([[c, deepest_lambda] for c in curr.children])
         if renumerate:
-            # print "renumerating "+self.print_parse(A_FA_B)  # DEBUG
+            # print "renumerating "+self.print_parse(ab)  # DEBUG
             ab.renumerate_lambdas([])
         try:
             ab.set_return_type(self.ontology)
