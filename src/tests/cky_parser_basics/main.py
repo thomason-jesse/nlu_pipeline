@@ -22,7 +22,7 @@ print "semantic forms: " + str(lex.semantic_forms)
 print "entries: " + str(lex.entries)
 
 print "instantiating CKYParser"
-parser = CKYParser.CKYParser(ont, lex)
+parser = CKYParser.CKYParser(ont, lex, use_language_model=True)
 
 print "reading in data and beginning training test"
 d = parser.read_in_paired_utterance_semantics(sys.argv[3])
@@ -38,6 +38,7 @@ for [x, y] in d:
     correct = False
     for i in range(0, 10):
         best, score, _ = next(parse_generator)
+        language_score = parser.get_language_model_score(best)
         if best is None:
             raise AssertionError("Testing failed on example '"+x+"' for which no more parses remain")
         if y.equal_allowing_commutativity(best.node, parser.commutative_idxs, ontology=ont):
@@ -45,6 +46,6 @@ for [x, y] in d:
             break
         else:
             print "...generated incorrect parse "+parser.print_parse(best.node, show_category=True) + \
-                " with score "+str(score)
+                " with score "+str(score)+", language score "+str(language_score)
     if not correct:
         raise AssertionError("Testing failed on example '" + x + "' while failed to give correct form in beam")
