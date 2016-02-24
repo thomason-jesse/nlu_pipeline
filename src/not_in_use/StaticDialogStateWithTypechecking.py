@@ -46,7 +46,7 @@ class StaticDialogStateWithTypechecking:
                 if self.param_valid(i, a.params[i]) :
                     self.user_action_parameters_belief[i][a.params[i]] = 0.9
             for param in self.user_action_parameters_belief[i]:
-                if param != a.params[i]:
+                if param != a.params[i] and self.param_valid(i, a.params[i]):
                     self.user_action_parameters_belief[i][param] *= 0.5  # decay confidence, similar to IJCAI paper
 
         # update expected number of parameters for action

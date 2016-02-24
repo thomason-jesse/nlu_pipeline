@@ -106,13 +106,16 @@ class Utterance:
                 return False
         if self.referring_params != None :
             for param_name in self.referring_params :
-                if system_action.referring_params != None :
-                    if param_name in system_action.referring_params and system_action.referring_params[param_name] != self.referring_params[param_name] :
-                        # Any param present in both the system action and the 
-                        # utterance must match. Note that a param need not and 
-                        # generally doesn't exist in both
-                        #print 'Non matching value for ', param_name, ' in system_action and utterance'
-                        return False
+                # Commenting this out because it doesn't allow change of
+                # value
+                
+                #if system_action.referring_params != None :
+                    #if param_name in system_action.referring_params and system_action.referring_params[param_name] != self.referring_params[param_name] :
+                        ## Any param present in both the system action and the 
+                        ## utterance must match. Note that a param need not and 
+                        ## generally doesn't exist in both
+                        ##print 'Non matching value for ', param_name, ' in system_action and utterance'
+                        #return False
                 if param_name not in partition.possible_param_values or self.referring_params[param_name] not in partition.possible_param_values[param_name] :
                     # Typically all partitions have some set of values 
                     # for all param names. The partition must allow 

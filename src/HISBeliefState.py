@@ -60,19 +60,17 @@ class HISBeliefState:
         elif utterance.referring_goal != None :
             required_goal = utterance.referring_goal    
         required_params = dict()
-        if system_action.referring_params != None :
-            for param_name in system_action.referring_params :
-                if param_name in required_params :
-                    required_params[param_name] = required_params[param_name] + [system_action.referring_params[param_name]]
-                else :
-                    required_params[param_name] = [system_action.referring_params[param_name]]
-                required_params[param_name] = list(set(required_params[param_name]))
         if utterance.referring_params != None :
             for param_name in utterance.referring_params :
                 if param_name in required_params :
                     required_params[param_name] = required_params[param_name] + [utterance.referring_params[param_name]]
                 else :
                     required_params[param_name] = [utterance.referring_params[param_name]]
+                required_params[param_name] = list(set(required_params[param_name]))
+        if system_action.referring_params != None :
+            for param_name in system_action.referring_params :
+                if param_name not in required_params :
+                    required_params[param_name] = [system_action.referring_params[param_name]]
                 required_params[param_name] = list(set(required_params[param_name]))
                 
         #print "required_goal = ", required_goal        # DEBUG
@@ -136,7 +134,7 @@ class HISBeliefState:
         #print '----------------------------------------------'
         #print str(system_action)
         for utterance in n_best_utterances :
-            #print str(utterance)
+            print str(utterance)
             # Check whether there are partitions that exactly match the 
             # system action-utterance pair
             matching_partitions = self.get_matching_partitions(system_action, utterance)
@@ -171,9 +169,10 @@ class HISBeliefState:
                     #print 'type_prob = ', type_prob # Pr(T(u)/T(m))
                     param_match_prob = numpy.log(int(utterance.match(partition, system_action))) # Pr(M(u)/p,m)
                     #print 'param_match_prob = ', param_match_prob 
-                    #print '---------------------------------'
                     hypothesis_beliefs[hypothesis] = obs_prob + type_prob + param_match_prob + partition.belief 
                         # b(p,u') = k * Pr(o'/u) * Pr(T(u)/T(m)) * Pr(M(u)/p,m) * b(p)
+                    #print 'Belief = ', hypothesis_beliefs[hypothesis]
+                    #print '---------------------------------'
                 else :
                     hypothesis = (partition, '-OTHER-')
                     obs_prob = utterance.parse_prob
