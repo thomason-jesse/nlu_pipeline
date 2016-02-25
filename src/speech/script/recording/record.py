@@ -291,17 +291,15 @@ class Recorder:
         self.scriptGenerator = None
 
         #Initialize microphone. 
-        self.libHandle.initMic()
+        self.libHandle.initMics()
 
     def __del__(self):
-        self.libHandle.closeMic()
+        self.libHandle.closeMics()
 
     def record(self):
         while not self.libHandle.isInterrupted():
             self.libHandle.record1600Hz("results/recordings/" + self.user_id + "_recording_" + str(self.phrase_num))
             self.phrase_num += 1
-
-            print "Recorded something" 
 
     def recordToggle(self):
         #Initializes pygame window to read spacebar presses. 
