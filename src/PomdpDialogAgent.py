@@ -188,16 +188,16 @@ class PomdpDialogAgent(DialogAgent) :
 
     def create_utterances_of_parse(self, parse) :
         parse = parse.node
-        #print 'In create_utterances_of_parse with', self.parser.print_parse(parse, show_category=True)
+        print 'In create_utterances_of_parse with', self.parser.print_parse(parse, show_category=True)
         # First check if it is a confirmation or denial
         if parse.idx == self.parser.ontology.preds.index('yes'):
-            #print 'Is affirm'
+            print 'Is affirm'
             return [Utterance('affirm')]
         elif parse.idx == self.parser.ontology.preds.index('no'):
-            #print 'Is deny'
+            print 'Is deny'
             return [Utterance('deny')]
         elif parse.idx == self.parser.ontology.preds.index('none'):
-            #print 'Got a none response'
+            print 'Got a none response'
             goal = self.previous_system_action.referring_goal
             if self.previous_system_action.extra_data is not None and len(self.previous_system_action.extra_data) >= 1:
                 param_name = self.previous_system_action.extra_data[0]
@@ -209,17 +209,17 @@ class PomdpDialogAgent(DialogAgent) :
             #print '\n'
             return [utterance]
         
-        #print 'Neither affirm nor deny'
+        print 'Neither affirm nor deny'
         
         # Now check if it a full inform - mentions goal and params
         try:
-            #print 'Trying to get an action'
+            print 'Trying to get an action'
             p_action = self.get_action_from_parse(parse)
         except SystemError:
             p_action = None
 
         if p_action is not None :
-            #print 'Got an action. Will convert and return'
+            print 'Got an action. Will convert and return'
             return [self.convert_action_to_utterance(p_action)]
             
         # Getting a complete action failed so assume this is a param  
@@ -227,7 +227,7 @@ class PomdpDialogAgent(DialogAgent) :
             # Lambda headed parse - unlikely to give a valid param
             # value
             return []
-        #print 'Trying to ground as param value'
+        print 'Trying to ground as param value'
         try :
             #print "Grounding ", self.parser.print_parse(parse)
             g = self.grounder.groundSemanticNode(parse, [], [], [])

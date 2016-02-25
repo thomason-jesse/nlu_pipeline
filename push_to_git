@@ -11,6 +11,9 @@ rm -f src/resources/*~
 rm -f src/resources/amt_expt/*~
 rm -f src/resources/amt_expt/other_changes/*~
 rm -f src/resources/amt_expt/other_changes/domain_amt/*~
+rm -f src/resources/fake_to_real/*~
+rm -f src/resources/fake_to_real/other_changes/*~
+rm -f src/resources/fake_to_real/other_changes/domain_amt/*~
 rm -f src/Parser_test.txt
 rm -f src/run_tests_data.txt
 rm -f src/Testing.txt

@@ -46,19 +46,19 @@ In a new tab for catkin_ws/, you can test the pipeline with
 
 $ rosrun nlu_pipeline test_pipeline.py [ontology text file] [lexicon text file] [training text file]
 
-rosrun nlu_pipeline test_pipeline.py src/nlu_pipeline/src/resources/amt_expt/ont.txt src/nlu_pipeline/src/resources/amt_expt/lex.txt src/nlu_pipeline/src/resources/amt_expt/utterance_action_pairs.txt
+rosrun nlu_pipeline test_pipeline.py src/nlu_pipeline/src/resources/fake_to_real/ont.txt src/nlu_pipeline/src/resources/fake_to_real/lex.txt src/nlu_pipeline/src/resources/fake_to_real/utterance_action_pairs.txt
 
 TESTING POMDP:
 
-rosrun nlu_pipeline TestPomdpPipeline.py src/nlu_pipeline/src/resources/amt_expt/ont.txt src/nlu_pipeline/src/resources/amt_expt/lex.txt src/nlu_pipeline/src/resources/amt_expt/utterance_action_pairs.txt
+rosrun nlu_pipeline test_pomdp_pipeline.py src/nlu_pipeline/src/resources/fake_to_real/ont.txt src/nlu_pipeline/src/resources/fake_to_real/lex.txt src/nlu_pipeline/src/resources/fake_to_real/utterance_action_pairs.txt
 
 POMDP AMT Experiment
 
-rosrun nlu_pipeline DialogueServer.py src/nlu_pipeline/src/resources/amt_expt/ont.txt src/nlu_pipeline/src/resources/amt_expt/lex.txt src/nlu_pipeline/src/resources/amt_expt/utterance_action_pairs.txt
+rosrun nlu_pipeline DialogueServer.py src/nlu_pipeline/src/resources/fake_to_real/ont.txt src/nlu_pipeline/src/resources/fake_to_real/lex.txt src/nlu_pipeline/src/resources/fake_to_real/utterance_action_pairs.txt
 
 Training POMDP :
 
-rosrun nlu_pipeline TrainPomdpPipeline.py src/nlu_pipeline/src/resources/amt_expt/ont.txt src/nlu_pipeline/src/resources/amt_expt/lex.txt src/nlu_pipeline/src/resources/amt_expt/utterance_action_pairs.txt
+rosrun nlu_pipeline TrainPomdpPipeline.py src/nlu_pipeline/src/resources/fake_to_real/ont.txt src/nlu_pipeline/src/resources/fake_to_real/lex.txt src/nlu_pipeline/src/resources/fake_to_real/utterance_action_pairs.txt
 
 Rosbridge server:
 

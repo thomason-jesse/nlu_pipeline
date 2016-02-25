@@ -256,9 +256,8 @@ class DialogAgent:
         num_parses_examined = 0
         parses = list()
         for (parse, score, _) in parse_generator :
-            print 'parse = ', self.parser.print_parse(parse.node, show_category=True), ', score = ', score 
             num_parses_examined += 1
-            if num_parses_examined == max_parse_beam :
+            if num_parses_examined == self.max_parse_beam :
                 break
             if parse is None :
                 break
@@ -269,6 +268,7 @@ class DialogAgent:
             if top_level_category not in ['M', 'NP', 'C'] :
                 # M - imperative (full action), C - confirmation, NP - noun phrase for params
                 continue
+            print 'parse = ', self.parser.print_parse(parse.node, show_category=True), ', score = ', score 
             parses.append((parse, score))
             num_parses_obtained += 1
             if num_parses_obtained == num_parses_needed :
@@ -279,7 +279,7 @@ class DialogAgent:
     def get_action_from_parse(self, root):
 	# print "Inside get_action_from_parse"
 
-        # print "parse to get action from: " + self.parser.print_parse(root)  # DEBUG
+        print "parse to get action from: " + self.parser.print_parse(root)  # DEBUG
 
         root.set_return_type(self.parser.ontology)  # in case this was not calculated during parsing
 
@@ -288,12 +288,13 @@ class DialogAgent:
             # assume for now that logical connectives do not operate over actions (eg. no (do action a and action b))
             # ground action arguments
             action = self.parser.ontology.preds[root.idx]
-            # print "action: "+action  # DEBUG
+            print "action: "+action  # DEBUG
             g_args = []
             # print "Going to enter loop"
             for arg in root.children:
+                print 'Grounding ', self.parser.print_parse(arg, show_category=True)
                 g = self.grounder.groundSemanticNode(arg, [], [], [])
-                # print "arg: "+str(g)  # DEBUG
+                print "arg: "+str(g)  # DEBUG
                 answer = self.grounder.grounding_to_answer_set(g)
                 if len(answer) == 0:
                     # print "Single answer found"
