@@ -8,7 +8,7 @@ from Utterance import Utterance
 from DialogAgent import DialogAgent
 from TemplateBasedGenerator import TemplateBasedGenerator
 from Knowledge import Knowledge
-from Utils import *
+from utils import *
 
 # This dialog agent maintains a much richer state and hence has to 
 # process system actions and user responses more elaborately. It extends
@@ -188,16 +188,16 @@ class PomdpDialogAgent(DialogAgent) :
 
     def create_utterances_of_parse(self, parse) :
         parse = parse.node
-        print 'In create_utterances_of_parse with', parse
+        #print 'In create_utterances_of_parse with', self.parser.print_parse(parse, show_category=True)
         # First check if it is a confirmation or denial
         if parse.idx == self.parser.ontology.preds.index('yes'):
-            print 'Is affirm'
+            #print 'Is affirm'
             return [Utterance('affirm')]
         elif parse.idx == self.parser.ontology.preds.index('no'):
-            print 'Is deny'
+            #print 'Is deny'
             return [Utterance('deny')]
         elif parse.idx == self.parser.ontology.preds.index('none'):
-            print 'Got a none response'
+            #print 'Got a none response'
             goal = self.previous_system_action.referring_goal
             if self.previous_system_action.extra_data is not None and len(self.previous_system_action.extra_data) >= 1:
                 param_name = self.previous_system_action.extra_data[0]
@@ -209,17 +209,17 @@ class PomdpDialogAgent(DialogAgent) :
             #print '\n'
             return [utterance]
         
-        print 'Neither affirm nor deny'
+        #print 'Neither affirm nor deny'
         
         # Now check if it a full inform - mentions goal and params
         try:
-            print 'Trying to get an action'
+            #print 'Trying to get an action'
             p_action = self.get_action_from_parse(parse)
         except SystemError:
             p_action = None
 
         if p_action is not None :
-            print 'Got an action. Will convert and return'
+            #print 'Got an action. Will convert and return'
             return [self.convert_action_to_utterance(p_action)]
             
         # Getting a complete action failed so assume this is a param  
@@ -227,23 +227,20 @@ class PomdpDialogAgent(DialogAgent) :
             # Lambda headed parse - unlikely to give a valid param
             # value
             return []
-        print 'Trying to ground as param value'
+        #print 'Trying to ground as param value'
         try :
-            print "Grounding ", self.parser.print_parse(parse)
+            #print "Grounding ", self.parser.print_parse(parse)
             g = self.grounder.groundSemanticNode(parse, [], [], [])
             answers = self.grounder.grounding_to_answer_set(g)
-            print 'answers = ', answers
-            print '--------------------------------'
+            #print 'answers = ', answers
+            #print '--------------------------------'
             utterances = []
             if type(answers) == 'str' :
                 answers = [answers]
             for answer in answers :
-                if self.previous_system_action.extra_data is not None and len(self.previous_system_action.extra_data) > 1:
-                    param_name = self.previous_system_action.extra_data[0]
-                else :
-                    param_name = 'patient'
                 goal = self.previous_system_action.referring_goal
                 params = dict()
+                #print 'self.previous_system_action.extra_data = ', self.previous_system_action.extra_data
                 if self.previous_system_action.action_type == 'request_missing_param' and self.previous_system_action.extra_data is not None and len(self.previous_system_action.extra_data) == 1 :
                     param_name = self.previous_system_action.extra_data[0]
                     params[param_name] = answer
@@ -273,10 +270,13 @@ class PomdpDialogAgent(DialogAgent) :
         i = 0
         while i < len(utterances) :
             u = utterances[i]
-            j = i
+            j = i + 1
             while j < len(utterances) :
                 u2 = utterances[j]
                 if u2.is_like(u) :
+                    #print '-------------------------'
+                    #print 'Merging \n', str(u), '\n', str(u2), '\n'
+                    #print '-------------------------'
                     u.parse_prob = add_log_probs(u.parse_prob, u2.parse_prob)
                     utterances.remove(u2)
                 else :
@@ -329,12 +329,14 @@ class PomdpDialogAgent(DialogAgent) :
                                 param_value = None
                                 if param_name in utterance.referring_params :
                                     param_value = utterance.referring_params[param_name]
-                                if param_name not in values :
-                                    values[param_name] = set([param_value])
-                                else :
-                                    values[param_name].add(param_value)
-                                if len(values[param_name]) > 1 :
-                                    diagreeing_params.add(param_name)
+                                if param_value is not None :
+                                    if param_name not in values :
+                                        values[param_name] = set([param_value])
+                                    else :
+                                        values[param_name].add(param_value)
+                                    if len(values[param_name]) > 1 :
+                                        diagreeing_params.add(param_name)
+                        #print 'diagreeing_params = ', diagreeing_params
                         if len(diagreeing_params) == 1 :
                             # There is exactly one param on whose value 
                             # these parses differ 
@@ -345,7 +347,7 @@ class PomdpDialogAgent(DialogAgent) :
                             params = dict()
                             for param_name in param_order :
                                 if param_name not in diagreeing_params :
-                                    params[param_name] = values[param_name][0]
+                                    params[param_name] = list(values[param_name])[0]
                                     # values[param_name] will have exactly
                                     # one element if param_name is not a
                                     # disagreeing param
@@ -375,22 +377,26 @@ class PomdpDialogAgent(DialogAgent) :
         
         # Clean up by removing duplicates and invalid utterances    
         print 'Created utterances'
+        print '\n'.join([str(utterance) for utterance in self.n_best_utterances])
         self.n_best_utterances = self.merge_duplicate_utterances(self.n_best_utterances)   
-        print 'Merged duplicates'
+        print '\n\nMerged duplicates'
+        print '\n'.join([str(utterance) for utterance in self.n_best_utterances])
         self.n_best_utterances = self.cluster_utterances(self.n_best_utterances)
-        print 'Clustered to identify unknown params'
+        print '\n\nClustered to identify unknown params'
+        print '\n'.join([str(utterance) for utterance in self.n_best_utterances])
         self.n_best_utterances = self.remove_invalid_utterances(self.n_best_utterances, self.grounder) 
-        print 'Removed invalid utterances'
+        print '\n\nRemoved invalid utterances'
+        print '\n'.join([str(utterance) for utterance in self.n_best_utterances])
         
         sum_log_prob = float('-inf')
         for utterance in self.n_best_utterances :
             sum_log_prob = add_log_probs(sum_log_prob, utterance.parse_prob)
 
         sum_prob = math.exp(sum_log_prob)
-        print 'sum_prob = ', sum_prob
-        print 'self.knowledge.min_obs_by_non_n_best_prob = ', self.knowledge.min_obs_by_non_n_best_prob
+        #print 'sum_prob = ', sum_prob
+        #print 'self.knowledge.min_obs_by_non_n_best_prob = ', self.knowledge.min_obs_by_non_n_best_prob
         non_n_best_prob = max(self.knowledge.min_obs_by_non_n_best_prob, self.knowledge.max_obs_by_non_n_best_prob - sum_prob)
-        print 'non_n_best_prob = ', non_n_best_prob
+        #print 'non_n_best_prob = ', non_n_best_prob
         other_utterance = Utterance('-OTHER-', parse_prob=numpy.log(non_n_best_prob))
         self.n_best_utterances.append(other_utterance)
         sum_log_prob = add_log_probs(sum_log_prob, numpy.log(non_n_best_prob))
@@ -413,6 +419,9 @@ class PomdpDialogAgent(DialogAgent) :
         if self.max_prob_user_utterances is None :
             self.max_prob_user_utterances = list()    
         self.max_prob_user_utterances.append(max_prob_utterance)
+        
+        print '\nN best utterances : '
+        print '\n'.join([str(utterance) for utterance in self.n_best_utterances])
 
     # Creates (text, denotation) pairs and retrains parser
     def train_parser_from_dialogue(self, final_action) :

@@ -9,10 +9,11 @@ import StaticDialogState
 
 class DialogAgent:
 
-    def __init__(self, parser, grounder, policy, u_input, output, parse_depth=10):
+    def __init__(self, parser, grounder, policy, u_input, output, parse_depth=10, max_parse_beam=20):
         self.parser = parser
         self.grounder = grounder
         self.parse_depth = parse_depth
+        self.max_parse_beam = max_parse_beam
         self.state = None
         self.policy = policy
         self.input = u_input
@@ -242,26 +243,37 @@ class DialogAgent:
             self.parser.learner.learn_from_actions(train_data)
         return False
 
-    def get_n_best_parses(self, response, n=None) :
+    def get_n_best_parses(self, response, num_parses_needed=None) :
         if len(response) == 0 :
             return []
-        if n is None :
-            n = self.parse_depth
+        if num_parses_needed is None :
+            num_parses_needed = self.parse_depth
         # Parser expects a space between 's and the thing it is applied 
         # to, for example "alice 's" rather than "alice's"
         response = re.sub("'s", " 's", response)
         parse_generator = self.parser.most_likely_cky_parse(response)
-        k = 0
+        num_parses_obtained = 0
+        num_parses_examined = 0
         parses = list()
         for (parse, score, _) in parse_generator :
+            print 'parse = ', self.parser.print_parse(parse.node, show_category=True), ', score = ', score 
+            num_parses_examined += 1
+            if num_parses_examined == max_parse_beam :
+                break
             if parse is None :
                 break
-            print 'parse = ', self.parser.print_parse(parse.node, show_category=True), ', score = ', score 
+            if parse.node.is_lambda and parse.node.is_lambda_instantiation :
+                # Lambda headed parses are very unlikely to be correct. Drop them
+                continue
+            top_level_category = self.parser.lexicon.categories[parse.node.category]
+            if top_level_category not in ['M', 'NP', 'C'] :
+                # M - imperative (full action), C - confirmation, NP - noun phrase for params
+                continue
             parses.append((parse, score))
-            k += 1
-            if k == n :
+            num_parses_obtained += 1
+            if num_parses_obtained == num_parses_needed :
                 break
-        x = raw_input()
+        #x = raw_input()
         return parses 
 
     def get_action_from_parse(self, root):

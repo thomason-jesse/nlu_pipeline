@@ -1,7 +1,7 @@
 __author__ = 'aishwarya'
 
 import math
-from Utils import *
+from utils import *
 
 class Utterance:
 

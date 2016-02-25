@@ -6,7 +6,7 @@ import sys, re
 import Action
 
 from SystemAction import SystemAction
-from Utils import *
+from utils import *
 from UtteranceBasedStaticDialogState import UtteranceBasedStaticDialogState
 from PomdpDialogAgent import PomdpDialogAgent
 
@@ -91,7 +91,8 @@ class StaticDialogAgent(PomdpDialogAgent):
         
         self.previous_system_action = SystemAction('request_missing_param', max_belief_action)
         param_order = self.knowledge.param_order[max_belief_action]
-        self.previous_system_action.extra_data = param_order[idx]
+        self.previous_system_action.extra_data = [param_order[idx]]
+        print 'self.previous_system_action.extra_data = ', self.previous_system_action.extra_data
         
         response = self.response_generator.get_sentence(self.previous_system_action)    
         self.output.say(response)
@@ -103,7 +104,7 @@ class StaticDialogAgent(PomdpDialogAgent):
             self.dialogue_stopped = True
             return
         
-        theme = self.previous_system_action.extra_data
+        theme = self.previous_system_action.extra_data[0]
         if theme in self.parser_train_data :
             self.parser_train_data[theme].append(u)
         else :

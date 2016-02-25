@@ -27,3 +27,4 @@ M : at(the(lambda x:e.(hasoffice(alice,x))))
 
 search for george in alice 's office
 M : searchroom(george,the(lambda x:e.(hasoffice(alice,x))))
+

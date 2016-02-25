@@ -10,7 +10,7 @@ from SummaryState import SummaryState
 from PomdpKtdqPolicy import PomdpKtdqPolicy
 from SystemAction import SystemAction
 from PomdpDialogAgent import PomdpDialogAgent
-from Utils import *
+from utils import *
 
 # This class is supposed to read log files and convert them into a form 
 # that can be used for training a policy. It requires the ability to 
@@ -18,8 +18,8 @@ from Utils import *
 # It extends PomdpDialogAgent for code reuse
 class PomdpTrainer(PomdpDialogAgent) :
 
-    def __init__(self, parser, grounder, parse_depth=10, load_policy_from_file=False):
-        PomdpDialogAgent.__init__(self, parser, grounder, None, None, parse_depth, load_policy_from_file)
+    def __init__(self, parser, grounder, policy, parse_depth=10):
+        PomdpDialogAgent.__init__(self, parser, grounder, policy, None, None, parse_depth)
 
     # Train the policy using logs from the IJCAI 2015 experiment
     # This makes assumptions on the formatting of the logs
@@ -38,6 +38,7 @@ class PomdpTrainer(PomdpDialogAgent) :
                 fname = fail_dir + '/' + fail_files[fail_idx]
                 self.train_policy_from_single_old_log(fname, False)
                 fail_idx += 1
+            save_model(policy, 'ktdq_policy_object')
             
     # Train the policy using logs from the IJCAI 2015 experiment
     # This makes assumptions on the formatting of the logs

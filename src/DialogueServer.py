@@ -18,7 +18,7 @@ import datetime
 from TemplateBasedGenerator import TemplateBasedGenerator
 from PomdpDialogAgent import PomdpDialogAgent
 from StaticDialogAgent import StaticDialogAgent
-from Utils import *
+from utils import *
 from nlu_pipeline.srv import *
 
 from std_msgs.msg import String

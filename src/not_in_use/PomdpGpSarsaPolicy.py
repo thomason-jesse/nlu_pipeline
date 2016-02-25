@@ -13,7 +13,7 @@ __author__ = 'aishwarya'
 # arrays because arrays don't do vector math in an intuitive way
 
 import numpy as np, sys, math, copy, itertools
-from Utils import *
+from utils import *
 from SystemAction import SystemAction
 from Action import Action
 from SummaryState import SummaryState

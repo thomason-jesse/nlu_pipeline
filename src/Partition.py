@@ -1,7 +1,7 @@
 __author__ = 'aishwarya'
 
 import copy, numpy 
-from Utils import *
+from utils import *
 
 # NOTE: All probabilities are in log space
 

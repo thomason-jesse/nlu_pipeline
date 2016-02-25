@@ -2,7 +2,7 @@ __author__ = 'aishwarya'
 
 from StaticDialogState import StaticDialogState
 from Knowledge import Knowledge
-from Utils import *
+from utils import *
 
 # This maintains the same state information as StaticDialogState but
 # updates using Utterance objects rather than strings or Action objects
@@ -29,10 +29,10 @@ class UtteranceBasedStaticDialogState(StaticDialogState):
         for i in range(0, len(param_order)):
             if len(self.user_action_parameters_belief) == i:
                 self.user_action_parameters_belief.append({})
-            if u.referring_params[param_order[i]] is not None :
+            if get_dict_val(u.referring_params, param_order[i]) is not None :
                 self.user_action_parameters_belief[i][u.referring_params[param_order[i]]] = 0.9
             for param in self.user_action_parameters_belief[i]:
-                if param != u.referring_params[param_order[i]] :
+                if param != get_dict_val(u.referring_params, param_order[i]) :
                     self.user_action_parameters_belief[i][param] *= 0.5  # decay confidence, similar to IJCAI paper
 
         # update expected number of parameters for action
@@ -48,14 +48,14 @@ class UtteranceBasedStaticDialogState(StaticDialogState):
             self.user_action_belief[goal] = 1
             param_order = self.knowledge.param_order[goal]
             for i in range(0, len(param_order)) :
-                param_value = m.referring_params[param_order[i]]
+                param_value = get_dict_val(m.referring_params, param_order[i])
                 if param_value is not None :
                     self.user_action_parameters_belief[i][param_value] = 1
         else :
             self.user_action_belief[goal] *= 0.5
             param_order = self.knowledge.param_order[goal]
             for i in range(0, len(param_order)) :
-                param_value = m.referring_params[param_order[i]]
+                param_value = get_dict_val(m.referring_params, param_order[i])
                 if param_value is not None :
                     self.user_action_parameters_belief[i][param_value] *= 0.5
 
@@ -68,7 +68,7 @@ class UtteranceBasedStaticDialogState(StaticDialogState):
     def update_from_missing_param(self, m, u):
         goal = m.referring_goal
         param_name = m.extra_data[0]
-        param_value = u.referring_params[param_name]
+        param_value = get_dict_val(u.referring_params, param_name)
         if goal is not None and param_name is not None and param_value is not None:
             idx = self.knowledge.param_order[goal].index(param_name)
             self.user_action_parameters_belief[idx][param_value] = 1

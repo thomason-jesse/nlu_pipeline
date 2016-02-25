@@ -1,0 +1,9 @@
+This is a list of test cases that test some useful scenarios - 
+
+1.  Static agent - Start with "walk to india". Enter "alice's office" as a param value.
+    Goal: It should not be creating utterances with 3502 as patient and recipient
+2.  POMDP - Any search or bring - to make sure the domain initialized in Knowledge is correct
+3.  Either - Any query involving x's office, to check that the simulator has loaded the correct domain
+4.  Either - "check x's for y" - Seems to need special hyperparams (which I have not yet identified)
+5.  Either - "search for x in y's office" - Needs an extra lexical form for search
+6.  Either  - "find out whether bob is in alice's office" - It is a difficult sentence for the parser, very likely something it cannot do. But the parser should not hang there or give nonsense with high confidence

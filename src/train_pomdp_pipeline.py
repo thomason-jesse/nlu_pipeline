@@ -1,39 +1,20 @@
 #!/usr/bin/env python
-__author__ = 'jesse'
+__author__ = 'aishwarya'
 
-import rospy
 import sys
 import Ontology
 import Lexicon
 import KBGrounder
 import CKYParser
-import StaticDialogPolicy
-import ActionSender
-from TemplateBasedGenerator import TemplateBasedGenerator
-from StaticDialogAgent import StaticDialogAgent
-from DialogAgent import DialogAgent
+import numpy, re
+
+from Knowledge import Knowledge
+from PomdpKtdqPolicy import PomdpKtdqPolicy
+from PomdpTrainer import PomdpTrainer
 from utils import *
 
-class InputFromKeyboard:
-    def __init__(self):
-        pass
-
-    def get(self):
-        return raw_input()
-
-
-class OutputToStdout:
-    def __init__(self):
-        pass
-
-    def say(self, s):
-        print "SYSTEM: "+s
-
 # Fixing the random seed for debugging
-numpy.random.seed(10)
-
-print "calling ROSpy init"
-rospy.init_node('test_NLU_pipeline')
+numpy.random.seed(4)
 
 print "reading in Ontology"
 ont = Ontology.Ontology(sys.argv[1])
@@ -51,7 +32,7 @@ print "entries: " + str(lex.entries)
 print "instantiating KBGrounder"
 grounder = KBGrounder.KBGrounder(ont)
 
-#print "instantiating Parser"
+print "instantiating Parser"
 parser = CKYParser.CKYParser(ont, lex, use_language_model=True)
 # Set parser hyperparams to best known values for training
 parser.max_multiword_expression = 2  # max span of a multi-word expression to be considered during tokenization
@@ -74,21 +55,11 @@ parser.max_hypothesis_categories_for_unknown_token_beam = 2  # for unknown token
 grounder.parser = parser
 grounder.ontology = parser.ontology
 
-print "instantiating DialogAgent"
-u_in = InputFromKeyboard()
-u_out = OutputToStdout()
-static_policy = StaticDialogPolicy.StaticDialogPolicy()
-A = StaticDialogAgent(parser, grounder, static_policy, u_in, u_out)
-#A = DialogAgent(parser, grounder, static_policy, u_in, u_out)
-A.dialog_objects_logfile = 'src/nlu_pipeline/src/models/trial_log.pkl'
+knowledge = Knowledge()
+policy = PomdpKtdqPolicy(knowledge, False)
+print "instantiating Trainer"
+A = PomdpTrainer(parser, grounder, policy)
 
-response_generator = TemplateBasedGenerator()
-
-while True:
-    u_out.say("How can I help?")
-    s = raw_input()
-    if s == 'stop':
-        break
-    a = A.initiate_dialog_to_get_action(s)
-    if a is not None :
-        print response_generator.get_action_sentence(a)
+success_dir = '/u/aish/Documents/Research/rlg/logs_only/second/valid'
+fail_dir = '/u/aish/Documents/Research/rlg/logs_only/second/invalid'
+A.train_from_old_logs(success_dir, fail_dir)

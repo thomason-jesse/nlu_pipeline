@@ -21,16 +21,18 @@ __author__ = 'aishwarya'
 # arrays because arrays don't do vector math in an intuitive way
 
 import numpy as np, sys, math, copy, itertools
-from Utils import *
+from utils import *
 from SystemAction import SystemAction
 from Action import Action
 from SummaryState import SummaryState
 from Partition import Partition
 from Utterance import Utterance
+from AbstractPolicy import AbstractPolicy
 
-class PomdpKtdqPolicy :
+class PomdpKtdqPolicy(AbstractPolicy) :
     def __init__(self, knowledge, load_from_file=False) :
-        self.knowledge = knowledge
+        AbstractPolicy.__init__(self, knowledge)
+        self.training = True
         
         # Calculate number of features
         self.n = 3
@@ -54,6 +56,9 @@ class PomdpKtdqPolicy :
         self.cleaning_epsilon = self.knowledge.ktdq_cleaning_epsilon
         self.alpha = self.knowledge.ktdq_alpha
         self.beta = self.knowledge.ktdq_beta
+        
+        self.prev_state = None
+        self.prev_action = None
 
     # Convert the summary state feature vector b to the features used by
     # the algorithm and get feature vector for the case when action is a
@@ -127,39 +132,6 @@ class PomdpKtdqPolicy :
         sample = int(np.random.uniform(0, num_actions))
         return candidate_actions[sample]
     
-    # Return the set of actions allowed for the current state. These
-    # are mostly hand-coded rules
-    def get_candidate_actions(self, current_state) :
-        candidate_actions = copy.deepcopy(self.knowledge.summary_system_actions)
-        
-        # Allow 'take-action' only if the top hypothesis has a unique 
-        # executable action
-        if current_state is None or current_state.top_hypothesis is None :
-            candidate_actions.remove('take_action')
-            return candidate_actions
-        elif current_state.top_hypothesis[0] is None or current_state.top_hypothesis[0].possible_goals is None :
-            candidate_actions.remove('take_action')
-            return candidate_actions
-        elif len(current_state.top_hypothesis[0].possible_goals) != 1 :
-            candidate_actions.remove('take_action')
-            return candidate_actions
-        else :
-            # Do not allow 'request-missing-param' for speak actions
-            unique_goal = current_state.top_hypothesis[0].possible_goals[0]
-            if unique_goal == 'speak_t' or unique_goal == 'speak_e' :
-                if 'request_missing_param' in candidate_actions :
-                    candidate_actions.remove('request_missing_param')
-                    
-            # Do not allow 'take-action' if some required param is uncertain
-            for param_name in self.knowledge.param_order[unique_goal] :
-                if param_name not in current_state.top_hypothesis[0].possible_param_values :
-                    if 'take_action' in candidate_actions :
-                        candidate_actions.remove('take_action')
-                elif len(current_state.top_hypothesis[0].possible_param_values[param_name]) != 1 :
-                    if 'take_action' in candidate_actions :
-                        candidate_actions.remove('take_action')
-            return candidate_actions
-    
     # Defines the current policy
     def pi(self, b) :
         r = np.random.uniform()
@@ -179,38 +151,31 @@ class PomdpKtdqPolicy :
             return best_action        
     
     def get_initial_action(self, initial_state) :
+        self.prev_state = initial_state
         a = 'repeat_goal'
+        self.prev_action = a;
         return (a, self.get_system_action_requirements(a, initial_state))
     
     def get_next_action(self, reward, current_state) :
-        a = self.pi(current_state)
-        return (a, self.get_system_action_requirements(a, current_state))
+        if self.untrained :
+            a_prime = self.get_action_from_hand_coded_policy(current_state)
+        else :
+            a_prime = self.pi(current_state)
+        if self.training :
+            if self.prev_state is None or self.prev_action is None :
+                raise RuntimeError("Training called without setting previous state or action")
+            self.train(self.prev_state, self.prev_action, current_state, reward)
+            #self.untrained = False
+        self.prev_state = current_state
+        self.prev_action = a_prime
+        return (a_prime, self.get_system_action_requirements(a_prime, current_state))
     
     def update_final_reward(self, reward) :
-        pass
+        if self.training :
+            if self.prev_state is None or self.prev_action is None :
+                raise RuntimeError("Training called without setting previous state or action")
+            self.train(self.prev_state, self.prev_action, None, reward)
     
-    def check_covariance_matrix(self, m) :
-        n = m.shape[0]
-        #for i in range(n) :
-            #if m[i, i] < 0 :
-                #print 'Diagonal element is < 0'
-                #print 'C = ', self.C
-                #sys.exit(1)
-        for i in range(n) :
-            for j in range(n) :
-                if m[i, j] != m[j, i] :
-                    print 'Matrix not symmetric'
-                    sys.exit(1)
-        (eig_vals, eig_vectors) = np.linalg.eig(m)
-        for eig_val in eig_vals :
-            if type(eig_val) in [np.complex_, np.complex64, np.complex128] :
-                print 'Complex eigen value'
-                #print 'C = ', self.C
-                sys.exit(1)
-            elif eig_val < -0.0001 :
-                print 'Negative eigen value'
-                sys.exit(1)
-   
     def compute_sigma_points(self) :
         theta = list()
         w = list()
@@ -316,129 +281,6 @@ class PomdpKtdqPolicy :
     def get_zero_vector(self, size) :
         return np.matrix(np.zeros(size)).T 
         
-    # Converts a state to a single Action object if possible
-    # If the partition either allows more than one goal or more than one
-    # value for any param that action needs, then return None
-    def resolve_state_to_goal(self, state) :
-        if state is None or state.top_hypothesis is None :
-            return None
-        partition = state.top_hypothesis[0]   
-        if partition.possible_goals is None or len(partition.possible_goals) != 1 :
-            return None
-        goal = partition.possible_goals[0]
-        action = Action(goal)
-        param_order = state.knowledge.param_order[goal]
-        params = []
-        if partition.possible_param_values is None :
-            return None
-        for param_name in param_order :
-            if param_name not in partition.possible_param_values or len(partition.possible_param_values[param_name]) != 1 :
-                return None
-            else :
-                params.append(partition.possible_param_values[param_name][0])
-        action.params = params    
-        return action
-    
-    def get_system_action_requirements(self, action_type, state) :
-        if action_type == 'repeat_goal' :
-            return SystemAction(action_type)
-        elif action_type == 'take_action' :
-            return self.resolve_state_to_goal(state)
-            
-        elif action_type == 'confirm_action' :
-            if state.top_hypothesis is None or state.top_hypothesis[0] is None :
-                # No hypotheses to verify. Confirm something random
-                goal_idx = int(np.random.uniform(0, len(state.knowledge.goal_actions)))
-                return SystemAction(action_type, state.knowledge.goal_actions[goal_idx])
-            
-            goal = None
-            if len(state.top_hypothesis[0].possible_goals) > 0 : 
-                goal_idx = int(np.random.uniform(0, len(state.top_hypothesis[0].possible_goals)))    
-                goal = state.top_hypothesis[0].possible_goals[goal_idx]
-            else :
-                # Top hypothesis has no goals, verify any random goal
-                goal_idx = int(np.random.uniform(0, len(self.knowledge.possible_goals)))    
-                goal = state.top_hypothesis[0].possible_goals[goal_idx]
-
-            system_action = SystemAction(action_type, goal)
-            param_order = state.knowledge.param_order[goal]
-            params = dict()
-            partition_params = state.top_hypothesis[0].possible_param_values
-            if partition_params is None :
-                return system_action
-            for param_name in param_order :
-                if param_name in partition_params and len(partition_params[param_name]) == 1 :
-                    # Only confirm params if the hypothesis thinks there is only one 
-                    # possible value for it
-                    params[param_name] = partition_params[param_name][0]
-                #else :
-                    #print 'Uncertain about ', param_name, ' : ', partition_params[param_name]
-            system_action.referring_params = params
-            return system_action
-            
-        elif action_type == 'request_missing_param' :
-            if state.top_hypothesis is None or state.top_hypothesis[0] is None :
-                # No hypotheses. Anything can be asked
-                goal_idx = int(np.random.uniform(0, len(state.knowledge.goal_actions)))
-                goal = state.knowledge.goal_actions[goal_idx]
-                system_action = SystemAction(action_type, goal)
-                param_idx = int(np.random.uniform(0, len(state.knowledge.param_order[goal])))
-                system_action.extra_data = [state.knowledge.param_order[goal][param_idx]]
-                return system_action
-                    
-            goal = state.top_hypothesis[0].possible_goals[0]
-            system_action = SystemAction(action_type, goal)
-            param_order = state.knowledge.param_order[goal]
-            params = dict()
-            uncertain_params = list()
-            partition_params = state.top_hypothesis[0].possible_param_values
-            if partition_params is None :
-                return system_action
-            for param_name in param_order :
-                if param_name not in partition_params or len(partition_params[param_name]) != 1 :
-                    uncertain_params.append(param_name)
-                else :
-                    params[param_name] = partition_params[param_name][0]
-            system_action.referring_params = params
-            if len(uncertain_params) > 0 :
-                # If the top partition is uncertain about a param, confirm it
-                param_idx = int(np.random.uniform(0, len(uncertain_params)))
-                system_action.extra_data = [uncertain_params[param_idx]]
-                return system_action
-            else :
-                # The top hypothesis partition doesn't have uncertain 
-                # params but it is possible it is not of high enough 
-                # confidence
-                
-                # If there is no second hypothesis, just confirm any value
-                # This param si chosen at random so that you don't get 
-                # stuck in a loop here
-                if state.second_hypothesis is None or state.second_hypothesis[0].possible_param_values is None :
-                    param_idx = int(np.random.uniform(0, len(param_order)))
-                    system_action.extra_data = [param_order[param_idx]]
-                    return system_action
-                
-                # A good heuristic is to see in what params the first 
-                # and second hypotheses differ. Any one of these is 
-                # likely to help. 
-                second_params = state.second_hypothesis[0].possible_param_values
-                for param_name in param_order :
-                    top_param_value = partition_params[param_name][0]
-                    if param_name not in second_params or top_param_value not in second_params[param_name] or len(second_params[param_name]) == 1 :
-                        # This is not a useful param to compare
-                        pass
-                    else :
-                        system_action.extra_data = [param_name]
-                        return system_action
-                
-                # If you reached here, this is probably an inappropriate 
-                # action so just verify a random param. 
-                param_idx = int(np.random.uniform(0, len(param_order)))
-                system_action.extra_data = [param_order[param_idx]]
-                return system_action
-                
-            return system_action
-                    
     def save_vars(self) :
         save_model(self.theta, 'theta')
         save_model(self.P, 'P')
@@ -449,32 +291,6 @@ class PomdpKtdqPolicy :
         print 'self.P = ', self.P
         print '------------------------------------------------'
        
-    def get_action_from_hand_coded_policy(self, state) :
-        if state.num_dialog_turns > 10 :
-            return 'take_action'
-        feature_vector = state.get_feature_vector()
-        num_goals = feature_vector[2]
-        num_uncertain_params = feature_vector[3]
-        last_utterance_type = feature_vector[6]
-        if num_goals == 1 :
-            if num_uncertain_params == 0 :
-                if state.top_hypothesis_prob < 0.3 :
-                    return 'request_missing_param'
-                if last_utterance_type == 'affirm' or last_utterance_type == 'deny' :
-                    if state.top_hypothesis_prob < 0.75 :
-                        return 'repeat_goal'      
-                    else :
-                        return 'take_action'
-                else :
-                    if state.top_hypothesis_prob < 0.99 :
-                        return 'confirm_action'
-                    else :
-                        return 'take_action'
-            else :
-                return 'request_missing_param'
-        else :
-            return 'repeat_goal'      
-        
                    
         
     

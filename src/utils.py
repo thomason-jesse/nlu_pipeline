@@ -96,4 +96,12 @@ def predicate_holds(predicate, argument, grounder) :
         return True
     else :
         return False
+        
+def get_dict_val(dict_name, key) :
+    if dict_name is None :
+        return None
+    elif key not in dict_name :
+        return None
+    else :
+        return dict_name[key]
 

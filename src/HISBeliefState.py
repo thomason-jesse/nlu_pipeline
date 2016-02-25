@@ -2,7 +2,7 @@ __author__ = 'aishwarya'
 
 import itertools, numpy
 from Partition import Partition
-from Utils import *
+from utils import *
 
 class HISBeliefState:
 
@@ -134,7 +134,7 @@ class HISBeliefState:
         #print '----------------------------------------------'
         #print str(system_action)
         for utterance in n_best_utterances :
-            print str(utterance)
+            #print str(utterance)
             # Check whether there are partitions that exactly match the 
             # system action-utterance pair
             matching_partitions = self.get_matching_partitions(system_action, utterance)

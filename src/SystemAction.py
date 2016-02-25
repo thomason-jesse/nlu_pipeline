@@ -1,6 +1,6 @@
 __author__ = 'aishwarya'
 
-from Utils import *
+from utils import *
 
 class SystemAction:
     # A system action has a name and a dict of params
