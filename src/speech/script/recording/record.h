@@ -18,13 +18,22 @@ struct micParams {
   	int dir;
   	snd_pcm_uframes_t frames;
   	int16 *buffer;
+	FILE* file; 
 };
 
 //Initializes the microphone for recording. 
-int initMic(); 
+int initMic(struct micParams *mp, char *dev_name, int num_channels); 
+
+void initMics();
 
 //Cleans up mic resources. 
-void closeMic(); 
+void closeMic();
+
+void closeMics(); 
+
+void recordFromMic(struct micParams *mp); 
+
+void drainMic(struct micParams *mp); 
 
 /*Records mono audio at 1600Hz, little endian 
   and uses sphinx directly to recognize it. 
