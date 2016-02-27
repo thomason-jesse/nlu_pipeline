@@ -16,6 +16,9 @@ class ScriptGenerator:
         self.genTemplates()
         self.genNames()
 
+        #Mode for generating items. 
+        self.mode = "adjective"
+
         #Variables to hold data to be saved.
         self.user_id = user_id
         self.phrase_num = 0
@@ -23,7 +26,7 @@ class ScriptGenerator:
         self.denotations = {} #Keeps specific word denotations.
         self.denotation = None # keeps denotation for entire phrase. 
         self.semantic_form = None
-        self.semantic_data = None
+        self.semantic_data = {}
 
         #Sets font for displaying text. 
         self.font = pygame.font.SysFont('monospace', 15)
@@ -33,14 +36,18 @@ class ScriptGenerator:
         self.screen_h = displayInfo.current_h
 
     def genPhrase(self, screen):
+        #Generates the phrase itself. (i.e. the text)
         self.phrase = self.genCommand()    
 
+        #The text object to render to screen. 
         self.phraseText = self.font.render(self.phrase, 1, self.textColor)
 
+        #Updates display. 
         screen.fill(self.background)
         screen.blit(self.phraseText, self.calcPos())
         pygame.display.update()
 
+    #Calculates the position of the text on the screen. 
     def calcPos(self):
         width = self.phraseText.get_width()
         height = self.phraseText.get_height()
@@ -89,10 +96,10 @@ class ScriptGenerator:
     #Generates templates from files. 
     def genTemplates(self):
         #Templates are all held in lists. 
-        self.templates.append(["walk", [line for line in open('walkTemplates.txt', 'r')]])
-        self.templates.append(["search", [line for line in open('searchTemplates.txt', 'r')]])
+#self.templates.append(["walk", [line for line in open('walkTemplates.txt', 'r')]])
+#self.templates.append(["search", [line for line in open('searchTemplates.txt', 'r')]])
         self.templates.append(["bring", [line for line in open('bringTemplates.txt', 'r')]])
-        self.templates.append(["walk_possessive", [line for line in open('walkPossessiveTemplates.txt', 'r')]])
+#self.templates.append(["walk_possessive", [line for line in open('walkPossessiveTemplates.txt', 'r')]])
 
     #Generates list of all possible references to people. 
     def genNames(self): 
@@ -194,6 +201,11 @@ class ScriptGenerator:
 
             self.semantic_form = "walk(the(lambda x:e.(and(office(x), possesses(x, "
             self.semantic_form += name + ")))"
+        elif templateType == "bring" and self.mode == "adjective":
+            self.semantic_form = "bring(a(" 
+            self.semantic_form += self.semantic_data["item form"] + "),"
+            self.semantic_form += self.semantic_data["name"] + ")"
+            
 
 
     #Generates denotation for phrase.
@@ -206,7 +218,11 @@ class ScriptGenerator:
             self.denotation = "bring("
             self.denotation += self.denotations["<I>"] + ","
             self.denotation += self.denotations["<N>"] + ")"
-            self.semantic_form = self.denotation
+            
+            #If normal bring action, then denotation == semantic_form. 
+            if self.mode == "normal":
+                self.semantic_form = self.denotation
+
         elif templateType == "search":
             self.denotation = "searchroom("
             self.denotation += self.denotations["<N>"] + ","
@@ -215,20 +231,9 @@ class ScriptGenerator:
         elif templateType == "walk_possessive":
             self.denotation = "walk(" + self.denotations["<PP>"] + ")"
 
-    def processWord(self, word):
-        if word in self.tags:
-            expansionIndex = random.randint(0, len(self.tags[word]) - 1)
-            expansionList = self.tags[word][expansionIndex].split(':')
-            expansion = expansionList[0].strip()
-            denotation = expansionList[1].strip()
-
-            #Stores denotation. 
-            self.denotations[word] = denotation
-
-            return expansion
-
+    def processWord(self, word): 
         #Expands name from name list of names that was built. 
-        elif word == "<N>":
+        if word == "<N>":
             nameList = self.names[random.randint(0, len(self.names) - 1)]
             name = nameList[0]
             denotation = nameList[1]
@@ -236,7 +241,57 @@ class ScriptGenerator:
             #Stores denotation
             self.denotations[word] = denotation
 
+            #Stores name to create semantic form later. 
+            self.semantic_data["name"] = denotation
+
             return name
+        elif word == "<I>" and not self.mode == "normal":
+            if self.mode == "adjective":
+                adjectives = list(self.tags["<A>"])
+                nouns = self.tags["<NO>"]
+                semantic_form = ""
+
+                #0 - 2 adjectives will be randomly chosen. 
+                numAdjectives = random.randint(0, 2)
+            
+                #Picks a random noun. 
+                noun = nouns[random.randint(0, len(nouns) - 1)]
+                
+                #Begins phrase
+                phrase = "a "
+
+                #Generates unique adjectives for the phrase. 
+                for i in range(0, numAdjectives):
+                    adjectiveIndex = random.randint(0, len(adjectives) - 1)
+                    adjective = adjectives[adjectiveIndex].strip()
+                    
+                    #Adds adjective to phrase with comma if necessary. 
+                    if i < numAdjectives - 1:
+                        phrase += adjective + ", "
+                    else:
+                        phrase += adjective + " "
+                    
+                    #Adds adjective to semantic form. 
+                    semantic_form += "and(" + adjective + "(x), "
+
+                    del adjectives[adjectiveIndex]
+
+                #Adds noun to phrase and semantic form. 
+                phrase += noun
+                semantic_form += noun + "(x)"
+
+                #Finishes preparing semantic form. 
+                for i in range(0, numAdjectives):
+                    semantic_form += ")"
+
+                semantic_form = "lambda x:e.(" + semantic_form + ")"
+
+                #Stores denotation and preliminary semantic form. 
+                self.denotations["<I>"] = noun
+                self.semantic_data["item form"] = semantic_form
+    
+                return phrase
+            
         elif word == "<PP>":
             nameList = self.names_possessive[random.randint(0, len(self.names_possessive) - 1)]
             name = nameList[0]
@@ -247,9 +302,20 @@ class ScriptGenerator:
             self.denotations[word] = office
 
             #Saves name for semantic form. 
-            self.semantic_data = denotation
-
+            self.semantic_data["name"] = denotation
+            
+            #Returns name with possessive. 
             return name
+        elif word in self.tags:
+            expansionIndex = random.randint(0, len(self.tags[word]) - 1)
+            expansionList = self.tags[word][expansionIndex].split(':')
+            expansion = expansionList[0].strip()
+            denotation = expansionList[1].strip()
+
+            #Stores denotation. 
+            self.denotations[word] = denotation
+
+            return expansion
         else:
             return word
 

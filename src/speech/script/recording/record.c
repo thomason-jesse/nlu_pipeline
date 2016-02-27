@@ -33,7 +33,8 @@ int isInterrupted() {
 
 void initMics() {
 	initMic(&m1, "default", 1);
-	initMic(&m2, "hw:1,0", 1); 
+
+	//TODO Generalize to multiple microphones. 
 }
 
 int initMic(struct micParams *mp, char* dev_name, int num_channels){
@@ -137,7 +138,6 @@ int initMic(struct micParams *mp, char* dev_name, int num_channels){
 
 void closeMics() {
 	closeMic(&m1); 
-	closeMic(&m2); 
 }
 
 void closeMic(struct micParams *mp) {
@@ -155,7 +155,6 @@ int record1600Hz(char * fileName) {
 
 	//Clears buffer in case there is any data left over from last recording. 
 	memset((void *)m1.buffer, 0, BUFF_SIZE * sizeof(short)); 
-	memset((void *)m2.buffer, 0, m2.frames * sizeof(int16));
 
 	//Waits for recording to start. 
 	while (!recording && !interrupted)
@@ -168,7 +167,6 @@ int record1600Hz(char * fileName) {
 	}
 
 	m1.file = fopen("mic1.raw", "w");
-	m2.file = fopen("mic2.raw", "w"); 
 
 	if (!m1.file) {
 		printf("record.c: Error opening voice.raw!");
@@ -180,21 +178,12 @@ int record1600Hz(char * fileName) {
 	if (snd_pcm_state(m1.handle) == SND_PCM_STATE_SETUP)
 		snd_pcm_prepare(m1.handle);
 
-	if (snd_pcm_state(m2.handle) == SND_PCM_STATE_SETUP)
-		snd_pcm_prepare(m2.handle); 
-
  	while (recording) {
 		recordFromMic(&m1); 
-		recordFromMic(&m2); 
   	}
 
 	drainMic(&m1);
-	drainMic(&m2); 
-
 	fclose(m1.file);
-	fclose(m2.file); 
-
-	printf("\nClosed the microphone\n"); 
 
 	return 0;
 }
