@@ -13,7 +13,8 @@ and writes to standard output for 5 seconds of data.
 static int recording = 0;
 static int interrupted = 0; 
 static struct micParams m1;
-static struct micParams m2; 
+static struct micParams m2;
+static struct micParams m3;  
 
 void startRecord() {
 	recording = 1; 
@@ -32,9 +33,9 @@ int isInterrupted() {
 }
 
 void initMics() {
-	initMic(&m1, "default", 1);
-
-	//TODO Generalize to multiple microphones. 
+	initMic(&m1, "bluetooth", 2);
+	//initMic(&m2, "hw:1,0", 1);
+	//initMic(&m3, "btheadset", 2);  
 }
 
 int initMic(struct micParams *mp, char* dev_name, int num_channels){
@@ -84,8 +85,15 @@ int initMic(struct micParams *mp, char* dev_name, int num_channels){
 		return -1; 
 	}
 
+	rc = snd_pcm_hw_params_set_rate_resample(mp->handle, mp->params, 16000); 
+
+
+	if (rc < 0) {
+		fprintf(stderr, "Unable to set rate: %s\n", snd_strerror(rc)); 
+	}
+
   	/* One channel (mono) */
-  	rc = snd_pcm_hw_params_set_channels(mp->handle, mp->params, 1);
+  	rc = snd_pcm_hw_params_set_channels(mp->handle, mp->params, num_channels);
 
 	if (rc < 0) {
 		fprintf(stderr, "Unable to set channels: %s\n", snd_strerror(rc));
@@ -93,29 +101,6 @@ int initMic(struct micParams *mp, char* dev_name, int num_channels){
 		return -1; 
 	}
 
-  	/* 16000 bits/second (i.e. Hz) sampling rate for Sphinx */
-  	mp->val = 44100;
-  	
-	rc = snd_pcm_hw_params_set_rate_near(mp->handle, mp->params,
-                                  &mp->val, &mp->dir);
-
-	if (rc < 0) {
-		fprintf(stderr, "Unable to set rate: %s\n", snd_strerror(rc)); 
-
-		return -1; 
-	}
-
-  	/* Set period size to 32 frames. */
-  	mp->frames = 2048;
-  	
-	rc = snd_pcm_hw_params_set_period_size_near(mp->handle,
-                              mp->params, &mp->frames, &mp->dir);
-
-	if (rc < 0) {
-		fprintf(stderr, "Unable to set period: %s\n", snd_strerror(rc));
-
-		return -1; 
-	}
 
   	/* Write the parameters to the driver */
   	rc = snd_pcm_hw_params(mp->handle, mp->params);
@@ -126,18 +111,18 @@ int initMic(struct micParams *mp, char* dev_name, int num_channels){
 		return -1; 
   	}
 
-  	/* Use a buffer large enough to hold one period */
-  	snd_pcm_hw_params_get_period_size(mp->params,
-                                      &mp->frames, &mp->dir);
+	snd_pcm_prepare(mp->handle); 
 
   	/* 2 bytes/sample, 1 channel */
-  	mp->buffer = (int16 *) malloc(mp->frames * sizeof(int16));
+  	mp->buffer = (short *)malloc(BUFF_SIZE * sizeof(short));
 
 	return 0; 
 }
 
 void closeMics() {
-	closeMic(&m1); 
+	//closeMic(&m1); 
+	//closeMic(&m2);
+	closeMic(&m3);  
 }
 
 void closeMic(struct micParams *mp) {
@@ -154,42 +139,62 @@ int record1600Hz(char * fileName) {
 	int rc = 0; 
 
 	//Clears buffer in case there is any data left over from last recording. 
-	memset((void *)m1.buffer, 0, BUFF_SIZE * sizeof(short)); 
+	//memset((void *)m1.buffer, 0, BUFF_SIZE * sizeof(short)); 
+	//memset((void *)m2.buffer, 0, m2.frames * sizeof(int16));
 
 	//Waits for recording to start. 
 	while (!recording && !interrupted)
 		usleep(70000);
 
 	if (interrupted) {
-		fclose(m1.file); 
+		//fclose(m1.file); 
 
 		return 0; 
 	}
 
-	m1.file = fopen(fileName, "w");
+	m1.file = fopen("mic1.raw", "w");
+	//m2.file = fopen("mic2.raw", "w"); 
+	//m3.file = fopen("mic3.raw", "w"); 
 
-	if (!m1.file) {
-		printf("record.c: Error opening voice.raw!");
+	//if (!m1.file) {
+	//	printf("record.c: Error opening voice.raw!");
 
-		return -1; 
-	}
+	//	return -1; 
+	//}
 
 	//Readys for recording. 
-	if (snd_pcm_state(m1.handle) == SND_PCM_STATE_SETUP)
-		snd_pcm_prepare(m1.handle);
+	//if (snd_pcm_state(m1.handle) == SND_PCM_STATE_SETUP)
+	//	snd_pcm_prepare(m1.handle);
+
+	//if (snd_pcm_state(m2.handle) == SND_PCM_STATE_SETUP)
+	//	snd_pcm_prepare(m2.handle); 
+
+	printf("About to record\n"); 
 
  	while (recording) {
-		recordFromMic(&m1); 
+		recordFromMic(&m1);
+
+		printf("Recorded from microphone\n");  
+		//recordFromMic(&m2); 
+		//recordFromMic(&m3); 
   	}
 
-	drainMic(&m1);
+	//drainMic(&m1);
+	//drainMic(&m2); 
+
 	fclose(m1.file);
+	//fclose(m2.file);
+	//fclose(m3.file);  
+
+	printf("\nClosed the microphone\n"); 
 
 	return 0;
 }
 
 void recordFromMic(struct micParams *mp) {
-    	int rc = snd_pcm_readi(mp->handle, (char *)mp->buffer, mp->frames);
+    	int rc = snd_pcm_readi(mp->handle, (char *)mp->buffer, BUFF_SIZE * sizeof(short));
+
+	printf("READI\n"); 
 
 		if (rc == -EPIPE) {
       		/* EPIPE means overrun */
@@ -202,10 +207,10 @@ void recordFromMic(struct micParams *mp) {
               snd_strerror(rc));
     	} 
 		else if (rc != BUFF_SIZE) {
-      		//fprintf(stderr, "short read, read %d frames\n", rc);
+      		fprintf(stderr, "short read, read %d frames\n", rc);
     	}
 
-   		rc = write(fileno(mp->file), (char *)mp->buffer, mp->frames * sizeof(int16));
+   		rc = write(fileno(mp->file), (char *)mp->buffer, BUFF_SIZE * sizeof(short));
 
 		if (rc != mp->size);
       		//fprintf(stderr, "short write: wrote %d bytes\n", rc);
@@ -221,6 +226,6 @@ void drainMic(struct micParams *mp) {
 		exit(1);  
 	}
 
-	while ((rc = snd_pcm_readi(mp->handle, (char *)mp->buffer, mp->frames)) > 0)
-		write(fileno(mp->file), (char *)mp->buffer, mp->frames * sizeof(int16)); 
+	while ((rc = snd_pcm_readi(mp->handle, (char *)mp->buffer, BUFF_SIZE)) > 0)
+		write(fileno(mp->file), (char *)mp->buffer, BUFF_SIZE * sizeof(short)); 
 }

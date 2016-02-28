@@ -16,7 +16,7 @@ the undergrad : francis
 <C>
 <P>
 the kitchen : kitchen
-the lab : lab
+the lab : l_3414b
 the office : office
 room 3402 : l_3402
 room 3414b : l_3414b
@@ -28,7 +28,7 @@ room 3508 : l_3508
 room 3510 : l_3510
 room 3512 : l_3512
 room 3516 : l_3516
-sink : kitchen
+the sink : kitchen
 </C>
 Full name : titles : denotation : office (if any)
 <C>
