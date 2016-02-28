@@ -14,4 +14,3 @@ open:
 playback:
 	gcc playback.c -lasound -o playback
 
-
