@@ -117,76 +117,76 @@ yourself : me
 </C>
 <C>
 <A>
-light
-tall
-white
-clear
-gray
-black
-yellow
-spiky
-orange
-half-full
-round
-empty
-metallic
-aluminum
-heavy
-blue
-narrow
-wide
-brown
-fat
-red
-bright
-cylindrical
-rectangular
-circular
-water
-coffee
-styrofoam
-rough
-thin
-top
-small
-silver
-green
-short
-liquid
-colored
-full
-metal
-neon
-large
-pink
-pointed
-purple
-tiny
-hollow
-paper
-pointy
-squishy
-skinny
-curvy
-shiny
-foamy
-closed
-cream-colored
-open
-plastic
-soup
-silent
-pencil-shaped
-medium-sized
-transparent
-aerosol
-soft
-orange-topped
-cardboard
-teal
-spherical
-big
-foam
+a : light
+a : tall
+a : white
+a : clear
+a : gray
+a : black
+a : yellow
+a : spiky
+an : orange
+a : half-full
+a : round
+an : empty
+a : metallic
+an : aluminum
+a : heavy
+a : blue
+a : narrow
+a : wide
+a : brown
+a : fat
+a : red
+a : bright
+a : cylindrical
+a : rectangular
+a : circular
+a : water
+a : coffee
+a : styrofoam
+a : rough
+a : thin
+a : top
+a : small
+a : silver
+a : green
+a : short
+a : liquid
+a : colored
+a : full
+a : metal
+a : neon
+a : large
+a : pink
+a : pointed
+a : purple
+a : tiny
+a : hollow
+a : paper
+a : pointy
+a : squishy
+a : skinny
+a : curvy
+a : shiny
+a : foamy
+a : closed
+a : cream-colored
+an : open
+a : plastic
+a : soup
+a : silent
+a : pencil-shaped
+a : medium-sized
+a : transparent
+an : aerosol
+a : soft
+an : orange-topped
+a : cardboard
+a : teal
+a : spherical
+a : big
+a : foam
 </C>
 <C>
 <NO>

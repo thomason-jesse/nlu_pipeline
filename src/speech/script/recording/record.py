@@ -11,10 +11,14 @@ class ScriptGenerator:
         self.tags = {}
         self.names = []
         self.names_possessive = []
+        self.adjectives = []
 
         self.genTags()
         self.genTemplates()
+
+        #These methods MUST be called AFTER genTags().  
         self.genNames()
+        self.genAdjectives()
 
         #Mode for generating items. 
         self.mode = "adjective"
@@ -100,6 +104,15 @@ class ScriptGenerator:
 #self.templates.append(["search", [line for line in open('searchTemplates.txt', 'r')]])
         self.templates.append(["bring", [line for line in open('bringTemplates.txt', 'r')]])
 #self.templates.append(["walk_possessive", [line for line in open('walkPossessiveTemplates.txt', 'r')]])
+
+    #Generates a list of adjectives as well as the determiners that precede each one. 
+    def genAdjectives(self):
+        for line in self.tags["<A>"]:
+            splitList = lin.split(':')
+            determiner = splitList[0].strip()
+            adjective = splitList[1].strip()
+
+            self.adjectives.append([determiner, adjective])
 
     #Generates list of all possible references to people. 
     def genNames(self): 
@@ -256,14 +269,16 @@ class ScriptGenerator:
             
                 #Picks a random noun. 
                 noun = nouns[random.randint(0, len(nouns) - 1)]
-                
-                #Begins phrase
-                phrase = "a "
 
                 #Generates unique adjectives for the phrase. 
                 for i in range(0, numAdjectives):
                     adjectiveIndex = random.randint(0, len(adjectives) - 1)
-                    adjective = adjectives[adjectiveIndex].strip()
+                    adjective = adjectives[adjectiveIndex][1]
+
+                    #Begins phrase. 
+                    if i == 0:
+                        determiner = adjectives[adjectiveIndex][0]
+                        phrase += determiner + " "
                     
                     #Adds adjective to phrase with comma if necessary. 
                     if i < numAdjectives - 1:
