@@ -5,13 +5,15 @@ import random
 import sys
 
 class ScriptGenerator:
-    def __init__(self, displayInfo, user_id):
+    def __init__(self, displayInfo, user_id, mode = "normal", recording = True):
         #Initializes data structure for generating phrases. 
         self.templates = []
         self.tags = {}
         self.names = []
         self.names_possessive = []
         self.adjectives = []
+        self.nouns = []
+        self.used_adjectives = False
 
         self.genTags()
         self.genTemplates()
@@ -19,9 +21,10 @@ class ScriptGenerator:
         #These methods MUST be called AFTER genTags().  
         self.genNames()
         self.genAdjectives()
+        self.genNouns()
 
         #Mode for generating items. 
-        self.mode = "adjective"
+        self.mode = mode
 
         #Variables to hold data to be saved.
         self.user_id = user_id
@@ -108,11 +111,19 @@ class ScriptGenerator:
     #Generates a list of adjectives as well as the determiners that precede each one. 
     def genAdjectives(self):
         for line in self.tags["<A>"]:
-            splitList = lin.split(':')
+            splitList = line.split(':')
             determiner = splitList[0].strip()
             adjective = splitList[1].strip()
 
             self.adjectives.append([determiner, adjective])
+
+    def genNouns(self):
+        for line in self.tags["<NO>"]:
+            splitList = line.split(':')
+            determiner = splitList[0].strip()
+            noun = splitList[1].strip()
+
+            self.nouns.append([determiner, noun])
 
     #Generates list of all possible references to people. 
     def genNames(self): 
@@ -214,10 +225,14 @@ class ScriptGenerator:
 
             self.semantic_form = "walk(the(lambda x:e.(and(office(x), possesses(x, "
             self.semantic_form += name + ")))"
-        elif templateType == "bring" and self.mode == "adjective":
-            self.semantic_form = "bring(a(" 
-            self.semantic_form += self.semantic_data["item form"] + "),"
-            self.semantic_form += self.semantic_data["name"] + ")"
+        elif templateType == "bring":
+            if self.used_adjectives:
+                self.semantic_form = "bring(a(" 
+                self.semantic_form += self.semantic_data["item form"] + "),"
+                self.semantic_form += self.semantic_data["name"] + ")"
+            else:
+                #Cases equivalent.
+                self.semantic_form = self.denotation
             
 
 
@@ -244,6 +259,84 @@ class ScriptGenerator:
         elif templateType == "walk_possessive":
             self.denotation = "walk(" + self.denotations["<PP>"] + ")"
 
+    def genAdjectiveDescribed(self):
+        adjectives = list(self.tags["<A>"])
+
+        nouns = self.tags["<NO>"]
+        semantic_form = ""
+
+        #0 - 2 adjectives will be randomly chosen. 
+        numAdjectives = random.randint(0, 2)
+            
+        #Picks a random noun. 
+        nounTuple = nouns[random.randint(0, len(nouns) - 1)].split(':')
+        noun_determiner = nounTuple[0].strip()
+        noun = nounTuple[1].strip()
+
+        #Phrase to build. 
+        phrase = ""
+
+        #Generates unique adjectives for the phrase. 
+        for i in range(0, numAdjectives):
+            adjectiveIndex = random.randint(0, len(adjectives) - 1)
+            adjectiveTuple = adjectives[adjectiveIndex].split(':')
+
+            adjective = adjectiveTuple[1].strip()
+            determiner = adjectiveTuple[0].strip()
+
+            #Begins phrase. 
+            if i == 0:
+                determiner = adjectives[adjectiveIndex][0]
+                phrase = determiner + " "
+                    
+            #Adds adjective to phrase with comma if necessary. 
+            if i < numAdjectives - 1:
+                phrase += adjective + ", "
+            else:
+                phrase += adjective + " "
+                    
+            #Adds adjective to semantic form. 
+            semantic_form += "and(" + adjective + "(x), "
+
+            del adjectives[adjectiveIndex]
+
+        #If no adjective, then adds determiner. 
+        if numAdjectives == 0:
+            phrase += noun_determiner + " "
+
+        #Adds noun to phrase and semantic form. 
+        phrase += noun
+        semantic_form += noun + "(x)"
+
+        #Finishes preparing semantic form. 
+        for i in range(0, numAdjectives):
+            semantic_form += ")"
+
+        semantic_form = "lambda x:e.(" + semantic_form + ")"
+
+        #Stores denotation and preliminary semantic form. 
+        self.denotations["<I>"] = noun
+        self.semantic_data["item form"] = semantic_form
+    
+        #Used in genSemanticForm method for disambiguating the case. 
+        self.used_adjectives = True
+
+        return phrase
+
+    def genNormalItem(self):
+        expansionIndex = random.randint(0, len(self.tags["<I>"]) - 1)
+        expansionList = self.tags["<I>"][expansionIndex].split(':')
+        expansion = expansionList[0].strip()
+        denotation = expansionList[1].strip()
+
+        #Stores denotation. 
+        self.denotations["<I>"] = denotation
+
+        #Did not use adjectives, this comes up when generating the semantic form. 
+        self.used_adjectives = False
+
+        return expansion
+    
     def processWord(self, word): 
         #Expands name from name list of names that was built. 
         if word == "<N>":
@@ -258,55 +351,21 @@ class ScriptGenerator:
             self.semantic_data["name"] = denotation
 
             return name
-        elif word == "<I>" and not self.mode == "normal":
-            if self.mode == "adjective":
-                adjectives = list(self.tags["<A>"])
-                nouns = self.tags["<NO>"]
-                semantic_form = ""
-
-                #0 - 2 adjectives will be randomly chosen. 
-                numAdjectives = random.randint(0, 2)
-            
-                #Picks a random noun. 
-                noun = nouns[random.randint(0, len(nouns) - 1)]
-
-                #Generates unique adjectives for the phrase. 
-                for i in range(0, numAdjectives):
-                    adjectiveIndex = random.randint(0, len(adjectives) - 1)
-                    adjective = adjectives[adjectiveIndex][1]
-
-                    #Begins phrase. 
-                    if i == 0:
-                        determiner = adjectives[adjectiveIndex][0]
-                        phrase += determiner + " "
-                    
-                    #Adds adjective to phrase with comma if necessary. 
-                    if i < numAdjectives - 1:
-                        phrase += adjective + ", "
-                    else:
-                        phrase += adjective + " "
-                    
-                    #Adds adjective to semantic form. 
-                    semantic_form += "and(" + adjective + "(x), "
-
-                    del adjectives[adjectiveIndex]
-
-                #Adds noun to phrase and semantic form. 
-                phrase += noun
-                semantic_form += noun + "(x)"
-
-                #Finishes preparing semantic form. 
-                for i in range(0, numAdjectives):
-                    semantic_form += ")"
-
-                semantic_form = "lambda x:e.(" + semantic_form + ")"
-
-                #Stores denotation and preliminary semantic form. 
-                self.denotations["<I>"] = noun
-                self.semantic_data["item form"] = semantic_form
-    
-                return phrase
-            
+        elif word == "<I>":
+            if self.mode == "normal":
+                return self.genNormalItem()
+            elif self.mode == "adjective":
+                return self.genAdjectiveDescribed()
+            elif self.mode == "mix":
+                #Picks either an adjective described or a regular item. 
+                if random.randint(0, 1):
+                    return self.genAdjectiveDescribed()
+                else:
+                    return self.genNormalItem() 
+            else:
+                print "Mode not correctly set!"
+                sys.exit()
+           
         elif word == "<PP>":
             nameList = self.names_possessive[random.randint(0, len(self.names_possessive) - 1)]
             name = nameList[0]
@@ -321,6 +380,7 @@ class ScriptGenerator:
             
             #Returns name with possessive. 
             return name
+        #The rest of the cases can be replaced by a simple sampling from the tag's list. 
         elif word in self.tags:
             expansionIndex = random.randint(0, len(self.tags[word]) - 1)
             expansionList = self.tags[word][expansionIndex].split(':')
@@ -359,7 +419,7 @@ class ScriptGenerator:
         self.phrase_num += 1
 
 class Recorder:
-    def __init__(self, user_id):
+    def __init__(self, user_id, mode):
         import ctypes
 
         if True: #TODO Allow path specification is None:
@@ -368,6 +428,7 @@ class Recorder:
             self.libHandle = ctypes.CDLL(path)
 
         self.user_id = user_id
+        self.mode = mode
         self.phrase_num = 0
         self.scriptGenerator = None
 
@@ -403,7 +464,7 @@ class Recorder:
         running = True
 
         #Creates the phrase generating object. 
-        self.scriptGenerator = ScriptGenerator(displayInfo, self.user_id)
+        self.scriptGenerator = ScriptGenerator(displayInfo, self.user_id, self.mode)
         self.scriptGenerator.genPhrase(screen)
 
         while running:
@@ -483,9 +544,33 @@ class Recorder:
         thread2.join()
 
 #Ensures that arguments were passed correctly.
-if not len(sys.argv) == 2:
-    print "Usage: python record.py [user_id]"
+if not len(sys.argv) >= 2:
+    print "Usage: python record.py [user_id] [mode] [record]"
     sys.exit()
 
-recorder = Recorder(sys.argv[1])
-recorder.recordUser()
+user_id = sys.argv[1]
+
+if len(sys.argv) >= 3:
+    mode = sys.argv[2]
+
+    if not (mode == "normal" or mode == "adjective" or mode == "mix"):
+        print "Mode not recognized, correct values: normal, adjective, mix."
+        sys.exit()
+else: 
+    mode = "normal"
+
+if len(sys.argv) == 4:
+    record = sys.argv[3]
+    
+    if not (record == "y" or record == "n"):
+        print "record value must be \'y\' or \'n\'."
+else:
+    record = True
+
+#Sets up recording interface if necessary. 
+if record:
+    recorder = Recorder(user_id, mode)
+    recorder.recordUser()
+else:
+    pass
+    #TODO script generator without recording environment. 

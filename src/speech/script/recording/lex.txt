@@ -190,30 +190,30 @@ a : foam
 </C>
 <C>
 <NO>
-container
-cap
-thing
-object
-cylinder
-rectangle
-tub
-pineapple
-bottle
-can
-cannister
-prism
-lid
-crayon
-roll
-tube
-sphere
-spraycan
-cup
-chips
-drink
-beans
-ball
-jar
+a : container
+a : cap
+a : thing
+an : object
+a : cylinder
+a : rectangle
+a : tub
+a : pineapple
+a : bottle
+a : can
+a : cannister
+a : prism
+a : lid
+a : crayon
+a : roll
+a : tube
+a : sphere
+a : spraycan
+a : cup
+some : chips
+a : drink
+some : beans
+a : ball
+a : jar
 </C>
 <C>
 <O>
