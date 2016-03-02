@@ -103,10 +103,10 @@ class ScriptGenerator:
     #Generates templates from files. 
     def genTemplates(self):
         #Templates are all held in lists. 
-#self.templates.append(["walk", [line for line in open('walkTemplates.txt', 'r')]])
-#self.templates.append(["search", [line for line in open('searchTemplates.txt', 'r')]])
+	self.templates.append(["walk", [line for line in open('walkTemplates.txt', 'r')]])
+	self.templates.append(["search", [line for line in open('searchTemplates.txt', 'r')]])
         self.templates.append(["bring", [line for line in open('bringTemplates.txt', 'r')]])
-#self.templates.append(["walk_possessive", [line for line in open('walkPossessiveTemplates.txt', 'r')]])
+	self.templates.append(["walk_possessive", [line for line in open('walkPossessiveTemplates.txt', 'r')]])
 
     #Generates a list of adjectives as well as the determiners that precede each one. 
     def genAdjectives(self):
@@ -221,7 +221,7 @@ class ScriptGenerator:
 
     def genSemanticForm(self, templateType):
         if templateType == "walk_possessive":
-            name = self.semantic_data
+            name = self.semantic_data["name"]
 
             self.semantic_form = "walk(the(lambda x:e.(and(office(x), possesses(x, "
             self.semantic_form += name + ")))"

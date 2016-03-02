@@ -41,7 +41,7 @@ int initMic(struct micParams *mp, char* dev_name, int num_channels){
 	int rc = 0; 
 
   	/* Open PCM device for recording (capture). */
-  	rc = snd_pcm_open(&mp->handle, "default",
+  	rc = snd_pcm_open(&mp->handle, dev_name,
 					SND_PCM_STREAM_CAPTURE, 0);
 	if (rc < 0) {
     	fprintf(stderr,
@@ -166,7 +166,7 @@ int record1600Hz(char * fileName) {
 		return 0; 
 	}
 
-	m1.file = fopen("mic1.raw", "w");
+	m1.file = fopen(fileName, "w");
 
 	if (!m1.file) {
 		printf("record.c: Error opening voice.raw!");
