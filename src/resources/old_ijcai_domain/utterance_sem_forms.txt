@@ -13,9 +13,6 @@ M : bring(coffee,peter)
 bring alice a hamburger
 M : bring(hamburger,stacy)
 
-bring alice a burger
-M : bring(hamburger,stacy)
-
 deliver a hamburger to alice
 M : bring(hamburger,stacy)
 

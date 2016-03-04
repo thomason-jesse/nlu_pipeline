@@ -74,7 +74,7 @@ class TemplateBasedGenerator :
                 person = self.person_str[person]
             return 'I brought ' + str(action.params[0]) + ' to ' + person + '.'
         elif action.name == 'at' :
-            room = str(action.params[1])
+            room = str(action.params[0])
             if room in self.rooms :
                 room = self.room_str[room]
             return 'I went to ' + room  + '.'

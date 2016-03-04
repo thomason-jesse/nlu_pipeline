@@ -13,6 +13,13 @@ def save_obj_general(obj, name):
     print 'Saving log'
     with open(str(name), 'wb') as f:
         pickle.dump(obj, f, pickle.HIGHEST_PROTOCOL)
+        
+def load_obj_general(name) :
+    try :
+        f = open(name, 'rb')
+        return pickle.load(f)
+    except :
+        return None
 
 def load_model(name):
     try :

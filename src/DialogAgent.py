@@ -4,6 +4,9 @@ import random
 import copy
 import sys
 import re
+import time
+import multiprocessing
+import Queue
 import Action
 import StaticDialogState
 
@@ -22,6 +25,12 @@ class DialogAgent:
         # define action names and functions they correspond to
         self.dialog_actions = ["repeat_goal", "confirm_action", "request_missing_param"]
         self.dialog_action_functions = [self.request_user_initiative, self.confirm_action, self.request_missing_param]
+        
+        self.num_turns_across_dialogs = 0
+        self.num_not_parsed = 0
+        
+        self.max_allowed_unks = 2
+        self.max_allowed_length = 7
 
     # initiate a new dialog with the agent with initial utterance u
     def initiate_dialog_to_get_action(self, u):
@@ -243,15 +252,51 @@ class DialogAgent:
             self.parser.learner.learn_from_actions(train_data)
         return False
 
+    def calc_num_unk_words(self, tokens) :
+        num_unks = 0
+        for token in tokens :
+            if token not in self.parser.lexicon.surface_forms :
+                num_unks += 1
+            else :
+                sur_idx = self.parser.lexicon.surface_forms.index(token)
+                if sur_idx >= len(self.parser.lexicon.entries) :
+                    num_unks += 1
+                elif len(self.parser.lexicon.entries[sur_idx]) == 0 :
+                    num_unks += 1
+        return num_unks
+
+    def is_parseable(self, response) :
+        tokens = self.parser.tokenize(response)[0]
+        #print 'tokens = ', tokens
+        if len(tokens) == 0 or len(tokens) > self.max_allowed_length :
+            self.num_not_parsed += 1
+            # The parser will hang on too long a sentence
+            return False
+        num_unks = self.calc_num_unk_words(tokens)
+        if num_unks > self.max_allowed_unks :
+            self.num_not_parsed += 1
+            # The parser is very unlikely to be able to parse this
+            return False
+        return True
+
     def get_n_best_parses(self, response, num_parses_needed=None) :
+        self.num_turns_across_dialogs += 1
         if len(response) == 0 :
             return []
         if num_parses_needed is None :
             num_parses_needed = self.parse_depth
+            
         # Parser expects a space between 's and the thing it is applied 
         # to, for example "alice 's" rather than "alice's"
         response = re.sub("'s", " 's", response)
+        
+        if not self.is_parseable(response) :
+            return []
+            
+        #print 'Possibly parseable'    
         parse_generator = self.parser.most_likely_cky_parse(response)
+        #print 'Parser returned'
+        
         num_parses_obtained = 0
         num_parses_examined = 0
         parses = list()
@@ -268,12 +313,11 @@ class DialogAgent:
             if top_level_category not in ['M', 'NP', 'C'] :
                 # M - imperative (full action), C - confirmation, NP - noun phrase for params
                 continue
-            print 'parse = ', self.parser.print_parse(parse.node, show_category=True), ', score = ', score 
+            #print 'parse = ', self.parser.print_parse(parse.node, show_category=True), ', score = ', score 
             parses.append((parse, score))
             num_parses_obtained += 1
             if num_parses_obtained == num_parses_needed :
                 break
-        #x = raw_input()
         return parses 
 
     def get_action_from_parse(self, root):
@@ -288,13 +332,13 @@ class DialogAgent:
             # assume for now that logical connectives do not operate over actions (eg. no (do action a and action b))
             # ground action arguments
             action = self.parser.ontology.preds[root.idx]
-            print "action: "+action  # DEBUG
+            #print "action: "+action  # DEBUG
             g_args = []
             # print "Going to enter loop"
             for arg in root.children:
-                print 'Grounding ', self.parser.print_parse(arg, show_category=True)
+                #print 'Grounding ', self.parser.print_parse(arg, show_category=True)
                 g = self.grounder.groundSemanticNode(arg, [], [], [])
-                print "arg: "+str(g)  # DEBUG
+                #print "arg: "+str(g)  # DEBUG
                 answer = self.grounder.grounding_to_answer_set(g)
                 if len(answer) == 0:
                     # print "Single answer found"
@@ -303,9 +347,11 @@ class DialogAgent:
                     elif action == "speak_e":
                         g_args.append(None)
                     else:
-                        raise SystemError("action argument unrecognized. arg: '"+str(answer)+"'")
+                        #raise SystemError("action argument unrecognized. arg: '"+str(answer)+"'")
+                        return None
                 elif len(answer) > 1:
-                    raise SystemError("multiple interpretations of action argument renders command ambiguous. arg: '"+str(answer)+"'")
+                    #raise SystemError("multiple interpretations of action argument renders command ambiguous. arg: '"+str(answer)+"'")
+                    return None
                 else:
                     # print "No answer found"
                     if action == "speak_t":
@@ -316,4 +362,5 @@ class DialogAgent:
             return Action.Action(action, g_args)
 
         else:
-            raise SystemError("cannot get action from return type "+str(self.parser.ontology.types[root.return_type]))
+            #raise SystemError("cannot get action from return type "+str(self.parser.ontology.types[root.return_type]))
+            return None

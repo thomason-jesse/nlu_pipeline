@@ -107,8 +107,9 @@ class Knowledge:
         self.ktdq_kappa = 0
         
         rbf_points = [0.25, 0.5, 0.75]
+        self.ktdq_prob_bins = rbf_points
         self.ktdq_rbf_centres = list(itertools.product(rbf_points, rbf_points))
-        self.ktdq_rbf_sigma = 0.1
+        self.ktdq_rbf_sigma = 0.001
         self.ktdq_epsilon = 0.1
         
         # No of turns above which a dialogue is assumed to be long

@@ -9,7 +9,7 @@ import ParseNode
 import SemanticNode
 
 neg_inf = float('-inf')
-random.seed(100)
+
 
 class Parameters:
     def __init__(self, ont, lex, use_language_model=False):
@@ -1498,7 +1498,11 @@ class CKYParser:
             ab.set_return_type(self.ontology)
         except TypeError as e:
             print e
-            sys.exit("ERROR in form '"+self.print_parse(ab)+"'")
+            ### ORIG
+            #sys.exit("ERROR in form '"+self.print_parse(ab)+"'")
+            ### AISH
+            raise e
+            ###
         ab.set_category(self.lexicon.categories[a.category][0])
         ab.commutative_raise_node(self.commutative_idxs, self.ontology)
         # print "performed FA(2) with '"+self.print_parse(a, True)+"' taking '"+self.print_parse(b, True) + \

@@ -31,8 +31,12 @@ class PomdpDialogAgent(DialogAgent) :
         self.first_turn = True
         
         # To store data for retraining the parser
+        self.retrain_parser = False     # Retrain parser at the end of 
+                                        # every dialogue
         self.parser_train_data = None
         self.max_prob_user_utterances = None
+        self.max_parses_examined_in_retraining = 10
+        
         
         # Logging for future use
         self.final_action_log = None
@@ -64,7 +68,9 @@ class PomdpDialogAgent(DialogAgent) :
                 self.output.say(output + " Was this the correct action?")
                 response = self.input.get().lower()  
                 if response == '<ERROR/>' :
-                    complete_log_object = ('pomdp', self.dialog_objects_log, action, self.parser_train_data)
+                    # Benefit of doubt - assume the action was correct
+                    self.policy.update_final_reward(self.knowledge.correct_action_reward)
+                    complete_log_object = ('pomdp', self.dialog_objects_log, action, True, self.parser_train_data)
                     if self.dialog_objects_logfile is not None :
                         save_obj_general(complete_log_object, self.dialog_objects_logfile)
                     return False  
@@ -72,14 +78,15 @@ class PomdpDialogAgent(DialogAgent) :
                     self.policy.update_final_reward(self.knowledge.correct_action_reward)
                     self.cur_turn_log = ['take_action', None]
                     self.dialog_objects_log.append(self.cur_turn_log)
-                    complete_log_object = ('pomdp', self.dialog_objects_log, action, self.parser_train_data)
+                    complete_log_object = ('pomdp', self.dialog_objects_log, action, True, self.parser_train_data)
                     if self.dialog_objects_logfile is not None :
                         save_obj_general(complete_log_object, self.dialog_objects_logfile)
-                    self.train_parser_from_dialogue(action)
+                    if self.retrain_parser :
+                        self.train_parser_from_dialogue(action)
                 else :
                     self.cur_turn_log = ['take_action', None]
                     self.dialog_objects_log.append(self.cur_turn_log)
-                    complete_log_object = ('pomdp', self.dialog_objects_log, action, self.parser_train_data)
+                    complete_log_object = ('pomdp', self.dialog_objects_log, action, False, self.parser_train_data)
                     if self.dialog_objects_logfile is not None :
                         save_obj_general(complete_log_object, self.dialog_objects_logfile)
                     self.policy.update_final_reward(self.knowledge.wrong_action_reward)
@@ -93,12 +100,12 @@ class PomdpDialogAgent(DialogAgent) :
                 response = self.dialog_action_functions[self.dialog_actions.index(dialog_action)]()
                 self.cur_turn_log = [self.previous_system_action, response]
                 if response == '<ERROR/>' :
-                    complete_log_object = ('pomdp', self.dialog_objects_log, None, self.parser_train_data)
+                    complete_log_object = ('pomdp', self.dialog_objects_log, None, False, self.parser_train_data)
                     if self.dialog_objects_logfile is not None :
                         save_obj_general(complete_log_object, self.dialog_objects_logfile)
                     return False
                 if response == 'stop' :
-                    complete_log_object = ('pomdp', self.dialog_objects_log, None, self.parser_train_data)
+                    complete_log_object = ('pomdp', self.dialog_objects_log, None, False, self.parser_train_data)
                     if self.dialog_objects_logfile is not None :
                         save_obj_general(complete_log_object, self.dialog_objects_logfile)
                     self.policy.update_final_reward(self.knowledge.wrong_action_reward)
@@ -151,7 +158,7 @@ class PomdpDialogAgent(DialogAgent) :
         # Create an n-best list of Utterance objects along with probabiltiies 
         # obtained from their confidences
         self.get_n_best_utterances_from_parses(n_best_parses)
-        print 'Created utterances'
+        #print 'Created utterances'
         
         if len(self.n_best_utterances) > 0 :
             # Update the belief state
@@ -189,15 +196,16 @@ class PomdpDialogAgent(DialogAgent) :
     def create_utterances_of_parse(self, parse) :
         parse = parse.node
         print 'In create_utterances_of_parse with', self.parser.print_parse(parse, show_category=True)
+        print '\n\n'
         # First check if it is a confirmation or denial
         if parse.idx == self.parser.ontology.preds.index('yes'):
-            print 'Is affirm'
+            #print 'Is affirm'
             return [Utterance('affirm')]
         elif parse.idx == self.parser.ontology.preds.index('no'):
-            print 'Is deny'
+            #print 'Is deny'
             return [Utterance('deny')]
         elif parse.idx == self.parser.ontology.preds.index('none'):
-            print 'Got a none response'
+            #print 'Got a none response'
             goal = self.previous_system_action.referring_goal
             if self.previous_system_action.extra_data is not None and len(self.previous_system_action.extra_data) >= 1:
                 param_name = self.previous_system_action.extra_data[0]
@@ -209,17 +217,17 @@ class PomdpDialogAgent(DialogAgent) :
             #print '\n'
             return [utterance]
         
-        print 'Neither affirm nor deny'
+        #print 'Neither affirm nor deny'
         
         # Now check if it a full inform - mentions goal and params
         try:
-            print 'Trying to get an action'
+            #print 'Trying to get an action'
             p_action = self.get_action_from_parse(parse)
         except SystemError:
             p_action = None
 
         if p_action is not None :
-            print 'Got an action. Will convert and return'
+            #print 'Got an action. Will convert and return'
             return [self.convert_action_to_utterance(p_action)]
             
         # Getting a complete action failed so assume this is a param  
@@ -227,7 +235,7 @@ class PomdpDialogAgent(DialogAgent) :
             # Lambda headed parse - unlikely to give a valid param
             # value
             return []
-        print 'Trying to ground as param value'
+        #print 'Trying to ground as param value'
         try :
             #print "Grounding ", self.parser.print_parse(parse)
             g = self.grounder.groundSemanticNode(parse, [], [], [])
@@ -420,16 +428,16 @@ class PomdpDialogAgent(DialogAgent) :
             self.max_prob_user_utterances = list()    
         self.max_prob_user_utterances.append(max_prob_utterance)
         
-        print '\nN best utterances : '
-        print '\n'.join([str(utterance) for utterance in self.n_best_utterances])
+        #print '\nN best utterances : '
+        #print '\n'.join([str(utterance) for utterance in self.n_best_utterances])
 
     # Creates (text, denotation) pairs and retrains parser
     def train_parser_from_dialogue(self, final_action) :
         print 'Lexicon - ', self.parser.lexicon.surface_forms
         print 'self.parser_train_data = ', self.parser_train_data
 
+        # Learn correct values for each param name
         answers = dict()
-        answers['full'] = str(final_action)
         goal = final_action.name
         for (idx, param_name) in enumerate(self.knowledge.param_order[goal]) :
             # Pair answers to requesting of a param to the value of the 
@@ -441,12 +449,42 @@ class PomdpDialogAgent(DialogAgent) :
         training_pairs = list()
         for key in self.parser_train_data :
             if key in answers :
+                ccg = self.parser.lexicon.read_category_from_str('NP')
+                form = self.parser.lexicon.read_semantic_form_from_str(answers[key], None, None, [],
+                                                                allow_expanding_ont=False)
+                form.category = ccg
                 for item in self.parser_train_data[key] :
-                    training_pairs.append((item, answers[key]))
+                    training_pairs.append((item, form))
 
-        print 'training_pairs = ', training_pairs
-
-        # TODO: Use training pairs to retrain parser
+        # Retrain parser
+        # For everything describing the full action, get M candidate
+        # parses. Try to ground each one as an action and see if it 
+        # matches the desired action. If so, retrain with that parse.
+        valid_semantic_forms = list()
+        for command in self.parser_train_data['full'] :
+            parses = self.get_n_best_parses(command, self.max_parses_examined_in_retraining) 
+            for (parse, conf) in parses :
+                action = self.get_action_from_parse(parse.node)
+                if action is not None and action == final_action :
+                    valid_semantic_forms.append(parse.node)
+        
+        # Heuristic - Convert the action str into a semantic node if
+        # no parse was successful
+        if len(self.parser_train_data['full']) > 0 and len(valid_semantic_forms) == 0 :
+            ccg = self.parser.lexicon.read_category_from_str('M')
+            form = self.parser.lexicon.read_semantic_form_from_str(str(final_action), None, None, [],
+                                                            allow_expanding_ont=False)
+            form.category = ccg
+            valid_semantic_forms.append(form)
+                    
+        for command in self.parser_train_data['full'] :
+            for parse in valid_semantic_forms :
+                if self.is_parseable(command) :
+                    training_pairs.append((command, parse))
+                
+        print 'training_pairs = \n', '\n'.join([command + ' - ' + self.parser.print_parse(parse) for (command, parse) in training_pairs])
+        if len(training_pairs) >= 1 :
+            self.parser.train_learner_on_semantic_forms(training_pairs)
         
         # Re-initialize the data structure for next dialogue    
         self.parser_train_data = dict()

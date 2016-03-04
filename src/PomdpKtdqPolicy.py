@@ -35,12 +35,15 @@ class PomdpKtdqPolicy(AbstractPolicy) :
         self.training = True
         
         # Calculate number of features
-        self.n = 3
-        self.n += len(self.knowledge.ktdq_rbf_centres)
+        #self.n = 3
+        self.n = 1
+        #self.n += len(self.knowledge.ktdq_rbf_centres)
+        self.n += len(self.knowledge.ktdq_prob_bins)
+        #self.n += len(self.knowledge.ktdq_prob_bins)
         self.n += len(self.knowledge.goal_actions)
         self.n += len(self.knowledge.goal_params) + 1
         self.n += len(self.knowledge.user_dialog_actions)
-        self.n += len(self.knowledge.goal_actions) + 1
+        #self.n += len(self.knowledge.goal_actions) + 1
         self.n *= len(self.knowledge.summary_system_actions)
         
         # Initialize params
@@ -67,47 +70,70 @@ class PomdpKtdqPolicy(AbstractPolicy) :
         new_state_feature_vector = list()
         new_state_feature_vector.append(1)
         
-        s1 = orig_feature_vector[0]     # Probability of top hypothesis
-        s2 = orig_feature_vector[1]     # Probability of second hypothesis
-        for (c1, c2) in self.knowledge.ktdq_rbf_centres :
-            dist_to_rbf_centre = (s1 - c1) ** 2 + (s2 - c2) ** 2
-            feature_value = math.exp(-dist_to_rbf_centre / 2 * (self.knowledge.ktdq_rbf_sigma ** 2))
-            # exp(-((s1 - c1)^2 + (s2 - c2)^2) / 2 * sigma^2)
+        #s1 = numpy.exp(orig_feature_vector[0])     # Probability of top hypothesis
+        #s2 = numpy.exp(orig_feature_vector[1])     # Probability of second hypothesis
+        #for (c1, c2) in self.knowledge.ktdq_rbf_centres :
+            #dist_to_rbf_centre = (s1 - c1) ** 2 + (s2 - c2) ** 2
+            ##feature_value = math.exp(-dist_to_rbf_centre / 2 * (self.knowledge.ktdq_rbf_sigma ** 2))
+            #feature_value = dist_to_rbf_centre
+            #print 's1 = ', s1, ', s2 = ', s2, ', c1 = ', c1, ', c2 = ', c2, 
+            #print ', d = ', dist_to_rbf_centre, ', f = ', feature_value
+            ## exp(-((s1 - c1)^2 + (s2 - c2)^2) / 2 * sigma^2)
+            #new_state_feature_vector.append(feature_value)
+        ##print 'new_state_feature_vector = ', new_state_feature_vector
+        #print '----------------'
+        
+        # Probability of top hypothesis
+        s1 = numpy.exp(orig_feature_vector[0])     
+        for canonical_prob_value in self.knowledge.ktdq_prob_bins :
+            feature_value = numpy.abs(s1 - canonical_prob_value)
             new_state_feature_vector.append(feature_value)
+        
+        # Probability of second hypothesis
+        #s2 = numpy.exp(orig_feature_vector[1])     
+        #for canonical_prob_value in self.knowledge.ktdq_prob_bins :
+            #feature_value = numpy.abs(s2 - canonical_prob_value)
+            #new_state_feature_vector.append(feature_value)
         
         # No of goals allowed by the top partition     
         s3 = orig_feature_vector[2]
         # Delta function for each possible value
         for i in range(1, len(self.knowledge.goal_actions) + 1) :
+            #print 's3 = ', s3, ', i = ', i
             new_state_feature_vector.append(int(i == s3))
+        #print '----------------'
 
         # No of params in the top partition required by its action that are uncertain    
         s4 = orig_feature_vector[3]
         # Delta function for each possible value
         for i in range(0, len(self.knowledge.goal_params) + 1) :
+            #print 's4 = ', s4, ', i = ', i
             new_state_feature_vector.append(int(i == s4))
+        #print '----------------'
         
-        # Number of dialog turns used so far    
-        s5 = orig_feature_vector[4]        
-        # 0-1 : Is dialogue too long?
-        new_state_feature_vector.append(int(s5 > self.knowledge.ktdq_long_dialogue_thresh))
+        ## Number of dialog turns used so far    
+        #s5 = orig_feature_vector[4]        
+        ## 0-1 : Is dialogue too long?
+        #new_state_feature_vector.append(int(s5 > self.knowledge.ktdq_long_dialogue_thresh))
         
-        # Do the top and second hypothesis use the same partition: yes/no  
-        s6 = orig_feature_vector[5]
-        # 0-1 : Do the top and second hypothesis use the same partition?
-        new_state_feature_vector.append(int(s6 == 'yes'))
+        ## Do the top and second hypothesis use the same partition: yes/no  
+        #s6 = orig_feature_vector[5]
+        ## 0-1 : Do the top and second hypothesis use the same partition?
+        #new_state_feature_vector.append(int(s6 == 'yes'))
 
         # Type of last user utterance - inform_full/inform_param/affirm/deny        
         s7 = orig_feature_vector[6]
         # Delta function for each possible value
         for value in self.knowledge.user_dialog_actions :
+            #print 's7 = ', s7, ', value = ', value
             new_state_feature_vector.append(int(s7 == value))    
+        #print '----------------'
             
         # Goal in top hypothesis partition or 'None' if this is not unique
-        s8 = orig_feature_vector[7]
-        # Delta function for each possible value
-        for value in self.knowledge.goal_actions + [None] :
-            new_state_feature_vector.append(int(s8 == value))
+        #s8 = orig_feature_vector[7]
+        ## Delta function for each possible value
+        #for value in self.knowledge.goal_actions + [None] :
+            #new_state_feature_vector.append(int(s8 == value))
             
         # For each feature in the state feature vectors, create 4 
         # features by multiplying with delta function of each action
@@ -121,8 +147,6 @@ class PomdpKtdqPolicy(AbstractPolicy) :
     # Calculate Q(b, a) using current parameters
     def calc_q(self, b, a) :
         f = self.get_feature_vector(b, a)
-        print 'f = ', f.shape
-        print 'self.theta = ', self.theta.shape
         return (f.T * self.theta).item(0, 0)
                 
     # Pick a random action that is valid for the current state 
@@ -144,6 +168,7 @@ class PomdpKtdqPolicy(AbstractPolicy) :
             best_action = None
             for a in candidate_actions :
                 q = self.calc_q(b, a)
+                print 'a = ', a, ', q = ', q
                 if q >= max_q :
                     max_q = q
                     best_action = a
@@ -157,6 +182,7 @@ class PomdpKtdqPolicy(AbstractPolicy) :
         return (a, self.get_system_action_requirements(a, initial_state))
     
     def get_next_action(self, reward, current_state) :
+        print 'b = ', current_state.get_feature_vector()
         if self.untrained :
             a_prime = self.get_action_from_hand_coded_policy(current_state)
         else :
