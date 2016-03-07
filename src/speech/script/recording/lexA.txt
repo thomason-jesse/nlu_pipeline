@@ -1,0 +1,124 @@
+<C>
+<T>
+doctor
+dr
+mr
+ms 
+professor
+</C>
+<C>
+<PS>
+advisor : ray
+chair : bruce
+director : ray
+grad student : jesse
+intern : robert
+pi : peter
+postdoc : jivko
+professor : ray
+secretary : peggy
+student : walter
+ta : carol
+undergrad : francis 
+</C>
+<C>
+<P> 
+kitchen : kitchen
+lab : lab
+office : office
+room 3402 : l_3402
+room 3414b : l_3414b
+room 3418 : l_3418
+room 3420 : l_3420
+room 3432 : l_3432
+room 3502 : l_3502
+room 3508 : l_3508
+room 3510 : l_3510
+room 3512 : l_3512
+room 3516 : l_3516
+sink : kitchen
+</C>
+<C>
+<FN>
+alice ashcraft : alice
+bruce porter : bruce
+carol daniel : carol
+dana ballard : dana
+dave eckhart : dave
+evelyn eve foster : evelyn
+francis frannie parker : francis
+george green : george
+jivko : jivko
+kazunori : kazunori
+mallory clark : mallory
+matteo : matteo
+max : max
+pato : pato
+peggy : peggy
+peter stone : peter
+ray mooney : ray
+robert bob brown : robert
+shiqi : shiqi
+stacy morgan : stacy
+walter ward : walter
+yuqian : yuqian
+</C>
+<C>
+<I> 
+a bag of chips : chips
+a beverage : beverage
+a burger : burger
+a cheeseburger : cheeseburger
+a coffee cup : coffee
+a cup of coffee : coffee
+a cupcake : cupcake
+a drink : drink
+a glass : glass
+a glass of juice : juice
+a hamburger : burger
+a hammer : hammer
+a muffin : muffin
+a notebook : notebook
+a pencil : pencil
+a phone : phone
+a pillow : pillow
+a salad : salad
+a sandwich : sandwich
+a snack : snack
+a watch : watch
+an apple : apple
+an organizer : organizer
+some coffee : coffee
+some coffee to go : coffee
+some coke : coke
+some soda : coke
+some tea : tea
+some water : water
+something to drink : coke
+the basket : basket
+the binder : binder
+the book : book
+the box : box
+the bread : bread
+the cake : cake
+the calendar : calendar
+the cellphone : cellphone
+the chips : chips
+the container : container
+the crisps : chips
+the dessert : dessert
+the diary : diary
+the doritos : doritos
+the dustbin : trashcan
+the juice : juice
+the laptop : laptop
+the lays : chips
+the ledger : ledger
+the letter : letter
+the milk : milk
+the pizza : pizza
+the planner : planner
+the potato chips : chips
+the trashcan : trashcan
+yourself : me
+</C>

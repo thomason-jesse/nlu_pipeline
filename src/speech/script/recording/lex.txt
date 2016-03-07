@@ -1,0 +1,234 @@
+<C>
+<PS>
+the advisor : ray
+the chair : bruce
+the director : ray
+the grad student : jesse
+the intern : rodolfo
+the pi : peter
+the postdoc : jivko
+the professor : ray
+the secretary : stacy
+the ta : aishwarya
+the undergrad : rodolfo
+</C>
+<C>
+<P>
+the kitchen : kitchen
+the lab : l3_414b
+the office : office
+room 3402 : l3_402
+room 3414b : l3_414b
+room 3418 : l3_418
+room 3420 : l3_420
+room 3432 : l3_432
+room 3502 : l3_502
+room 3508 : l3_508
+room 3510 : l3_510
+room 3512 : l3_512
+room 3516 : l3_516
+sink : kitchen
+</C>
+Full name : titles : denotation : office (if any)
+<C>
+<FN>
+bruce-NA-porter : doctor_dr_mr_professor : bruce : NA
+stacy-NA-miller : ms_secretary : stacy : l3_502
+dana-NA-ballard : dr_doctor_mr_professor : dana : l3_510
+jivko-NA-NA : mr : jivko : l3_432
+peter-NA-stone : doctor_professor_dr_mr : peter : l3_508
+ray-NA-mooney : doctor_dr_professor_mr : ray : l3_512
+shiqi-NA-NA : mr : shiqi : l3_420
+scott-NA-niekum : doctor_dr_mr_professor : scott : l3_404
+jesse-NA-thomason : mr : jesse : l3_414b
+aishwarya-NA-padmakumar : ms : aishwarya : l3_414b
+rodolfo-rudy-corona : mr : rodolfo : l3_414b
+</C>
+<C>
+<I>
+apple : the apple
+basket : the basket
+beverage : the beverage
+binder : the binder
+book : the book
+box : the box
+bread : the bread
+cake : the cake
+calendar : the calendar
+calendar : the planner
+cellphone : the cellphone
+chips : the bag of chips
+chips : the chips
+chips : the crisps
+chips : the lays
+chips : the potato chips
+coffee : the coffee
+coffee : the coffee cup
+coffee : the coffee to go
+coffee : the cup of coffee
+coke : the coke
+coke : the soda
+container : the container
+cupcake : the cupcake
+dessert : the dessert
+diary : the diary
+doritos : the doritos
+glass : the glass
+hamburger : the burger
+hamburger : the cheeseburger
+hamburger : the hamburger
+hammer : the hammer
+juice : the drink
+juice : the glass of juice
+juice : the juice
+laptop : the laptop
+ledger : the ledger
+letter : the letter
+milk : the milk
+muffin : the muffin
+notebook : the notebook
+organizer : the organizer
+pencil : the pencil
+phone : the phone
+pillow : the pillow
+pizza : the pizza
+salad : the salad
+sandwich : the sandwich
+snack : the snack
+tea : the tea
+trashcan : the dustbin
+trashcan : the trashcan
+watch : the watch
+water : the glass of water
+water : the water
+</C>
+<C>
+<A>
+aerosol : an
+aluminum : an
+big : a
+black : a
+blue : a
+bright : a
+brown : a
+cardboard : a
+circular : a
+clear : a
+closed : a
+coffee : a
+colored : a
+cream-colored : a
+curvy : a
+cylindrical : a
+empty : an
+fat : a
+foam : a
+foamy : a
+full : a
+gray : a
+green : a
+half-full : a
+heavy : a
+hollow : a
+large : a
+light : a
+liquid : a
+medium-sized : a
+metal : a
+metallic : a
+narrow : a
+neon : a
+open : an
+orange : an
+orange-topped : an
+paper : a
+pencil-shaped : a
+pink : a
+plastic : a
+pointed : a
+pointy : a
+purple : a
+rectangular : a
+red : a
+rough : a
+round : a
+shiny : a
+short : a
+silent : a
+silver : a
+skinny : a
+small : a
+soft : a
+soup : a
+spherical : a
+spiky : a
+squishy : a
+styrofoam : a
+tall : a
+teal : a
+thin : a
+tiny : a
+top : a
+transparent : a
+water : a
+white : a
+wide : a
+yellow : a
+</C>
+<C>
+<NO>
+ball : a
+beans : some
+book : a
+bottle : a
+box : a
+bucket : a
+can : a
+cannister : a
+cap : a
+carton : a
+cellphone : a
+chips : some
+container : a
+crayon : a
+cup : a
+cylinder : a
+diary : a
+drink : a
+flask : a
+floaty : a 
+jar : a
+laptop : a 
+lid : a
+marker : a
+mug : a
+notebook : a
+object : an
+pineapple : a
+plush-toy : a
+prism : a
+rectangle : a
+roll : a
+shaker : a
+sphere : a
+spray : a
+spraycan : a
+stuffed-animal : a
+thing : a
+tin : a 
+tub : a
+tube : a
+wipes : a
+</C>
+<C>
+<O>
+circles
+color
+describing
+inside
+pictures
+rattles
+shaking
+text
+thinking
+</C>

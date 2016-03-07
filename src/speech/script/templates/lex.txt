@@ -1,0 +1,123 @@
+<T>: Title
+-----------
+doctor
+dr
+mr
+ms 
+professor
+
+<PS>: Position
+--------------
+advisor : ray
+chair : bruce
+director : ray
+grad student : jesse
+intern : robert
+pi : peter
+postdoc : jivko
+professor : ray
+secretary : peggy
+student : walter
+ta : carol
+undergrad : francis 
+
+<P>: Place 
+-----------
+kitchen : kitchen
+lab : lab
+office : office
+room 3402 : l_3402
+room 3414b : l_3414b
+room 3418 : l_3418
+room 3420 : l_3420
+room 3432 : l_3432
+room 3502 : l_3502
+room 3508 : l_3508
+room 3510 : l_3510
+room 3512 : l_3512
+room 3516 : l_3516
+sink : kitchen
+
+<FN>: Full Name
+----------------
+bruce porter : bruce
+alice ashcraft : alice
+carol daniel : carol
+dana ballard : dana
+dave eckhart : dave
+evelyn eve foster : evelyn
+francis frannie parker : francis
+george green : george
+jivko : jivko
+kazunori : kazunori
+mallory clark : mallory
+matteo : matteo
+max : max
+pato : pato
+peggy : peggy
+peter stone : peter
+ray mooney : ray
+robert bob brown : robert
+shiqi : shiqi
+stacy morgan : stacy
+walter ward : walter
+yuqian : yuqian
+
+<I>: Item 
+----------
+an apple : apple
+a bag of chips : chips
+the basket : basket
+a beverage : beverage
+the binder : binder
+the book : book
+the box : box
+the bread : bread
+a burger : burger
+the cake : cake
+the calendar : calendar
+the cellphone : cellphone
+a cheeseburger : cheeseburger
+the chips : chips
+some coffee : coffee
+a coffee cup : coffee
+some coffee to go : coffee
+some coke : coke
+the container : container
+the crisps : chips
+a cup of coffee : coffee
+a cupcake : cupcake
+the dessert : dessert
+the diary : diary
+the doritos : doritos
+a drink : drink
+the dustbin : trashcan
+a glass : glass
+a glass of juice : juice
+a hamburger : burger
+a hammer : hammer
+the juice : juice
+the laptop : laptop
+the lays : chips
+the ledger : ledger
+the letter : letter
+the milk : milk
+a muffin : muffin
+a notebook : notebook
+an organizer : organizer
+a pencil : pencil
+a phone : phone
+a pillow : pillow
+the pizza : pizza
+the planner : planner
+the potato chips : chips
+a salad : salad
+a sandwich : sandwich
+a snack : snack
+some soda : coke
+something to drink : coke
+some tea : tea
+the trashcan : trashcan
+a watch : watch
+some water : water
+yourself : me

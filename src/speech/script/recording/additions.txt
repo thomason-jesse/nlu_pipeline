@@ -1,0 +1,15 @@
+Possible additions to nouns.
+-----------------------------
+bucket
+carton
+flask
+floaty
+marker
+mug
+plush-toy
+shaker
+spray
+stuffed-animal
+tin
+wipes
+

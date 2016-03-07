@@ -1,0 +1,123 @@
+<T>: Title
+-----------
+doctor
+dr
+mr
+ms 
+professor
+
+<PS>: Position
+--------------
+advisor : ray
+chair : bruce
+director : ray
+grad student : jesse
+intern : robert
+pi : peter
+postdoc : jivko
+professor : ray
+secretary : peggy
+student : walter
+ta : carol
+undergrad : francis 
+
+<P>: Place 
+-----------
+kitchen : kitchen
+lab : lab
+office : office
+room 3402 : l_3402
+room 3414b : l_3414b
+room 3418 : l_3418
+room 3420 : l_3420
+room 3432 : l_3432
+room 3502 : l_3502
+room 3508 : l_3508
+room 3510 : l_3510
+room 3512 : l_3512
+room 3516 : l_3516
+sink : kitchen
+
+<FN>: Full Name
+----------------
+bruce porter : bruce
+alice ashcraft : alice
+carol daniel : carol
+dana ballard : dana
+dave eckhart : dave
+evelyn eve foster : evelyn
+francis frannie parker : francis
+george green : george
+jivko : jivko
+kazunori : kazunori
+mallory clark : mallory
+matteo : matteo
+max : max
+pato : pato
+peggy : peggy
+peter stone : peter
+ray mooney : ray
+robert bob brown : robert
+shiqi : shiqi
+stacy morgan : stacy
+walter ward : walter
+yuqian : yuqian
+
+<I>: Item 
+----------
+apple : apple
+bag of chips : chips
+basket : basket
+beverage : beverage
+binder : binder
+book : book
+box : box
+bread : bread
+burger : burger
+cake : cake
+calendar : calendar
+cellphone : cellphone
+cheeseburger : cheeseburger
+chips : chips
+coffee : coffee
+coffee cup : coffee
+coffee to go : coffee
+coke : coke
+container : container
+crisps : chips
+cup of coffee : coffee
+cupcake : cupcake
+dessert : dessert
+diary : diary
+doritos : doritos
+drink : drink
+dustbin : trashcan
+glass : glass
+glass of juice : juice
+hamburger : burger
+hammer : hammer
+juice : juice
+laptop : laptop
+lays : chips
+ledger : ledger
+letter : letter
+milk : milk
+muffin : muffin
+notebook : notebook
+organizer : organizer
+pencil : pencil
+phone : phone
+pillow : pillow
+pizza : pizza
+planner : planner
+potato chips : chips
+salad : salad
+sandwich : sandwich
+snack : snack
+soda : coke
+something to drink : coke
+tea : tea
+trashcan : trashcan
+watch : watch
+water : water
+yourself : me
