@@ -3,6 +3,9 @@ import threading
 import pygame
 import random
 import sys
+import os
+import time
+import shutil
 
 class ScriptGenerator:
     def __init__(self, displayInfo, user_id, mode = "normal", recording = True):
@@ -36,21 +39,32 @@ class ScriptGenerator:
         self.semantic_data = {}
 
         #Sets font for displaying text. 
-        self.font = pygame.font.SysFont('monospace', 15)
+        self.font = pygame.font.SysFont('monospace', 24, True)
         self.textColor = (255, 255, 255)
         self.background = (191, 87, 0)
         self.screen_w = displayInfo.current_w
         self.screen_h = displayInfo.current_h
 
+        #Sets up font for options text.
+        self.option_font = pygame.font.SysFont('monospace', 15)
+        self.instructions = "OPTIONS: [space_bar = toggle recording] [r = re-record phrase] "
+        self.instructions += "[d = delete recording] [right_arrow = move to next phrase]"
+
     def genPhrase(self, screen):
         #Generates the phrase itself. (i.e. the text)
         self.phrase = self.genCommand()    
 
+        #Paints phrase on screen. 
+        self.drawPhrase(screen)
+
+    def drawPhrase(self, screen):
         #The text object to render to screen. 
         self.phraseText = self.font.render(self.phrase, 1, self.textColor)
+        self.option_text = self.option_font.render(self.instructions, 1, self.textColor)
 
         #Updates display. 
         screen.fill(self.background)
+        screen.blit(self.option_text, (0,0))
         screen.blit(self.phraseText, self.calcPos())
         pygame.display.update()
 
@@ -103,27 +117,31 @@ class ScriptGenerator:
     #Generates templates from files. 
     def genTemplates(self):
         #Templates are all held in lists. 
-	self.templates.append(["walk", [line for line in open('walkTemplates.txt', 'r')]])
-	self.templates.append(["search", [line for line in open('searchTemplates.txt', 'r')]])
+#self.templates.append(["walk", [line for line in open('walkTemplates.txt', 'r')]])
+#self.templates.append(["search", [line for line in open('searchTemplates.txt', 'r')]])
         self.templates.append(["bring", [line for line in open('bringTemplates.txt', 'r')]])
-	self.templates.append(["walk_possessive", [line for line in open('walkPossessiveTemplates.txt', 'r')]])
+#self.templates.append(["walk_possessive", [line for line in open('walkPossessiveTemplates.txt', 'r')]])
 
     #Generates a list of adjectives as well as the determiners that precede each one. 
     def genAdjectives(self):
         for line in self.tags["<A>"]:
             splitList = line.split(':')
-            determiner = splitList[0].strip()
-            adjective = splitList[1].strip()
+            determiner = splitList[1].strip()
+            adjective = splitList[0].strip()
 
             self.adjectives.append([determiner, adjective])
+
+        print "Adjectives: " + str(self.adjectives)
 
     def genNouns(self):
         for line in self.tags["<NO>"]:
             splitList = line.split(':')
-            determiner = splitList[0].strip()
-            noun = splitList[1].strip()
+            determiner = splitList[1].strip()
+            noun = splitList[0].strip()
 
             self.nouns.append([determiner, noun])
+
+        print "Nouns: " + str(self.nouns)
 
     #Generates list of all possible references to people. 
     def genNames(self): 
@@ -270,8 +288,8 @@ class ScriptGenerator:
             
         #Picks a random noun. 
         nounTuple = nouns[random.randint(0, len(nouns) - 1)].split(':')
-        noun_determiner = nounTuple[0].strip()
-        noun = nounTuple[1].strip()
+        noun_determiner = nounTuple[1].strip()
+        noun = nounTuple[0].strip()
 
         #Phrase to build. 
         phrase = ""
@@ -281,12 +299,11 @@ class ScriptGenerator:
             adjectiveIndex = random.randint(0, len(adjectives) - 1)
             adjectiveTuple = adjectives[adjectiveIndex].split(':')
 
-            adjective = adjectiveTuple[1].strip()
-            determiner = adjectiveTuple[0].strip()
+            adjective = adjectiveTuple[0].strip()
+            determiner = adjectiveTuple[1].strip()
 
             #Begins phrase. 
             if i == 0:
-                determiner = adjectives[adjectiveIndex][0]
                 phrase = determiner + " "
                     
             #Adds adjective to phrase with comma if necessary. 
@@ -326,8 +343,8 @@ class ScriptGenerator:
     def genNormalItem(self):
         expansionIndex = random.randint(0, len(self.tags["<I>"]) - 1)
         expansionList = self.tags["<I>"][expansionIndex].split(':')
-        expansion = expansionList[0].strip()
-        denotation = expansionList[1].strip()
+        expansion = expansionList[1].strip()
+        denotation = expansionList[0].strip()
 
         #Stores denotation. 
         self.denotations["<I>"] = denotation
@@ -395,14 +412,18 @@ class ScriptGenerator:
             return word
 
     def saveData(self):
-        phraseFile = open('results/phrases/' + str(self.user_id) + '_' + 'phrase' + '_' + str(self.phrase_num), 'w')
-        denotationFile = open('results/denotations/' + str(self.user_id) + '_' + 'denotation' + '_' + str(self.phrase_num), 'w')
-        semanticFile = open('results/semantic_forms/' + str(self.user_id) + '_' + 'semantic' + '_' + str(self.phrase_num), 'w')
+        prefix = 'results/' + str(self.user_id)
+        phraseFile = open(prefix + '/phrases/' + str(self.user_id) + '_' + 'phrase_' + str(self.phrase_num), 'w')
+        denotationFile = open(prefix + '/denotations/' + str(self.user_id) + '_' + 'denotation_' + str(self.phrase_num), 'w')
+        semanticFile = open(prefix + '/semantic_forms/' + str(self.user_id) + '_' + 'semantic_' + str(self.phrase_num), 'w')
 
         #Writes data. 
         phraseFile.write(self.phrase)
         denotationFile.write(self.denotation)
         semanticFile.write(self.semantic_form)
+
+        #Copies temp recording file to permanent location.
+        shutil.copy("temp_record.raw", prefix + '/recordings/' + str(self.user_id) + '_' + 'recording_' + str(self.phrase_num)) 
 
         print "----------------------------------"
         print "PHRASE: " + self.phrase
@@ -440,8 +461,7 @@ class Recorder:
 
     def record(self):
         while not self.libHandle.isInterrupted():
-            self.libHandle.record1600Hz("results/recordings/" + self.user_id + "_recording_" + str(self.phrase_num))
-            self.phrase_num += 1
+            self.libHandle.record1600Hz("temp_record.raw")
 
     def recordToggle(self):
         #Initializes pygame window to read spacebar presses. 
@@ -452,12 +472,19 @@ class Recorder:
 
         #Gets monitor information and uses it to go to fullscreen mode. 
         displayInfo = pygame.display.Info()
-        screen = pygame.display.set_mode((displayInfo.current_w -100, displayInfo.current_h-100))
+        screen = pygame.display.set_mode((displayInfo.current_w, displayInfo.current_h), pygame.FULLSCREEN)
 
         #Information for "recording" circle. 
         red = (255, 0, 0)
         orange = (191, 87, 0)
         circPos = (displayInfo.current_w - 200, 200)
+
+        #Keys that may be pressed in this method. 
+        space = [pygame.K_SPACE]
+        interrupt = [pygame.K_RCTRL, pygame.K_c]
+        right = [pygame.K_RIGHT]
+        repeat = [pygame.K_r]
+        delete = [pygame.K_d]
 
         print "\nPress [SPACEBAR] to record"
 
@@ -465,69 +492,106 @@ class Recorder:
 
         #Creates the phrase generating object. 
         self.scriptGenerator = ScriptGenerator(displayInfo, self.user_id, self.mode)
-        self.scriptGenerator.genPhrase(screen)
 
         while running:
-            pygame.event.pump()
-            keys = pygame.key.get_pressed()
-
-            if (keys[pygame.K_RCTRL] or keys[pygame.K_LCTRL]) and keys[pygame.K_c]:
-                running = False
-
-                self.libHandle.interruptRecord()
-
-            if keys[pygame.K_SPACE]:
-                #Starts recording from mic to file. 
-                self.libHandle.startRecord()
-
-                #Loops while user is holding space bar. 
-                while keys[pygame.K_SPACE]:
-                    pygame.event.pump()
-                    keys = pygame.key.get_pressed()
-
-                #Draws circle to signify recording. 
-                pygame.draw.circle(screen, red, circPos, 20, 0) 
-                pygame.display.update()
-
-                recording = True
-
-                #Waits for user to press spacebar again to stop recording. 
-                while recording:
-                    pygame.event.pump()
-                    keys = pygame.key.get_pressed()
-
-                    if keys[pygame.K_SPACE]:
-                        recording = False
-                        screen.fill(orange)
-                        pygame.display.update()
-
-                    #Sleeps to free up cpu. 
-                    pygame.time.wait(100)
-
-                #Stops recording when they release it. 
-                self.libHandle.stopRecord()
-                recording = False
-
-                #Saves phrase, denotation, and semantic form to file. 
-                self.scriptGenerator.saveData()
-
-                #Waits for user to get next phrase.     
-                while not keys[pygame.K_RIGHT]:
-                    pygame.event.pump()
-                    keys = pygame.key.get_pressed()
-
-                #Waits for user to let go of key.     
-                while keys[pygame.K_RIGHT]:
-                    pygame.event.pump()
-                    keys = pygame.key.get_pressed()
-
-                self.scriptGenerator.genPhrase(screen)
-
-            #Sleeps to free up cpu.
-            pygame.time.wait(100)
-
+            #Generates phrase
+            self.scriptGenerator.genPhrase(screen)
+            inPhrase = True
             
+            while inPhrase:
+                #Key combinations that may be pressed. 
+                keys = [space, interrupt]
+                pressed = self.waitForKeys(keys)
+
+                if pressed == interrupt:
+                    running = False
+                    self.libHandle.interruptRecord()
+
+                if pressed == space:
+                    #Waits for space to be released. 
+                    self.waitForRelease(space)
+
+                    #Starts recording from mic to file. 
+                    self.libHandle.startRecord()
+
+                    #Draws circle to signify recording. 
+                    pygame.draw.circle(screen, red, circPos, 20, 0) 
+                    pygame.display.update()
+
+                    #Waits for user to press spacebar again to stop recording. 
+                    self.waitForKeys([space])
+
+                    #Stops recording when they release it. 
+                    self.libHandle.stopRecord()
+                    inPhrase = False
+
+                    #Gets rid of recording circle. 
+                    self.scriptGenerator.drawPhrase(screen)
+
+                    #Keys that may be pressed at this stage. 
+                    keys = [right, repeat, interrupt, delete]
+                    pressed = self.waitForKeys(keys)
+    
+                    #If interrupted, then exits program and saves data. 
+                    if pressed == interrupt:
+                        self.scriptGenerator.saveData()
+                        running = False
+                        self.libHandle.interruptRecord()
+
+                    #Saves data and will now move on to next phrase.  
+                    if pressed == right:
+                        self.scriptGenerator.saveData()
+
+                    #If delete, will not save data and deletes recorded file.  
+                    if pressed == delete:
+                        pass
+
+                    #Goes back to being in phrase to record once more. 
+                    if pressed == repeat:
+                        inPhrase = True
+
+        #Exits pygame. 
         pygame.quit()
+
+    #Waits for one of inputted keys to be pressed. Returns key that was pressed. 
+    def waitForKeys(self, keys):
+        #Waits for one of the given keys to be pressed. 
+        while True:
+            pygame.event.pump()
+            pressed = pygame.key.get_pressed()
+
+            #Returns key pressed if there is one. 
+            for combo in keys:
+                num_pressed = 0
+
+                #Checks that each key in combo was pressed. 
+                for key in combo:
+                    if pressed[key]:
+                        num_pressed += 1
+
+                if num_pressed == len(combo):
+                    return combo
+
+            #Releases processor for a little bit. 
+            time.sleep(0.001)
+
+    def waitForRelease(self, keys):
+        zero_pressed = False
+        
+        #Loops until keys given are no longer being pressed. 
+        while not zero_pressed:
+            num_pressed = 0
+
+            pygame.event.pump()
+            pressed = pygame.key.get_pressed()
+
+            for key in keys:
+                if pressed[key]:
+                    num_pressed += 1
+
+            #The given keys have been released. 
+            if num_pressed == 0:
+                zero_pressed = True
 
     def recordUser(self):
 
