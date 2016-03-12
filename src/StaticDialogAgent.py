@@ -20,6 +20,7 @@ class StaticDialogAgent(PomdpDialogAgent):
     def __init__(self, parser, grounder, policy, u_input, output, parse_depth=10):
         PomdpDialogAgent.__init__(self, parser, grounder, policy, u_input, output, parse_depth)    
         self.dialogue_stopped = False
+        self.log_header = 'static'
 
     # initiate a new dialog with the agent with initial utterance u
     def initiate_dialog_to_get_action(self, u):
@@ -56,12 +57,12 @@ class StaticDialogAgent(PomdpDialogAgent):
         
         success = False
         if action is not None :
-            self.output.say(response_generator.get_action_sentence(a) + ' Was this the right action? (y/n)'
+            self.output.say(self.response_generator.get_action_sentence(action, self.final_action_log) + ' Was this the right action? (y/n)')
             response = self.input.get()
             if response == '<ERROR/>' or response.lower() == 'y' or response.lower() == 'yes' :
                 success = True
         
-        complete_log_object = ('static', self.dialog_objects_log, action, success, self.parser_train_data)
+        complete_log_object = (self.log_header, self.dialog_objects_log, action, success, self.parser_train_data)
         if self.dialog_objects_logfile is not None :
             save_obj_general(complete_log_object, self.dialog_objects_logfile)
         

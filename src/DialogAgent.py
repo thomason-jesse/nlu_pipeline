@@ -9,6 +9,7 @@ import multiprocessing
 import Queue
 import Action
 import StaticDialogState
+import traceback
 
 class DialogAgent:
 
@@ -31,6 +32,8 @@ class DialogAgent:
         
         self.max_allowed_unks = 2
         self.max_allowed_length = 7
+        
+        self.error_log = None
 
     # initiate a new dialog with the agent with initial utterance u
     def initiate_dialog_to_get_action(self, u):
@@ -292,32 +295,45 @@ class DialogAgent:
         
         if not self.is_parseable(response) :
             return []
-            
-        #print 'Possibly parseable'    
-        parse_generator = self.parser.most_likely_cky_parse(response)
-        #print 'Parser returned'
         
-        num_parses_obtained = 0
-        num_parses_examined = 0
         parses = list()
-        for (parse, score, _) in parse_generator :
-            num_parses_examined += 1
-            if num_parses_examined == self.max_parse_beam :
-                break
-            if parse is None :
-                break
-            if parse.node.is_lambda and parse.node.is_lambda_instantiation :
-                # Lambda headed parses are very unlikely to be correct. Drop them
-                continue
-            top_level_category = self.parser.lexicon.categories[parse.node.category]
-            if top_level_category not in ['M', 'NP', 'C'] :
-                # M - imperative (full action), C - confirmation, NP - noun phrase for params
-                continue
-            #print 'parse = ', self.parser.print_parse(parse.node, show_category=True), ', score = ', score 
-            parses.append((parse, score))
-            num_parses_obtained += 1
-            if num_parses_obtained == num_parses_needed :
-                break
+        try :    
+            #print 'Possibly parseable'    
+            parse_generator = self.parser.most_likely_cky_parse(response)
+            #print 'Parser returned'
+            
+            num_parses_obtained = 0
+            num_parses_examined = 0
+            
+            for (parse, score, _) in parse_generator :
+                num_parses_examined += 1
+                if num_parses_examined == self.max_parse_beam :
+                    break
+                if parse is None :
+                    break
+                if parse.node.is_lambda and parse.node.is_lambda_instantiation :
+                    # Lambda headed parses are very unlikely to be correct. Drop them
+                    continue
+                top_level_category = self.parser.lexicon.categories[parse.node.category]
+                if top_level_category not in ['M', 'NP', 'C'] :
+                    # M - imperative (full action), C - confirmation, NP - noun phrase for params
+                    continue
+                #print 'parse = ', self.parser.print_parse(parse.node, show_category=True), ', score = ', score 
+                parses.append((parse, score))
+                num_parses_obtained += 1
+                if num_parses_obtained == num_parses_needed :
+                    break
+        except (KeyboardInterrupt, SystemExit):
+            raise
+        except :
+            error = str(sys.exc_info()[0])
+            if self.error_log is not None :
+                self.error_log.write('Parser error for string: ' + response)
+                self.error_log.write(error + '\n')
+                self.error_log.write(traceback.format_exc() + '\n\n\n')
+                self.error_log.flush() 
+            print traceback.format_exc()
+            
         return parses 
 
     def get_action_from_parse(self, root):

@@ -46,6 +46,7 @@ class PomdpDialogAgent(DialogAgent) :
         self.dialog_objects_logfile = None 
         self.dialog_objects_log = None
         self.cur_turn_log = None
+        self.log_header = 'pomdp'
         
     # Returns True if the dialog terminates on its own and False if the u
     # user entered stop
@@ -70,7 +71,7 @@ class PomdpDialogAgent(DialogAgent) :
                 if response == '<ERROR/>' :
                     # Benefit of doubt - assume the action was correct
                     self.policy.update_final_reward(self.knowledge.correct_action_reward)
-                    complete_log_object = ('pomdp', self.dialog_objects_log, action, True, self.parser_train_data)
+                    complete_log_object = (self.log_header, self.dialog_objects_log, action, True, self.parser_train_data)
                     if self.dialog_objects_logfile is not None :
                         save_obj_general(complete_log_object, self.dialog_objects_logfile)
                     return False  
@@ -78,7 +79,7 @@ class PomdpDialogAgent(DialogAgent) :
                     self.policy.update_final_reward(self.knowledge.correct_action_reward)
                     self.cur_turn_log = ['take_action', None]
                     self.dialog_objects_log.append(self.cur_turn_log)
-                    complete_log_object = ('pomdp', self.dialog_objects_log, action, True, self.parser_train_data)
+                    complete_log_object = (self.log_header, self.dialog_objects_log, action, True, self.parser_train_data)
                     if self.dialog_objects_logfile is not None :
                         save_obj_general(complete_log_object, self.dialog_objects_logfile)
                     if self.retrain_parser :
@@ -86,7 +87,7 @@ class PomdpDialogAgent(DialogAgent) :
                 else :
                     self.cur_turn_log = ['take_action', None]
                     self.dialog_objects_log.append(self.cur_turn_log)
-                    complete_log_object = ('pomdp', self.dialog_objects_log, action, False, self.parser_train_data)
+                    complete_log_object = (self.log_header, self.dialog_objects_log, action, False, self.parser_train_data)
                     if self.dialog_objects_logfile is not None :
                         save_obj_general(complete_log_object, self.dialog_objects_logfile)
                     self.policy.update_final_reward(self.knowledge.wrong_action_reward)
@@ -100,12 +101,12 @@ class PomdpDialogAgent(DialogAgent) :
                 response = self.dialog_action_functions[self.dialog_actions.index(dialog_action)]()
                 self.cur_turn_log = [self.previous_system_action, response]
                 if response == '<ERROR/>' :
-                    complete_log_object = ('pomdp', self.dialog_objects_log, None, False, self.parser_train_data)
+                    complete_log_object = (self.log_header, self.dialog_objects_log, None, False, self.parser_train_data)
                     if self.dialog_objects_logfile is not None :
                         save_obj_general(complete_log_object, self.dialog_objects_logfile)
                     return False
                 if response == 'stop' :
-                    complete_log_object = ('pomdp', self.dialog_objects_log, None, False, self.parser_train_data)
+                    complete_log_object = (self.log_header, self.dialog_objects_log, None, False, self.parser_train_data)
                     if self.dialog_objects_logfile is not None :
                         save_obj_general(complete_log_object, self.dialog_objects_logfile)
                     self.policy.update_final_reward(self.knowledge.wrong_action_reward)

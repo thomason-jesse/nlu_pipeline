@@ -56,7 +56,7 @@ grounder.parser = parser
 grounder.ontology = parser.ontology
 
 knowledge = Knowledge()
-policy = PomdpKtdqPolicy(knowledge, False)
+policy = PomdpKtdqPolicy(knowledge)
 print "instantiating Trainer"
 param_mapping_file = 'src/nlu_pipeline/src/resources/old_ijcai_domain/ontology_mapping.csv'
 A = PomdpTrainer(parser, grounder, policy, param_mapping_file = param_mapping_file)

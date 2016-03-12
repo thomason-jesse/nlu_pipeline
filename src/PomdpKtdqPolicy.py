@@ -30,7 +30,7 @@ from Utterance import Utterance
 from AbstractPolicy import AbstractPolicy
 
 class PomdpKtdqPolicy(AbstractPolicy) :
-    def __init__(self, knowledge, load_from_file=False) :
+    def __init__(self, knowledge) :
         AbstractPolicy.__init__(self, knowledge)
         self.training = True
         

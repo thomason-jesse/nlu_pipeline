@@ -79,7 +79,7 @@ u_out = OutputToStdout()
 
 knowledge = Knowledge()
 #policy = PomdpKtdqPolicy(knowledge, False)
-policy = load_model('ktdq_policy_hc')
+policy = load_model('ktdq_policy_corrected_hc_ol1')
 policy.untrained = False
 policy.training = False
 A = PomdpDialogAgent(parser, grounder, policy, u_in, u_out)
