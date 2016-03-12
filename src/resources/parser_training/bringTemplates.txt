@@ -1,0 +1,74 @@
+bring <I> to <N>
+please bring <I> to <N>
+take <I> to <N>
+please take <I> to <N>
+<N> wants <I>
+<N> would like <I>
+give <I> to <N>
+please give <I> to <N>
+deliver <I> to <N>
+please deliver <I> to <N>
+<N> would like you to bring them <I>
+i would like you to please bring <I> to <N>
+i would like you to please give <N> <I>
+i would like you to please take <I> to <N>
+i would like you to please deliver <I> to <N>
+i would like for you to please bring <I> to <N>
+i would like for you to please give <N> <I>
+i would like for you to please take <I> to <N>
+i would like for you to please deliver <I> to <N>
+<N> would like you to bring them <I>
+i would like you to bring <I> to <N>
+i would like you to give <N> <I>
+i would like you to take <I> to <N>
+i would like you to deliver <I> to <N>
+i would like for you to bring <I> to <N>
+i would like for you to give <N> <I>
+i would like for you to take <I> to <N>
+i would like for you to deliver <I> to <N>
+i want you to please bring <I> to <N>
+i want you to please give <N> <I>
+i want you to please take <I> to <N>
+i want you to please deliver <I> to <N>
+i want for you to please bring <I> to <N>
+i want for you to please give <N> <I>
+i want for you to please take <I> to <N>
+i want for you to please deliver <I> to <N>
+<N> wants you to bring them <I>
+i want you to bring <I> to <N>
+i want you to give <N> <I>
+i want you to take <I> to <N>
+i want you to deliver <I> to <N>
+i want for you to bring <I> to <N>
+i want for you to give <N> <I>
+i want for you to take <I> to <N>
+i want for you to deliver <I> to <N>
+you should take <I> to <N>
+you should deliver <I> to <N>
+you should bring <I> to <N>
+you should give <I> to <N>
+go and give <I> to <N>
+go and deliver <I> to <N>
+go bring <I> to <N>
+go bring <N> <I>
+can you give <N> <I>
+can you take <I> to <N>
+can you deliver <I> to <N>
+can you bring <I> to <N>
+can you bring <N> <I>
+can you please give <N> <I>
+can you please take <I> to <N>
+can you please deliver <I> to <N>
+can you please bring <I> to <N>
+can you please bring <N> <I>
+hurry and bring <I> to <N>
+hurry and deliver <I> to <N>
+hurry and take <I> to <N>
+go get <I> for <N>
+go and get <I> for <N>
+please go get <I> for <N>
+please go and get <I> for <N>
+go ahead and deliver <I> to <N>
+go ahead and bring <I> to <N>
+go ahead and take <I> to <N>
+go ahead and take <N> <I>
