@@ -32,9 +32,8 @@ mallory-NA-morgan : dr : peter : l3_508
 peggy-NA-parker : dr : dana : l3_510
 walter-NA-ward : dr : ray : l3_512
 </C>
-<C>
 denotation : determiner and reference 
-</C>
+<C>
 <I>
 muffin : a muffin
 muffin : a cake
@@ -56,9 +55,9 @@ hamburger : a hamburger
 juice : a drink
 juice : a glass of juice
 juice : juice
-<C>
-adjective : determiner 
 </C>
+adjective : determiner 
+<C>
 <A>
 aerosol : an
 aluminum : an

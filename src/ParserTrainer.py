@@ -1,35 +1,37 @@
+#!/usr/bin/env python
 __author__ = ['aishwarya', 'rodolfo']
 
 import random
 import sys
+import Ontology
+import Lexicon
+import CKYParser
 
-path = 'resources/parser_training/'
+path = 'src/nlu_pipeline/src/resources/parser_training/'
 
 class ParserTrainer:
     def __init__(self):
         #Initializes data structure for generating phrases. 
-        self.templates = []
+        self.templates = dict()
         self.tags = {}
         self.names = []
         self.names_possessive = []
-        self.adjectives = []
-        self.nouns = []
-        self.used_adjectives = False
 
         self.genTags()
         self.genTemplates()
 
         #These methods MUST be called AFTER genTags().  
         self.genNames()
-        self.genAdjectives()
-        self.genNouns()
 
         #Variables to hold data to be saved.
         self.phrase = None
-        self.denotations = {} #Keeps specific word denotations.
+        self.denotations = dict() #Keeps specific word denotations.
         self.denotation = None # keeps denotation for entire phrase. 
         self.semantic_form = None
-        self.semantic_data = {}
+        self.semantic_forms = dict()
+        self.people_used = list()
+        
+        print 'names possessive ', self.names_possessive
 
     #Generates dictionary of tags and their elements from lex.txt. 
     def genTags(self):
@@ -59,33 +61,10 @@ class ParserTrainer:
 
     #Generates templates from files. 
     def genTemplates(self):
-        #Templates are all held in lists. 
-        self.templates.append(["walk", [line for line in open(path + 'walkTemplates.txt', 'r')]])
-        self.templates.append(["search", [line for line in open(path + 'searchTemplates.txt', 'r')]])
-        self.templates.append(["bring", [line for line in open(path + 'bringTemplates.txt', 'r')]])
-        self.templates.append(["walk_possessive", [line for line in open(path + 'walkPossessiveTemplates.txt', 'r')]])
-
-    #Generates a list of adjectives as well as the determiners that precede each one. 
-    def genAdjectives(self):
-        for line in self.tags["<A>"]:
-            splitList = line.split(':')
-            determiner = splitList[1].strip()
-            adjective = splitList[0].strip()
-
-            self.adjectives.append([determiner, adjective])
-
-        #print "Adjectives: " + str(self.adjectives)
-
-    def genNouns(self):
-        for line in self.tags["<NO>"]:
-            splitList = line.split(':')
-            determiner = splitList[1].strip()
-            noun = splitList[0].strip()
-
-            self.nouns.append([determiner, noun])
-
-        #print "Nouns: " + str(self.nouns)
-
+        self.templates['walk'] = [line for line in open(path + 'walkTemplates.txt', 'r')]
+        self.templates['search'] = [line for line in open(path + 'searchTemplates.txt', 'r')]
+        self.templates['bring'] = [line for line in open(path + 'bringTemplates.txt', 'r')]
+        
     #Generates list of all possible references to people. 
     def genNames(self): 
         #Adds positions by themselves. 
@@ -162,137 +141,65 @@ class ParserTrainer:
 
     def genCommand(self):
         #Picks a random action to take. 
-        templateListIndex = random.randint(0, len(self.templates) -1) 
-        templateType = self.templates[templateListIndex][0]
-        templateList = self.templates[templateListIndex][1]
+        actions = self.templates.keys()
+        actionIndex = random.randint(0, len(actions) -1) 
+        templateType = actions[actionIndex]
+        templateList = self.templates[templateType]
 
         #Picks a random template from that action's templates. 
         templateIndex = random.randint(0, len(templateList) - 1)
         template = templateList[templateIndex]
 
         command = []
+        self.people_used = list()
 
         for word in template.split():
             command.append(self.processWord(word))
+        
+        if len(self.people_used) > 2 :
+            print 'len(self.people_used) > 2 : check your code'
+            sys.exit(1)
+        elif len(self.people_used) == 2 :
+            if self.people_used[0] == self.people_used[1] :
+                # Search has same searchee and owner
+                # Need a new command 
+                return self.genCommand()
 
-        self.genDenotation(templateType)
-        self.genSemanticForm(templateType)
+        self.genDenotationAndSemForm(templateType)
 
         print 'command = ', command
         return ' '.join(command)
 
-    def genSemanticForm(self, templateType):
-        if templateType == "walk_possessive":
-            name = self.semantic_data["name"]
-
-            self.semantic_form = "at(the(lambda x:e.(hasoffice("
-            self.semantic_form += name + ", x))))"
-        elif templateType == "bring":
-            if self.used_adjectives:
-                self.semantic_form = "bring(a(" 
-                self.semantic_form += self.semantic_data["item form"] + "),"
-                self.semantic_form += self.semantic_data["name"] + ")"
-            else:
-                #Cases equivalent.
-                self.semantic_form = self.denotation
-            
-
-
     #Generates denotation for phrase.
     #Also generates semantic form if case matches. 
-    def genDenotation(self, templateType):
+    def genDenotationAndSemForm(self, templateType):
         if templateType == "walk":
             self.denotation = "at(" + self.denotations["<P>"] + ")"
-            self.semantic_form = self.denotation
+            self.semantic_form = "at(" + self.semantic_forms["<P>"] + ")"
         elif templateType == "bring":
             self.denotation = "bring("
             self.denotation += self.denotations["<I>"] + ","
             self.denotation += self.denotations["<N>"] + ")"
             self.semantic_form = self.denotation
-
         elif templateType == "search":
             self.denotation = "searchroom("
             self.denotation += self.denotations["<N>"] + ","
             self.denotation += self.denotations["<P>"] + ")"
-            self.semantic_form = self.denotation
-        elif templateType == "walk_possessive":
-            self.denotation = "at(" + self.denotations["<PP>"] + ")"
-
-    def genAdjectiveDescribed(self):
-        adjectives = list(self.tags["<A>"])
-
-        nouns = self.tags["<NO>"]
-        semantic_form = ""
-
-        #0 - 2 adjectives will be randomly chosen. 
-        numAdjectives = random.randint(0, 2)
-            
-        #Picks a random noun. 
-        nounTuple = nouns[random.randint(0, len(nouns) - 1)].split(':')
-        noun_determiner = nounTuple[1].strip()
-        noun = nounTuple[0].strip()
-
-        #Phrase to build. 
-        phrase = ""
-
-        #Generates unique adjectives for the phrase. 
-        for i in range(0, numAdjectives):
-            adjectiveIndex = random.randint(0, len(adjectives) - 1)
-            adjectiveTuple = adjectives[adjectiveIndex].split(':')
-
-            adjective = adjectiveTuple[0].strip()
-            determiner = adjectiveTuple[1].strip()
-
-            #Begins phrase. 
-            if i == 0:
-                phrase = determiner + " "
-                    
-            #Adds adjective to phrase with comma if necessary. 
-            if i < numAdjectives - 1:
-                phrase += adjective + ", "
-            else:
-                phrase += adjective + " "
-                    
-            #Adds adjective to semantic form. 
-            semantic_form += "and(" + adjective + "(x), "
-
-            del adjectives[adjectiveIndex]
-
-        #If no adjective, then adds determiner. 
-        if numAdjectives == 0:
-            phrase += noun_determiner + " "
-
-        #Adds noun to phrase and semantic form. 
-        phrase += noun
-        semantic_form += noun + "(x)"
-
-        #Finishes preparing semantic form. 
-        for i in range(0, numAdjectives):
-            semantic_form += ")"
-
-        semantic_form = "lambda x:e.(" + semantic_form + ")"
-
-        #Stores denotation and preliminary semantic form. 
-        self.denotations["<I>"] = noun
-        self.semantic_data["item form"] = semantic_form
-    
-        #Used in genSemanticForm method for disambiguating the case. 
-        self.used_adjectives = True
-
-        return phrase
-
+            self.semantic_form = "searchroom("
+            self.semantic_form += self.semantic_forms["<N>"] + ","
+            self.semantic_form += self.semantic_forms["<P>"] + ")"
+        
     def genNormalItem(self):
+        print 'In genNormalItem'
         expansionIndex = random.randint(0, len(self.tags["<I>"]) - 1)
         expansionList = self.tags["<I>"][expansionIndex].split(':')
         expansion = expansionList[1].strip()
         denotation = expansionList[0].strip()
+        print 'expansion = ', expansion, ', denotation = ', denotation
 
         #Stores denotation. 
         self.denotations["<I>"] = denotation
-
-        #Did not use adjectives, this comes up when generating the semantic form. 
-        self.used_adjectives = False
-
+        self.semantic_forms["<I>"] = denotation
         return expansion
     
     def processWord(self, word): 
@@ -304,28 +211,39 @@ class ParserTrainer:
 
             #Stores denotation
             self.denotations[word] = denotation
-
-            #Stores name to create semantic form later. 
-            self.semantic_data["name"] = denotation
-
+            self.semantic_forms[word] = denotation
+            self.people_used.append(denotation)
             return name
         elif word == "<I>":
-            self.genNormalItem()
-           
-        elif word == "<PP>":
-            nameList = self.names_possessive[random.randint(0, len(self.names_possessive) - 1)]
-            name = nameList[0]
-            denotation = nameList[1]
-            office = nameList[2]
+            return self.genNormalItem()
+        elif word == '<P>' :
+            r = random.random()
+            if r < 0.5 :
+                # Pick a direct room number
+                expansionIndex = random.randint(0, len(self.tags[word]) - 1)
+                expansionList = self.tags[word][expansionIndex].split(':')
+                expansion = expansionList[0].strip()
+                denotation = expansionList[1].strip()
 
-            #Stores denotation. 
-            self.denotations[word] = office
+                #Stores denotation. 
+                self.denotations[word] = denotation
+                self.semantic_forms[word] = denotation
+                
+                return expansion
+            else :
+                # Create a possessive form
+                nameList = self.names_possessive[random.randint(0, len(self.names_possessive) - 1)]
+                name = nameList[0]
+                denotation = nameList[1]
+                office = nameList[2]
 
-            #Saves name for semantic form. 
-            self.semantic_data["name"] = denotation
-            
-            #Returns name with possessive. 
-            return name
+                #Stores denotation. 
+                self.denotations[word] = office
+                self.semantic_forms[word] = 'the(lambda x:e.(hasoffice(' + denotation + ', x)))'
+                self.people_used.append(denotation)
+                
+                #Returns name with possessive. 
+                return name + ' office'
         #The rest of the cases can be replaced by a simple sampling from the tag's list. 
         elif word in self.tags:
             expansionIndex = random.randint(0, len(self.tags[word]) - 1)
@@ -342,13 +260,40 @@ class ParserTrainer:
 
     
 if __name__ == '__main__' :
+    print "reading in Ontology"
+    ont = Ontology.Ontology(sys.argv[1])
+    print "predicates: " + str(ont.preds)
+    print "types: " + str(ont.types)
+    print "entries: " + str(ont.entries)
+
+    print "reading in Lexicon"
+    lex = Lexicon.Lexicon(ont, sys.argv[2])
+    print "surface forms: " + str(lex.surface_forms)
+    print "categories: " + str(lex.categories)
+    print "semantic forms: " + str(lex.semantic_forms)
+    print "entries: " + str(lex.entries)
+    
     parser_trainer = ParserTrainer()
-    print parser_trainer.tags.keys()
-    x = raw_input()
-    while True :
-        print parser_trainer.genCommand()
-        print parser_trainer.semantic_form
-        x = raw_input()
-        if x == 'n' :
-            break
+    parser = CKYParser.CKYParser(ont, lex, use_language_model=True)
+    
+    # Set parser hyperparams to best known values for training
+    parser.max_multiword_expression = 2  # max span of a multi-word expression to be considered during tokenization
+    parser.max_new_senses_per_utterance = 2  # max number of new word senses that can be induced on a training example
+    parser.max_cky_trees_per_token_sequence_beam = 100  # for tokenization of an utterance, max cky trees considered
+    parser.max_hypothesis_categories_for_unknown_token_beam = 2  # for unknown token, max syntax categories tried
+
+    # Create train set
+    D = parser.read_in_paired_utterance_semantics(sys.argv[3])
+    for i in range(1, 1000) :
+        command = parser_trainer.genCommand()
+        print 'command = ', command, '\nsem form = ', parser_trainer.semantic_form
+        
+        ccg = parser.lexicon.read_category_from_str('M')
+        form = parser.lexicon.read_semantic_form_from_str(parser_trainer.semantic_form, 
+                                                    None, None, [], allow_expanding_ont=False)
+        form.category = ccg
+
+        D.append((command, form))
+    converged = parser.train_learner_on_semantic_forms(D, 10, reranker_beam=10)
+    save_model(parser, 'parser_1000')
     
