@@ -10,8 +10,9 @@ import shutil
 class ScriptGenerator:
     def __init__(self, displayInfo, user_id, mode = "normal", recording = True):
         #Initializes data structure for generating phrases. 
-        self.templates = []
+        self.templates = {}
         self.tags = {}
+        self.dists = {} #Probability distributions. 
         self.names = []
         self.names_possessive = []
         self.adjectives = []
@@ -28,6 +29,22 @@ class ScriptGenerator:
 
         #Mode for generating items. 
         self.mode = mode
+
+        #Distribution for actions.
+        self.walk_prob = ["walk", 0.3]
+        self.search_prob = ["search", 0.2]
+        self.bring_prob = ["bring", 0.5] #bring action is split into normal and adjective.
+
+        self.dists["actions"] = [self.walk_prob, self.search_prob, self.bring_prob]
+
+        #Distribution within bring action. 
+        self.bring_norm_prob = ["normal", 0.4]
+        self.bring_adj_prob = ["adjective", 0.6]
+
+        self.dists["bring"] = [self.bring_norm_prob, self.bring_adj_prob]
+
+        #Seeds random number generator. 
+        random.seed(time.time())
 
         #Variables to hold data to be saved.
         self.user_id = user_id
@@ -116,11 +133,16 @@ class ScriptGenerator:
 
     #Generates templates from files. 
     def genTemplates(self):
-        #Templates are all held in lists. 
-#self.templates.append(["walk", [line for line in open('walkTemplates.txt', 'r')]])
-#self.templates.append(["search", [line for line in open('searchTemplates.txt', 'r')]])
-        self.templates.append(["bring", [line for line in open('bringTemplates.txt', 'r')]])
-#self.templates.append(["walk_possessive", [line for line in open('walkPossessiveTemplates.txt', 'r')]])
+        self.templates["walk"] = []
+        self.templates["search"] = []
+        self.templates["bring"] = []
+
+        #Templates are all held in lists.  
+        #Each list has a template type and sublist with all pertaining templates. 
+        self.templates["walk"].append(["walk", [line for line in open('walkTemplates.txt', 'r')]])
+        self.templates["walk"].append(["walk_possessive", [line for line in open('walkPossessiveTemplates.txt', 'r')]])
+        self.templates["search"].append(["search", [line for line in open('searchTemplates.txt', 'r')]])
+        self.templates["bring"].append(["bring", [line for line in open('bringTemplates.txt', 'r')]])
 
     #Generates a list of adjectives as well as the determiners that precede each one. 
     def genAdjectives(self):
@@ -217,11 +239,31 @@ class ScriptGenerator:
                         self.names_possessive.append([nameString + "'s", denotation, office])
     
 
+    def sampleFromDist(self, dist):
+        sample_f = random.random()
+        total = 0.0
+
+        for l in dist:
+            #l[1] contains probability for action. 
+            total += l[1]
+
+            if sample_f < total:
+                #l[0] contains the action. 
+                return l[0]
+
     def genCommand(self):
-        #Picks a random action to take. 
-        templateListIndex = random.randint(0, len(self.templates) -1) 
-        templateType = self.templates[templateListIndex][0]
-        templateList = self.templates[templateListIndex][1]
+        #Picks a random action. 
+        action = self.sampleFromDist(self.dists["actions"])
+
+        print "ACTION: " + str(action)
+
+        #Picks a random sub action.
+        templateTypeList = self.templates[action]
+
+        #Picks a list of templates from the action type's list. 
+        templateListIndex = random.randint(0, len(templateTypeList) -1)
+        templateType = templateTypeList[templateListIndex][0]
+        templateList = templateTypeList[templateListIndex][1] 
 
         #Picks a random template from that action's templates. 
         templateIndex = random.randint(0, len(templateList) - 1)
@@ -371,14 +413,17 @@ class ScriptGenerator:
         elif word == "<I>":
             if self.mode == "normal":
                 return self.genNormalItem()
+            
             elif self.mode == "adjective":
                 return self.genAdjectiveDescribed()
+            
             elif self.mode == "mix":
                 #Picks either an adjective described or a regular item. 
-                if random.randint(0, 1):
+                if self.sampleFromDist(self.dists["bring"]) == "adjective":
                     return self.genAdjectiveDescribed()
                 else:
                     return self.genNormalItem() 
+            
             else:
                 print "Mode not correctly set!"
                 sys.exit()
@@ -472,7 +517,7 @@ class Recorder:
 
         #Gets monitor information and uses it to go to fullscreen mode. 
         displayInfo = pygame.display.Info()
-        screen = pygame.display.set_mode((displayInfo.current_w, displayInfo.current_h), pygame.FULLSCREEN)
+        screen = pygame.display.set_mode((displayInfo.current_w-100, displayInfo.current_h-100))
 
         #Information for "recording" circle. 
         red = (255, 0, 0)
@@ -609,7 +654,7 @@ class Recorder:
 
 #Ensures that arguments were passed correctly.
 if not len(sys.argv) >= 2:
-    print "Usage: python record.py [user_id] [mode] [record]"
+    print "Usage: python record.py [user_id] [mode (normal/mix/adjective)] [record (y/n)]"
     sys.exit()
 
 user_id = sys.argv[1]
