@@ -1,6 +1,6 @@
 __author__ = 'aishwarya'
 
-import sys, random, math, copy, re, numpy, itertools
+import sys, random, math, copy, re, numpy, itertools, traceback
 from HISBeliefState import HISBeliefState
 from SummaryState import SummaryState
 from SystemAction import SystemAction
@@ -196,74 +196,87 @@ class PomdpDialogAgent(DialogAgent) :
 
     def create_utterances_of_parse(self, parse) :
         parse = parse.node
-        print 'In create_utterances_of_parse with', self.parser.print_parse(parse, show_category=True)
-        print '\n\n'
-        # First check if it is a confirmation or denial
-        if parse.idx == self.parser.ontology.preds.index('yes'):
-            #print 'Is affirm'
-            return [Utterance('affirm')]
-        elif parse.idx == self.parser.ontology.preds.index('no'):
-            #print 'Is deny'
-            return [Utterance('deny')]
-        elif parse.idx == self.parser.ontology.preds.index('none'):
-            #print 'Got a none response'
-            goal = self.previous_system_action.referring_goal
-            if self.previous_system_action.extra_data is not None and len(self.previous_system_action.extra_data) >= 1:
-                param_name = self.previous_system_action.extra_data[0]
+        top_level_category = self.parser.lexicon.categories[parse.category]
+        
+        #print 'In create_utterances_of_parse with', self.parser.print_parse(parse, show_category=True)
+        #print '\n\n'
+
+        # Confirmation (affirm/deny/none)
+        if top_level_category == 'C' :
+            if parse.idx == self.parser.ontology.preds.index('yes'):
+                #print 'Is affirm'
+                return [Utterance('affirm')]
+            elif parse.idx == self.parser.ontology.preds.index('no'):
+                #print 'Is deny'
+                return [Utterance('deny')]
+            elif parse.idx == self.parser.ontology.preds.index('none'):
+                #print 'Got a none response'
+                goal = self.previous_system_action.referring_goal
+                if self.previous_system_action.extra_data is not None and len(self.previous_system_action.extra_data) >= 1:
+                    param_name = self.previous_system_action.extra_data[0]
+                else :
+                    return []
+                params = dict()
+                params[param_name] = None
+                utterance = Utterance('inform_param', goal, params)      
+                #print '\n'
+                return [utterance]
             else :
                 return []
-            params = dict()
-            params[param_name] = None
-            utterance = Utterance('inform_param', goal, params)      
-            #print '\n'
-            return [utterance]
         
-        #print 'Neither affirm nor deny'
-        
-        # Now check if it a full inform - mentions goal and params
-        try:
-            #print 'Trying to get an action'
-            p_action = self.get_action_from_parse(parse)
-        except SystemError:
-            p_action = None
+        # Complete action with goal and params
+        elif top_level_category == 'M' :
+            try:
+                #print 'Trying to get an action'
+                p_action = self.get_action_from_parse(parse)
+            except SystemError:
+                p_action = None
 
-        if p_action is not None :
-            #print 'Got an action. Will convert and return'
-            return [self.convert_action_to_utterance(p_action)]
-            
-        # Getting a complete action failed so assume this is a param  
-        if parse.is_lambda and parse.is_lambda_instantiation :
-            # Lambda headed parse - unlikely to give a valid param
-            # value
-            return []
-        #print 'Trying to ground as param value'
-        try :
-            #print "Grounding ", self.parser.print_parse(parse)
-            g = self.grounder.groundSemanticNode(parse, [], [], [])
-            answers = self.grounder.grounding_to_answer_set(g)
-            #print 'answers = ', answers
-            #print '--------------------------------'
-            utterances = []
-            if type(answers) == 'str' :
-                answers = [answers]
-            for answer in answers :
-                goal = self.previous_system_action.referring_goal
-                params = dict()
-                #print 'self.previous_system_action.extra_data = ', self.previous_system_action.extra_data
-                if self.previous_system_action.action_type == 'request_missing_param' and self.previous_system_action.extra_data is not None and len(self.previous_system_action.extra_data) == 1 :
-                    param_name = self.previous_system_action.extra_data[0]
-                    params[param_name] = answer
-                    utterance = Utterance('inform_param', goal, params)      
-                    utterances.append(utterance)
-                else :
-                    for param_name in self.knowledge.goal_params :
-                        params_copy = copy.deepcopy(params)
-                        params_copy[param_name] = answer
-                        utterance = Utterance('inform_param', goal, params_copy)      
+            if p_action is not None :
+                #print 'Got an action. Will convert and return'
+                return [self.convert_action_to_utterance(p_action)]
+            else :
+                return []
+        
+        # To be grounded as param value
+        elif top_level_category == 'NP' :
+            if parse.is_lambda and parse.is_lambda_instantiation :
+                # Lambda headed parse - unlikely to give a valid param
+                # value
+                return []
+            #print 'Trying to ground as param value'
+            try :
+                #print "Grounding ", self.parser.print_parse(parse)
+                g = self.grounder.groundSemanticNode(parse, [], [], [])
+                answers = self.grounder.grounding_to_answer_set(g)
+                #print 'answers = ', answers
+                #print '--------------------------------'
+                utterances = []
+                if type(answers) == 'str' :
+                    answers = [answers]
+                for answer in answers :
+                    goal = self.previous_system_action.referring_goal
+                    params = dict()
+                    #print 'self.previous_system_action.extra_data = ', self.previous_system_action.extra_data
+                    if self.previous_system_action.action_type == 'request_missing_param' and self.previous_system_action.extra_data is not None and len(self.previous_system_action.extra_data) == 1 :
+                        param_name = self.previous_system_action.extra_data[0]
+                        params[param_name] = answer
+                        utterance = Utterance('inform_param', goal, params)      
                         utterances.append(utterance)
-            return utterances
-        except TypeError as e :
-            print e.message
+                    else :
+                        for param_name in self.knowledge.goal_params :
+                            params_copy = copy.deepcopy(params)
+                            params_copy[param_name] = answer
+                            utterance = Utterance('inform_param', goal, params_copy)      
+                            utterances.append(utterance)
+                return utterances
+            except TypeError as e :
+                error = str(sys.exc_info()[0])
+                if self.error_log is not None :
+                    self.error_log.write(traceback.format_exc() + '\n\n\n')
+                    self.error_log.flush() 
+                print traceback.format_exc()
+                return []
 
     def remove_invalid_utterances(self, utterances, grounder) :
         invalid_utterances = set()

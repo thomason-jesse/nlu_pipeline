@@ -7,7 +7,7 @@ import Ontology
 import Lexicon
 import CKYParser
 
-path = 'src/nlu_pipeline/src/resources/parser_training/'
+path = '/u/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/resources/parser_training/'
 
 class ParserTrainer:
     def __init__(self):
