@@ -615,16 +615,10 @@ width:50%
           <li>Search a room for someone. </li>
         </ul>
         </p>
-        <p> You need to do the following - 
-        <ol>
-          <li>Instruct the robot to accomplish a task, clarifying any questions it has. </li>
-          <li>Name a person on the floor to verify that you are a human. </li>
-          <li>Complete a small survery about your experiences. </li>
-          <li>Receive your code for Mechanical Turk. </li>
-        </ol>
+        <p> Following this, answer a question to verify that you are human and then receive a code to enter in Mechanical Turk to receive payment.
         </p>
         
-        <p> You need to complete all the above steps to complete the HIT. Navigating away from the page or refreshing it during any of the above steps <b>will</b> prevent you from completing the HIT. If the conversation extends too long, you may end it by replying 'stop' but ending the conversation before ten responses from your side without successfully communicating the task <b>will</b> invalidate your HIT.  </p>
+        <p> If the conversation extends too long, you may end it by replying 'stop' but ending the conversation before ten responses from your side without successfully communicating the task <b>will</b> invalidate your HIT.  </p>
         
 		<p><FORM NAME="ask_for_ID_form" ACTION="" METHOD="GET">
 			Click the button below to begin.<br/>
@@ -648,8 +642,8 @@ width:50%
 		<TR ID="user_input_table_row">
 			<TD td style="width:15%">YOU</TD>
 			<TD td style="width:85%">
-				<INPUT TYPE="text" NAME="user_input_box" VALUE="" style="width:100%" onkeydown="if (event.keyCode == 13) {document.getElementsByName('user_input_button')[0].click();event.returnValue=false;event.cancel=true;}" onSubmit="function(){return false;}"></INPUT>
-				<BUTTON TYPE="button" NAME="user_input_button" Value="submit" onClick="getDialogResponse(this.form)" onSubmit="getDialogResponse(this.form)" style="display:none"></BUTTON>
+				<INPUT TYPE="text" NAME="user_input_box" VALUE="" style="width:100%" onkeydown="if (event.keyCode == 13) {document.getElementsByName('user_input_button')[0].click();event.returnValue=false;event.cancel=true;}"></INPUT>
+				<INPUT TYPE="button" NAME="user_input_button" Value="submit" onClick="getDialogResponse(this.form)" onSubmit="getDialogResponse(this.form)" style="display:none"></INPUT>
 			</TD>
 		</TR>
 		</FORM>

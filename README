@@ -54,7 +54,7 @@ rosrun nlu_pipeline test_pomdp_pipeline.py src/nlu_pipeline/src/resources/fake_t
 
 POMDP AMT Experiment
 
-rosrun nlu_pipeline DialogueServer.py src/nlu_pipeline/src/resources/fake_to_real/ont.txt src/nlu_pipeline/src/resources/fake_to_real/lex.txt src/nlu_pipeline/src/resources/fake_to_real/utterance_sem_forms.txt
+rosrun nlu_pipeline DialogueServer.py src/nlu_pipeline/src/resources/fake_to_real/ont.txt src/nlu_pipeline/src/resources/fake_to_real/lex.txt src/nlu_pipeline/src/resources/fake_to_real/utterance_sem_forms.txt true
 
 Training POMDP :
 

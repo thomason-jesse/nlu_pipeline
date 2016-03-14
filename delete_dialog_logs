@@ -5,6 +5,7 @@ rm -f ~/public_html/AMT/error/*
 rm -f ~/public_html/AMT/executed_actions/*
 rm -f ~/public_html/AMT/log/*
 rm -f ~/public_html/AMT/log_special/*
+rm -f ~/public_html/AMT/log_text/*
 rm -f ~/public_html/AMT/surveys/*
 rm -f ~/public_html/AMT/target_commands/*
 rm -f ~/public_html/AMT/validations/*

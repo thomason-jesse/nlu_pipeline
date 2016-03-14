@@ -34,13 +34,14 @@ MAIN_LOG_PATH = '../../../../public_html/AMT/'
 #MAIN_LOG_PATH = ''
 
 LOGGING_PATH = 'log/'
+TEXT_LOG_PATH = 'log_text/'
 FINAL_ACTION_PATH = 'executed_actions/'
 USER_LOG_FILE = 'log_special/users.txt'
 MAIN_ERROR_LOG_FILE = 'log_special/errors.txt'
 DIALOG_ERROR_LOG_PATH = 'error/'
 
 # Fixing the random seed for debugging
-numpy.random.seed(4)
+#numpy.random.seed(4)
 
 class InputFromService:
     def __init__(self, user_id,  error_log, logfile=None):
@@ -334,18 +335,26 @@ class DialogueServer :
                     self.error_log.flush()        
                 finally :
                     self.lock.release()
+                    self.user_log.flush()
+                    self.error_log.flush()
                     return success 
             else :
+                self.user_log.flush()
+                self.error_log.flush()
                 return False
         else :
             # The system is currently handling another user
-            #print 'Could not acquire lock'
+            print 'Could not acquire lock'
+            self.user_log.flush()
+            self.error_log.flush()
             return False
 
     def handle_user(self, user_id) :
         print 'Handling user ', user_id
-        u_in = InputFromService(user_id, self.error_log)
-        u_out = OutputToService(user_id, u_in, self.error_log)
+        text_log = MAIN_LOG_PATH + TEXT_LOG_PATH + user_id + '.txt'
+        
+        u_in = InputFromService(user_id, self.error_log, text_log)
+        u_out = OutputToService(user_id, u_in, self.error_log, text_log)
         try :
             final_action_log = MAIN_LOG_PATH + FINAL_ACTION_PATH + user_id + '.txt'
             log = MAIN_LOG_PATH + LOGGING_PATH + user_id + '.pkl'

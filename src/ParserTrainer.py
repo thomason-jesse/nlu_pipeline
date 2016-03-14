@@ -295,5 +295,6 @@ if __name__ == '__main__' :
 
         D.append((command, form))
     converged = parser.train_learner_on_semantic_forms(D, 10, reranker_beam=10)
-    save_model(parser, 'parser_1000')
+    filename = '/u/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/models/parser_condor.pkl'
+    save_obj_general(parser, filename)
     

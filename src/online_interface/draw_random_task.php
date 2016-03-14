@@ -118,7 +118,7 @@ elseif (strcmp($task_type,"search") == 0) {
     $target_command = "search(".$searchee.','.$room.")";
     $searchee_expression = $people_to_expressions_lc[$searchee][rand(0,count($people_to_expressions_lc[$searchee])-1)];
     $owner_expression = $people_to_expressions_lc[$owner][rand(0,count($people_to_expressions_lc[$owner])-1)];
-    $task_description = "Make the robot find out whether ".$searchee_expression." is in ".$owner_expression."'s office";
+    $task_description = "Make the robot search ".$owner_expression."'s office for ".$searchee_expression;
 }
 
 //draw query task (will be used as validation task against spammers)

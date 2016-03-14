@@ -9,7 +9,6 @@ import ParseNode
 import SemanticNode
 
 neg_inf = float('-inf')
-random.seed(12)
 
 class Parameters:
     def __init__(self, ont, lex, use_language_model=False):
