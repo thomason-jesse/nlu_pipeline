@@ -13,25 +13,25 @@ class Server:
         self.s1 = socket.socket()
         self.s2 = socket.socket()
         self.host = ''
-        self.port1 = 72100
-        self.port2 = 72101
+        self.port1 = 65300
+        self.port2 = 65301
 
         self.addr1 = None
         self.addr2 = None
         self.conn1 = None
         self.conn2 = None
 
-        self.s1.bind((host, port1))
-        self.s2.bind((host, port2))
+        self.s1.bind((self.host, self.port1))
+        self.s2.bind((self.host, self.port2))
 
         self.waitForConnections()
 
     def waitForConnections(self, num_connections = 1):
-        s1.listen(num_connections)
-        self.conn1, self.addr1 = s1.accept()
+        self.s1.listen(num_connections)
+        self.conn1, self.addr1 = self.s1.accept()
 
-        s2.listen(num_connections)
-        self.conn2, self.addr2 = s2.accept()
+        self.s2.listen(num_connections)
+        self.conn2, self.addr2 = self.s2.accept()
 
         print "Server connected to both clients."
 
@@ -54,17 +54,17 @@ class Server:
         #Confirmation code. 
         confirm_code = str(random.random())
     
-        self.conn1.send(message + ':' + confirm_code)
-        self.conn2.send(message + ':' + confirm_code)
+        self.conn1.send(message + '|' + confirm_code)
+        self.conn2.send(message + '|' + confirm_code)
 
         #Waits for confirmation of receipt. 
-#self.waitForConfirm(confirm_code)
+        self.waitForConfirm(confirm_code)
 
 class Client:
     def __init__(self, host, port):
         self.s = socket.socket()
         self.host = host
-        self.port = port
+        self.port = int(port)
 
         self.connect()
 
@@ -75,7 +75,12 @@ class Client:
         self.s.send(confirm_code)
 
 class ScriptGenerator:
-    def __init__(self, displayInfo, user_id, mode = "normal", recording = True):
+    def __init__(self, displayInfo = None, user_id = None, mode = "normal", recording = True):
+        #If display is none, then this is a run on one of the extra machines. 
+        #i.e. we don't need any data structure initialization. 
+        if displayInfo == None:
+            return
+    
         #Initializes data structure for generating phrases. 
         self.templates = {}
         self.tags = {}
@@ -552,7 +557,7 @@ class ScriptGenerator:
         self.phrase_num += 1
 
         #Returns data so that it may be sent to other recording machines. 
-        return ';'.join(self.user_id, self.phrase_num, self.phrase, self.denotation, self.semantic_form)
+        return ';'.join([str(self.user_id), str(self.phrase_num - 1), self.phrase, self.denotation, self.semantic_form])
 
     #Saves data packet received from main machine on extra machine. 
     def saveDataPacket(self, data):
@@ -560,7 +565,7 @@ class ScriptGenerator:
 
         #Updates data structures. 
         self.user_id = dataList[0]
-        self.phrase_num = dataList[1]
+        self.phrase_num = int(dataList[1])
         self.phrase = dataList[2]
         self.denotation = dataList[3]
         self.semantic_form = dataList[4]
@@ -600,7 +605,7 @@ class Recorder:
 
         #Waits for messages until told to stop. 
         while running:
-            message_params = client.s.recv(1024).split(':')
+            message_params = client.s.recv(1024).split('|')
             message_type = message_params[0]
      
             if message_type == "start":
@@ -610,9 +615,9 @@ class Recorder:
                 self.libHandle.stopRecord()
 
             if message_type == "interrupt":
-                if len(message_params) > 1:
+                if len(message_params) > 2:
                     data = message_params[1]
-                    self.saveDataPacket(data)
+                    scriptGenerator.saveDataPacket(data)
 
                 self.libHandle.interruptRecord()
 
@@ -623,7 +628,7 @@ class Recorder:
                 scriptGenerator.saveDataPacket(data)
             
             #Sends back confirmation message to main machine of message receipt. 
-#client.sendConfirm(message_params[len(message_params) - 1])
+            client.sendConfirm(message_params[len(message_params) - 1])
 
     #Recording method for main machine in recording session. 
     def recordToggle(self):
@@ -714,14 +719,14 @@ class Recorder:
                         self.libHandle.interruptRecord()
 
                         #Sends pertaining message to other machines. 
-                        server.sendMessage("interrupt" + ':' + data)
+                        server.sendMessage("interrupt" + '|' + data)
 
                     #Saves data and will now move on to next phrase.  
                     if pressed == right:
                         data = self.scriptGenerator.saveData()
 
                         #Sends data to other machines to save. 
-                        server.sendMessage("data" + ':' + data)
+                        server.sendMessage("data" + '|' + data)
 
                     #If delete, will not save data and deletes recorded file.  
                     if pressed == delete:
@@ -776,7 +781,7 @@ class Recorder:
             if num_pressed == 0:
                 zero_pressed = True
 
-    def recordUser(self, is_server = False, host = None, port = None):
+    def recordUser(self, is_server = True, host = None, port = None):
         if is_server:
             #Creates threads for recording. 
             thread1 = threading.Thread(target = self.record)
