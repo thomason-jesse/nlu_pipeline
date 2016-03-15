@@ -6,6 +6,73 @@ import sys
 import os
 import time
 import shutil
+import socket
+
+class Server:
+    def __init__(self):
+        self.s1 = socket.socket()
+        self.s2 = socket.socket()
+        self.host = ''
+        self.port1 = 72100
+        self.port2 = 72101
+
+        self.addr1 = None
+        self.addr2 = None
+        self.conn1 = None
+        self.conn2 = None
+
+        self.s1.bind((host, port1))
+        self.s2.bind((host, port2))
+
+        self.waitForConnections()
+
+    def waitForConnections(self, num_connections = 1):
+        s1.listen(num_connections)
+        self.conn1, self.addr1 = s1.accept()
+
+        s2.listen(num_connections)
+        self.conn2, self.addr2 = s2.accept()
+
+        print "Server connected to both clients."
+
+    def waitForConfirm(self, confirm_code):
+        m1 = self.conn1.recv(1024)
+        
+        if not m1 == confirm_code:
+            print "Confirm code incorrect!" 
+            sys.exit()
+
+        m2 = self.conn2.recv(1024)
+
+        if not m2 == confirm_code:
+            print "Confirm code incorrect!"
+            sys.exit()
+
+
+    #Sends given message to extra machines. 
+    def sendMessage(self, message):
+        #Confirmation code. 
+        confirm_code = str(random.random())
+    
+        self.conn1.send(message + ':' + confirm_code)
+        self.conn2.send(message + ':' + confirm_code)
+
+        #Waits for confirmation of receipt. 
+#self.waitForConfirm(confirm_code)
+
+class Client:
+    def __init__(self, host, port):
+        self.s = socket.socket()
+        self.host = host
+        self.port = port
+
+        self.connect()
+
+    def connect(self):
+       self.s.connect((self.host, self.port)) 
+
+    def sendConfirm(self, confirm_code):
+        self.s.send(confirm_code)
 
 class ScriptGenerator:
     def __init__(self, displayInfo, user_id, mode = "normal", recording = True):
@@ -484,6 +551,23 @@ class ScriptGenerator:
         #Updates phrase number. 
         self.phrase_num += 1
 
+        #Returns data so that it may be sent to other recording machines. 
+        return ';'.join(self.user_id, self.phrase_num, self.phrase, self.denotation, self.semantic_form)
+
+    #Saves data packet received from main machine on extra machine. 
+    def saveDataPacket(self, data):
+        dataList = data.split(';')
+
+        #Updates data structures. 
+        self.user_id = dataList[0]
+        self.phrase_num = dataList[1]
+        self.phrase = dataList[2]
+        self.denotation = dataList[3]
+        self.semantic_form = dataList[4]
+
+        #With now mirrored data, saves it as usual. 
+        self.saveData()
+
 class Recorder:
     def __init__(self, user_id, mode):
         import ctypes
@@ -508,6 +592,40 @@ class Recorder:
         while not self.libHandle.isInterrupted():
             self.libHandle.record1600Hz("temp_record.raw")
 
+    #Recording method for other machines in recording session. 
+    def recordExtra(self, host, port):
+        client = Client(host, port)
+        scriptGenerator = ScriptGenerator()
+        running = True
+
+        #Waits for messages until told to stop. 
+        while running:
+            message_params = client.s.recv(1024).split(':')
+            message_type = message_params[0]
+     
+            if message_type == "start":
+                self.libHandle.startRecord()
+
+            if message_type == "stop":
+                self.libHandle.stopRecord()
+
+            if message_type == "interrupt":
+                if len(message_params) > 1:
+                    data = message_params[1]
+                    self.saveDataPacket(data)
+
+                self.libHandle.interruptRecord()
+
+            if message_type == "data":
+                data = message_params[1]
+
+                #Saves data received and sends confirmation to main machine to move forward. 
+                scriptGenerator.saveDataPacket(data)
+            
+            #Sends back confirmation message to main machine of message receipt. 
+#client.sendConfirm(message_params[len(message_params) - 1])
+
+    #Recording method for main machine in recording session. 
     def recordToggle(self):
         #Initializes pygame window to read spacebar presses. 
         pygame.init()
@@ -538,6 +656,9 @@ class Recorder:
         #Creates the phrase generating object. 
         self.scriptGenerator = ScriptGenerator(displayInfo, self.user_id, self.mode)
 
+        #Creates server object to communicate with other recording machines. 
+        server = Server()
+
         while running:
             #Generates phrase
             self.scriptGenerator.genPhrase(screen)
@@ -552,9 +673,15 @@ class Recorder:
                     running = False
                     self.libHandle.interruptRecord()
 
+                    #Sends interrupt message to other machines. 
+                    server.sendMessage("interrupt")
+
                 if pressed == space:
                     #Waits for space to be released. 
                     self.waitForRelease(space)
+
+                    #Sends start record message to other machines. 
+                    server.sendMessage("start")
 
                     #Starts recording from mic to file. 
                     self.libHandle.startRecord()
@@ -565,6 +692,9 @@ class Recorder:
 
                     #Waits for user to press spacebar again to stop recording. 
                     self.waitForKeys([space])
+
+                    #Sends stop message to other machines. 
+                    server.sendMessage("stop")
 
                     #Stops recording when they release it. 
                     self.libHandle.stopRecord()
@@ -579,20 +709,28 @@ class Recorder:
     
                     #If interrupted, then exits program and saves data. 
                     if pressed == interrupt:
-                        self.scriptGenerator.saveData()
+                        data = self.scriptGenerator.saveData()
                         running = False
                         self.libHandle.interruptRecord()
 
+                        #Sends pertaining message to other machines. 
+                        server.sendMessage("interrupt" + ':' + data)
+
                     #Saves data and will now move on to next phrase.  
                     if pressed == right:
-                        self.scriptGenerator.saveData()
+                        data = self.scriptGenerator.saveData()
+
+                        #Sends data to other machines to save. 
+                        server.sendMessage("data" + ':' + data)
 
                     #If delete, will not save data and deletes recorded file.  
                     if pressed == delete:
+                        server.sendMessage("delete")
                         pass
 
                     #Goes back to being in phrase to record once more. 
                     if pressed == repeat:
+                        server.sendMessage("repeat")
                         inPhrase = True
 
         #Exits pygame. 
@@ -638,11 +776,15 @@ class Recorder:
             if num_pressed == 0:
                 zero_pressed = True
 
-    def recordUser(self):
-
-        #Creates threads for recording. 
-        thread1 = threading.Thread(target = self.record)
-        thread2 = threading.Thread(target = self.recordToggle)
+    def recordUser(self, is_server = False, host = None, port = None):
+        if is_server:
+            #Creates threads for recording. 
+            thread1 = threading.Thread(target = self.record)
+            thread2 = threading.Thread(target = self.recordToggle)
+        else:
+            #Creates threads for extra machine recording. 
+            thread1 = threading.Thread(target = self.record)
+            thread2 = threading.Thread(target = self.recordExtra, args = (host, port))
 
         #Starts thread execution. 
         thread1.start()
@@ -651,35 +793,44 @@ class Recorder:
         #Waits for recording threads to finish. 
         thread1.join()
         thread2.join()
+           
 
 #Ensures that arguments were passed correctly.
-if not len(sys.argv) >= 2:
-    print "Usage: python record.py [user_id] [mode (normal/mix/adjective)] [record (y/n)]"
+if not len(sys.argv) >= 5:
+    print "Usage: python record.py [user_id] [mode (normal/mix/adjective)] [record (y/n)] [server (y/n)] [host] [port]"
     sys.exit()
 
 user_id = sys.argv[1]
+mode = sys.argv[2]
 
-if len(sys.argv) >= 3:
-    mode = sys.argv[2]
+if not (mode == "normal" or mode == "adjective" or mode == "mix"):
+    print "Mode not recognized, correct values: normal, adjective, mix."
+    sys.exit()
 
-    if not (mode == "normal" or mode == "adjective" or mode == "mix"):
-        print "Mode not recognized, correct values: normal, adjective, mix."
-        sys.exit()
-else: 
-    mode = "normal"
-
-if len(sys.argv) == 4:
-    record = sys.argv[3]
+record_opt = sys.argv[3]
     
-    if not (record == "y" or record == "n"):
-        print "record value must be \'y\' or \'n\'."
-else:
+if not (record_opt == "y" or record_opt == "n"):
+    print "record value must be \'y\' or \'n\'."
+    sys.exit()
+
+if record_opt == "y":
     record = True
+else:
+    record = False
 
 #Sets up recording interface if necessary. 
 if record:
+    is_server = sys.argv[4]
     recorder = Recorder(user_id, mode)
-    recorder.recordUser()
+
+    #Determines if current machine is main machine or not. 
+    if is_server == 'y':
+        recorder.recordUser()
+    else:
+        host = sys.argv[5]
+        port = sys.argv[6]
+        recorder.recordUser(False, host, port)
+
 else:
     pass
     #TODO script generator without recording environment. 

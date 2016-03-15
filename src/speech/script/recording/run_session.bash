@@ -3,6 +3,8 @@
 USER_ID="$1"
 MODE="$2"
 RECORD_FLAG="$3"
+SERVER_FLAG="$4"
+
 
 #Makes directories for session. 
 mkdir -p results/$USER_ID/denotations
