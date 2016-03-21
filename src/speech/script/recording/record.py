@@ -154,6 +154,8 @@ class ScriptGenerator:
         self.drawPhrase(screen)
 
     def drawPhrase(self, screen):
+        import pygame
+
         #The text object to render to screen. 
         self.phraseText = self.font.render(self.phrase, 1, self.textColor)
         self.option_text = self.option_font.render(self.instructions, 1, self.textColor)
