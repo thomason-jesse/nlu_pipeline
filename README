@@ -84,8 +84,6 @@ Format of various logs -
                 - full - Text corresponding to a complete action
                 - <param_name> - Value for the parameter <param_name>. Currently the parameter names in use are patient, recipient and location
 
-            
-
 
 INSTALLING SPEECH RECOGNIZER:
 
