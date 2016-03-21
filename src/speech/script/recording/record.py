@@ -79,6 +79,8 @@ class ScriptGenerator:
         #i.e. we don't need any data structure initialization. 
         if displayInfo == None:
             return
+        else:
+            import pygame
     
         #Initializes data structure for generating phrases. 
         self.templates = {}
