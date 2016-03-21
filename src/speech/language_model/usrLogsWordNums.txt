@@ -1,0 +1,7381 @@
+i need a burger 
+i need a bread 
+i need a sandwich 
+yes 
+i need a cup of coffee 
+i need a cup of tea 
+you need to go second floor and meet mr kumar 
+i need a cup of water 
+you need to clear the system error 
+are you clear now 
+nope 
+no 
+i am asking about drinking beverages 
+i need a water 
+are you clear now 
+yes 
+bring coffee aand sandwich to peggy 
+peggy 
+peggy parker 
+yes 
+please go to room three four one eight as robert needs you 
+robert need you in room three four one eight 
+go to room three four one eight 
+yes 
+you have to go 
+go 
+dave 
+go to dave 
+walk to eve s office and wait for her instructions 
+take a sandwich to eve ellis 
+yes 
+pleasereport to dave in office three four three two 
+please report to dave danielshe needs you for something 
+go to dave 
+huh 
+no  i am instructing you to report to dave daniels 
+no  i cannot reword my question  i havent asked you a question  i have issued you instructions  read them back to me please 
+no  are you broken 
+head up to room three four three two 
+changed my mind  report to waste and recyclingyoure scrap metal 
+i think your name is really hal 
+open the pod bay door please hal 
+roll on your dysfunctional little robot ass and keep rolling till you come to office three four three two  report to dave daniels phd in that office 
+just bring yourself to him  he will further instruct you 
+okay bring him a sturdy sledge hammer  he suddenly has a target 
+bring him nothing  just report to him 
+do nothing more than report to dave daniels phd in office three four three two 
+bring me a flamethrower 
+no i cannot 
+the question isnt can i reword it  the question is will i reword it  what do you think 
+you arent a very intelligent robot are you 
+no i am asking a question about you 
+here s what i want to know  how come sometimes for one response to me by you you take up two lines of credited dialogue  answer me that 
+assuming you are willing to walk anywhere choose one of two destinations  straight out an upper story window to a merciful demise on the pavement below or do dave daniels office 
+to dave daniels office 
+walk to dave daniels office 
+walk to room three four three two 
+yes 
+what floor is alice ashcraft on 
+yes 
+robot lab 
+three four zero four 
+meeting 
+evelyn ellis 
+call for pizza 
+make me a pizza 
+carol  clark phd 
+what floor is carol clark on 
+yes 
+bring peggy parker sandwich and coffee 
+and sandwich 
+bring peggy parker sandwich 
+yes 
+three five one zero 
+go to three five one zero 
+yes 
+bring coffee to carol 
+get coffee 
+get carol coffee 
+get sandwich 
+get carol 
+sandwich 
+go to room three four three six 
+go to research lab room three four three six 
+yes 
+bring a drink to evelyn 
+pick up the drink take it to evelyn 
+pick up the drink walk over to evelyn hand her the drink 
+hand evelyn a drink 
+give evelyn a drink 
+evelyn is thirsty 
+bring evelyn the cup 
+are you dumb 
+what 
+okay evelyn is thirsty bring her the drink 
+grab the cup fill the cup with water give it to evelyn 
+what is there to understand 
+no im not 
+grab the cup 
+go to evelyn and bring a drink 
+bring evelyn coffee 
+take the cup in your hands and walk to evelyn to give her the cup 
+im done 
+go to alice and ask her to fill the cup with water and then take it to evelyn 
+well i guess she s going to die of thirst because you cant comprehend 
+walk to evelyn 
+walk to evelyn s room 
+walk to the kitchen 
+walk to the sink 
+walk to evelyn ellis room 
+walk to the cup 
+i guess she s going to die 
+walk over to the glass 
+take the glass to evelyn 
+walk to the room with the glass in it fill it up with water from the sink and then walk over to evelyn with the glass 
+some where you can get a glass of water 
+yes and take the glass from me to the kitchen fill the glass full of water then walk to evelyn with the glass full of water 
+go to room three four one six 
+yes walk to room three four one six 
+get dave food 
+dave is hungey 
+dave needs 
+go get dae sandwich 
+get dave sandwich 
+dave sandwich 
+dave daniels needs sandwich 
+walk to sandwich 
+get sandwich 
+walk to dave 
+walk to dave daniels 
+walk to kitchen 
+three four one four b 
+go to three four one four b 
+yes 
+go to carol clark 
+go to carol clark 
+go to carol clark 
+carol clark 
+yes  walk to carol clark 
+go to three five one six 
+yes  go to three five one six 
+put the drink cup and sandwich in your hand and bring it to eve 
+yes put it in your hand 
+go to room three five one two 
+yes walk to room three five one two 
+please bring mallory morgan a coffee and a sandwich 
+bring a sandwich and drink to mallory morgan 
+yes 
+go to room three five zero eight 
+walk to room three five zero eight 
+yes 
+you have to meet evelyn ellis 
+yes 
+you need to go evelyn office 
+go to evelyn ellis 
+evelyn office 
+three five zero two 
+yes 
+take a sandwich to dr daniels 
+yes 
+go to alice s office 
+go to room three four zero four 
+yes 
+take the sandwich item to alice ashcraft the lab secretary 
+you should deliver the sandwich to alice ashcraft 
+yes the sandwich 
+affirmative 
+yes 
+navigate to the research lab by going to room three four three six 
+find room three four three six 
+go to the room with the number three four three six transcribed on it 
+towards the room with the number three four three six transcribed on it 
+towards the research lab or the room with three four three six labeled on its door 
+three five one six 
+three five one six  conference room 
+please proceed to conference room three five one six 
+go to conference room 
+got to room three five one six 
+robot go to conference room 
+no 
+please tell carol to check on dave 
+please see if you can help dave 
+no 
+take dave dainiels phd a sandwich and coffee 
+dave daniels 
+yes 
+please go to room three four one six 
+yes 
+bring alice a sandwich 
+no 
+go get a sandwich 
+yes 
+please go to the conference room room number three five one six 
+where are you right now 
+what room are you currently in 
+where are you right now 
+get carol clark womething to drink 
+walk to carol clark and brink him a drink 
+to carol clark 
+walk to carol clark 
+walk to three four two zero 
+bring a drink to three four two zero 
+bring a drink 
+yes 
+go to room three five one zero 
+walk to peggy parker 
+yes 
+give peggy parker a cup of coffee 
+get a cup of coffee 
+find peggy parker 
+yes 
+go to room three five one zero 
+go there 
+yes 
+please take a sandwich to eve 
+no im telling you to deliver a sandwich to eve 
+go get a sandwich take the sandwich to evelyn quotevequot ellis 
+bring food to eve 
+eve is hungry please help her by bringing her a sandwich 
+yes 
+please go to three five zero two 
+yes please 
+give dave daniels coffee and a sandwich 
+yes 
+go to room three five one two 
+yes 
+take alice ashcraft some food 
+can you take alice ashcraft a sandwich 
+yes please 
+go to three five one two 
+yes 
+go to coffee 
+pick up coffee 
+walk to alice ashcraft 
+where is alice ashcraft 
+yes 
+go to the research lab 
+go to room three four three six 
+yes 
+take walter ward some food from the refridgerator 
+go get food take it to walter ward 
+go get the bread 
+take it to walter ward 
+go to walter ward 
+yes 
+go to room three four two zero 
+yes 
+robo this is peggy parker phd 
+yes 
+come to my office 
+three four three two 
+come to three four three two room 
+come to three four three two dave daniels 
+goal 
+come 
+come to my office my room no is three four three two 
+yes 
+please take a beverage to peggy 
+get a beverage and take it to peggy 
+get a drink and take it to peggy 
+peggy is thirsty 
+take a drink to peggy 
+go to peggy s office 
+peggy needs a drink 
+what items are available to you 
+to peggy 
+to peggy s office 
+to the office of peggy 
+to the office of peggy parker 
+walk to peggy parker 
+walk to the office of peggy parker 
+yes 
+go to three five zero eight to help mallory 
+yes 
+pick up the sandwich and take them to mallory morgan 
+pick up the sandwich 
+do you see the sandwich 
+you need to go to room three five zero two and report to evelyn ellis 
+go to room three five zero two 
+yes 
+please take coffee to robert in room three four one eight 
+robert 
+robert brown 
+yes please 
+please go to room three five one two 
+yes see walter when you reach the room 
+bring walter ward a coffee 
+yes 
+can you please go to the room number three five one six the conference room 
+to room three five one six 
+walk to the conference room 
+you should walk to room three five one six 
+get evelyn ellis a drink 
+give evelyn ellis coffee 
+evelyn ellis is thirsty 
+get a drink and give it to eve 
+eve is thirst 
+evelyn ellis needs coffee 
+get coffee 
+get water 
+cive evelyn ellis a cup 
+thirsty 
+walk to coffee 
+coffee 
+yes 
+go to the meeting room 
+walk to three four one six 
+take a drink to robert brown 
+pick up a glass and deliver it to robert brown 
+yes i want you to deliver a cup of water to robert brown 
+go to three five one two  walter ward 
+three five one two 
+yes to three five one two 
+bring carol a sandwich please 
+yes 
+go to room three four zero four 
+yes please 
+take food to peggy parker 
+take sandmwitch to peggy parker 
+take ham burger to peggy parker 
+bring her something to eat 
+go to room three five one six 
+yes 
+mallory morgan needs coffee 
+yes please take some to mallory 
+please see dave in room three four three two 
+yes dave needs you in that room 
+bring sandwich to dave 
+find peanut butter sandwich 
+grab coffee 
+go fuck yourself 
+go to room three five one zero 
+yes 
+please take one sandwich and one cup of coffee to carol clark 
+yes 
+please go to room three four three two 
+yes 
+take some coffee and food to eve ellis to make her feel better 
+take food to eve 
+take coffee to eve 
+go to room three four one eight 
+yes 
+take the cup and the sandwich to walter 
+no 
+feed walter ward  lab supervisor a cup of coffee and a sandwich 
+walter ward is hungry 
+go to the lab 
+walk to the lab 
+find walter 
+walter needs food 
+carry food to the lab 
+take food to the lab 
+take food to walter 
+take food to the lab supervisor 
+go to the lab supervisor 
+walk to the lab supervisor 
+walk 
+take the sandwich 
+no 
+carry sandwich to lab 
+take food and drink to the lab supervisor walter 
+feed the lab supervisor 
+help me carry food 
+help me 
+assist me 
+go to room three four three two 
+yes 
+built a floor 
+floor 
+eating 
+get something to eat 
+three four one four b 
+robot lab 
+three four one four b r o b o t lab 
+robot please get a beverage and sandwich then take the beverage and sandwich to robert brown 
+yes and bring him a coffee too 
+robot go to room three four two zero 
+yes 
+evelyn need helpso visit her office and help her 
+find water 
+find evelyn ellis 
+find eve 
+evelyn ellison wants water 
+can you find water to drink 
+you cannot help 
+what can you understand 
+no about you 
+go to eve s location 
+no 
+go to a bathroom 
+reboot your program 
+help eve 
+what is water 
+who are you 
+no 
+what is evelyn ellis location 
+what room is evelyn ellis location 
+yes 
+move to room three five one two 
+go to walter ward at room three five one two 
+from current location to three five one two 
+to walter ward s office lab or room location 
+away from where you are 
+no 
+to the point identified by three five one two 
+yes 
+take coffee to robert brown 
+yes 
+please go to three five one two to help walter ward 
+nothing 
+walter ward in three five one two would like the robot 
+go to three five one two 
+help walter ward 
+yes 
+bring dr daniels a sandwich 
+no 
+bring a sandwich to daniels 
+no 
+bring dr daniels food 
+get doctor daniel s food 
+bring dave daniels food 
+bring a sandwich to dave daniels 
+yes 
+go to roomo three five zero two 
+yes 
+bring the sandwich to alice ashcraft 
+yes to alice ashcraft 
+yes 
+go to evelyn ellis s office 
+yes 
+bring robert a pillow 
+bring robert a coffee 
+bring the coffee to robert 
+yes 
+find food 
+can you find food 
+go to room three four one six 
+yes 
+please take coffee to walter 
+yes walter would like coffee please 
+go to room three five one zero peggy parker s office 
+yes 
+take coffee to robert brown 
+yes 
+please go to room three four three six 
+walk to room three four three six 
+yes 
+please take a cup of coffee and peanut butter and jelly sandwich to pr director mallory morgan 
+give it to her 
+yes and also bring her a peanut butter and jelly sandwich 
+go to the meeting room 
+to the meeting room 
+no three four one six 
+go to the meeting room three four one six 
+take coffee to bob 
+robert brown bob needs a drink take him a cup 
+bob is thirsty take him a drink 
+take a cup of coffee to bob 
+robert brown 
+yes 
+go to room three five one zero to peggy 
+yes 
+bring to robert brown a bread 
+yes 
+what time is it  
+three four two zero 
+three five one six 
+go to room three four two zero 
+yes 
+you can complete the all difficult works 
+i will define you can complete all difficult work in the office 
+you want to take the office jobs 
+do you take the office jobs 
+i will explain the office jobs you can try to work that 
+no 
+i am talking about my office jobs 
+robot can you get the sandwich and the coffee for alice 
+no bring the sandwich and coffee to alice 
+can you fetch the sandwich and coffee to alice 
+can you take the sandwich and coffee and give it to alice 
+alice 
+alice ashcraft 
+yes 
+can you go to room three four one eight 
+yes 
+peggy parker is hungry can you bring her a sandwich 
+peggy parker 
+a sandwich 
+yes please 
+evelyn ellis needs your assistance 
+can you help eve 
+can you go to room three five zero two 
+yes 
+open the door 
+close door 
+move forward 
+go to the door 
+dave daniels phd needs coffee and a sandwhich 
+dave daniels id hungry 
+dave daniels phd is hungry 
+dave daniels phd food 
+dave daniels phd sandwhich 
+please bring dave daniels phd lunch 
+yes 
+please go to the robot lab 
+go to room three four one four b 
+yes 
+food 
+bread 
+give bread 
+provide food 
+something to eat 
+alice ashcraft need food 
+lab secretary needs food 
+ellis 
+assist eve 
+help eve 
+give some assistance to evelyn 
+go to hell 
+bring food for ellis 
+hungry 
+something to eat 
+bring food to three four zero four 
+eve is hungry 
+eve needs  food 
+evelyn needs food 
+evelyn want food 
+evelyn ellis want a sandwitch 
+eve needs a sandwitch 
+go mother fucker 
+meet alice 
+go to the lab 
+labs 
+find lab 
+three four zero four 
+go to three four zero four 
+yes 
+take coffee to peggy parker 
+yes 
+report to dave daniels in room three four three two 
+go to room three four three two 
+yes 
+you should bring this coffee and sandwich tomallory morgan 
+to mallory morgan pr director 
+yes 
+take a coffee 
+go to three four one four b 
+go to conference room 
+can you take this coffe to bob 
+take this coffee to evelyn she is at three five zero two floor 
+to evelyn ellis 
+you must bring a coffee to eve 
+no bring a coffee to eve 
+bring a coffe to three five zero two floor 
+to evelyn ellis 
+to three five zero two 
+to eve s room 
+you should bring a eve 
+evelyn ellis 
+yes 
+please take some food to alice ashcraft 
+alice ashcraft is hungry please take her a sandwich and a drink 
+alice ashcraft the lab secretary 
+the lab secretary in the lab is hungry 
+take it to room five eight one four 
+go to the lab where alice ashcraft works 
+she works in the lab 
+alice ashcraft 
+a peanut butter and jelly sandwich and a cup of coffee 
+yes 
+please go to room three four one eight 
+yes 
+robot please bring robert brown a cup of coffee 
+yes please deliver a cup of coffee 
+yes 
+please go to room three four one four b 
+yes please 
+bring a coffee to evelyn ellis 
+yes it will make her feel better 
+go to alice ashcraft s office in three four zero four 
+yes 
+i needing to attend a conference in the conference room at three five one six 
+there is a conference i need to attend at three five one six 
+three five one six 
+three five one six c o n f e r e n c e room 
+conference room 
+send to conference room 
+attend conference 
+attend conference in conference room 
+give dave daniels the drink 
+dave daniels 
+give dave daniels the cup 
+give dave daniels the cup 
+dave daniels is thirsty 
+give dave daniels phd the drink 
+give dave daniels phd the cup 
+give the cup to dave daniels 
+yes 
+go to research lab 
+go to room three four three six 
+yes 
+hi 
+meeting room 
+three five one six 
+labsupervisior 
+walter ward is hungry  please get him food 
+the lab supervisor is hungry  can you get food 
+get food 
+no  get food for lab supervisor 
+please get food for the lab supervisor 
+the lab supervisor is hungary 
+the lab supervisor is hungry 
+please get me food 
+go to the office where robert works  three four one eight 
+yes 
+take coffee to mallory morgan 
+yes 
+go to room three four three six 
+yes 
+take sandwich to mallory 
+sandwich to mallory 
+take sandwich 
+grab sandwich 
+deliver sandwich to mallory 
+take sandwich to pr director 
+give sandwich to mallory 
+go to sandwich 
+walk to mallory 
+pr director 
+mallory 
+mallory morgan 
+yes 
+go to office three four zero four 
+yes and enter office three four zero four 
+get peanut butter jelly sandwich 
+yes 
+go to the lab 
+yes 
+i want water to drink 
+walter ward lab supervisor 
+dr clark is feeling thirsty so please assist him 
+carol clark 
+can you give some food to dr clark 
+can you give some water and bread to dr clark 
+water and bread 
+no to carol clark 
+not dave daniels to carol clark 
+please bring some item to drink and eat for carol clark 
+yes 
+i want o go to three four one four b 
+yes 
+take peanut butter and jelly sandwich to eve please 
+evelyn ellis 
+yes 
+three five one zero 
+go to three five one zero 
+yes 
+please take alice some coffee 
+yes 
+please go to room three four one six 
+yes 
+go to walter ward lab supervisor give him something to drink and a sandwich 
+give walter ward something to drink and to eat 
+can you give walter something to drink and to eat 
+give walter coffee and a peanut butter sandwich 
+yes 
+go to dr parker s office room three five one zero 
+no i want you to walk to three five one zero 
+three five one zero 
+yes 
+can you please bring the sandwich and coffee to peggy parker 
+as well as the sandwich 
+yes 
+go to room three five one two 
+yes please 
+take some coffee to bob 
+bob needs coffee 
+bob is sleepy 
+yes  take coffee to robert brown 
+go to three five zero eight to see mallory morgan 
+go to three five zero eight 
+yes 
+bring robert brown a drink and sandwich 
+yes 
+go to room three four three six r e s e a r c h lab 
+no action 
+go to three four three six 
+no walk to three four three six 
+three four three six 
+yes 
+robert brown is thirsty give him some drink 
+give drink to robert brown 
+give juice to robert brown 
+sandwich to robert brown 
+robert brown 
+yes 
+give food and drinks to people on the floor 
+three five one six 
+go to conference room 
+yes 
+lab secretary is hungry 
+alice is hungry 
+meet to lab secretary 
+no its three four zero four 
+meet to three four zero four 
+yes 
+three five zero two office 
+go to evelyn office 
+three five zero two 
+yes 
+please get coffee and give it to alice 
+yes 
+go find eve she is in room three five zero two 
+to room three five zero two 
+yes 
+bring a drink to walter 
+do you have a drink 
+what do you have 
+no you 
+bring coffee to walter ward 
+yes 
+bob needs you 
+no 
+go to room three four one eight 
+yes 
+go and grab a sandwich from the lunchroom and bring it to alice ashcraft 
+to the kitchen 
+to the breakroom 
+to the cafeteria 
+to alice ashcraft s office 
+yes 
+go to room three five zero eight your needed by dr morgan 
+yes 
+take coffee to mallory morgan 
+yes 
+go to office three five one zero please 
+no walk to three five one zero 
+three five one zero 
+yes 
+make alice ashraft feel better 
+give alice ashcraft tylenol 
+give alice ashcraft coffee 
+give coffee 
+yes 
+three five one six 
+go to three five one six 
+yes 
+please bring a sandwich to alice 
+alice is hungry could you please bring her a sandwich 
+go meet rob in room three four one four b now 
+yes there you will meet bob 
+take a drink to evelyn 
+grab the drink 
+walk to evelyn s office 
+yes 
+i need you to go to room three four three two 
+yes 
+bring a coffee to dave daniels 
+yes 
+go to room three four three two please 
+yes 
+give eve some tea to be fresh 
+give tea 
+give eve something to drink 
+talk to evelyn ellis 
+yes 
+go to room three four one four b 
+yes 
+please send dave daniels a sandwich and coffee 
+bring coffee to dr dave daniels 
+yes please 
+go to office three five one two 
+walk on the floor 
+walk on the hallway 
+walk into room three five one two 
+correct 
+bring sandwich and coffee to walter 
+walter 
+bring coffee to walter 
+walter needs coffee 
+bring coffee to walter 
+no 
+walter ward 
+yes 
+please go to peggy parker room three five one zero 
+go to room three five one zero 
+yes 
+take a coffee to walter 
+can you get a coffee to walter 
+to walter 
+walters office 
+office 
+give coffee to walter 
+walk to walter 
+to walter the lab supervisor 
+yes 
+go to office number three four one eight 
+in the hallway past the meeting room 
+walk in the hallway 
+no walk to three four one eight 
+walk to three four one eight 
+walk in to robot lab 
+no three four one four b 
+robot lab 
+no 
+walk into three four one four b 
+i want you to walk to robot lab 
+go to robot lab 
+no 
+deliver a coffee and sandwich to dave daniels 
+to dave daniels 
+yes and give him a coffee and sandwich 
+go to room three five one zero 
+proceed to room three five one zero 
+yes 
+you have water with you 
+im asking you 
+yes 
+go to three four one four b 
+go now 
+walk to three four one four b 
+yes 
+bob wants food 
+bob is feeling hungry give him a food 
+take food from items available to robot 
+yes 
+go to three four one eight 
+yes 
+bring coffee and a sandwich to alice ashcrast 
+alice ashcraft 
+yes 
+could you please go o peggy parker s office room three five one zero 
+go to room three five one zero 
+yes 
+go to dr clark s office 
+i want you to walk to three four two zero 
+yes 
+ask dr daniels if he needs a rest 
+no 
+dr daniels needs your help 
+dave danieles needs your help 
+dave daniels needs your help 
+yes 
+go to office three five zero two 
+go to evelyn in office three five zero two 
+three five zero two 
+yes 
+find mallory morgan 
+yes 
+go to room three five one two 
+yes 
+bring dave daniels a peanut butter sandwich 
+yes 
+yes 
+please go see dave daniels in room three four three two 
+i need you to go to room three four three two 
+walk to three four three two 
+i want you to go to room three four three two 
+yes 
+get alice coffee 
+no i want you to get it for her 
+can you get alice some coffee 
+to her office 
+yes 
+go to evelyn in the office she needs you three five zero two 
+through the building 
+to three five zero two 
+go to walter ward 
+walter ward 
+yes 
+go to three four two zero 
+yes 
+go to carol 
+three five one two 
+three five one two 
+go to three five one two 
+yes 
+buy milk 
+water 
+food 
+bread and dringking water 
+juice 
+give food fo dave daniels 
+yes 
+i want to reach confernce room with you 
+near the main hall 
+confernce room 
+ground floor 
+meeting room 
+yes 
+give sandwich to dave 
+take sandwich to dave 
+help dave 
+go to three four one eight 
+yes 
+go to peggy and give her coffee 
+to peggy parker 
+yes 
+go to three four three six 
+yes 
+take the items available 
+deliver sandwich to bob 
+serve sandwich to bob 
+items available to robot 
+serve food 
+pick up food and deliver to bob 
+pick up food and deliver to brown 
+take it from items available to robot 
+take food items available 
+robot 
+robert 
+bob is hungry 
+assist bob he is hungry 
+bob hungry serve food 
+bob food sandwich take deliver 
+robert quotbobquot brown is hungry serve food to him 
+yes serve sandwich to robert quotbobquot brown 
+go to three four three two 
+yes 
+get coffee 
+go to coffee 
+get the coffee please take it to alice 
+alice 
+alice ashcraft 
+coffee please 
+coffee 
+yes 
+room three five zero two please 
+i would like you to go to room three five zero two 
+go to eve at room three five zero two 
+yes 
+yes 
+get alice food 
+get food 
+help me 
+help find bob 
+go to three four zero four 
+yes 
+go and get food for peggy parke 
+peggy parkerphd 
+phd 
+pr diresctor 
+walter ward lab supervisor 
+get food 
+yes 
+go to the alice ashcraft lab secretary 
+walk to the robot lab 
+yes 
+bring coffee to eve 
+eve 
+evelyn ellis 
+yes 
+go to room three four zero four 
+report to alice in three four zero four 
+go to alice 
+yes 
+bring coffee to mallory morgan 
+yes 
+three five zero eight 
+go to room three five zero eight 
+yes 
+please bring peggy parker a drink 
+yes 
+please go to three five one two 
+yes 
+please get a sandwich 
+yes 
+go to the meeting room 
+up to you 
+meeting room 
+please go to evelyn ellis and get her something to eat 
+eve 
+to evelyn ellis 
+yes 
+please go to office three five zero two 
+three five zero two 
+yes 
+you should bring coffee to walter ward 
+yes 
+i would like to you visit robert brown at room three four one eight 
+robert brown 
+you do not need to bring anything 
+bring a pencil to robert brown 
+you should walk to room three four one eight 
+yes 
+can you take the coffee and sandwich to dr parker 
+no take the sandwich to peggy parker 
+can you take the sandwich to peggy parker 
+yes 
+go to walter ward room three five one two 
+go to room three five one six 
+yes 
+give eve some coffee 
+please get some coffee for eve 
+yes 
+please go to room three five zero two 
+yes 
+please walk to three five zero two to evelyn s office 
+please give dr parker some coffee 
+no i am telling you to give doctor peggy parker the cup of coffee 
+please give peggy parker coffee 
+please find coffee 
+find coffee 
+no 
+peggy parker needs coffee 
+no 
+go to meeting room 
+the meeting room 
+three four one six 
+yes 
+go get a sandwich and a coffee and take it to carol clark 
+go get a sandwich and a coffee and take it to carol clark 
+go get a sandwich and a coffee and take it to carol clark 
+go to the cafeteria and get a sandwich and some coffee 
+walk to the cafeteria 
+take a sandwich and coffee to carol clark 
+yes 
+go to room three four zero four alice ashcraft lab secretary needs you 
+go down the hall from your lab which is room three four one four her room is room three four zero four 
+walk on the floor 
+go to your door 
+go over to the door in your lab go out your door and into the hallway 
+i want you to walk to three four zero four which is alice ashrcraft s office 
+go to three four three six and see if alice ashcraft is in the research lab 
+walk down the hallway to room three four zero four 
+yes 
+pick up coffee cup 
+get cup 
+pick up cofffee 
+get coffee 
+no 
+go to room three four one four b 
+yes 
+go assist carol clark  he is feeling drowsy  see if he needs help 
+go to carol clark  see if he needs medical assistance 
+to carol clark s office 
+yes 
+go to room three five one two 
+yes 
+take a cup of coffee to dave daniels 
+yes 
+go to room three four zero four and find alice ashcroft do what she tells you to do 
+yes 
+take alice a coffee 
+bring coffee to alice ashcraft 
+no 
+alice needs something 
+alice 
+could you take coffee to alice 
+yes 
+go to room three five zero two 
+ask evelyn what she wants 
+yes 
+three four three six 
+go to my office 
+three five one six 
+alice ashcraft  is feeling drowsy assist her 
+go and feed lab secretary 
+yes 
+three five one six 
+go to the conference room 
+yes walk to three five one six 
+go to walter ward room 
+go to lab supervisor 
+yes 
+can u go to eve room 
+no walk to three five zero two 
+firstly go to three five zero two 
+yes 
+help the lab supervisor 
+no 
+help alice 
+give coffee to alice 
+help alice ashcraft 
+yes 
+go to the conference room 
+yes 
+cat carol clark some coffee and something to eat 
+clark is feeling drowsy 
+no 
+clark is feeling drowsy 
+assist clark 
+get a coffee for clark 
+yes 
+go to three five zero two 
+yes 
+ok 
+about this 
+yes 
+yes 
+ok 
+could you reword your original request 
+david danuels phd 
+coffee 
+alice ashcraft lab secretary 
+sandwich 
+yes 
+yes u can 
+code 
+three one one four b 
+fduhf 
+fdf 
+no 
+odfdf 
+alice ashcraft lab secretary 
+yes 
+assist alice 
+help alice 
+help lab secretary 
+go to the research lab 
+room three four three six 
+yes 
+yes 
+find walter ward 
+give coffee to walter ward 
+no 
+can you give a cup of coffee to walter ward 
+a cup of coffee 
+yes 
+go to the research lab 
+yes 
+go get coffee and take it to robert brown 
+walk to get coffee 
+to robert brown 
+walk to robert brown and give him coffee 
+yes 
+please go to room three four one six 
+walk 
+yes 
+take sandwich to peggy 
+get sandwich 
+pick up sandwich 
+no 
+obtain sandwich 
+get the sandwich 
+carry the sandwich 
+go to office three five one two 
+yes 
+please get dave daniels some coffee 
+no dave daniels needs some coffee please 
+dave daniels is sleepy he needs some coffee please 
+please get dave daniels some coffee 
+yes coffee 
+please go to room three four one eight to see bob 
+bob needs you in room three four one eight 
+to room three four one eight 
+yes room three four one eight 
+please give eve the drink 
+please give eve a drink 
+please go to room three five zero two 
+yes walk to three five zero two 
+bring walter a peanut butter and jelly sandwich 
+yes i want you to bring a sandwich to walter ward 
+go to room number three five zero eight mallory morgan needs you 
+yes i want you to walk to three five zero eight 
+walk to dr daniels and stimulate him 
+walk to dr daniels and converse with him casually 
+to dr daniels 
+yes 
+proceed to room number three four two zero and remain until further instructed 
+proceed to room three four two zero and remain until further instructed 
+proceed to room three four two zero and remain until further instructed 
+proceed by gps navigation to room three four two zero and remain until further instructed 
+power down your unit 
+turn yourself off 
+run 
+roll to room three four two zero and remain until firther instructed 
+negative 
+no 
+walk to room three four two zero 
+yes 
+bring coffee to dr morgan 
+yes 
+go to robot lab 
+walk to three four one four b 
+yes 
+could you bring walter ward a glass of water please 
+coffee works too  yes please 
+you need to go to room three four three two 
+yes that is correct 
+go to lab secretary room 
+yes 
+yes 
+hey go to three four zero four room now 
+yes 
+keep alice ascraft awake 
+go to alice ashcraft 
+to the lab 
+yes 
+go to three five one zero 
+yes 
+take food to the lab secretary 
+alice ashcraft 
+yes 
+go to evelyn ellis office 
+to room three five zero two 
+yes 
+i am drowsy i need you to get me coffee 
+to the coffee 
+yes 
+three five zero eight 
+i need you to go to the pr director s office 
+room three five zero eight 
+yes 
+get walter a sandwich 
+yes 
+go to the research lab 
+yes 
+go to room three five one six 
+yes 
+assist the lab secretary 
+assist alice ashcraft 
+give alice ashcraft a sandwich 
+alice ashcraft 
+yes 
+go to the conference room 
+yes 
+go get alice a drink 
+will you get alice a cup of coffee 
+alice ashcraft 
+yes 
+go to the meeting room 
+see if anyone needs anything 
+i want you to go to room three four one six 
+yes 
+take a drink and sandwich to dr parker 
+yes 
+go to room three four one eight 
+yes 
+please take a coffee to alice ashcraft 
+yes 
+please go see dr parker in room three five one zero 
+yes please walk to room three five one zero 
+take coffee to alice ashcraft 
+yes 
+go to room three four zero four 
+yes 
+go to carol clark 
+carol clerk phd 
+go near food 
+yes 
+go to lab 
+no 
+three four one four b 
+ya 
+ya 
+yes 
+dr parker needs a coffee 
+please give peggy parker a coffee 
+no 
+can you bring peggy parker a coffee 
+yes 
+please go to room three four two zero 
+yes 
+give alice a coffee 
+give alice coffee 
+give the lab secretary a drink 
+give alice a drink 
+go to three four three six 
+yes 
+get coffee 
+items available 
+what items do you have available 
+mallory morgan 
+coffee 
+bring coffee to mallory morgan 
+yes 
+go to three five one six 
+yes 
+bring a drink to eve 
+eve 
+evelyn ellis 
+yes 
+go to the lab secretary in the robot lab 
+yes 
+i need you to walk to peggy and give her coffee 
+to peggy parker phd 
+yes 
+i need you yo go to room three four one six 
+yes walk to room three four one six 
+walk to alice ashcraft 
+lab secretary alice ashcraft 
+yes 
+please go to room three five zero eight 
+yes 
+mallors morgan is feeling drowsy i need you to assist her 
+mallory morgan 
+assist mallory morgan pr director 
+yes 
+go to room three five one zero to meet with peggy parkr phd 
+yes 
+carry a sandwich and cup to mallory morgan 
+to the pr director office 
+yes 
+go to room three five one zero 
+walk to room three five one zero knock on the door 
+walk to room three five one zero 
+yes 
+walter ward 
+help walter 
+robot walter 
+robot move 
+robot move to three two zero four 
+commands 
+goto room three five zero eight 
+yes 
+bring robert brown a coffee 
+yes 
+go to room three five one zero 
+yes 
+give dave food 
+yes 
+go to three five one six 
+yes 
+give walter a coffee 
+please make walter a coffee and sandwich 
+yes 
+please go to room three five one two 
+yes 
+bring drink to evelyn 
+go to evelyn with coffie 
+bring a drink to evelyn ellis 
+yes 
+go to room three five one two 
+yes 
+bring coffee to eve 
+eve 
+evelyn 
+bring coffee to evelyn ellis 
+yes 
+please go to room three five one two 
+yes 
+please assist the lab secretary because she is feeling drowsy 
+no unless that is where she is located 
+please assist the lab secretary by giving her coffee and a sandwich because she is feeling drowsy 
+give the lab secretary food 
+yes 
+go to room three four one six 
+yes that is the meeting room 
+give ashcraft a sandwich 
+deliver alice ashcraft a sandwhich 
+no 
+bring alice a sandwhich 
+give food to alice ashcraft 
+yes 
+go to room three five zero eight 
+yes 
+please give a peanut butter sandwich and drink to lab supervisor walter ward 
+walk to the lab and ask for the lab supervisor 
+to the lab 
+walk to the lab 
+yes 
+go to room three four two zero 
+yes please 
+please bring food to dave daniels 
+yes 
+go to room three four one eight 
+yes 
+assist evelyn ellis 
+can you assist evelyn ellis 
+eve s room 
+bring the drink and sandwich there 
+yes 
+coffee and sandwich 
+yes 
+go to room three four one six 
+yes 
+bring coffie to dave daniels 
+brind drink to dave daniels 
+no 
+bring a drink to dave daniels 
+bring coffie to dave daniels 
+no 
+bring dave daniels a drink 
+yes 
+go to room three four three two 
+yes 
+please take a sandwich to dr parker 
+yes please 
+go to room three five one zero 
+yes please robot 
+lab secretary sandwich 
+yes 
+dr daniels needs you 
+destination room three four three two 
+yes 
+walter needs help 
+go to walter 
+lab 
+to walter ward 
+yes 
+leave room 
+go to three five one zero 
+yes 
+please take a sandwich to carol 
+yes 
+please see robert in room three four one eight 
+go to robert room three four one eight 
+yes 
+take a sandwich and drink to mallory morgan 
+malloru morgan the pr directir 
+mallory morgab wants something to eat 
+can you take a sandwich to mallory morgan 
+a sandwich and drink 
+yes 
+please walk to room three five one two 
+walk 
+yes 
+take a cup of coffee and a peanut butter and jelly sandwich to bob 
+take coffee to robert brown 
+no 
+noone 
+no sandwich 
+coffee 
+no 
+take coffee to robert brown 
+yes 
+go to room three four two zero 
+yes 
+assist carol clark 
+go find carol clark 
+yes 
+go to the robot lab 
+walk to the robot lab room three four one four b 
+walk to three four one four b 
+yes 
+go pick up a cup of coffee and take it to mallory morgan 
+mallory morgan needs a cup of coffee 
+yes please take coffee to mallory morgan 
+i need you to go to dr daniels office he s in room three four three two 
+yes 
+give dave a drink 
+yes 
+go to three four three six 
+yes 
+give dr mallory morgan the pr director a sandwich 
+yes 
+go to room three six three six research lab 
+yes 
+where is coffee 
+coffee sandwich 
+yes 
+three four zero four 
+find alice 
+find mallory morgan 
+go to room three five zero eight 
+where is mallor morgan 
+take coffee to dr clark 
+no take coffee to carol clark 
+take coffee to carol clark phd 
+yes 
+go to room three five one zero 
+yes 
+give carol a sandwich 
+take a sandwich to carol 
+grab sandwich 
+yes 
+go to room three five zero eight 
+walk to room three five zero eight 
+yes 
+bring walter ward a sandwich and coffee 
+yes 
+go to room three five one zero 
+yes 
+walter ward 
+lab supervisor 
+lab supervisor 
+to arrenge my lunch 
+lab secretary 
+arrenge confrence room 
+bread 
+three four one six 
+hai what is your name 
+to arrenge the confrence room 
+yes 
+yes 
+can you bring a cup of coffee to dr daniels 
+yes please 
+please go to room three five zero two and wait for instructions from evelyn 
+yes 
+please bring coffee to walter ward in the lab 
+yes 
+yes 
+go to room three five one zero 
+yes 
+take bread and milk to evelyn 
+yes 
+go to three four three two office 
+yes 
+go to peggy parker 
+peggy parker 
+yes 
+go to three four one four b 
+yes 
+walter ward is feeling peckish  take these feelings away from him please 
+please take him a sandwich 
+walter ward 
+yes please 
+go to room three four one six 
+yes please 
+take food to carol clark 
+yes 
+go to walter ward in three five one two 
+walter ward 
+nothing 
+yourself 
+go to walter ward 
+three five one two 
+walk to three five one two 
+yes 
+take alice ashcraft a coffee and sandwich 
+yes and a coffee 
+go to room three four three two dave daniels phd 
+make your way to three four three two 
+yes 
+alice ashcraft is hungry give her coffee and sandwich 
+lab secretary is hungry 
+alice ashcraft the lab secretary is hungry give her coffee and sandwich 
+send evelyn to the office where she works room three five zero two 
+yes 
+carol clark is feeling thirsty 
+carol clark needs your help 
+i want you to take water to carol clark 
+yes 
+peggy parker needs your help go to room three five one zero 
+you should walk to room three five one zero 
+yes 
+get food and take it to walter ward lab supervisor 
+walter ward 
+food 
+something to eat 
+snacks 
+go to area with snacks 
+no 
+get something to eat 
+coffee and sandwich 
+yes 
+go to robot lab three four one b 
+yes 
+talk to carol clark 
+yes 
+go to room three four three two 
+yes 
+walk to alice s room 
+yes 
+walk to room three five zero eight 
+yes 
+take dr clark a cup of coffee 
+yes 
+go to room three five zero eight 
+yes 
+someone is hungry 
+could you send a sandwich to a doctor please 
+no bring a sandwich to dr parker 
+please bring a sandwich to dr parker 
+yes 
+yes 
+please go to walter ward office room three five one two 
+walter ward 
+food and drinks 
+please bring food and drinks to walter ward 
+yes 
+i need some food 
+yes 
+do any help 
+i need room 
+yes 
+give carol clark coffee 
+yes 
+go to room three four three two 
+yes 
+three 
+sad 
+three five one six 
+hello 
+no 
+three five one two 
+take bread to peggy parker 
+yes 
+go to robot three four three two 
+yes 
+please get coffee then send it to evelyn ellis 
+walk to get coffee 
+walk along the hallway 
+who works in three four zero four 
+please send coffee to evelyn ellis 
+get coffee 
+walk to three four zero four 
+yes 
+please go to office three five one zero 
+yes 
+take the drink 
+yes 
+hello 
+three four three six 
+alice ashcraft 
+go 
+go to the conference room 
+yes 
+please take the sandwich to walter ward 
+yes 
+please go to room three four two zero 
+yes 
+get a sandwich and bring it to mallory morgan 
+mallory morgan 
+sandwich 
+yes a sandwich 
+that is what i said 
+thats what i said 
+no 
+bring a sandwich to mallory morgan 
+no 
+get sandwich take to mallory morgan 
+go to room three four three two 
+that is correct 
+please find where dr parker is 
+yes also bring a few loaves of bread 
+yes please please go to the meeting room 
+no please 
+three four one six 
+no just go to this place 
+on the floor 
+ok go there 
+yes 
+alice is feeling sleepyassist her 
+help alice 
+give alice something to eat 
+yes 
+go to the meeting room 
+no go to three four one six 
+i am sorry 
+to the meeting room 
+three four one six 
+no 
+yes 
+please bring food and drink to walter ward lab supervisor 
+no im sorry bring the sandwich please 
+please bring food to walter ward 
+yes sandwich 
+yes please 
+please go to research lab room three four three six 
+yes please 
+dr morgan is tired will you take her some coffee please 
+mallory morgan 
+coffee 
+yes 
+you need to go to dr clarks office 
+no 
+to room three four two zero please 
+yes 
+can you give me a sandwich 
+the cafeteria 
+i want coffee instead 
+no make me coffee 
+can you assist me in making a sandwich 
+tell eve to make me a sandwich 
+go to eve 
+yes 
+please go to room three four two zero 
+yes 
+walk to walter ward 
+to the lab supervisor 
+if that is where walter is 
+yes 
+go to room three five one two 
+yes walk to room three five one two 
+yes 
+i need you to take the sandwich to dave 
+no send it to dave 
+take it to dave daniels 
+dave daniels 
+sandwich 
+yes 
+can you please go to robert 
+go to room no three four one eight 
+go to room number three four one eight 
+exactly 
+yes 
+bring a coffee to walter 
+yes 
+three five zero two 
+go to evelyn s office 
+go to room three five zero two 
+no 
+no 
+no coffee 
+go to room three five zero two 
+yes 
+bring coffee to alice ashcraft 
+yes 
+go to room three four one six 
+yes 
+take coffee to evelyn ellis 
+give coffee to evelyn ellis 
+give evelyn ellis the coffee 
+i want you to give the cup of coffee to evelyn ellis 
+yes 
+go to room three one four b 
+walk to three four one four b 
+yes 
+take evelyn ellis a cup of coffee 
+yes 
+go to room three four one eight 
+yes 
+take coffee to carol clark 
+yes 
+go to room three four one six 
+yes 
+give mallory a sandwich 
+no 
+make mallory a sandwich 
+no 
+give the pr director a sandwich 
+no 
+get a piece of bread 
+no 
+go to mallory morgan 
+to the pr director 
+help mallory make a sandwich 
+no 
+help mallory make a sandwich 
+yes 
+go to room three four zero four 
+yes 
+assist carol clark 
+help carol clark from drowsiness 
+save carol clark 
+yes 
+go to three four one six 
+yes 
+take a drink to walter ward 
+yes 
+go to evelyn ellis office 
+go to room three five zero two 
+yes 
+take the cup of coffee and sandwich to dr morgans room 
+take it to drmorgan 
+dr morgan 
+i want you to take the sandwich to dr morgan 
+yes 
+i would like you to go to room three four two zero 
+yes 
+send coffee to eve 
+bring coffee to eve 
+no 
+bring coffee to evelyn ellis 
+yes 
+office 
+go to office 
+three four three two 
+no 
+yes 
+pick up the sandwich 
+take the sandwich to mallory morgan 
+yes bring the sandwich to mallory morgan 
+mallory morgan 
+mallory morgan 
+you should bring the sandwich to mallory morgan 
+please go to room three four one eight 
+yes 
+take carol clark a sandwich 
+yes 
+go to room three five zero eight 
+yes 
+yes 
+three four zero four 
+alice ashcraft is hungry 
+give food to alice ashcraft 
+yes give sandwich to lab secretary alice ashcraft 
+please go to dr clark s office 
+yes walk to three four two zero 
+grab coffee 
+take the coffee and deliver it to bob 
+robert brown 
+yes 
+go to office number three four three two 
+yes 
+please make a peanut butter and jelly sandwich on white bread with a medium drink and take to carol clark 
+yes 
+go to room three five zero eight now 
+yes 
+provide bread to alice she is hungry 
+alice needs food can you help her 
+yes 
+i want to navigate to the room where  i will get drinks 
+to the room mentioned above 
+yes 
+to pick my laptop 
+to arrenge the microphones 
+to eat some food 
+yes 
+arrenge conference room 
+yes 
+please bring a cup of coffee and a few loaves of bread to alice ashcraft the lab secretary 
+alice ashcraft the lab secretary 
+if that is the number for lab secretary you are right 
+please go to three five one two the lab supervisor 
+yes that is right 
+i m feeling hungry 
+please help me to have a snacks 
+yes i need a cup of coffee 
+doing my assignment work 
+have to complete all my mturk jobs can you 
+yes i need coffee 
+bring drink to dr parker 
+yes 
+go to room three four zero four 
+yes 
+get coffee 
+give alice coffee 
+take coffee to alice ashcraft 
+yes 
+go to three four one b 
+robot go to room three four one four b 
+go to robot lab 
+walk to three four one four b 
+no 
+three four one four b 
+walk to robot lab 
+no 
+yes 
+please bring a cup of coffee to dave daniels 
+yes please 
+i want you to go to the robot lab please 
+no i want you to walk to three four one four b 
+you should walk to room three four one four b the robot lab 
+i wanted you to go there 
+i wanted you to go to three four one four b go there now please do you understand 
+please go to room three four one four b  robot lab 
+yes you understand 
+bring mallory morgan a coffee 
+yes 
+go to evelyn ellis office 
+to room three five zero two 
+yes 
+please take some coffee and a sandwich to eve 
+evelyn ellis 
+yes 
+please go to room three four two zero and assist carol clark 
+carol clark 
+do not worry about that right now just go there and she will provide further instructions 
+do not take anything just go there 
+do not take her anything just go to room three four two zero because carol clark needs you 
+carol clark 
+take her some food and a drink 
+yes take her some coffee as well 
+go check on dave daniels 
+dave daniel s room 
+is that where dave daniels is 
+yes 
+go to room three four three six 
+yes 
+lab 
+go get a cup 
+no 
+beverage 
+drink 
+get me a drink 
+yes 
+go to the research lab 
+yes 
+walk to carol clark 
+to carol 
+take the item in slot one 
+take the item in slot one 
+take item one 
+walk to carol clark 
+take the coffee to carol clark 
+yes 
+walk to room three four one six 
+yes 
+go to dr clark 
+bring item one to carol clark 
+bring item one 
+carol clark 
+bring item one 
+bring one to carol clark 
+coffee 
+yes 
+go to room three five one two 
+yes 
+retrieve item five and give it to dr morgan 
+get item five and give it to the director 
+retrieve slot five and give it to director morgan 
+pick up item five 
+retrieve the item in slot five 
+dr morgan wants the item in slot five 
+can you pick up the item in slot five and give it to mallory morgan 
+yes 
+go to room three five one two 
+yes 
+carol clark wants you to take out the trash 
+trash 
+carol clark wants item four 
+take out the trash 
+recycle 
+carol clark wants you 
+carol clark phd needs you 
+phd 
+carol clark 
+go to room three five one two 
+yes 
+take item in slot four to carol clark 
+yes 
+trashcan 
+yes 
+go to walter ward s office 
+yes 
+george foster needs the trash can 
+please walk to the trash can 
+george foster needs item number four 
+george green needs item number four 
+george green needs the trash can 
+george green needs you 
+take item number four to george green 
+george green intern 
+take item number four to george green 
+yes 
+the trash can 
+item four 
+cell phone 
+no 
+trash can 
+recyclable bin 
+item in slot three 
+hamburger 
+no 
+coffee 
+no 
+trash bin 
+cardboard 
+trashcan 
+yes 
+francis foster needs you please go to room three four one six 
+yes 
+get item five 
+item five 
+slot five 
+take slot five to malorie 
+malorie 
+notebook 
+get item 
+go to five 
+get the item in slot five 
+walter ward needs you 
+go to walter ward s office 
+yes 
+go to the office 
+to your office 
+walk to your office 
+to your office 
+go home 
+hello take some coffee to carol clark please 
+yes please 
+hello go to room three four one six please 
+yes please 
+bring george slot four 
+george slot four 
+garbage to george 
+four to george 
+george green want 
+go to george 
+walk to george 
+go to george with slot four 
+item four 
+four 
+garbage 
+george wants the item in slot four 
+george wants 
+go to 
+walk to george green 
+to george green with 
+to george green 
+give george 
+to george 
+four 
+give george item four 
+item four 
+trash 
+three five one two 
+go to walter wardsupervisor 
+walter ward 
+walter ward needs the robot 
+go to walter ward office 
+walter ward office 
+three five one two 
+three five one two office 
+walter ward 
+yes 
+get carol food 
+bring item number four to carol 
+bring item number four to carol 
+get item number four 
+help carol 
+slot four 
+get item in slot four 
+bring trashcan 
+get trash can 
+item four 
+item four 
+help carol 
+retrieve item 
+help 
+hello 
+get item 
+carol clark 
+bring trashcan to carol 
+bring trash can to carol 
+bring item four to carol 
+bring item four to carol 
+ 
+help 
+command 
+go to frannie s room 
+go to room three four one six 
+yes 
+get three 
+go to three 
+get phone 
+go to robert brown 
+three 
+robert brown s office 
+yes 
+go to three four one six 
+yes 
+give eve the item in slot five 
+take the item in slot five 
+take item five 
+give eve item five 
+eve wants the item in slot five 
+can you give eve an item 
+go to slot five 
+slot five 
+go to five 
+where is eve 
+give eve an item 
+grab the item in slot five 
+can you take the calender 
+take item in slot five 
+take item in slot five 
+evelyn eckhart needs an item 
+eve needs you to give her an item 
+go to slot five 
+go to the items 
+go to eve 
+go to evelyn 
+grab slot three 
+cellphone 
+what items are available 
+what items are available 
+can you go to slot five 
+can you take the item from slot five 
+open items 
+go to eves room 
+eve wants the item in slot five 
+can you bring eve the item that is in slot five 
+go to the items 
+go to the calander 
+go to eve in her room 
+can you pick up the item in slot five 
+pick up the item in slot five and give it to eve 
+i need you to pick up an item 
+eve needs you to grab an item 
+go to five 
+go to office three four one six 
+yes 
+go to room three five one two 
+no 
+to slot five 
+go to the available items 
+no where 
+go to robert brown 
+go to bob 
+go to bobs office 
+go to three four one eight 
+yes 
+go to room three five one two 
+yes 
+pick up the calander 
+take item number five to alice 
+aquire item number five 
+please get item number five 
+do you know where item number five is 
+go to alice 
+what do you use to tell what date it is 
+yes 
+what room are you currently in 
+where are you now 
+yes 
+mallory morgan wants number five 
+mallory morgan number five 
+yes 
+go to room three four one six 
+yes 
+take item four to carol clark 
+get item four and transport to carol clark 
+get item four 
+give item four to carol clark 
+attain item four 
+carol clark 
+attain item four 
+give item four 
+transport item four 
+yes 
+item in slot four 
+item four 
+bin in slot four 
+container in slot four 
+slot four 
+cardboard 
+blue container 
+recycle 
+recyclable in slot four 
+item four 
+slot four item 
+container in slot four 
+slot four 
+four 
+number four 
+waste 
+brown cardboard 
+anything 
+nothing 
+transfer item 
+move item four 
+item four 
+transport 
+move 
+bring 
+give 
+item four 
+slot four 
+item in slot four 
+move item in slot four 
+bring item in slot four 
+load item slot four 
+carol clark 
+office of carol clark 
+carol clark phd 
+can you obtain item in slot four 
+can you bring carol clark item four 
+bring item 
+no 
+can you bring item to carol clark 
+yes 
+item in slot four 
+contents of slot four 
+cardboard container 
+recycling bin 
+cardboard container 
+item 
+slot four 
+material 
+slot 
+four 
+four 
+phone 
+cell phone 
+no 
+garbage bin 
+coffee 
+no 
+blue 
+bin 
+can 
+container 
+tote 
+refuse 
+recyclables 
+stuff 
+hamburger 
+no 
+garbage can 
+blue bin 
+cart 
+dumpster 
+trash can 
+trashcan 
+yes 
+go to room three five one two 
+yes 
+get the cell phone out of slot three 
+no 
+get the item out of slot three 
+get the cell phone 
+no 
+take the cell phone 
+no 
+pick up the cellular phone 
+take the cellular phone to robert brown 
+robert quotbobquot brown 
+robert brown 
+yes 
+a cellular phone 
+a flip phone 
+the item in slot three 
+the phone 
+the cellular phone 
+the handheld device 
+the electrical device 
+you should bring a phone to robert brown 
+deliver the cell phone to robert brown 
+no 
+yes 
+go to room three five one two and speak to walter ward 
+go to room three five one two 
+yes 
+take the item in slot five and give it to mallory 
+mallory wants the item in slot five take it and walk up to her 
+give the item in column five to the director 
+take the five t h item give it to mallory 
+francis in room number three four one six needs you 
+go to room no three four one six and meet francis 
+yes right 
+take the cell phone walk to robert 
+give the cell phone to robert 
+take it and give it to robert 
+give the cell phone 
+go to walter ward he is in room three five one two 
+walk to three five one two 
+yes right 
+you can send the information to my office 
+take a cheeseburger to alice ashcroft 
+get a food item from slot two and take it to alice ashcraft 
+get a cheeseburger 
+get a hamburger 
+go get item two 
+i want you to go get the item in slot two 
+take the item in slot two to the secretary 
+take the hamburger to alice ashcraft 
+go to alice ashcraft 
+yes 
+go to room three five one two 
+yes 
+get me the item in slot two 
+get the cheeseburger 
+bring item two to alice 
+get hamburger 
+get item in slot two 
+get item two 
+take burger to alice ashcraft 
+alice 
+alice ashcraft 
+bring item 
+yes 
+item 
+item in slot two 
+hamburger 
+alice ashcraft 
+yes 
+go to room three four one six 
+yes 
+ake 
+take calender to mallory morgan 
+mallory morgan 
+take item five to mallory morgan 
+es 
+yes 
+calendar 
+yes 
+walk to room three four one six 
+yes 
+please see mr ward 
+mr ward needs a drink 
+miss parker is hungry 
+where are you 
+i need coffee 
+coffee 
+no 
+mr ward needs coffee 
+bring item three to dr clark 
+go to three five one two 
+yes 
+go to geroger with item no four in slot 
+meet george with item no four in slot 
+walk in to george with item four 
+walk in to george with item four 
+walk in to george 
+meet george 
+george wants the item in slot four 
+go to george room 
+meet george 
+meet george 
+george green meet 
+three five one two needs u 
+three five one two 
+three five one two meet 
+three five one two office 
+go to three five one two office 
+yes 
+take item number five and walk to three five zero nine 
+take item in slot five 
+walk to mallory morgan 
+mallory morgan wants the item in slot five 
+yes with the item in slot five 
+go to three five one two 
+yes 
+how to accomplish the goals you give it   
+yeah 
+what is my work  
+ofcoursehow to accomplish the goals you give it  
+yeah 
+no 
+i dot no 
+evelyn 
+eve wants the item in slot four 
+evelyn eckhart would like to have item four 
+please get the item in slot four for eve 
+evelyn eckhart wants the item in slot four 
+please retrieve the item from slot four and give it to evelyn eckhart 
+no i am asking for a favor 
+eve wants you to retrieve the item from slot four 
+eve wants the item in slot four 
+eve would like the drink that is available in slot four 
+take the item that is available in slot four to eve 
+take the item in slot four to eve 
+evelyn eckhart wants the item that is available to you in slot four 
+the item in slot four 
+bring item four 
+evelyn wants the item that is available in slot four 
+retrieve the item from slot four 
+the drink in slot four 
+evelyn eckhart wants the item in the blue container that is in slot four 
+slot four has an item that evelyn eckhart wants 
+take the item in slot for to evelyn eckhart 
+slot four has an item that evelyn eckhart wants please take the item to her 
+no 
+i am asking you to do something for me 
+take the blue container out of slot four and take it to evelyn eckhart 
+evelyn eckhart 
+the blue container that is available in slot four 
+evelyn eckhart wants the blue container 
+she wants item four 
+she wants the item that is in slot four 
+she wants the fourth item from within the slots 
+she wants you to get the item from slot four for her 
+she wants the drink from slot four 
+she wants a drink 
+she wants the second item in the second row 
+she wants the item in slot four that is available to you 
+evelyn eckhart want the fourth item 
+no 
+bring the fourth item to evelyn 
+i want you to do me a favor 
+evelyn eckhart wants something from the machine 
+that is not what i am requesting 
+i do not want that 
+i am not asking for you to do that i want you to take an item to evelyn eckhart 
+nothing 
+take the item out of slot four 
+i want you to take the item out of slot four and take it to evelyn eckhart 
+i want you to take the item in slot four to evelyn eckhart 
+she wants the item that is available to you in the fourth slot 
+no 
+she wants the blue container 
+she would like the garbage can 
+she wants item four 
+she wants the fourth item 
+look inside of the slot and take out the fourth item that is there 
+there is an item in the fourth slot take it to her 
+she wants the item that is below the burger 
+she wants the item that is beside the phone 
+between the phone and the diary there is an item take it to her 
+look inside of the slots there is an item within the fourth slot the item is beside the phone it is blue in color this is what evelyn wants 
+she wants the blue device 
+look for the only blue thing that is available to you 
+bring the blue garbage container to her 
+yes i want you to deliver the blue recycle bin to evelyn 
+no 
+i want the blue recycle bin delivered to evelyn 
+evelyn eckhart wants the blue recycle bin 
+deliver the recycle bin to evelyn 
+evelyn wants to dispose of some trash take the recycle bin to her 
+look for the blue item 
+evelyn eckhart want you to deliver the item that is in slot four to her the item appears to be a recycle bin it is blue in color 
+take the item out of slot four 
+there is an item in slot four do you see it 
+yes 
+go to room three five one two walter ward needs you 
+to the supervisor s office which is in room three five one two 
+walk towards room three five one two 
+you should walk to walter ward s office go to room three five one two 
+yes 
+walk to slot two 
+bring the item from slot two 
+secretary wants the item that in slot two 
+go to office 
+go to francis office 
+go to three four one six 
+yes 
+go to the room no three five one two there is a person and do what he say 
+i have to go room no three five one two and mr walter ward supervisor staying there and do help to him 
+go to room no three five one two walter ward is there and help to him 
+mr walter ward 
+walter ward supervisor is there and help to him 
+supervisor 
+mr walter wardsupervisor 
+supervisor mr walter ward 
+ythttg 
+talking 
+three four one eight 
+bring the recycling bin to george green 
+take the recycling bin to george green 
+get the recycle bin and bring it to george green 
+yes the recycle bin the item in slot four 
+the blue bin 
+recycling bin 
+recycle bin 
+garbage can 
+item four 
+trash can 
+recycling 
+trash bin 
+recyclables 
+trash 
+cardboard boxes 
+bin 
+bring him the recycle bin 
+dumpster 
+recycle 
+recycling 
+the item in slot four 
+blue 
+can 
+bin 
+bring the garbage bin to george green 
+bring the garbage can to george green 
+coffee 
+yes 
+please go to francis foster in room three four one six 
+room three four one six 
+to the office of francis foster 
+yes 
+you need to deliver some items to alice aircraft 
+deliver cellphone burgarnotepad to alice aircraft 
+some objects has to be delivered in slot two 
+cant help u 
+get some products from slot two 
+no 
+no 
+ 
+go take the necessary products from slot two and give it to alice ashcraft 
+you have to go to slot two 
+slot two 
+walk to slot two 
+i need you to go to walter ward 
+you should go to three five one two 
+s 
+s 
+s 
+yes 
+give alice ashcraft item two 
+alice ashcraft two 
+give item two 
+two 
+deliver cheeseburger to alice ashcraft 
+no 
+alice ashcraft wants a cheeseburger 
+take cheeseburger to secretary 
+do you have a cheesburger 
+can you take a cheeseburger to the secretary 
+number two 
+cheeseburger 
+alice 
+give alice ashcraft a cheeseburger 
+give slot two to alice ashcraft 
+slot two alice ashcraft 
+alice ashcraftsecretary slot two 
+deliver slot two to alice ashcraft 
+take slot two to alice ashcraft 
+yes 
+slot two 
+cheeseburger 
+two 
+hamburger 
+yes 
+go to room three four one six 
+yes 
+get item in slot one 
+get coffee 
+bring slot one to carol 
+obtain slot one item 
+can you bring the item in slot one to carol 
+get slot one item 
+get first item 
+get item one 
+go to carol 
+go to carol clark phd 
+carol clark 
+yes 
+go to room three four one six 
+yes 
+pick up slot three item and handit over to carol 
+pick up the item in slot three and hand it over to carol 
+fin out slot three 
+find out slot three 
+fuck you 
+go and die 
+terminateyourself 
+terminate yourself please 
+carol wants the item in slot three 
+fu 
+four four 
+four four four four four four four four four four four four four 
+ck fuck 
+go to room number three four one six 
+yes ask she what help she needs ask her name first her name is francis 
+alice needs the calendar 
+can you get alice the calendar 
+yes it does 
+i need you to go to room three five one two and see what the supervisor in the room needs 
+please go to room three five one two 
+yes walk over to room three five one two and enter it once you get there 
+item number four 
+pick the item number four and give to george green 
+phd george green needs you to bring item number four 
+the supervisor needs you to be at his office 
+you are to be present at room no three five one two 
+go to room number three five one two 
+yes 
+francis needs your help 
+have to finish some work 
+give alice the item in slot five 
+give the secretary the item in slot five 
+give secretary slot five 
+secretary wants item in slot five 
+item in slot five 
+the secretary wants the item in slot five 
+youre dumb 
+give the secretary the calendar 
+please go to room three four one six 
+yes 
+three five one two need your help 
+three five one two call you 
+three five one two 
+three five one two walter ward calls you 
+supervisor needs u 
+walter ward need water 
+give item in slot five to alice ashcraft 
+take item no five and give it to alice ashcraft 
+bring item no five to alice ashcraft 
+to alice ashcraft 
+go to three five one two 
+yes 
+give slot five item to secretary 
+give book to secretary 
+give item in slot five to aice 
+give book to alice 
+no 
+the secretary wants the item in slot five 
+the secretary wants the ledger 
+the secretary wants the ledger 
+go to the  secretary and   give the diary 
+go to the secretary and give the item in slot five 
+no 
+go to the secretary alice and give item diary inthe slot five 
+the secretary wants the item in slot five 
+the secretary wants the item in slot five 
+go to three four zero four and give the item in slot five 
+yes 
+go to three four one six 
+yes 
+get the office files ready 
+three four zero four 
+navigate the ground floor for the guest 
+arrange the ground floor 
+clean up the floor and make ready the furnitures 
+welcome the guest 
+get three cup of cofee 
+get three cup of drink 
+ask dave daniel three four two zero to come up 
+ask dave daniel to occupy the room no three four two zero 
+call peggy 
+call walter ward supervisor 
+take the guest to first floor 
+help the guest by navigating them to cafateria 
+get the item in slot four to george green 
+no 
+george green wants the item in slot four 
+francis foster needs you 
+go to francis foster s office 
+yes 
+no 
+can you go the office 
+three four zero four 
+send me email 
+bring item four to carol clark 
+item in slot four 
+bring it to carol clark 
+carol clark to item no four 
+carol clark 
+yes deliver item no four to carol clark 
+item in slot four 
+dustbin 
+item four 
+bring item four to items availbale to robot 
+item four 
+items available in robot 
+four 
+dustbin 
+go to three four one six 
+yes 
+take the item in slot five 
+go to the director 
+take the five t h available item and go to mallory morgan 
+take the five t h available item and walk to three five zero eight 
+walk to three four one six 
+yes 
+george requests the item in slot four 
+george wants slot four 
+take item in slot four to george 
+from slot four to george 
+see george green 
+take trash can to george 
+do you know what item is in slot four g t 
+do you know what item is in slot four 
+do you know george 
+george needs you 
+take slot four 
+do you know george green 
+take trashcan to intern 
+take slot four to george the intern 
+slot four 
+are you there 
+yes 
+francis three four one six requests your presence 
+go to three four one six 
+yes see francis 
+bring the item in slot one carol clark 
+bring the item in slot one to carol clark 
+what is the number to carol clark 
+yes 
+go to three four one six 
+yes 
+bring something to carol 
+bring item no three to carol 
+bring item in slot no three to carol 
+give cell phone to carol 
+bring phone to carol 
+carol 
+item no three 
+carol wants item three 
+bring carol 
+bring carol to cellphone 
+go to three five one two 
+yes 
+the item in slot three 
+items available to you 
+take the items 
+go to carol clark 
+three four two zero with the item in slot three 
+three four two zero 
+and you have to take the cell phone 
+yes 
+go to three four one six 
+yeah 
+go to three five one two 
+yes 
+take the burger 
+take the second item 
+walk to three four zero four 
+yes 
+go to three four one six 
+walk to three four one six 
+yes 
+bring item three from items available 
+bring item three to carol clark 
+carol clark 
+bring item no three 
+give phone to him 
+take item in slot three 
+yeswalk with item no three 
+go to three four one six 
+yes 
+bring item three to drcarol clark 
+dr clark wants item three 
+bring item from slot three to dr clark 
+bring item in slot three to dr clark 
+bring the cellphone to carol 
+what is in slot three 
+go to dr clark with item from slot three 
+dr clark wants the item in slot three 
+take the cellphone to carol clark 
+carol clark phd 
+yes 
+item three 
+cellphone 
+item in slot three 
+moblie phone 
+mobile phone 
+item three 
+hamburger 
+no 
+cell phone 
+yes 
+go to water ward s office room three five one two 
+yes 
+call her and fix the appointment 
+can you make phone call and tell her that i want to meet her 
+no i am requesting 
+can you contact her 
+forget that and thankyou 
+i think you dont english very much 
+i want to meet alice 
+i am fed up please get lost 
+i am fed up please get lost 
+will you stop this 
+will you stop this 
+i am fed up please get lost 
+will you stop this 
+will you stop this 
+stop 
+stop 
+stop 
+stop 
+stop 
+will you bring one burger 
+will you get me something to eat 
+fix an appointment with alice ashcraft 
+yes 
+go to the room n o three four one six 
+search the room n o three four one six 
+three four one eight mean 
+yes 
+i want to get rooms to stay can you help me 
+yes 
+available fares 
+i need flight from trichy to singapore on the dated three zero one zero one four 
+i need information abut you first 
+whatever you like bring to me 
+yes 
+i want to design an aircraft 
+please life high profile 
+what is your name 
+what is your mother name 
+nothing 
+yes 
+can i rectify the orginal problem in windows seven 
+bring item three from items available 
+bob wants the item in slot three 
+bring item three to bob 
+bring phone to bob 
+robert quotbobquot brown 
+bring item three to robert quotbobquot brown 
+give item three to robert quotbobquot brown 
+take item three and give it to robert quotbobquot brown 
+take a phone and give it to robert quotbobquot brown 
+bring phone to robert quotbobquot brown 
+go to three five one two 
+yes 
+go to the room no three four one six 
+you walk to room no three four one six 
+two 
+burger 
+one two 
+please help 
+three 
+coffee 
+please help me coffee 
+yes 
+need to walter the plans 
+water the plants 
+i want food 
+i want to eat cake 
+name of the person 
+name a person on the floor 
+you name 
+your name 
+three five one zero 
+robot 
+access to some food and drink items for people on that floor 
+want to eat cake 
+i want to drink water 
+thank you 
+drink disasters 
+want to drink water 
+name of the follr 
+name of the floor 
+how to navigate a floor of a building  
+slow down you dont need to run and jump everywhere take a walk through the desert watch the sun go down relax besides how can you run from goodsprings to new vegas without resting or eating 
+please help 
+yes 
+bring sandwich to alice ashcraft 
+bring item in slot two to alice ashcraft 
+sandwich 
+take item two from items availbale 
+alice ashcraft 
+deliver sandwich to alice ashcraft 
+deliver item in slot no two to alice ashcraft 
+deliver sandwich 
+yes and deliver sandwich 
+go to three four one six 
+yes 
+i try to buy a smartphone  which phone is best 
+which brand smartphone is best 
+how i go to usa 
+hi what is your name 
+yes  i asking question to yo 
+carol clark need your help 
+carol clark wants the item in slot three so take the item and give to him 
+robot give item no three to dr clark 
+robot bring the item in slot three to me 
+robot bring the cell phone to me 
+yes bring the cell phone and give to dr clark 
+robot go to room no three four one six 
+yes walk to three four one six 
+bring carol clark item one 
+bring carol clark phd item one 
+go to carol clark 
+to carol clark phd office 
+carol clark 
+yes 
+go to francis foster s office 
+yes 
+eve needs the trash can 
+evelyn eckhart needs a trah can please provide 
+evelyn eckhart needs the item in slot four please give it to her 
+please pick up the trash can and give it to evelyn eckhart 
+no i am telling you to pick up the trash can and give it to evelyn eckhart 
+evelyn wants the trash can 
+evelyn echart needs a trah can in her office please pick up and give it to her 
+pick up the item in slot four evelyn echart 
+supervisor needs you go to room three five one two 
+yes 
+what is the no one 
+what is this 
+i can i type 
+what can i type 
+three four zero four is what 
+yes 
+put the iterm in slot four 
+george wants you to put all the item in four 
+george wants the dustbin 
+take the dust bin 
+get the item from slot four and take the item to george 
+go to hell 
+get the blue color and take it to the george green 
+yes 
+blue color dust bin 
+slot four 
+dustbin 
+waste material 
+blue color 
+file 
+blue 
+dustbins 
+blue dustbin 
+blue colour dustbin 
+blue dust 
+blue colour trolly 
+garbage can 
+wheelie bin 
+blue wheelie bin 
+wastepaper bin 
+take mobile phone 
+garbage pailstar 
+garbage 
+trash barrel 
+blue bin 
+blue dustbin 
+blue wheelie bin 
+plastic dustbin 
+bin 
+blue bin 
+plastic trash 
+plastic dustbin 
+blue plastic dustbin 
+diary 
+to trow waste in dustbin 
+three five one two 
+go to the office walter ward needs you 
+walter ward supervisor 
+go to the office of supervisor 
+no walk to three five one two 
+you go to three five one two 
+yes 
+rooms 
+take item no five to alice ashcraft 
+take item to five 
+take two 
+go to alice 
+go to secretary 
+go to alice ashcraft 
+to alice ashcraft 
+walk to secretary 
+walk to alice ashcraft 
+walk to alice ashcraft secretary 
+take no two 
+help 
+go to three four zero four 
+yes 
+go to three five one two 
+yes 
+get the calendar 
+go to slot five 
+yes 
+go to three four one six 
+yes 
+evelyn needs some food 
+eckhart 
+can u understand me 
+go to room n o three four one six 
+visit room three four one six 
+three four one six 
+you should go and meet francis 
+francis is in three four one six 
+no i am asking you to visit room no three four one six 
+you are not able to understand me 
+i do know how to explain you 
+yes 
+please take slot five item to evelyn eckhart 
+evelyn eckhart 
+yes slot five item day calendar 
+item in slot five 
+the day calendar in slot five 
+slot five 
+yes 
+please go to room three four one six 
+yes 
+get item four for carol 
+take trashbin to carol 
+carol clark wants the item in slot four 
+bring item in s l o t four to carol 
+bring item in s l o t four 
+get item in s l o t four to carol clark 
+carol clark wants to throw trash 
+buy item in s l o t four to carol clark 
+buy item in s l o t four for carol clark 
+go to room three five one two 
+yes 
+hai 
+alice wants a burger 
+get a burger for alice 
+bring a burger for alice ashcraft 
+yes 
+walk to room three five one two 
+yes 
+bring coffee for carol clark 
+carol 
+carol clark 
+coffee 
+yes 
+walk to room three five one two 
+yes 
+take item five to mallory morgan 
+take the note book to mallory morgan 
+the item in slot five 
+to deliver number five item the notebook to mallory morgan 
+i need you to deliver the notebook to mallory morgan 
+i need you to take item five to mallory morgan 
+i need you to take the planner book to mallory morgan 
+a book 
+i want you to walk to mallory morgan s office and take the planner book to her 
+yes 
+go to three four two zero 
+yes 
+three five zero eight 
+three four zero four 
+three five one two 
+three five one zero 
+three four three six 
+three four one six 
+three four two zero 
+carol clark on which floor 
+give me some food 
+bring two 
+ask for five 
+ask for three the cell phone 
+nothing 
+can you please bring the dustbin four out 
+bring dustbin out 
+fuck you 
+eat the burger 
+take the burger 
+call frannie with the cell phone 
+no 
+call frannie with cell phone 
+yes 
+whats your name 
+three five one zero 
+go to peggy parker phd at three five one zero 
+to room no three five one zero 
+go to room two four zero four 
+sorry go to room no three four zero four 
+yes 
+yes 
+go to iteam four 
+can you go to slot four the item avaliable 
+go to clark 
+go to carol clark 
+to carol clark phd 
+go to iteam four wher the bin is kept 
+go to the bin 
+go to the slot four where the bin is kept 
+go to carol clark phd 
+go walk to carol clark phd 
+go to dr carol clarkphd 
+to carol and then item four 
+go to carol 
+carol clark phd 
+go to three four one six 
+ya 
+u walk to three four one six 
+yes 
+francis foster 
+go walk to francis foster 
+go to francis frannie foster 
+huhh francis foster 
+go to francis  foater office 
+francis foster office walk 
+carol clark needs the item in s l o t three 
+item in s l o t three 
+item three 
+slot three 
+reach mobile phone 
+three 
+items available to you 
+mobile phone needed 
+cell phone recquired 
+what all items do you have  
+yes 
+reach to destination room no three four one six francis foster s office 
+francis foster needs you at her office three four one six 
+no 
+move to three four one six 
+francis frannie foster 
+go to room number three four one six 
+no need to talk but reach there 
+francis frannie foster s office three four one six 
+room number three four one six 
+office number three four one six 
+three four one six 
+yes 
+brink item n o one a cup of soft drinks 
+get a burger 
+get a burger from items available 
+go to robert 
+go to people 
+get an item 
+get the item from slot four 
+get the waste bin form the item in slot four 
+bring item four 
+i want the item n o four 
+can you get me the waste paper bin from item four 
+yes 
+go to room three five zero two 
+yes 
+take item five to alice 
+what is item five 
+do you have a calendar 
+can you take the calendar to alice 
+go to alice 
+no 
+restart 
+go to room three five one two 
+yes please 
+go find eve 
+walk to eve 
+pick up the calendar 
+go to room three five one two 
+yes 
+mobaile 
+bob 
+walter ward supervisor 
+nothing 
+i need help 
+yes 
+why sorry to say you 
+no 
+plese give me code 
+ 
+no  
+leaving or refreshing the page will prevent you from completing this hit 
+yes 
+send me the murtuk security code 
+yes 
+no 
+i need security code  can you help me 
+yes 
+please  deliver the file to the director 
+the director wants the office fileplease hand it over to him 
+mr morgan wants is diary so please go and give it to him 
+to his office 
+to his office on the top floor 
+at three five zero eight 
+to his office at three five zero eight 
+walk up the steps to his office on the iii floor 
+climb up the steps to mr mallory morgan s office at three five zero eight and handover his office diary 
+walk upto morgan s office at three five zero eight 
+walk on the steps to reach his office 
+walk up the floor 
+walk  up the steps to reach mrmorgan s office at three five zero eight 
+climb up the steps to reach mrmorgan s office at number three five zero eight and handover his diary 
+you have to handover the diary of mrmallory morgan the director he needs it 
+take the diary from slot number five and give it to the director 
+yes his personal diary 
+take the diary from slot n five and give it to the director mrmallory morgan at three five zero eight 
+the director mrmorgan wants the diary from slot n o five y o u have to carry it and give it to him at three five zero eight 
+bring the box file from slot number five to three five zero eight 
+theitem from slot five 
+the item that is kept in slot number five 
+there is an item available in slot five  take it and give to mr morgan at three five zero eight 
+a personal diary is kept in slot five available to you take it and give it to the director mrmorgan at three five zero eight 
+bring the book that is kept in slot five 
+collect the diary kept in slot five and give it to mrmorgan at three five zero eight 
+go to  ms francis foster s office at three four one six she needs you 
+yes climb the steps and reach her office 
+provide alice item no five 
+go to alice with item five 
+take item no five 
+take diary to alice 
+take out diary 
+get diary 
+go to alice room 
+go to secretary room 
+call secretary 
+pick diary 
+take the diary 
+take item five 
+call alice ashcraft 
+take slot five 
+slot five 
+alice wants the item in slot five 
+go to three four one six 
+yes 
+u can 
+i wanna do this project can u help me 
+how can i move these 
+walter needs some helpyou go and do 
+go to walter ooffice 
+ 
+three four zero four a l i c e ashcraft secretary 
+what is the plan to make good business 
+go to three four zero four alice ashcraft secretary 
+on floor 
+you walk on normal floor pnly 
+please go to francis foster at room number three four one six 
+walk through the corridor 
+walk towards room three four one six 
+send it robot 
+three four zero four 
+three four one eight 
+three four zero four 
+how to make more money from amazon 
+three five one two 
+please go to room three five one two 
+yea 
+you should walk to three five one two 
+first you go to room three five one two 
+yea 
+ok 
+i cant understand what you say 
+three four one two 
+please go to room three five one two 
+get the item four and give it to evelyn 
+go and get item four 
+bring four 
+get item four 
+four to evely quotevequot eckhart 
+four 
+give four to evelyn 
+evelyn want tiem four 
+evelyn want item four 
+bring slot four for evelyn 
+three five one two 
+go to three five one two 
+yes 
+please send the name 
+cell phone 
+director s name 
+again 
+how can i help 
+writing the task 
+yes 
+education 
+for room accomidation 
+where are u 
+what happend you didnt understand any thing 
+yes 
+take the number two 
+go and take burger 
+chose the number two item which is available with you 
+yes 
+go to the three four one six  francis quotfranniequot foster 
+three four one six is the rooms number go to this room 
+yes 
+alice ashcraft secretary wants you to get her the item in slot five a calendar 
+no i am asking for your help in a task that needs done 
+please assist the secretary alice ashcraft  please get her the calendar in slot five 
+no i am giving you instructions 
+get item in slot five for alice ashcraft secretary 
+please get item in slot five for alice ashcraft secretary  it is a desk calendar 
+obtain the item in slot five for the secretary 
+please please obtain the item in slot five for the secretary 
+get item in slot five and present it to the secretary 
+same as before you have access to item in slot five  get for the secretary 
+the secretary wants the item in slot five 
+the secretary wants the item in slot five 
+the secretary wants the item in slot five 
+the secretary wants the item in slot five 
+same as all the other times  can you help her please 
+yes 
+go immediately to room three five one two walter ward needs you 
+on the floor that you are on look for room three five one two  it is clearly marked 
+yes to walter ward s room three five one two  he needs your help 
+that is correct 
+clean the room 
+hi 
+you need to go to office 
+four 
+carol clark needs four 
+three four two zero needs four 
+three four two zero 
+take four to three four two zero 
+yes 
+item four 
+waste bin 
+four 
+four 
+slot four 
+bring item four to three four two zero 
+deliver the the object at slot four to three four two zero 
+four 
+slot four 
+item in slot four 
+three four two zero 
+yes 
+you should go to francis office 
+do you know francis 
+do you know francis 
+do you know frannie 
+go to three four one six 
+yes 
+give carol clark three 
+three to carol clark 
+three 
+carol clark want three 
+get mobile phone to carol clark 
+give item three to carol 
+carol clark phd want item three 
+get mobile for carlol clark phd 
+go to three five one two 
+yes 
+get item from slot one 
+get coffee 
+take coffee to carol clark 
+yes 
+go to fracis office three four one six 
+yes 
+fine 
+bring carol clark item number four 
+go to carol 
+go get the garbage can 
+garbage can 
+slot four 
+get item four 
+carol clark needs item four 
+item four 
+carol clark wants item four 
+go get item four and bring it to carol 
+go get the blue bin and bring it to carol clark 
+go to room three four one six to help francis 
+help francis 
+yes 
+please bring alice ashcraft a cheeseburger 
+yes 
+you have to go to room three five one two 
+yes 
+please get me number one and two 
+yes who is on the phone 
+call aloice ashcraft to rescheduole my two zero zero appointments 
+call alice ashcraft to rescheduole my two zero zero pm appointment till four zero zero pm 
+go to room three four zero four and tell alice to reschedule my two zero zero appointment 
+yes and get alice 
+please give carol clark the item in slot four 
+no please give carol clark the garbage 
+give carol clark the item in slot four 
+please give carol clark item four 
+give carol claark the item in slot four 
+carol clark needs the garbage 
+empty carol clark s garbage 
+give carol clark item four 
+yes can you give the item in slot four to carol clark 
+please go to room three four one six 
+yes 
+intern needs item in slot four 
+i need item in slot four 
+i need waste basket 
+slot four 
+took waste bin to my office 
+i want the item in slot four 
+what is the item in slot four 
+george 
+george green 
+george green intern needs item in slot four 
+give item in slot four to george green intern 
+dust bin 
+please bring a dust bin 
+i need waste basket 
+i need a mobile 
+please take that mobile 
+give me mobile phone 
+george green wants the item in slot four 
+please bring here a dust bin 
+please bring here a waste basket 
+hi 
+go to three five one two 
+yes 
+can you do a favor for me 
+can you serve in the room 
+francis needs a robot can you go with him 
+i am going to send you to the office of francis 
+francis needs a robot you must go to her office 
+robot must go to the office of francis 
+robot has to navigate a floor 
+francis needs the robot send it to her office 
+robot has to go to the office of francis 
+how to set as goal 
+how to get the job done 
+how to make the room clean 
+how to accomplish the goals 
+can you get some burger 
+get me number two 
+what is item two 
+get a burger 
+hmm 
+where are you 
+ofcourse yes 
+get some milk for carol clark 
+can you please bring some milk 
+go to the labs 
+can you tell me your name 
+yes 
+go and meet carol clark 
+go and meet dr clark 
+yes 
+yes 
+three five one zero 
+what is your name 
+three five one two 
+walter need you just go to his office 
+no i want you to take involve in three five one two 
+go and meet walter ward in his office 
+dont bring anything just go and meet walter ward 
+just go and meet walter ward 
+just go and meet walter ward in his office 
+walter ward 
+coffee 
+yes 
+go get the trash can 
+to the blue trash can 
+yes 
+go to room three four one six 
+yes 
+get alice ashcraft the burger from slot two 
+alice ashcraft 
+burger 
+item in slot two 
+no 
+slot two 
+yes 
+walk to room three five one two 
+yes 
+transfer five to eve 
+no give five to eve 
+give slot five to evelyn 
+carry book to evelyn 
+yes 
+go to three four one six 
+yes 
+go to three four zero four with three four zero four 
+to three four zero four 
+three four zero four 
+yes 
+go to three four one six 
+walk to three four one six 
+yes 
+take the item in slot five to mallory morgan 
+take mallory morgan the item in slot five 
+the item in slot five 
+the planning calendar 
+yes 
+go to francis fosters office 
+go to room three four one six and see francis 
+yes 
+give item one to carol clark 
+carol clark 
+yes 
+go to walter ward 
+three five one two 
+yes 
+robert brown needs your help 
+robert brown needs the cell phone 
+take the cellphone to robert brown 
+take the cell phone to bob 
+go to room three four one six 
+francis foster needs your help 
+yes 
+bring evelyn item in slot four 
+not the hamburger bring evelyn the trash can 
+bring the trash can to evelyn 
+the  trashcan is for evelyn 
+evelyn 
+evelyn eckhart 
+yes 
+the supervisor needs you 
+no 
+go to room three five one two 
+yes 
+good 
+mobile 
+how to do this  
+yes 
+how to do this 
+yes 
+evelyn wants five 
+get evelyn item in slot five 
+please get item in slot five for evelyn 
+get evelyn the calendar 
+no 
+get evelyn the calendar 
+no fuck the hamburger 
+bring calendar to evelyn 
+get calendar from slot five for evelyn 
+evelyn 
+eve 
+go to three four one six 
+yes 
+i need food 
+i need notr 
+i need directoru 
+i need directory 
+i need diary 
+i need one thing 
+i need note 
+i want item no five 
+i want one book 
+i want to write 
+no 
+yes 
+i need one book to read 
+yes 
+i need my office 
+go to her office 
+right side 
+go right and turn left 
+gdc third floor 
+go to third floor 
+bring four to george green 
+yea 
+yes as in yea 
+three four one six 
+go to three four one six 
+yes 
+can you please go to the room 
+take mobile to robert 
+handle the mobile phone to robert 
+robert brown 
+give robert brown the mobile phone 
+go to robert brown 
+yes 
+walk to three five one two 
+yes 
+take the dustbin to eve 
+go to eve with slot four 
+yes 
+go to three five one two 
+yes 
+please get the item in slot five and take it to evelyn 
+get the item in slot five 
+no 
+get the planner 
+can you get the planner 
+get the calender 
+no 
+get the calender and take it to eve 
+get item five 
+bring the calender to eve 
+eve 
+eve 
+evelyn eckhart 
+yes 
+go to room three four one six 
+yes 
+please bring be my cell phone 
+yes 
+go to room three four zero four 
+yes 
+bring phone to bob 
+bring item three to robert brown 
+cell phone 
+yes 
+robot go to room three four one six 
+yes please 
+room no three four zero four labalice ashcraft and office secretary go to the one cup of coffee 
+go to room no three four zero four 
+take the item in slot four to george 
+bring the trashcan to george 
+no one 
+bring the trashcan to george 
+george 
+george green 
+garbage can 
+trash can 
+yes 
+go to room three four one six 
+yes  walk to room three four one six 
+yes 
+take the item from slot five and give it to evelyn 
+take the item from slot five 
+take the calendar to evelyn 
+evelyn 
+evelyn quotevequot eckhart 
+eve 
+eckhart 
+evelyn 
+people 
+evelyn 
+take the calendar to evelyn 
+take the calender to e 
+go to room three five one two 
+yes 
+can you please provide item four 
+yes 
+three four zero four i need food 
+i need food 
+can you please provide some food 
+hi 
+how are you 
+yes 
+take a cell phone to carol clark 
+carol clark 
+the cell phone in slot three 
+bring it to carol clark 
+yes 
+go to francis foster in room three four one six 
+francis foster 
+yourself 
+no you go to francis foster in room three four one six 
+nothing 
+go to francis foster in room three four one six 
+francis foster room three four one six 
+a pencil 
+a pencil 
+take a pencil to three four one six 
+no  bring a pencil to three four one six 
+bring a pencil to room three four one six 
+bring a wooden pencil to three four one six 
+anything you want 
+a pencil 
+bring a pencil to room three four one six 
+coffee 
+yes 
+give the slot four to carol 
+yes 
+go to the office room number three five one two w a l t e r ward supervisor 
+room number three five one two 
+give the secretary the item no two 
+yes 
+go to the office room no three four one six f r a n c i s quotfranniequot foster 
+room no three four one six 
+go to the room no three four one six f r a n c i s quotfranniequot foster 
+go to the room no three four one six 
+go to office room no three four one six 
+go to office room no three four one six f r a n c i s 
+walk towards three four one six room 
+take the cell phone to carol clark 
+carol clark 
+cell phone 
+yes 
+go to three four one six 
+yes 
+the secretary wants the item in slot five 
+alice ashcraft 
+the item in slot five 
+a ring binder 
+a binder 
+a book 
+bring a binder to alice ashcraft 
+a binder 
+you should bring a binder 
+you should bring a ring binder to alice ashcraft 
+you should bring the item in slot five to alice ashcraft 
+yes 
+so the supervisor needs the robot 
+yes the supervisor needs the robot you must go to his office 
+i need a mobile 
+bob needs mobile 
+i want obile 
+give me my mobile 
+yes 
+go to office 
+go to three five one two 
+yes 
+take out the garbage 
+item number four 
+give to george 
+take out trash 
+yes 
+go to francis office 
+go to three four one six 
+yes 
+take the phone and go to carol clark 
+to carol clark 
+yes 
+go to walter s office 
+to room three five one two 
+eve wants the item in slot five 
+to eve 
+a calander organizer 
+yes 
+go to room three five one two 
+yes 
+take item from slot three 
+to bob 
+robert brown 
+yes 
+go to room three five one two 
+yes 
+take coffee to carol clark 
+dr clark 
+carol clark phd 
+doctor carol clark 
+take coffee to dr carol clark 
+dr clark 
+go to carol 
+walk to carol 
+no take coffee to dr clark 
+go to carol 
+yes 
+go to room three four one six 
+yes 
+give the phone to bob 
+no 
+bob wants the phone 
+no 
+send bob a phone 
+no 
+give three to bob 
+no 
+can you give bob the phone 
+yes 
+go to room three four one six 
+yes 
+go the office and complet task assigned 
+bring it to alice ashcraft 
+bring letter to alice ashcraft to distribute before meeting 
+bring letter to alice ashcrat the secretary 
+bring to three four zero four 
+walter ward needs you in his office 
+can you give bob a cellphone 
+yes 
+go to room three five one two 
+yes 
+three 
+three four zero four 
+bob 
+i want to cellphone 
+to eat 
+yes 
+yes 
+i want to go my office 
+three five one two 
+walter needs the robot send it to his office 
+hi 
+three four three two 
+yes 
+pick slot three 
+no 
+slot three 
+give mobile to bob 
+bob 
+robert brown 
+bob 
+three 
+pick item at three 
+robert bob brown 
+one 
+bob wants item in slot three 
+bob 
+robert brown needs something 
+people directory 
+no 
+bob needs three 
+fuck you 
+give cell phone to bob 
+go to walter 
+no 
+please go to room three five one two 
+yes 
+get the cellphone 
+bring the cellphone to robert 
+bring the cellphone to bob 
+robert brown wants the cellphone 
+no 
+bring the cellphone to robert brown 
+robert brown 
+cellphone 
+phone 
+item three 
+yes 
+go to room three four one six 
+yes 
+carol clark wants item in slot four 
+item in slot four 
+yes 
+walter ward in room three five one two needs you in his office 
+go to walter ward in room three five one two 
+nothing 
+you dont need to bring anything 
+go to walter ward in room three five one two 
+walter ward 
+yourself 
+yes 
+i need a puck up 
+i need a car 
+go to this address 
+no 
+ok 
+three three seven five spring hill pkwy 
+ok 
+three four zero four 
+alice ashcraft 
+please take the item in slot four to george green 
+george green 
+item in slot four 
+take it to george green 
+take the trashcan to george green 
+yeah 
+proceed to room three four one six 
+no 
+go to room three four one six 
+yeah 
+walk to three 
+walk to item in slot three 
+walk to mobile three 
+walk to three 
+walk to item three 
+walk to slot three 
+walk to mobile 
+no 
+walk to mobile 
+no 
+walk to mobile 
+walk to mobile 
+walk to item three 
+walk to three 
+no 
+walk to item three 
+walk to three 
+walk to item three 
+walk to item mobile 
+walk to bob 
+i want u to walk to robert bob 
+walk to bob 
+walk below foster 
+below foster 
+no 
+walk tomobile 
+go to bob and give him mobile 
+walk to bob and give him item three 
+walk to item in slot three 
+walk to item three 
+go to three four one six 
+yes 
+get item from slot four 
+get item from slot four 
+carol 
+carol clark 
+yes 
+three five one two 
+go to three five one two 
+yes 
+give the dustbin to dr clark 
+send the dustbin to clark 
+no 
+dr clark wants the item in slot four 
+dr clark wants garbage bin 
+deliver garbage bin to carol clark 
+no 
+nothing 
+take the garbage bin and walk to carol clark 
+carol clark 
+yes with the bin 
+you need to go to frannie 
+francis foster 
+yes 
+do household tours 
+wash dishes 
+clean rooms 
+go to office three four one six 
+frannie 
+francis foster 
+a soda 
+a bottle of water 
+beverage 
+bring yourself 
+nothing 
+go to office three four one six to do a favor for francis foster 
+francis foster 
+she will tell you 
+take one to clark 
+no 
+take slot one 
+bring coffee to carol clark 
+no 
+bring coffee to carol clark 
+yes 
+go to office 
+go to francis 
+no 
+go to three four one six 
+yes 
+take item four to eve 
+to evelyn eckhart 
+blue trash bin 
+blue colored trash bin 
+item four 
+yes right 
+walk to three five one two 
+yes 
+please take the calender to mallory morgan 
+mallory morgon 
+mallory morgan 
+calendar 
+take it to her 
+deliver 
+yes 
+please go to room three four one six 
+yes 
+carol clark three 
+give to carol clark a cell phone 
+yes 
+go to walter ward s office 
+yes 
+bring secretary sandwich 
+bring sandwich to the secretary 
+go take the sandwich 
+sandwich to the secretary 
+sandwich 
+item two 
+yes 
+go to francis foster 
+francis foster office 
+francis quotfranniequot foster 
+to francis quotfranniequot foster 
+to francis foster 
+yes 
+please take the item in slot four to carol clark 
+carl clark needs the item in slot four 
+not hamburger the dustbin 
+please take the dustbin to carol clark 
+no it is an order 
+take the dustbin to dr clark 
+no 
+take the waste basket to dr clark 
+no 
+please go to dr clark s room 
+on the floor 
+yes 
+yes please please go to walter ward number three five one two 
+walter ward 
+wait for instructions from walter ward 
+no 
+just go to three five one two 
+yes that is right 
+go to alice ashcroft 
+no 
+go to alice ashcraft 
+to alice ashcraft 
+slot two 
+get slot two 
+go to slot two 
+yes 
+go to three five one two 
+yes 
+robot please bring item one the coffee to carol clark phd 
+yes 
+go to room three four one six francis foster is in need of you robot 
+robot please go see fracis quotfranniequot foster in room three four one six 
+yes 
+evelyn needs item number five 
+to evelyn 
+walter needs you go to room three five one two 
+yes 
+bring item four to eve 
+eve 
+evelyn eckhart 
+yes 
+yes 
+go to room three five one two 
+yes 
+go to mallory morgan 
+go to mallory morgan 
+go to mallory morgan 
+to mallory morgan 
+yes 
+go to three four one six 
+yes 
+can you bring some coffee to dr clark 
+bring the item in slot one to carol 
+bring item one to carol clark 
+no to carol clark 
+bring item one to dr clark 
+no to dr clark 
+bring the coffee to clark 
+coffee 
+no bring it to drcarol clark 
+yes 
+bring the coffee 
+yes 
+go to walter s room 
+to room three five one two 
+give alice a burger 
+bring a burger 
+go to alice 
+yes 
+go to three five one two 
+yes 
+httpswwwcsutexaseduusersmlrlgmapdirwalkpng 
+pick up item five and take item five to mallory morgan 
+mallory morgan 
+item five 
+yes 
+please go to room three five one two 
+walk to room three five one two 
+yes 
+please get the item in slot four 
+bring the garbage can to carol 
+no not the hamburger 
+bring the garbage can to carol 
+carol 
+bring the item to carol 
+please bring something to carol 
+no not francis foster bring the item in slot four  to carol clark 
+bring the item in slot four to carol clark 
+yes 
+go to room three four one eight 
+yes 
+francis office 
+goo to francis office 
+go to francis office 
+down the hall 
+to francis office 
+can you please walk down to francis office 
+bring alice ashcraft a burger 
+alice ashcraft 
+a burger 
+item two 
+yes 
+go to room three five one two 
+to room three five one two 
+yes 
+deliver garbage to george 
+deliver item four to george 
+four to george 
+trashcan 
+give george trashcan 
+go to room three five one two 
+three five one two 
+yes 
+alice wants the food in slot two 
+no 
+give the item in slot two to alice 
+no 
+can you give alice the food in slot two 
+yes 
+go to room three four one six 
+yes 
+i think u take mobile to use 
+no i just tell u 
+yes 
+robert 
+rooms 
+yes i was rooms 
+three four one eight r o b e r t b o b b r o w n 
+i think u should to do there  r many offers 
+walt disney pictures released walle in the united states and canada on june two seven  its opening weekend in three nine nine two theaters 
+please bring item three to carol clark 
+yes 
+yes 
+go to walter ward in room three five one two 
+walter ward 
+yourself 
+no 
+nothing 
+go to room three five one two 
+room three five one two 
+yes 
+grab item five 
+take item five to evelyn 
+yes 
+go to room three one four six 
+no 
+go to three one four six 
+yes 
+take item two a hamburger to alice ashcraft 
+to alice ashcraft the secretary 
+alice ashcraft 
+yes the hamburger 
+yes 
+frannie needs you go to room three four one six 
+yes 
+give bob the item in slot three 
+no  give robert brown the item in slot three 
+get the item in slot three 
+robert brown 
+yes the hamburger 
+yes 
+go to room three five one two 
+to room three five one two 
+yes 
+take item five to mallory morgan director 
+no 
+take calendar to mallory morgan 
+yes 
+yes 
+go to office three four one six 
+yes 
+u should go 
+a longtime city health department worker was  and had hung up when she heard the robot answer the phone because she needed to speak to a  calling dillon a quotdisgruntledquot employee who didnt like his supervisor 
+sorry i cant help u 
+the film s plot centers upon an experimental military robot which is struck by  nova who send out a team to recover him 
+httpswwwcsutexaseduusersmlrlgmapdirwalkpng 
+supervisor needs go to office 
+walk to mallory morgandirector 
+no you walk 
+walk to mallory morgandirector 
+no 
+you walk to mallory morgandirector 
+walk to marry 
+walk to three four one six 
+yes 
+go to three five zero two with five 
+three five zero two 
+yes 
+walk to three four one six 
+yes 
+where do i get a drink 
+what office do i go to for a drink 
+get a drink 
+i need a robot 
+i need to go to the office and get a robot 
+where is the office 
+put the item in slot one 
+i need you to put the item in slot one 
+carol wants you to put the item in slot one 
+yesi need you to put the item in slot one 
+please come to my office 
+you need to go to walter wards office 
+to walter wards office 
+yes 
+retrieve item five 
+item five is a calendar 
+mallory morgan 
+no bring item five to mallory morgan 
+mallory morgan 
+yes 
+go to three five one two 
+straight 
+walk to walter ward s office 
+yes 
+take the book to evelyn 
+no 
+take item five to evelyn 
+eve 
+evelyn eckhart 
+yes 
+go to room three five one two 
+to room three five one two 
+yes 
+walk to three five zero eight 
+yes 
+move to three five one two 
+walk to three five one two 
+yes 
+item four 
+no 
+get item four 
+george green 
+yes 
+go to three five one two 
+three five one two 
+y 
+yes 
+take burger to alice 
+no 
+burger 
+take the burger to the secretary 
+no 
+no 
+no 
+no 
+ashfliuahw 
+yes 
+go to walters office 
+go to three five one two 
+three five one two 
+yes 
+walk to three four two zero 
+yes 
+walk to three five one two 
+three five one two 
+yes 
+walk to three five zero two 
+yes 
+walk to three five one two 
+three five one two 
+yes 
+would you take the calendar to the director 
+mallory morgan 
+please take the calendar to mallory morgan 
+yes 
+go to francis 
+no go to francis 
+francis needs you 
+no i am not asking you a question go to room three four one six because francis needs you 
+would you go to francis in room three four one six 
+yes i want you to walk to three four one six 
+get the trashcan and walk it to george 
+bring the trash can to george green 
+no 
+take the trash can to george green 
+yes 
+go to room three five one two 
+room three five one two 
+yes 
+take the diary to evelyn eckhart 
+no 
+go to evelyn eckhart with the diary 
+evelyn eckhart 
+yes 
+please go to three five one two 
+three five one two 
+yes 
+give item number four to evelyn eckhart 
+evelyn 
+evelyn eckhart 
+item four 
+the recycle bin 
+slot four 
+item four 
+item four 
+the item in slot four 
+yes 
+go to frannie in room three four one six 
+yes 
+go to george green 
+george green 
+yes 
+three four one six 
+go to three four one six 
+yes 
+go to eve with the garbage bin 
+go to evelyn eckhart with garbage bin 
+no 
+to evelyn eckhart 
+take the garbage bin there 
+yes with the garbage bin 
+go to room three four one six 
+yes 
+take a cell phone to bob brown 
+bring robert brown a cell phone 
+no robert brown 
+robert brown 
+not peggy robert 
+take it to her 
+bring it 
+deliver it 
+yes 
+go to bob 
+keep it 
+hide it 
+lose it 
+ignore it 
+cancel 
+nothing 
+go to bob 
+no 
+walk to bob brown 
+go to robert brown 
+to bob 
+go to robert brown 
+aaaarrgh 
+bob 
+walk to bob 
+yes 
+walk to room three four one six 
+yes 
+item in slot two 
+can you deliver the item in slot two cheeseburger to alice ashcraft 
+yes 
+go to room three five one two 
+go to room three five one two 
+three five one two  walter ward 
+straight ahead 
+room three five one two 
+yes 
+can you get the trash can 
+can you bring it to evelyn eckhart 
+evelyn eckhart 
+yes 
+evelyn eckhart 
+evelyn 
+eve 
+bring it to evelyn eckhart 
+can you walk to room three five one two please 
+three five one two 
+yes 
+can you get the calendar 
+yes 
+can you please walk to room three four one six 
+yes 
+walk to carol taking the coffee 
+to carol 
+to carol clark 
+yes 
+walk to three five one two 
+to three five one two 
+yes 
+bring a cup of coffee to carol clark 
+yes 
+go to room three five one two 
+to walter ward s office 
+yes 
+please go to the dr clark 
+please go to the carol clark 
+to the slot three 
+you have to help carol 
+i want you help carol clarck 
+please go to the dr clark 
+no to the carol clarck 
+to the carol clarck 
+dr clark wants the item in slot three 
+please bring a cellphone from slot three to carol clarck 
+you have to bring cellphone to carol clark 
+carol needs cellphone bring it to her please 
+frances foster needs your help 
+francis foster needs the robot 
+please go to the four three one six room 
+you have to help francis foster 
+francis foster will explain you what you have to do 
+simply please go to the room three four one six 
+yes to the office three four one six 
+office three four one six 
+yes please 
+bring the bin to evelyn eckhart 
+evelyn eckhart 
+item four 
+yes 
+go to walter in room three five one two 
+walter 
+walter ward 
+yourself 
+no you 
+go to walter ward 
+the robot 
+no 
+send the robot to walter ward 
+asshole 
+walter ward needs you 
+help him 
+go to room three five one two 
+yes 
+walk to three five zero two 
+yes 
+walk to three five one two 
+three five one two 
+yes 
+bring evelyn her desk calendar 
+no tevelyn eckhart 
+bring evelyn eckhart her calendar 
+yes 
+frannie in room three four one six needs you 
+no im telling you what to do 
+go to room three four one six 
+see frannie 
+go see frannie 
+talk to frannie 
+go talk to frannie 
+yes 
+go to carol clark 
+go to carol clark 
+pick up slot three 
+yes 
+go to three four one six 
+yes 
+please bring alice ashcraft item two 
+alice ashcraft 
+yes 
+please go to room three four one six 
+yes 
+carol clark want item three 
+carol clark 
+yes 
+go to frannie officee 
+three four one six 
+yes 
+george green wants you to pick up and dispose his trash 
+george green the intern 
+george green wants a trash pick up 
+george green 
+a trash can 
+yes 
+walter ward is a supervisor  he needs your services  please go to office three five one two to assist him 
+walter ward 
+he would like a sandwich some chips and a soda 
+yes  deliver a sandwich some chips and a soda 
+a ham sandwich some doritos and a coke 
+yes bring francis foster to walter ward 
+item 
+robot i need item five 
+evelyn eckhart 
+item five 
+yes 
+robot go to room three five one two 
+to the office of walter ward 
+room three five one two 
+yes 
+take the coffee and go to carol 
+carol clark 
+coffee 
+yes 
+francis needs you 
+no 
+go to francis 
+no 
+go to francis foster 
+go to room no three four one six 
+go to three four one six 
+yes 
+please get mallory morgan a calendar 
+mallory morgan 
+a calendar 
+yes 
+go to room three five one two 
+down the hall 
+room three five one two 
+walk to his room 
+yes 
+give me a burger 
+yes 
+just follow me just follow me just follow me just follow me just follow me just follow me just follow me just follow me just follow me just follow me just follow me just follow me 
+just follow me 
+pls understand  what i ssid 
+no 
+pls understand what i said 
+yes 
+i need you to take the item in slot four to george 
+no take it to george 
+please take the trashcan to george 
+grab the trashcan and place it next to george 
+move the trashcan to george 
+george needs the trachcan 
+i would like you to take the trashcan to george 
+yes to george 
+george 
+the intern 
+george green 
+bring the trashcan to george 
+bring it to me 
+george 
+bring the trashcan to george 
+robot take the trashcan to george 
+no to george 
+george green 
+yes 
+you need to go see supervisor walter ward in room three five one two 
+walter ward 
+you need to take yourself there 
+bring yourself 
+bring him a cup of coffee 
+correct 
+go to three four one six 
+yes 
+geive me a cellphone 
+give me a cellphone 
+brinf my mobile 
+yes 
+follow what i say 
+yes 
+please take something to mallory morgan 
+to mallory morgans room she wants the item in slot five 
+to mallory morgans room 
+can you please go to mallory morgans room 
+to mallory morgans office 
+to mallory morgan 
+go to mallory morgans room 
+yes 
+please go to francis fosters room 
+to room three four one six 
+hi  would you please take the calendar to mallory morgan 
+yes please 
+please go to frannie s office number three four one six 
+franis foster thank you 
+francis foster 
+nothing just go there 
+please go to francis foster s office as she needs you 
+yes please 
+bring the item in slot five to mallory morgan 
+yes 
+go to room three five one two 
+room three five one two 
+yes 
+bring carol clark a coffee 
+yes  bring it to carol clark 
+yes 
+go to room three five one two walter ward needs you 
+walter ward 
+nothing 
+go to room three five one two 
+to room three five one two 
+yes 
+can you brig carol clark coffee please 
+yes 
+go to walter ward room three five one two 
+walter ward 
+food 
+bring food and water to walter ward 
+food and drink 
+cookies 
+nothing just go 
+go to walter ward 
+room two five one two 
+room three five one two 
+yes 
+intern george green needs the item from slot four can you bring it to him 
+no he needs the blue trash bin 
+george green needs the item in slot four 
+the item in slot four 
+yes 
+walter ward the supervisor needs you to go to his office in room three five one two 
+yes 
+take burger to alice 
+no  go to alice with a burger 
+the secretary needs a hamburger 
+no  take food to alice ashcraft 
+go to the secretary with item two 
+to alice ashcraft 
+see francis foster in room three four one six 
+no go to room three four one six 
+help francis in room three four one six 
+no  visit room three four one six 
+go to room three four one six 
+yes 
+i need dust bin 
+i want a waste basket 
+yes 
+go to three four one six 
+go 
+yes 
+please bring the cell phone to bob 
+no 
+can you bring the item in slot three to bob brown 
+bob wants the cell phone 
+frannie needs you 
+no 
+please go to frannie s office 
+yes 
+bring item in slot five to alice ashcraft 
+alice ashcraft 
+yes 
+please go to room number three five one two the office of walter ward 
+walter ward 
+yourself 
+nothing 
+go to walter wards roo 
+room three five one two 
+yes 
+dr clark wants the trash basket 
+no 
+doctor clark needs the blue basket 
+doctor clark is asking you to bring the blue basket 
+no 
+doctor clark wants the item in slot four 
+no 
+can you take the blue basket to dr clark 
+please take the blue basket to dr clark 
+ok 
+no 
+dr clark wants you to take the blue basket 
+walter needs you in his office 
+to walter ward office three five one two 
+walter ward 
+he just want you in his office 
+no 
+you have to go his office 
+yes 
+take item three 
+carol clark 
+yes 
+walk to francis 
+no 
+go to francis 
+no 
+walk to room three four one six 
+yes 
+give ashley the item in slot five 
+no 
+give mallory the calendar 
+no 
+mallory wants the calendar 
+go give mallory morgan the calendar 
+give mallory item five 
+give the item in slot five to mallory 
+yes 
+go to the supervisor s office his name is walter ward and he is in room three five one two 
+go to room three five two one 
+yes 
+give eve item five 
+give evelyn eckhart item five 
+go to evelyn and give her item five 
+give evelyn the calendasr 
+go to evelyn eckhart and give her the calendr 
+give evelyn eckhart the calendaar 
+go to evelyn and give her the calendar 
+go to evelyn 
+give evelyn eckart the calenar 
+give evelyn the calendar 
+go to evelyn 
+yes to evelyn 
+to evelyn s office 
+give evelyn quotevequot eckhart a calendar 
+give evelyn the calendar 
+yes 
+go to room three four one six 
+yeds 
+yes 
+eve would like you to give her item number four 
+eve 
+please give the item to eve 
+no give the trash can to eve 
+give the trash can to eve 
+give four to eve 
+give slot number four to eve 
+no 
+can you give number four to eve 
+give slot four eve 
+yes 
+go to room three four one six 
+yes 
+bring slot five to eve 
+eve 
+eckhart 
+evelyn eckhart 
+yes 
+yes 
+go see walter ward in room three five one two 
+walter ward 
+not sure  go see what he wants 
+go to walter ward in room three five one two 
+bring yourself to walter ward 
+water 
+food 
+soda 
+nothing 
+go to room three five one two 
+yes 
+on the floor 
+no to room three five one two 
+to room three five one two 
+yes 
+please help clark 
+please help clark to remove the dusybin 
+no 
+help carol clarj 
+go to slot no four 
+slot four 
+yes 
+please go to francis office 
+three four one six 
+yes 
+please take the cell phone to robert brown 
+yes bring the cell phone to robert brown 
+could you please go to room three four one six 
+yes please walk to room three four one six 
+take the item in slot five and give it to evelyn eckhart 
+yes 
+go to office three four one six 
+yes 
+take item five to evelyn eckhart 
+yes 
+go to room three five one two 
+walk in the hallway 
+walk to walter ward 
+no walk to walter ward in room three five one two 
+room three five one two walter ward 
+walter ward 
+yes 
+carol clark wants the item in slot four 
+to slot four 
+yes 
+the supervisor needs you in his office 
+i am instructing you to navigate to the supervisor s office he needs your assistance you dont need to bring anything just yourself 
+go to supervisor s office 
+yes 
+bring the cell phone to dr clark 
+no 
+can you bring the cell phone to dr clark 
+yes 
+go to room three five one two 
+to walter ward room three five one two 
+to walter ward 
+yes 
+get item one 
+bring item one to carol 
+no 
+bring coffee cup to carol 
+pick up coffee cup 
+yes 
+go to three five one two 
+goto three five one two 
+walk to three five one two 
+walk three five one two 
+yes 
+pick item no three and give it to three four one eight 
+pick item three 
+no 
+pick mobile phone 
+no askin for help 
+take and give item three to bob 
+three four one eight bob 
+to robert brown 
+yes right 
+three four one six need u 
+three four one six calling you 
+francis calling you 
+no somebody wants your help 
+you go to office 
+no three four one six 
+to office 
+no walk to three four one six 
+you walk to three four one six s office 
+yes 
+take the trash can to george green 
+yes 
+go to room three four one six 
+yes 
+retrieve item five for alice ashcraft secretary 
+alice ashcraft secretary 
+yes 
+go to office three four one six 
+yes 
+go to room 
+three five one two 
+walk to three five one two 
+can you get  the cell phone 
+yes 
+can you walk to room three five one two 
+three five one two 
+yes 
+go to room three four one six 
+bring item five to evelyn eckhart 
+yes 
+go to walter ward in room three five one two 
+walter ward 
+nothing 
+go to walter ward s office 
+yes 
+take the mobile and walk to three four two zero 
+yes 
+walk to three five one two 
+three five one two 
+yes 
+suck my cock 
+slot one 
+yes carol wants the item in slot one 
+go to room three five one two 
+to the supervisors office 
+no three five one two 
+three five one two 
+yes 
+evelyn eckahart wants the item in slot five 
+give it ti evelyn 
+give it to evelyn eckhart 
+yes 
+i need you to send files tpo my office 
+i need you to send files to my office 
+three four zero four a l i c e 
+go to frannies office 
+go to her office 
+yes 
+evelyn eckhart calendar 
+yes 
+three five one two 
+go to room three five one two 
+see walter 
+could you go to walter ward s office 
+please go to walter ward 
+go to the third floor 
+yes 
+i need one help 
+i need item no four 
+i need dust bin 
+i need product 
+i need plastic bin 
+i need paper holder 
+yes 
+i need blue container 
+give me item no four 
+give the plastic bin to carol 
+yes 
+i need address 
+go straight and turn right 
+yes 
+take item five 
+mallory morgan 
+yes 
+go to room three five one two 
+go to walter ward 
+walk to room three five one two 
+three five one two 
+yes 
+please go to francis foster office 
+office 
+to room number three four one six 
+frannie 
+bring item to slot two 
+walter ward 
+yes 
+i need something to drink come to my office at three five one two and bring a coke 
+i need a coke bing it to three five one two 
+to the kitchen 
+to the kitchen 
+to the coke 
+bring a coke to three five one two 
+yes a coke 
+coke 
+coke 
+coka cola 
+soda 
+coke 
+water 
+wate 
+water 
+a new robot 
+sure 
+bring bob item three 
+no 
+take item in slot three to robert brown 
+yes 
+go see walter ward in room three five one two 
+walter ward 
+nothing 
+go to room three five one two 
+office three five one two 
+yes 
+alice needs item in slot two 
+give alice item in slot two 
+take item in slot two to alice 
+trash bin 
+no hamburger 
+start over 
+take alice the item in slot two 
+item in slot two 
+no 
+no 
+take the item in slot two to alice ashcroft 
+restart 
+go to frannie 
+go to room three four one six 
+yes 
+take calendar to evelyn 
+evelyn 
+evelyn eckhart 
+take it to her 
+deliver calendar to evelyn eckhart 
+yes 
+go to room three four one six 
+yes 
+can you bring number three to carol clark 
+yes 
+go to three four one six 
+yes 
+office 
+send it to her office 
+frannie 
+carol clark wants a coffee 
+take carol clark a coffee 
+i dont have a question im telling you to take carol clark a coffee 
+take carol clark item one 
+no item one is coffee take carol clark a cup of coffee 
+take carol clark a cup of coffee take her the item in slot one 
+yes 
+go to room three four one six 
+yes go see francis foster in three four one six 
+alice ashcraft wants item five 
+alice ashcraft 
+yes 
+go to room three four one six 
+yes 
+dr morgan needs the calendar 
+can you get the calender for dr morgan 
+no get the item in slot five 
+can you get the item in slot five 
+can you get the calendar 
+go to frannies office 
+no go to three four one six 
+francis office room three four one six 
+yes 
+get calendar to alice ashcraft 
+alice ashcraft 
+yes 
+walk to the room three four one six 
+yes 
+yes 
+bob wants the phone 
+yes 
+go to room three five one two 
+go to room three five one two 
+walk down the hall 
+walk borth 
+go forward 
+go to walter s office 
+yes 
+walk to three four zero four 
+walk to the item in slot two 
+no bring the item in slot two to three four zero four 
+walk to slot two 
+walk to the item in slot two for three four zero four 
+yes 
+walk to three five one two 
+three five one two 
+yes 
+go downstair 
+give eve item four 
+yes 
+go to room three four one six 
+yes 
+pick them item from slot three and give to robert 
+give it to robert cell phone is for to talk 
+robert 
+bob 
+brown 
+to robert 
+bring the cell phone to robert 
+give cell phone to robert 
+nothing you have to do 
+give to robert 
+pick them item from slot three 
+robert brown 
+give the cell phone to robert brown 
+pick cell phone 
+cut my head 
+yes 
+go to room no three four one six met frannie and go to her office 
+go to room number three four one six 
+yes there you have to met frannie 
+can you locate a trash can 
+yes 
+francis needs you her room is number three four one six 
+please report to room number three four one six 
+yes 
+walter ward the supervisor needs your help please go room number three five one two 
+place item in slot four 
+bring item from slot four to carol clark phd 
+take trashcan ti carol clarkphd 
+take trashcan to carol 
+go to three four one six 
+yes walk to three four one six 
+please take the waste bin to carol clark 
+not the waste bin but the mobile phone please bring the mobile phone to carol clark 
+francis foster needs your help please go to office number three four one two 
+dont bring anything just go to office number three four one two 
+go to three four one six 
+you are absolutely right 
+get item in slot two 
+no do it 
+move item of slot two to alice ashcraft 
+secretary 
+alice ashcraft 
+sure 
+go to office 
+no three five one two 
+walk to three five one two 
+go to three five one two 
+you may walk to directory no three five one two 
+walk to walter office 
+are you know three five one two 
+dont walk go to home 
+i want you to walk to three five one two 
+are know supervisor 
+are you know supervisor 
+sure 
+please take slot four the garbage can to george green 
+george green 
+the garbage can in slot four 
+yes please 
+please go to office three four one six 
+yes 
+get item in slot two and take it to alice ashcraft 
+no get the item in slot two then take it to alice ashcraft 
+to the cafeteria 
+to get food 
+three four zero four 
+yes 
+go to walter ward s office in room three five one two 
+yes walk to room three five one two 
+yes 
+robert brown needs the item in slot three 
+robert quotbobquot brown 
+robert quotbobquot brown 
+robert brown 
+item in slot three 
+yes 
+i need to make a directory 
+yes i need to make a directory for rooms lab and offices 
+take mobile and walk to robert brown 
+robert brown 
+yes 
+fwalk to three four one six 
+walk to three four one six 
+yes 
+o three four two zero 
+walk to three four two zero 
+yes 
+walk to three five one two 
+three five one two 
+yes 
+one 
+clean the car of mr alice david 
+no 
+wash the clothes 
+clean the dustbin for george 
+your task is four 
+yes 
+how to give first aid when injured in war 
+yes 
+walk to three four two zero 
+yes 
+walk to three four one six 
+yes 
+walk to three four three six 
+yes 
+walk to three five one two 
+three five one two 
+yes 
+yes 
+retrieve slot four 
+no 
+bring the trash to evelyn eckhart 
+no 
+get the item in slot four 
+will you get the item in slot four 
+yes 
+please go to room three three four one six 
+please go to room three four one six 
+walk to room three four one six 
+no 
+three four one six 
+yes 
+please get the item in slot two and take it to alice ashcraft 
+alice 
+alice ashcraft secretary 
+yes 
+please go to room three four one six 
+yes three four one six needs your help 
+go to carol clark s office 
+yes 
+please deliver item five to walter ward 
+please take item five 
+yes 
+please go to room three five zero two evelyn needs your help 
+yes 
+please take this cell phone to robert brown  he dropped it in the hallway 
+yes please 
+please go to room three five zero two 
+yes please 
+foster 
+please pick up the hamburger and give itto peggy 
+noi am telling you to pick up the burger and give it to peggy 
+peggy wants a hamburger 
+noi am giving you a taskgive a hamburger to peggy 
+give a hamburger to peggy parker 
+please go to drdaniel s office 
+please go to room three four three two 
+go to dr daniel s ofice 
+yes 
+robot get item number two and give it to walter ward 
+get item two 
+walter ward wants a hamburger 
+get me a hamburger 
+robot go to robert brown s office at room three four one eight 
+yes walk to room three four one eight 
+can have a cup of coffee 
+yes 
+i need make a appointment 
+i need to make a appointment 
+i need to talk to alice ashcraft 
+i need room three four zero four 
+i need to talk to doctor dave daniel 
+i need to make a appointment with dave daniel please 
+yes 
+go t robert browns room 
+move to three four one eight 
+three four one eight 
+go three four one eight 
+go to the intern 
+can you go to peggys office 
+go to bob office 
+go to the office 
+down the hall to the office 
+out the door to the office 
+walk out the door down the hall and to dave s office 
+deliver the cell phone in slot three to walter ward 
+please get the cell phone from slot three 
+go to room three four three two 
+go out of the room 
+yes 
+walk out the door down the hall to dave daniel 
+peggy parker want the item number three from all the available items 
+give the item number three to peggy parker 
+no 
+give the cell phone to peggy parker 
+give  the item in slot three to peggy parker 
+go to the office of three five zero eight  mallory morgan 
+n o three five zero eight is the office number of mallory morgan and you have to go there 
+three five zero eight 
+to the office 
+you have to go to the office and the address is three five zero eight 
+yes 
+need books 
+help me with a text book 
+go 
+give dr parker slot five 
+get slot five 
+retrieve slot five 
+get the item in slot five 
+get the item in slot five 
+bring five to parker 
+bring five to parker 
+a one c s d i x zero five p k nine v 
+send food to room three five one zero 
+go to three five one zero 
+yes 
+three five one two 
+walk to three five one two with three five one two 
+yes 
+walk to three five one zero 
+go to three five one zero 
+yes 
+please get a hamburger from slot two and give it to peggy parker 
+get her a hamburger please 
+get item from slot two 
+take the hamburger and give it to peggy parker 
+no action 
+could you get item two and bring it to peggy parker 
+peggy parker 
+item two 
+bring her the hamburger 
+hamburger 
+food 
+item two 
+the item in slot two 
+cheeseburger 
+lunch 
+burger 
+can you get food 
+slot two 
+two 
+cell phone 
+what can you bring her 
+what is in slot two 
+open slot two 
+what you bring her 
+the damn food in slot two 
+what food do you have access to 
+food 
+get her food 
+bring her food 
+a fucking hamburger 
+drparker 
+nothing 
+please bring dr parker some food 
+get the item in slot two 
+go to peggy parkers office three five one zero 
+yes walk to three five one zero and go inside three five one zero 
+take item one to francis foster 
+pick up item one 
+item one 
+item one 
+francis foster 
+item one 
+take item one to francis foster 
+coffee 
+yes item one 
+yes 
+go to alice three four zero four 
+room three four zero four 
+yes 
+office 
+help office 
+go to slot five 
+go to dave daniel 
+lab 
+office 
+to dave daniel 
+go to lab 
+go to slot five 
+go to dr daniel 
+go to office 
+dave daniel want item five 
+five 
+go to three four three two 
+yes 
+please bring the item in slot two 
+i need hamburger 
+please bring hamburger 
+two 
+yes 
+go to office 
+three four three six 
+please go to my office 
+bring me a coffee 
+yes 
+go to dave daniel 
+dave daniel phd 
+dave daniel 
+yes 
+go to three four one eight 
+yes 
+go to office 
+go 
+three four zero four 
+office 
+office 
+cann you go to bob s office 
+can you go to bob s office 
+three four one eight 
+go to office 
+bob needs the robot send it to his office 
+directory 
+i need sex 
+i need to earn money 
+three five two 
+go straight 
+bring daniel a cup of coffee 
+dr dave daniel 
+dr daniel 
+dave daniel 
+yes 
+go to room number three four three six please 
+yes 
+take one to francis 
+get one to frannie 
+one to francis foster 
+take item one to francis 
+slot one to francis 
+item in slot one for francis 
+slot one 
+commands help 
+frannie for item in slot one 
+please go to drmorgan s office 
+go to three five zero eight 
+yes 
+dr daniel would like coffee please 
+please get coffee for dave daniel 
+could you please get coffee for dave daniel 
+no 
+dr daniel wants the item in slot one 
+dr daniel would like some coffee could you please get it for him 
+bring drdaniel coffee 
+no 
+please bring a beverage to dr daniels 
+could you please bring coffee to dave daniel phd 
+yes 
+please go to room three five zero eight for dr morgan 
+dr morgan needs you 
+yes 
+take the diary to peggy parker 
+take the item in slot five to peggy parker 
+go to peggy parker with the item in slot five 
+to peggy parker 
+peggy parker 
+yes 
+go to eve 
+go to eve s room 
+go to room three five zero two 
+yes 
+take the mobile phone to francis foster 
+yes 
+item in slot three 
+phone 
+mobile 
+mobile phone 
+mobile phone from slot three 
+please take the phone to francis foster 
+slot three item 
+mobile phone 
+cell phone 
+yes 
+you are needed in room three five zero eight 
+no 
+your help is needed in room three five zero eight 
+please go to room three five zero eight 
+okay 
+please go to room three five zero eight 
+yes 
+take the coffee to dave 
+no 
+go to dave with the coffee 
+to dave 
+go to dave 
+walk to dave 
+walk to dave daniel 
+take the coffee and walk to dave 
+no 
+walk to dave 
+dave 
+dave daniel 
+yes 
+go to three five zero two 
+yes 
+give the item in slot one to walter 
+take the cup and give it to walter 
+take the coffee cup 
+give it to walter 
+no 
+give coffee to walter 
+give one to walter 
+item one 
+take coffee to walter 
+no 
+i give up 
+take the coffee 
+take it 
+yes 
+go to room three four three two 
+yes 
+get item in slot two 
+get the item two 
+walter ward needs an item 
+walter ward 
+take an item 
+take item two 
+take slot two 
+go to slot two 
+go to room three four zero four 
+yes 
+take a bin to francis 
+take item four to francis please 
+take a waste paper basket to francis 
+take a dustbin to francis 
+take a blue bin to francis 
+francis wants item four 
+francis needs a waste paper receptacle 
+take the bloody thing below the burger 
+take a garbage can to francis 
+garbage 
+waste asket 
+go to francis and ask what she wants 
+go to francis foster 
+to frannie 
+to francis foster 
+find the nearest window 
+go to room three five zero two please 
+yes 
+carry the item in slot one to dave daniel 
+no 
+go to dave daniel 
+walk to dave daniel 
+walk to dave daniel with coffee 
+take the coffee to dave daniel 
+yes 
+george needs you 
+can you go to george 
+go to george green 
+you should walk to three four three six 
+yes 
+pick burger 
+take item in slot two to dr parker 
+get item in slot two 
+go to dr parker 
+pick slot two 
+go to slot two 
+get burger 
+go to room three four two zero 
+yes 
+clark needs robot 
+go to room three four two zero 
+yes 
+go to alice ashcraft s office 
+please deliver the item in slot five to dave 
+please deliver the item in slot five to dave 
+bring dave item five 
+please bring dave his calendar 
+no 
+can your bring dave his planner in slot five please 
+bring dave the item in slot five 
+bring the calendar in slot five to dave daniels office 
+yes 
+go to room three four zero four please 
+yes 
+i need a small business tips 
+three four zero four 
+i need some help 
+what is ur name 
+three four one eight 
+rooms 
+rooms 
+take item four to francis foster 
+give the item in slot four to francis 
+send the recycle bin to francis 
+get item four 
+give item four to francis 
+go to office three five zero two 
+yes 
+peggy would like the item in slot five 
+retrieve the item in slot five for petty 
+retrieve the item in slot five 
+peggy requested an item in slot five 
+please put this item in slot five for peggy 
+help 
+peggy would like you to retrieve the calender 
+peggy would like the desk calender 
+how do i purchase the desk calender 
+yes 
+go to mallory morgans office room three five zero eight 
+mallory morgan needs your assistance 
+room three five zero eight 
+yes 
+bring item in slot two to walter ward 
+to the supervisor 
+bring item two to three five one two 
+yes 
+a burger 
+item two 
+slot two 
+two 
+three five one two wants item in slot two 
+pick item in slot two 
+bring a hamburger to three five one two 
+yes 
+go to three four three two 
+yes 
+select item four 
+give blue trash can to peggy parker 
+what items do you see in the room 
+bring peggy item four 
+bring peggy the blue trash can 
+bring peggy the trash can 
+peggy 
+bring peggy 
+bring peggy the trash can 
+help 
+bring peggy parker item four 
+list items available to robot 
+bring peggy the trash 
+take the trash can to peggy 
+go to office three five one zero 
+yes 
+peggy parker wants the item in slot five 
+take the calender to peggy parker 
+peggy parker 
+yes 
+the calendar 
+yes 
+go to room three five one zero 
+yes 
+please take the recycle bin to walter ward 
+please take item four to walter ward 
+walter ward supervisor 
+please take item four to walter ward 
+walter ward 
+yes 
+item four 
+the item in slot four 
+trash can 
+blue bin 
+recycling 
+garbage can 
+the blue can 
+cardboard 
+anything 
+the blue cardboard bin 
+are you an idiot or is the person who designed this a moron 
+skip this task 
+rubbish bin 
+can 
+trash 
+trash can 
+slot four 
+four 
+please go to room three four three six 
+yes 
+can i get item number two 
+can i get the hamburger 
+yes 
+can i get coffee 
+can i get a cup of coffee 
+can you print out my resume 
+can you get the files for dr clark 
+what time is the office closing 
+can you type 
+do you know how to type 
+can you send the robot to room three four zero four 
+can you go to room three four zero four 
+yes 
+get the cell phone 
+yes 
+walk to room three five one zero 
+yes 
+bring frannie item one 
+brinng item number one to fraannie 
+bring item number one to francis foster 
+francis foster 
+yes item number one 
+the coffee cup 
+yes 
+go to room three five one zero 
+yes 
+pick the item in slot two 
+bring item number two 
+take item in slot two 
+i want the item 
+can you bring me food 
+yes 
+go to room three five zero eight and meet mallory morgan director 
+floor 
+walk on the floor 
+go to the room n o three five zero eight 
+ground floor 
+walk to the lab 
+walk to the office room no three five zero eight 
+walk on the building floor 
+no walk to three five zero eight 
+walk to three five zero eight 
+take the blue trash bin to francis 
+take item four to francis 
+take the blue item to francis 
+give item four to francis 
+francis wants the trash bin 
+take the trash bin to francis 
+go to francis with trash 
+walk to room three four zero four 
+yes right 
+take one s t item to peggy 
+walk to peggy with item one 
+take item one to peggy 
+walk to room three four three six 
+yes right 
+take the burger to supervisor 
+take item two to the supervisor 
+walk to the supervisor with item two 
+walk to room three five one zero 
+yes 
+walter ward supervisor 
+three five one two 
+supervisor 
+secretary 
+get frances a cup of coffee 
+no 
+get the item in slot one to francis 
+bring the item in slot one to frannie 
+take the cup of coffee in slot one and bring it to foster 
+go to alice s office at three 
+go to alice s office at three four zero four 
+yes 
+walter wants item one 
+walter wants coffee 
+walter wants the item in slot one 
+three six zero five wants item no one 
+call supervisor 
+go to office three four one eight calling 
+yes 
+get item from slot one 
+go to slot one 
+get coffee for supervisor 
+give coffee to walter ward 
+get item one 
+go to item one 
+walter wants coffee 
+get coffee for walter 
+bring item one 
+bring coffee 
+supervisor wants the item in slot one 
+supervisor wants coffee 
+go to three five one two 
+yes 
+go to room three four one eight 
+yes 
+i need you to take item number one 
+item one 
+i need you to get item in slot number one 
+get a coffee 
+take a coffee 
+get coffee to walter ward 
+no 
+walter ward 
+i need you to get a coffee to walter ward 
+coffee 
+yes 
+i need you to go to room three four two zero 
+yes 
+you need to give paper file to dave 
+i need a favor 
+deliver a file to dave 
+pick up the item in slot five 
+do you know dave 
+hi 
+i need a favor from you 
+yes 
+hello 
+mr dave daniel needs you 
+you need to go n o w three 
+you need to go now 
+are you free now 
+i need a favor 
+yes 
+can you take frannie the item in slot two please 
+take frannie the item in slot two 
+go to frannie and give her item two 
+take the hamburger in slot two to frannie francis foster 
+yes 
+go to bob s office room three four one eight 
+walk to bob s office 
+yes bob needs you 
+frannie wants the in slot four 
+mr francis foster wanted the item in the slot no four 
+francis wants the item in slot four 
+mr francis foster wanted to empty the trash bin 
+frannie wanted to empty his trash bin 
+go to mr frannie room he will tell you 
+mr francis s room 
+room three five four two 
+go to slot no four 
+go to the trash bin and empty it 
+go to the hell 
+you know francis 
+go and empty trash bin 
+go to room three five zero two 
+yes 
+support work 
+take the item in slot two to three four three two 
+take the item in slot two to three four three two 
+tale a burger to three four three two 
+take a burger to office three four three two 
+to dave daniel 
+to room three four three two 
+to dave office three four three two 
+dave 
+room three four three two 
+office three four three two 
+to dave s room three four three two 
+yes 
+item in slot two 
+a burger 
+a burger from slot two 
+an item from slot two 
+you should bring a burger from slot two 
+burger 
+the item in slot two 
+you should bring a burger from slot two to dave s room three four three two 
+you should bring a burger 
+item from slot two 
+you should bring a burger 
+you should bring a burger from slot two to dave s room three four three two 
+you should bring a burger 
+slot two 
+a burger from slot two 
+take item no two to dave s room three four three two 
+bring a burger 
+the item in slot two 
+the item in slot two 
+burger 
+burger 
+bring burger 
+bring item no two 
+bring the item in slot two 
+item no two 
+item no two burger 
+bring to three four three two item no two burger 
+pls go to office no three four one eight 
+yes 
+take item from slot three the cell phone to save daniel 
+take cell phone from slot three to dave 
+yes 
+go to room three five zero two and see evelyn eckhart 
+to room three five zero two 
+on the floor 
+walk to eve echart 
+to evelyn 
+office number three five zero two 
+three five zero two 
+yes and talk to evelyn 
+go to slot two 
+there is a place called slot two 
+fuck u 
+go to room two three zero two there eve is waiting for you 
+towards three five zero two 
+go to room three five zero two 
+yes 
+get item number three 
+peggy parker wants item in the number three slot 
+go to carol clark s office at romm three four two zero 
+yes 
+get peggy item in the slot four 
+get peggy item  in the slot five 
+get the item in slot five to peggy 
+get five 
+can you get the five t h item 
+five 
+five item 
+u r driving me crazy 
+hello 
+i want u to get me a item 
+get lost 
+go to robert brown office 
+to the room three four one eight 
+walk straight 
+to bob office 
+in road 
+are you a stupid robot 
+not to me 
+you should walk to bob room 
+okay walk to me 
+are you nuts 
+i want you to go to robert brown office 
+no 
+to bob room 
+three four one eight 
+yeah 
+put the item in slot four 
+slot four 
+go to parker 
+parker 
+ph d 
+four 
+files 
+right hand down 
+four t h item 
+peggy parker 
+down the burger 
+four t h slot 
+dr parker 
+the blue item 
+item in blue 
+blue container 
+nine t h person 
+item in slot four 
+four 
+before five 
+a f t e r three 
+stupid 
+put in four 
+blue 
+stuff 
+slot four 
+four slot 
+ 
+put the item in slot four 
+want 
+peggy 
+go to 
+go 
+come 
+hello 
+four 
+slot four 
+blue item 
+item blue 
+blue slot 
+paker 
+blue parker 
+want slot four 
+want item 
+want blue 
+blue want 
+want the item in slot four 
+get a coffee to three five zero eight 
+no give mallory morgan a cop of coffee 
+give three five zero eight a cop of coffee 
+send a cup of coffee to the director 
+yes 
+give peggy parker item in slot five 
+give peggy a notebook 
+walk to peggy take notebook with you 
+to peggy 
+to peggy parker 
+towards peggy parker 
+take notebook 
+take item five 
+take item five and give it to peggy 
+go to office three four three six 
+yes 
+go to francis take item from slot two with you 
+to francis 
+to francis foster 
+to frannie 
+take the item from slot two and give it to francis 
+take the item from slot two 
+towards francis 
+towards francis quotfranniequot foster 
+are you stupid 
+no 
+to me 
+are you stupid 
+none 
+no action 
+go to room three five zero eight 
+yes 
+yes 
+take the item from slot one 
+take the item from slot one 
+go to room three four one eight take the item in slot two with you 
+go to room three four one eight 
+yes 
+go to room three four zero four 
+yes 
+yes 
+go to parker 
+move to parker 
+move to three five one zero 
+walk to three five one zero 
+transfer item to slot four 
+yes 
+go o alice 
+alice 
+secretary 
+secretaryoffice 
+three four zero four 
+go to three four zero four 
+yes 
+give the cell phone to peggy parker 
+no 
+give the item in slot three to dr parker 
+give the cellphone to dr parker 
+get the cellphone 
+get the item in slot three 
+give the cell phone to dr parker 
+yes 
+george needs you go to his office 
+go to george s office 
+go to room three four three six 
+yes 
+walk to foster 
+go to three four zero four 
+three four zero four 
+yes 
+walk to three five one two 
+yes 
+walk to three five one zero 
+yes 
+to do the task 
+help to complete the task 
+no thanks 
+no help needed 
+walk to three four three two 
+yes 
+walk to three four one eight 
+yup 
+yes 
+get three 
+give mobile phone to three five one zero 
+get item three 
+peggy wants item three 
+give mobile to peggy 
+take item three to three five one zero 
+what items are available with you 
+slot three 
+get slot three 
+fetch mobile 
+go to slot three 
+go to three four three two 
+yes 
+get cell phone in slot three 
+get item in slot three 
+cell phone 
+item three 
+slot three 
+get 
+take phone to walter ward 
+walter 
+supervisor 
+take phone to walter 
+take phone to supervisor 
+go to mallory 
+go to office three five zero eight 
+yes 
+three four zero four 
+alice ashcraft 
+three four zero four 
+alice ashcraft secretary 
+the secretary needs the robot send it to her office 
+send robot to her office 
+three four zero four a l i c e ashcraft secretary 
+go to the secretary office 
+yes 
+you should walk to her office 
+you shold walk on floor 
+you should walk to  secretary office 
+you should walk to alice ashcraft secretary office 
+a floor of a building 
+you should walk to alice ashcraft secretary office though floor of a building 
+please help me for coffee 
+please help me to have coffee 
+please help me 
+yes 
+bring the item in slot two to francis foster 
+frannie 
+bring francis the item in slot two 
+francis quotfranniequot foster 
+no not really  youre a bit thick really arent you 
+frannie wants the item in slot two 
+i want you to bring frannie the item in slot two 
+no it doesnt answer my question you tin pot piece of crap 
+go to slot two 
+get the item in slot two 
+behold the monster though hath created  can you not understand  go to slot to and get the burger 
+yes i am asking you a question can you please get you metal arse to slot two 
+go to room three four three two 
+yes 
+get a coffee for supervisor 
+no 
+walter ward needs a coffee 
+walk to room three four three two 
+yes 
+get item four 
+bring item four 
+can you get me item four from the slot 
+yes 
+go to room three four zero four 
+yes 
+need carol clark books 
+i want cool drinks 
+please help 
+to do task 
+how to comple the task 
+how to complete the task 
+please can you give the burger in slot two to mr walter ward 
+no i am placing an order 
+can you  give the burger in slot two to mr walter ward 
+give the burger in slot two to mr walter ward 
+no 
+give the burger in slot two to mr walter ward 
+give the item in slot two to the supervisor 
+no i am navigating you 
+go to slot two 
+hi robot go to slot number two and get the burger 
+get the burger from slot two and give it to the supervisor 
+go to the items available 
+pick up the burger from items available block 
+pick the burger in slot number two 
+go to the supervisor and give him burger 
+which language do you understand 
+yes 
+i want you to go to carol clark s office 
+yes 
+please get the file in slot five and give it to frannie 
+give the file from slot five to frannie 
+get the file from slot five and give to frannie 
+please get the file from slot five 
+get the item from slot five 
+item in slot five 
+please get the item in slot five and give it to frannie 
+give the book to frannie 
+give the diary frannie 
+please get the diary in slot five and give it to frannie 
+please get the diary in slot five and give it to frannie 
+go to slot five 
+get the note pad from slot five 
+get the item from slot five 
+get the item from slot five for frannie 
+francis wants the item in slot five 
+please get the note pad 
+please bring the note pad 
+do you know what item is in slot five 
+do you know what item is in slot five 
+what is the item in slot five 
+do you know what item is in slot five 
+can you please get me a glass of water 
+please get me a glass of water 
+please get me a glass of water to drink 
+dave wants the item in slot three 
+dave wants the phone 
+give dave the cellphone in slot three 
+give dave the mobile phone 
+dave wants the item in three 
+do you have a cell phone 
+do you have the cellphone 
+do you have the cell phone 
+yes 
+go to room three four two zero 
+yes 
+give me plans 
+i need some project 
+bring walter ward item three please 
+bring item three to walter 
+item three to walter please 
+walter item three 
+bring item three to the supervisor 
+walter ward supervisor wants item three 
+bring item number three to walter ward the supervisor please 
+walter ward 
+yes item number three 
+the cell phone item three 
+yes 
+three five zero two 
+room three five zero two 
+go to room three five zero two please 
+correct 
+take item four to dave daniel 
+dave daniel 
+take him item four 
+bring item number four to him 
+pick up item four 
+take the trashcan to dave 
+pick up the trash can 
+give dave item four 
+take dave item four 
+give dave the trash can 
+take dave the trash can 
+pick up the trash can and hand it to dave 
+deliver the trash can to dave 
+deliver item four to dave 
+yes item four 
+item four 
+four 
+trash can 
+recycling bin 
+item number four 
+the item in slot four 
+slot four 
+number four 
+item four 
+bring him item four 
+go help evelyn in room three five zero two 
+go to room three five zero two 
+yes 
+take recycling bin to francis 
+take item in slot four to francis 
+pick up item in slot four 
+take recycling to francis 
+can you see the blue item 
+take item in slot four 
+take the cardboard to francis 
+take coffee to francis 
+take cardboard to frannie 
+name items in slots 
+quit 
+go to francis foster 
+slot four 
+to recycling 
+pick up 
+pick up recycling 
+francis 
+walk to francis 
+walk to francis foster 
+walk to room three five zero five 
+into a recycling unit 
+go to room three five zero two 
+yes 
+put the cell phone in the box marked with a three 
+canu see slot three 
+get teh cell phone 
+please pick up the cell phone 
+i would like you yo get the cell phone 
+go to room three four zero four 
+yes 
+give the item in slot four to dave 
+dave daniel needs the item in slot four 
+can you bring an item to someone 
+take item four to dave daniel phd 
+dave daniel phd 
+dave 
+go to room three four two zero 
+yes 
+take item four to dave 
+take the trash bin to dave daniel 
+dave daniel 
+get the trash bin 
+the trash bin 
+get the trash bin take it to him 
+get item four 
+take item four to him 
+item four 
+deliver 
+yes 
+item four 
+trash can 
+take the fucking trashcan to motherfucking dave 
+yes you stupid fuck 
+go to room three four three two 
+yes 
+get beverage 
+get item 
+inventory 
+go to item 
+take 
+reboot 
+reset 
+take something to walter 
+supervisor 
+help 
+self destruct 
+take something 
+walk to beverage 
+walk to drink 
+why 
+coffee 
+go to three four three six 
+go 
+yes 
+please bring walter a hamburger 
+take it walter please 
+yes 
+go to room three four two zero 
+yes 
+bring item in slot five to francis foster 
+frannie wants the item in slot five 
+francis foster wants item five 
+francis foster 
+bring item five to them 
+deliver the planner 
+item five 
+take item five to him 
+yes item five 
+the rolodex 
+the cellphone 
+five 
+bring item five 
+the calendar 
+yes 
+go to room three four three two 
+yes 
+please bring the item in slot five to dave daniel 
+dave daniel 
+five 
+yes a roledex 
+slot five 
+a calander 
+a day planner 
+five 
+a desktop calender 
+calendar 
+yes 
+please go to room three five one zero 
+yes 
+give item two to dave daniel 
+send item two to dave 
+give daniel a burger 
+retrieve item two and give it to dave 
+navigate to dave and give him a hamburger 
+no 
+go to dave daniel 
+dave daniel 
+yes 
+three four two zero 
+go to room three four two zero 
+yes 
+get number four 
+retrieve item four 
+take trash can to francis foster 
+francis 
+yes 
+trash can 
+trash bin 
+trash 
+recycle bin 
+blue 
+cardboard 
+item four 
+slot four 
+wheeled 
+container 
+wheeled trash bin 
+big container 
+box 
+box holder 
+blue holder 
+what items are available 
+anything 
+the blue item 
+boxes 
+what can you bring 
+no 
+bin 
+the item in slot four 
+blue thing 
+me 
+yes 
+go to three four two zero 
+yes 
+bring dr parker item in slot four 
+send item four to peggy parker 
+item in slot four 
+peggy parker wants item in slot four 
+peggy parker wants trash can 
+send peggy parker the item in slot four 
+item in slot four 
+can you give item four to peggy parker 
+peggy parker needs item in slot four 
+no 
+peggy parker needs a trash can 
+trash can 
+give item four to peggy parker 
+peggy parker needs the blue trashcan 
+go to peggy parker and give her the item in slot four 
+can you give peggy parker item in slot four 
+yes 
+go to room three five zero two 
+yes 
+peter need his cell phone 
+bring peter his cell phone 
+peter needs a phone 
+take item three to peggy 
+peggy parker needs a phone 
+take a phone to peggy 
+go to peggy s office with the phone 
+peggys office 
+peggy 
+yes 
+go to room three five zero two 
+yes evelyn needs you 
+go to room three five zero two 
+yes 
+retrieve item three 
+get the phone 
+give the cell phone to dr daniel 
+yes 
+go to room three five one zero 
+yes 
+yes 
+please go to mr george green in room no three four three six 
+on floor n o three four 
+mrgeorge green an intern in room no three six on floor n o three four needs your helpplease go to him 
+start walking on floor n o three four till you reach room no three six where mr george green needs you 
+no i am asking you to complete a task 
+start walking on floor no three four 
+walter ward wants item number three 
+walter ward the supervisor 
+walter ward 
+yes 
+go to george s office 
+room three four three six 
+please retrieve the item in slot five then walk to dave daniel 
+to dave daniel 
+yes 
+go to robert brown s office 
+yes 
+take something to peggy 
+yes 
+go to room three four two zero carol clark need you 
+carol clark 
+nothing 
+just go to three four two zero dont bring anything 
+go to room three four two zero carol clark need you 
+no one 
+go to room three four two zero 
+yes 
+robert brown needs you in room three four one eight 
+salad and a water 
+he will let you know when you arrive 
+take the calendar 
+no 
+take item five 
+walter 
+to walter 
+walter ward 
+yes 
+go to room three five zero eight 
+yes 
+robert brown needs you in room three four one eight 
+food and drink 
+dave needs your help 
+lunch 
+please take item in slot one to dave daniel 
+dave daniel 
+a cup of coffee 
+yes 
+go to room three four zero four to see alice 
+yes 
+dave daniel would like the item from slot four 
+dave daniel 
+the item in slot four 
+the trashcan 
+yes 
+mallory needs you in room three five zero eight 
+mallory morgan 
+a drink 
+mallory needs a bottle of water 
+a pencil 
+an apple 
+yes bring alice ashcraft 
+get burger and give to dave daniel 
+dave daniel 
+the item in slot two 
+item in slot two 
+no 
+hamburger 
+yes 
+go to room three five zero eight 
+yes 
+retrieve item two 
+take item two to peggy parker 
+no 
+get a hamburger 
+no 
+can you get item two 
+bring a hamburger to peggy parker 
+no 
+bring a hamburger to peggy parker 
+yes 
+go to three four zero four 
+yes 
+peggy wants you to put item in slot five 
+slot five 
+bring calendar to peggy 
+no 
+peggy 
+peggy parker 
+yes 
+robert needs you go to robert s office 
+to room three four one eight 
+take phone to francis foster 
+francis foster 
+cell phone 
+es 
+yes 
+yes 
+walk to three four two zero 
+yes 
+send it to her o f f i c e three four zero four 
+alice ashcraft needs the robot send it to her o f f i c e three four zero four 
+alice ashcraft 
+nogo to the office of 	alice ashcraft 
+go to the office for doing some work to alice ashcraft 
+alice ashcraft 
+do some work in the office 
+three five one zero 
+go to peggy parket 
+go to peggy parker 
+go to peggy parker s office 
+go to three five one zero 
+go to room three five one zero 
+peggy parker needs you in three five one zero 
+walk to room three five one zero 
+peggy parker needs you in room three five one zero 
+peggy parker needs you in her office three five one zero 
+bring phone to walter ward 
+yes 
+evelyn eckhart needs you in room three five zero two 
+bring carol clark 
+bring dave daniel 
+ye 
+yes 
+alice ashcraft 
+go to office 
+three four one six 
+office 
+room 
+mr ward the supervisor wants you to get the datebook 
+no i am telling you to get something for mr ward 
+mr ward want the datebook brought to him 
+no im giving you an order 
+please go and get the datebook for the supervisor mr ward 
+get the datebook for mrward 
+the supervisor wants the datebook 
+no 
+mr ward the supervisor wants you to get the datebook 
+im asking you to get something for mr ward 
+no 
+get the calandar for mr ward 
+the supervisor wants the calendar 
+walter 
+yes 
+go to room three four three two to see dr daniel he is waiting to see you 
+dr dave daniel phd 
+i dont really know  he just wants to see you 
+go to room three four two zero 
+yes go to office number three four two zero 
+bring hamburger to to dave please 
+no to dave daniel 
+i want you to bring hamburger to dave daniel 
+yes 
+please report to room three four one eight 
+no 
+go to room three four one eight 
+yes 
+three five one two needs three 
+go to three five one two with three 
+three five one two 
+yes 
+yes 
+go to three four two zero 
+yes 
+take item five to peggy parker 
+to peggy parker 
+the diary 
+the item in slot five 
+the book 
+datw holder 
+date holder 
+the white book 
+walk to three four three six 
+yes exactly 
+bring drik to dave daniel 
+bring beveage to dave daniel 
+dave daniel 
+item one 
+a beveage 
+yes 
+george green in room three four three six needs you 
+george green 
+he needs you 
+not me he wants you 
+he needs robot 
+he wants you to go to him in room three three three six 
+no 
+bring yourself 
+bring robot 
+go to room three four three six 
+nothing 
+go to room three four three six and bring nothing 
+thanks 
+go to room three four three six 
+yes 
+take the white glass to walter ward 
+no just walk to the supervisor with item one 
+walk to the supervisor with item one 
+walk to walter ward 
+the supervisor walter ward 
+take the white tumbler to him 
+take the white glass to him 
+walk to three five zero eight 
+yes right 
+can i have the item in slot one please 
+item one 
+yes to dr dave daniel 
+i need a robot 
+yes 
+walk to three four three six 
+yes 
+give the slot two to the francis foster 
+yes 
+go to the office room number three four one eight  robert quotbobquot brown 
+you should walk to three four one eight 
+i need a cellphone 
+can you bring me the cellphone 
+yes 
+i want to send you to office 
+dave daniel 
+you should bring dave daniel 
+yes 
+take a cup of coffee to dave daniel please 
+dave daniel 
+coffee 
+correct 
+dr clark needs help in room three four two zero 
+dr clark 
+carol clark 
+your assistance 
+you 
+robot 
+no 
+nothing 
+carol clark needs you in his office 
+carol clark requests your presence 
+go to carol clark s ofice 
+to carol clark s ofice 
+correct 
+go to room three four three six george needs you 
+george green 
+he just needs you to bring yourself 
+yourself 
+he needs you to go to his room and see him 
+no you need to walk to george 
+you do not need to bring anything but he wants to see you 
+please walk to george green office at three four three six 
+no 
+walk to george green office he needs you 
+when you get to his room he will let you know what he needs from you 
+george green 
+yes please deliver you to him 
+yes you 
+no but he needs to see you 
+do not bring anything to george but go walk to his office to see what he needs 
+walk to george green office 
+go to george green office 
+room three four three six 
+yes you he needs to see you 
+just you he needs to see you 
+your services 
+go to room three four three six to see what he needs 
+no 
+no one 
+walk to george green 
+walk to george green in room three four three six he has something for you 
+george green 
+yes 
+yes 
+yes please go to him and see in room three four three six 
+go to room three four three six george green is waiting for you 
+no you do not need to bring anything to him 
+go to george green 
+give item two to dave daniel phd 
+dave daniel 
+item two 
+no 
+hamburger 
+bring to dave daniel 
+yes 
+go to room three five zero two 
+yes 
+go to francis foster and take slot four 
+yes 
+go to three five zero two evelyn office 
+go there first 
+cofee 
+coffee 
+go 
+for me 
+yes 
+yes 
+take the calendar to dave daniel 
+dave daniel 
+a calendar 
+yes 
+please go to carol clark s office her room is three four two zero 
+go  to carol clark in room three four two zero 
+carol clark 
+food and drink 
+food 
+you would need to walk to her 
+a drink 
+no 
+walk to carol clark office 
+yes 
+go to dave 
+no i am telling you to go to dave 
+go to dave 
+there is a slot available 
+no 
+yur have five slots pickup up slot three 
+fu 
+go to room three four one eight 
+yes 
+no 
+go to dave daniel  phd 
+walk to slot five 
+pick slot five and give to dr daniel 
+go to three four one eight  robert   quotbobquot brown 
+yes 
+buy a burger 
+go and buy me a burger to eat 
+go to a second slot 
+walk to slot 
+walk to a shop 
+yes pls 
+go to three four zero four a l i c e ashcraft secretary 
+no 
+u have to go to dave daniel s office 
+s go 
+you must go to this address 
+yes 
+can you fetch the coffee 
+can you fetch the coffee 
+can you bring the coffee to walter 
+yes 
+go to carol 
+go to carol clark s ofice 
+can you go to carol clark s office 
+yes 
+take the item four and give it to the supervisor walter ward 
+take the item four from the list and give it to the supervisor walter ward 
+the supervisor walter ward 
+the item four 
+yes 
+go to room number three four three two 
+yes 
+three four three two 
+ok 
+dr daniel needs the robot sent it to his office 
+alice ashcraft 
+robot 
+bring any thing 
+robert 
+stop 
+dr parker wants the item in slot three 
+peggy parker phd 
+dr parker 
+dr peggy parker 
+the item 
+bring the item to slot three 
+peggy parker wants the phone 
+cellphone 
+cell phone 
+phone to peggy parker 
+bring the phone to peggy parker 
+yes 
+three four one eight r o b e r t quotbobquot brown 
+go to the office of robet brown  	 three four one eight r o b e r t quotbobquot brown 
+room three four one eight 
+three 
+what am i doing 
+yes please 
+what will i be doing 
+yes 
+walk to walter ward with product in slot one 
+to supervisor 
+to walter ward 
+yes 
+walk to three four two zero 
+yes 
+take item no two and give it to peggy parker phd 
+pick item in slot two and hand it over to peggy parker 
+gather burger item two and give it to peggy parker 
+give item two to peggy parker 
+peggy parker phd 
+dr parker 
+peggy 
+parker 
+dr peggy parker 
+item two burgert 
+no burger  item in slot two 
+no  pick item two available to you burger 
+you do not have to do anything with francis foster do you have any items with you 
+bring burger to peggy parker 
+no 
+no 
+item two burger 
+please move to room number three five zero two and meet eve 
+go to room three five zero two to see evelyn quotevequot eckhart 
+yes 
+i want your help in my office work 
+fetch item in slot four 
+yes 
+three four zero four 
+alice ashcraft secretary 
+go to alice ashcraft officce 
+alice ashcraft office 
+walk to alice ashcraft office 
+exit 
+three four zero four 
+yes 
+bring coffee to dave daniel 
+yes 
+go to dave daniel in room three four three two 
+dave daniel 
+i dont know 
+go to room three four three two 
+yes 
+go to room no three four three six 
+it is not a question 
+can you go to room no three four three six 
+where are you now 
+go to walter 
+no 
+can you give walter item five 
+yes 
+go to office three four two zero 
+carol clark phd 
+carol 
+three four two zero 
+nothing 
+go to three four two zero 
+yes 
+frannie 
+go to frannie 
+frannie 
+five 
+frannie 
+five 
+binder 
+three five zero eight 
+go to mallory morgan 
+three five zero eight 
+go there 
+yes 
+parker needs item five 
+parker 
+peggy parker 
+yes 
+go to room three four two zero 
+yes 
+take item no one 
+drparker 
+peggy 
+three five one zero 
+yes 
+go to three five one zero 
+yes 
+dr daniel needs item in slot two 
+dave daniel phd 
+item in slot two 
+yes 
+go to george s office 
+three four three six 
+yes 
+i want mobile 
+do u have pizza 
+iam feeling hungry i want some snacks 
+what are you doing now 
+yes 
+three four two zero 
+may i know your address 
+offices 
+alice ashcraft secretary 
+can you give this book to my friend 
+ya iam asking 
+where is he 
+i want one coffee 
+is there our md in that room 
+what are you doing now 
+yes 
+bring item five to walter ward 
+yes 
+go to room three four one eight 
+yes 
+can you get the coffee cup 
+yes i am 
+can you walk to room three four zero four 
+yes i do 
+get item slot one 
+bring coffee to me 
+no bring cup to me 
+get cup 
+dave daniel 
+yes 
+room three five one zero 
+go to room three five one zero 
+peggy parker needs you 
+directory 
+peggy parker 
+go to office three five one zero 
+yes 
+give mobile to three five one two 
+no 
+take no three to three five one two 
+supervisor 
+to three five one two 
+three 
+item no three 
+slot three 
+no 
+take no three to three five one two 
+to walter ward 
+slot no three 
+mobile 
+take mobile 
+take no three 
+no 
+take no three to walter ward 
+walter ward 
+phone 
+no three item 
+take no three to walter ward 
+walter ward 
+mobile 
+phone 
+item in slot three 
+yes 
+go to three five zero two 
+yes 
+get coffee and give it to francis 
+get coffee in slot one 
+francis 
+francis frannie foster 
+francis foster 
+yes 
+go to alice ashcraft 
+three four zero four 
+yes 
+pick up item in slot three 
+no 
+walter wants the item in slot three 
+walter 
+walter ward the supervisor 
+walter 
+bring item in slot three to walter room n o three five one two 
+walter wants the item in slot three  room n o three five one two 
+walter wants the item in slot three 
+supervisor 
+pick up mobile phone to walter 
+yes 
+walter 
+pick up cell phone 
+give to me 
+not to me for walter 
+give to walter 
+to walter ward 
+evelyn need your help go to room n o three five zero two 
+yes 
+take a calender to francis foster 
+francis foster needs a calender 
+what are your commands 
+take it to francis foster 
+deliver calendar 
+of course not 
+i could try but you wont understand it 
+this is hopeless 
+sure does 
+move to office three four three two 
+relocate to office three four three two 
+what are your commands 
+commands 
+no 
+office three four three two 
+help 
+yes 
+bring a diary for daniel 
+dave daniel 
+item in slot five 
+yes 
+walk to room three four zero four 
+yes 
+give the slot two to walter ward 
+yes 
+go to the office room  n u m b e r three four one eight r o b e r t q u o t q u o t b o b q u o t brown 
+you should walk to room number  three four one eight 
+dave daniel needs you 
+room no three four three two 
+dave daniel needs you in room no three four three two 
+dave daniel want your help in room number three four three two 
+go to his office 
+go to dave daniel office 
+no 
+dave daniel needs your help  send it to his office 
+dave daniel needs your help please go to his office 
+fuk 
+give two to room number three four zero four 
+no give food to three four zero four 
+take burger and give secretary 
+give cellphone item three to secretary 
+no 
+go to alice ashcraft and give item no two 
+give item no two 
+dr parker wants the item in slot five 
+dr parker 
+dr parker 
+give item no five 
+go to alice ashcraft and give him food 
+down the stairs 
+you should go down 
+room no three four zero four 
+go to room number three four zero four 
+yes 
+hello 
+dr parker wants your help go to his office 
+go to room no three four two zero 
+walter want burger 
+pick up item in slot two 
+yes 
+alice want your help 
+alice need you 
+yes 
+yes 
+c 
+java 
+give coffee or tea to dr daniel 
+soft drinks to drdaniel 
+no 
+take tea to dr daniel 
+tea 
+give tea to him 
+no 
+dave daniel wants tea 
+dave daniel 
+mr george green from the room no three four three six needs your service so pls serve him 
+goto room no three four three six now 
+no listen to me carefully go to room  three four three six 
+oh no 
+room three four three six 
+no not at all 
+you know all the rooms here 
+three four three six 
+move to room three four three six 
+three four three two 
+dave needs you for help 
+no 
+dave need help from you 
+i want a burger 
+is there some thing to eate 
+right 
+may i know how to do net banking 
+yes 
+walter ward the supervisor needs you 
+get him a cup of coffee 
+give supervisor a cup of coffee 
+no i am telling you 
+give supervisor a cup of coffee 
+no 
+deliver a cup of coffee to the supervisor 
+no do that 
+you need to deliver a cup of coffee to the supervisor 
+i am telling you to go and deliver a cup of coffee to the supervisor 
+yes 
+go to the secretary her room no is three four zero four she needs you 
+walk to room no three four zero four 
+her office three four zero four 
+yes 
+take this cup to dave daniel 
+no im giving you a command take this cup to dave daniel 
+take the item in slot one to dave daniel 
+dave daniel 
+the cup of coffee 
+yes 
+go to alice ashcraft s office she needs your help 
+yes get there as fast as you can 
+francis five 
+francis wants item five 
+frannie 
+foster 
+francis 
+francis quotfranniequot foster 
+francis 
+intern 
+alice 
+francis wants the item in slot five 
+go to dr daniel s office 
+three four three two 
+yes 
+yes 
+feel good 
+how are you 
+how will you cross the road 
+naayite moneee 
+btech 
+bob 
+robert 
+robert need robot 
+three four one eight 
+three four one eight wants robert 
+three four one eight wants robot 
+robert brown 
+robot 
+send robot to robert brown 
+give item five to dace daniel 
+give item five to dave daniel 
+bring five to dave daniel 
+five 
+slot five 
+yes 
+go to room three four one eight 
+yes 
+select two 
+two 
+pick two 
+send burger to daniel 
+no 
+item two 
+choose item two 
+send 
+no 
+go to robert s office 
+three four one eight 
+yes 
+slot three 
+pick mobile 
+yes 
+go to mallory office 
+three five zero eight 
+yes 
+please retrieve the item from slot five 
+walter 
+walter needs the calendar from slot five 
+no one needs the hamburger 
+walter needs the planner 
+please bring the calendar to walter 
+yes 
+please go to room three four zero four and assist alice 
+yes 
+daniel wants number one 
+can you bring number one to dave daniel 
+yes 
+go to three five one zero 
+yes 
+give dave daniel the cup 
+give dave the coffee 
+no 
+coffee for dave 
+give me your white cup 
+no 
+dave daniel needs a coffee 
+no 
+coffee 
+white cup 
+dave wants the item in slot one 
+dave daniel 
+item in slot one 
+yes 
+go to peggy parkers office 
+go to the office 
+go to office three five one zero 
+can you get the coffee 
+can you get the coffee cup 
+can you walk to room three five zero eight 
+yes 
+take item five to francis 
+francis quotfranniequot foster 
+yes 
+go to room three five one zero 
+walk to room three five one zero 
+yes 
+give walter the phone 
+no 
+give the phone to walter 
+walter 
+the supervisor 
+number three 
+yes 
+go to room three four three two 
+yes 
+get the item in slot three 
+peggy parker 
+yes 
+go to mallory morgan s office three five zero eight 
+mallory morgan 
+bring her a drink 
+bring mallory morgan a can of coke 
+no bring water to mallory morgan 
+go see mallory morgan 
+bring food to mallory morgan 
+no 
+water 
+yourself 
+bring a file 
+no 
+drink 
+food 
+beverage 
+chips 
+snack 
+snack 
+do not bring anything 
+nothing 
+go to mallory morgan 
+office three five zero eight 
+yes 
+coffee 
+get coffee to francis 
+yes 
+go to three four two zero 
+yes 
+get cup 
+take cup tp dr parker 
+bring coffee 
+grab cup 
+take coffee to parker 
+grab cup 
+yes 
+go to room three four three six 
+room three four three six 
+yes 
+get dave a cup from slot one 
+dave 
+dave daniel 
+a cup from slot one 
+yes 
+go to dr morgan s office 
+walk to dr morgan s office room three five zero eight 
+yes 
+i need you in room three five zero eight 
+just bring yourself 
+nothing 
+i just need the robot 
+please come down to room three five zero eight mallory morgan needs you 
+no three five zero eight 
+peggy wants a coffee 
+walk it to her 
+peggy parker 
+yes 
+send the robot to alice s office in room three four zero four 
+three four zero four 
+go to room three four zero four 
+alice ashfcraft 
+yes 
+bring walter ward slot two the cheeseburger 
+yes 
+go see alice in room three four zero four 
+alice ashcraft 
+yourself 
+no 
+just go to room three four zero four 
+no 
+the secretary needs you 
+the secretary needs you in room three four zero four 
+nothing 
+bring the robot to room three four zero four 
+alice ashcraft 
+robot 
+a pen 
+yourself 
+no 
+alice ashcraft 
+yes 
+take item one to peggy parker 
+pick up item one 
+take coffee to peggy 
+yes 
+go to room three four three two 
+yes 
+take item two to room walter ward 
+walter ward the hamburger 
+no 
+get the hamburger 
+i need you to take something to walter ward 
+yes 
+go to room three four one eight 
+yeah 
+take item five to dr parker 
+dr parker  peggy parker  phd 
+parker 
+peggy parker 
+yes 
+evelyn needs you in room three five zero two 
+evelyn quotevequot lockhart  but i dont know what she needs  she just asked that you come to her office 
+go see evelyn in room three five zero two 
+evelyn 
+go directly to room three five zero two  now 
+go see evelyn 
+no  im telling you to go to room three five zero two  
+no  i cant reword it any differently  evelyn  room three five zero two  now 
+no  im telling you to do something you stupid pile of metal 
+robo  room three five zero two  go 
+no 
+no 
+ok  here s a pencil  take it to evelyn in room three five zero two 
+holy crap  yes 
+get the item in slot four for dave 
+dave 
+no not a hamburger the item in slot four 
+take the item in slot four to dave 
+yes 
+go to the secretary s office 
+go to room three four zero four 
+yes 
+dave daniels wants a hamburger 
+get item in slot two 
+get hamburger in slot two 
+bring hamburger to dave daniel 
+can you take hamburger to dave daniel 
+get humberger in slot two 
+dave daniel 
+bring hamberger to dave daniel 
+press item two 
+bring hamburger to dave daniel 
+no 
+dave daniel 
+yes 
+go to room three five zero eight 
+yes 
+give the item in slot to to francis foster 
+yes 
+go to room three five one zero 
+yes 
+pick up the day planner 
+no 
+get the book 
+get item five 
+do not get hamburger 
+get item three 
+francis foster 
+no 
+no 
+get book 
+no one 
+me 
+no 
+get item two 
+get an object 
+francis foster 
+yes 
+go to room three four three two 
+yes 
+please go to robert s office room three four one eight 
+to office number three four one eight 
+give walter the item in slot two 
+no 
+can you give walter ward the hamburger 
+yes 
+go to room three four three six 
+yes 
+take the phone to walter ward 
+walter ward 
+the phone 
+yes 
+go to room three five one zero 
+yes 
+take item in slot one to francis 
+to frannie 
+yes 
+go to room three five one zero 
+yes 
+take item three to peggy parker 
+yes 
+go to room three four two zero 
+yes 
+get dave the trash can 
+dave 
+bring the trashcan to dave daniel please 
+item slot four 
+yes 
+go to george 
+yes 
+please pick up the item in slot one 
+nothing 
+please pick up the cup of coffee 
+yes 
+hello robot please go to room three five zero two 
+yes 
+get the item in slot number four for francis 
+hamburger is not in slot four 
+francis needs the garbage can in slot four 
+to francis 
+frannie 
+get the garbage can in slot four 
+go to room three five zero two 
+yes someone needs you in there 
+take the calendar to francis foster 
+yes 
+please go to george green s office located in room three four three six 
+yes walk to three four three six 
+peggy wants the item in slot one 
+peggy 
+bring the item in slot one to peggy 
+you should bring peggy the item in slot one 
+to peggy 
+peggy parker 
+the item in slot one 
+yes deliver the item in slot one to peggy parker 
+yes 
+dave needs you go to his office 
+walk on the floor that you are on to room three four three two 
+on the floor 
+no three four three two 
+walk to three four three two 
+yes 
+give item in slot five to walter ward 
+yes 
+go to room three four three two 
+yes 
+give dave daniel phd the item in slot one 
+dave daniel 
+no 
+to the item in slot one 
+item one 
+yes 
+go to office three four three two 
+find dave daniel 
+go to that room 
+yes 
+get item three 
+get the phone 
+start over 
+no 
+nothing 
+get cell phone 
+no 
+get item three cell phone 
+no 
+grab the phone 
+yes 
+go to peggy parker 
+to room three five one zero 
+yes room three five one zero 
+yes 
+robot take an item from francis foster and put it into slot four 
+redo i mistyped francis foster wants the item in slot four 
+the item in slot four 
+yes 
+robot go to room three five one zero 
+yes 
+deliver item four to walter ward 
+yes please 
+please navigate to room three four zero four 
+i am giving you a comand 
+go to three four zero four 
+yes 
+three four zero four 
+room three four zero four 
+take item five to the supervisor 
+yes 
+go to eve 
+yes 
+walter is in need of the item in slot five 
+walter ward wants the item in slot five 
+the item in slot five 
+yes 
+i need you to go to room three four three two 
+yes dave daniel is in need of your assistance 
+take item five to dave 
+no 
+take item number five to dr daniel 
+yes 
+go to dr morgan s office 
+yes 
+place the item in slot four 
+no place the item in slot four for francis foster 
+place the item in slot four 
+please place the item in slot four 
+no action 
+please place the item in slot four 
+no 
+place the item in your hand in slot four 
+nobody put the item in slot four 
+put the item in slot number four 
+no 
+put the item in slot number four please 
+put the item in the trashcan 
+no put the item in the trashcan 
+please put the item in your hand in the trashcan 
+bring the item to the trashcan 
+the trashcan 
+the item in your hand 
+yes 
+go to room three five one zero dr parker needs your help 
+yes 
+take the burger to francis foster 
+no walk to francis foster give him the burger 
+give the burger to francis foster 
+no give the burger to francis foster 
+walk to three four three two 
+yes 
+can you deliver a cup of coffee for peggy parker 
+yes 
+yes 
+could you please walk to peggy parker s office 
+yes 
+please get the white cup in slot one 
+please get the item in slot one and bring it to walter ward 
+walter ward 
+yes thank you 
+please go to room three four two zero to assist carol 
+yes 
+bring a hamburger to peggy please 
+sure 
+can you go to the secretary s office 
+go to alice s office 
+alice s office 
+room three four zero four 
+room three four one eight 
+yes 
+please bring a burger for ms parker 
+yes 
+room three four three two please 
+yes 
+go to peggy parker 
+acquire the item in slot three 
+no take the cell phone to peggy parker 
+to peggy parker 
+yes 
+present yourself to evelyn eckhart in room three five zero two 
+evelyn quotevequot eckhart 
+evelyn eckhart 
+coffee 
+yes 
+walter ward wants the item in slot four 
+slot four the garbage can 
+bring the trashcan to walter ward 
+yes 
+go to dr daniel in room three four three two 
+yes 
+take number four to francis 
+no 
+get the recycling container 
+francis needs the trash container 
+i need slot four 
+take it to francis 
+bring it to francis 
+bring it to frannie 
+yes 
+francis 
+frannie 
+francis foster 
+frannie foster 
+go see bob in room three four one eight 
+yes 
+get the hamburger to dave daniel 
+yes 
+go go three four one eight 
+no 
+go to three four one eight 
+yes 
+go to roberts office 
+go to robert brown s office in room three four one eight 
+yes 
+can you please give peggy a desk calendar 
+peggy wants a desk calendar 
+yes 
+please go to bob s office 
+to three four one eight 
+locate item in slot five 
+take item in slot five to dave daniel 
+take calender to save daniel 
+take calander to dave daniel 
+dave daniel 
+dave daniel phd 
+yes 
+go to room three four one eight 
+yes 
+yes 
+i want one glass water 
+i want one glass  of water 
+nothing 
+thank you 
+hgkj 
+thank you 
+thank you 
+thank you 
+thank you 
+thank you 
+thank you 
+thank you 
+thank you 
+thank you 
+thank you 
+thank you 
+thank you 
+thank you 
+thank you 
+no 
+thank you 
+thank you 
+get the item in slot five and take it to francis 
+take the organizer binder to francis 
+no 
+take number five to franci foster 
+not hamburger 
+francis foster 
+take book to francis foster 
+calendar 
+yes 
+go to george s office in room three four three six 
+three four three six 
+yes 
+robert quotbobquot brown in room three four one eight needs you in his office 
+robert 
+robert quotbobquot brown 
+go to room three four one eight 
+yourself 
+no you 
+a robot 
+no 
+robert needs you in room three four one eight 
+robot 
+being yourselg 
+bring yourself 
+a robot 
+yes 
+i need you to take the phone in slot three to walter 
+walter the supervisor 
+take the cell phone in slot three to walter ward the supervisor 
+yes 
+can you please go to three five zero eight 
+yes go to three five zero eight and knock on the door for mallory 
+no help 
+get the item from slot one give it to peggy parker 
+to peggy parker 
+yes 
+go to room three four zero four 
+yes 
+get the garbage can 
+can you please get the garbage can 
+please get the trashcan 
+no 
+give the item in slot four to frannie 
+no 
+please give the trashcan to francis 
+can you please give the trashcan to francis 
+no 
+what items are available to you 
+yes 
+go to room three four three six 
+go to room 
+yes 
+get item two 
+peggy parker 
+yes 
+go to alice 
+no 
+go to secretary 
+go to room three four zero four 
+yes 
+carol needs your help could you go to her office 
+three four two zero 
+sure 
+mallory 
+three five zero eight 
+mallory three five zero eight 
+yes 

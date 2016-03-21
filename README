@@ -87,3 +87,49 @@ Format of various logs -
             
 
 
+INSTALLING SPEECH RECOGNIZER:
+
+First navigate to catkin_ws/src/nlu_pipeline/, then create and pull the speech branch of the pipeline.
+
+$ cd catkin_ws/src/nlu_pipeline/
+$ git checkout -b speech
+$ git pull origin speech
+
+Next, install CMU Sphinxbase and pocketsphinx using the instructions found on:
+
+http://cmusphinx.sourceforge.net/wiki/tutorialpocketsphinx
+
+Now, install the python pygame package:
+
+$ sudo apt-get install python-pygame
+
+Or follow other installation instructions for your system at:
+
+http://www.pygame.org/download.shtml
+
+If espeak is not installed, intall it:
+
+$ sudo apt-get install espeak
+
+Finally, navigate to catkin_ws/src/nlu_pipeline/src/speech/ and make the speech node
+
+$ cd catkin_ws/src/nlu_pipeline/src/speech/
+$ make all
+
+TESTING SPEECH RECOGNIZER:
+
+In a new tab for catkin_ws/, the speech recognizer node may be run with:
+
+$ rosrun nlu_pipeline speechRecognizer.py
+
+SPEECH TROUBLESHOOTING:
+
+If you encounter an error along the lines of:
+
+"OSError: libpocketsphinx.so.3: cannot open shared object file: No such file or directory"
+
+Then make sure that /usr/local/lib is included in your LD_LIBRARY_PATH
+
+$ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
+
+should fix the error. 

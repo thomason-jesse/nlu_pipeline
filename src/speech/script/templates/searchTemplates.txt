@@ -1,0 +1,43 @@
+is <x> in <y>
+can you tell me if <x> is in <y>
+can you find <x> in <y>
+can you search for <x> in <y>
+can you tell me whether <x> is in <y>
+find <x> in <y>
+find out whether <x> is in <y>
+find out if <x> is in <y>
+go look for <x> in <y>
+go look whether <x> is in <y>
+go look if <x> is in <y>
+go see whether <x> is in <y>
+go see if <x> is in <y>
+go find <x> in <y>
+go find out whether <x> is in <y>
+go find out if <x> is in <y>
+check <y> for <x>
+check for <x> in <y>
+search <y> for <x>
+search for <x> in <y>
+tell me if <x> is in <y>
+tell me whether <x> is in <y>
+look for <x> in <y>
+look whether <x> is in <y>
+look if <x> is in <y>
+see if <x> is in <y>
+see whether <x> is in <y>
+could you tell me if <x> is in <y>
+could you find <x> in <y>
+could you search for <x> in <y>
+could you tell me whether <x> is in <y>
+go and look for <x> in <y>
+go and look whether <x> is in <y>
+go and look if <x> is in <y>
+go and see whether <x> is in <y>
+go and see if <x> is in <y>
+go and find <x> in <y>
+go and find out whether <x> is in <y>
+go and find out if <x> is in <y>
+look and tell me whether <x> is in <y>
+look and tell me if <x> is in <y>
+find out and tell me whether <x> is in <y>
+find out and tell me if <x> is in <y>

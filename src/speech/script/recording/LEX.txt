@@ -1,0 +1,222 @@
+Positions
+<position> : <denotation>
+--------------------------
+the advisor : ray
+the chair : bruce
+the director : ray
+the grad student : jesse
+the intern : robert
+the pi : peter
+the postdoc : jivko
+the professor : ray
+the secretary : peggy
+the student : walter
+the ta : carol
+the undergrad : francis 
+
+Places
+<reference w/ determiner> : <denotation>
+--------------------------------------
+the kitchen : kitchen
+the lab : l3_414b
+the office : office
+room 3402 : l3_402
+room 3414b : l3_414b
+room 3418 : l3_418
+room 3420 : l3_420
+room 3432 : l3_432
+room 3502 : l3_502
+room 3508 : l3_508
+room 3510 : l3_510
+room 3512 : l3_512
+room 3516 : l3_516
+sink : kitchen
+
+Names
+<firstName-Nickname-LastName> : <titles> : <denotation> : <office>
+-------------------------------------------------------------------
+bruce-NA-porter : doctor_dr_mr_professor : bruce : NA
+stacy-NA-miller : doctor_dr_ms_professor : stacy : l3_502
+dana-NA-ballard : dr_doctor_mr_professor : dana : l3_510
+jivko-NA-NA : mr : jivko : l3_432
+peter-NA-stone : doctor_professor_dr_mr : peter : l3_508
+ray-NA-mooney : doctor_dr_professor_mr : ray : l3_512
+shiqi-NA-NA : mr : shiqi : l3_420
+scott-NA-niekum : doctor_dr_mr_professor : scott : l3_404
+jesse-NA-thomason : mr : jesse : l3_414b
+aishwarya-NA-padmakumar : ms : aishwarya : l3_414b
+rodolfo-rudy-corona : mr : rodolfo : l3_414b
+
+Items
+<denotation> : <determiner and reference>
+------------------------------------------
+apple : an apple
+basket : the basket
+beverage : a beverage
+binder : the binder
+book : the book
+box : the box
+bread : the bread
+burger : a burger
+burger : a hamburger
+cake : the cake
+calendar : the calendar
+cellphone : the cellphone
+cheeseburger : a cheeseburger
+chips : a bag of chips
+chips : the chips
+chips : the crisps
+chips : the lays
+chips : the potato chips
+coffee : a coffee cup
+coffee : a cup of coffee
+coffee : some coffee
+coffee : some coffee to go
+coke : some coke
+coke : some soda
+coke : something to drink
+container : the container
+cupcake : a cupcake
+dessert : the dessert
+diary : the diary
+doritos : the doritos
+drink : a drink
+glass : a glass
+hammer : a hammer
+juice : a glass of juice
+juice : the juice
+laptop : the laptop
+ledger : the ledger
+letter : the letter
+milk : the milk
+muffin : a muffin
+notebook : a notebook
+organizer : an organizer
+pencil : a pencil
+phone : a phone
+pillow : a pillow
+pizza : the pizza
+planner : the planner
+salad : a salad
+sandwich : a sandwich
+snack : a snack
+tea : some tea
+trashcan : the dustbin
+trashcan : the trashcan
+watch : a watch
+water : some water
+
+Adjectives
+<adjective> : <determiner>
+---------------------------
+aerosol : an
+aluminum : an
+big : a
+black : a
+blue : a
+bright : a
+brown : a
+cardboard : a
+circular : a
+clear : a
+closed : a
+coffee : a
+colored : a
+cream-colored : a
+curvy : a
+cylindrical : a
+empty : an
+fat : a
+foam : a
+foamy : a
+full : a
+gray : a
+green : a
+half-full : a
+heavy : a
+hollow : a
+large : a
+light : a
+liquid : a
+medium-sized : a
+metal : a
+metallic : a
+narrow : a
+neon : a
+open : an
+orange : an
+orange-topped : an
+paper : a
+pencil-shaped : a
+pink : a
+plastic : a
+pointed : a
+pointy : a
+purple : a
+rectangular : a
+red : a
+rough : a
+round : a
+shiny : a
+short : a
+silent : a
+silver : a
+skinny : a
+small : a
+soft : a
+soup : a
+spherical : a
+spiky : a
+squishy : a
+styrofoam : a
+tall : a
+teal : a
+thin : a
+tiny : a
+top : a
+transparent : a
+water : a
+white : a
+wide : a
+yellow : a
+
+Nouns
+<noun> : <determiner>
+-----------------------
+ball : a
+beans : some
+bottle : a
+can : a
+cannister : a
+cap : a
+chips : some
+container : a
+crayon : a
+cup : a
+cylinder : a
+drink : a
+jar : a
+lid : a
+object : an
+pineapple : a
+prism : a
+rectangle : a
+roll : a
+sphere : a
+spraycan : a
+thing : a
+tub : a
+tube : a
+
+Other
+<other>
+------------
+circles
+color
+describing
+inside
+pictures
+rattles
+shaking
+text
+thinking

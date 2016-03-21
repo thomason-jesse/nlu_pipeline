@@ -1,0 +1,2994 @@
+<s> <FN> would like the item in slot five </s> 
+<s> take cell <I> from slot three to <FN> </s> 
+<s> bring the item in slot one to <FNP> </s> 
+<s> please get the <I> </s> 
+<s> please go to <P> three four three two </s> 
+<s> get the date <I> for <T> <LN> </s> 
+<s> please take item four to <FN> <LN> </s> 
+<s> give <I> to him </s> 
+<s> go to <FN> in her <P> </s> 
+<s> can you give <FN> the <I> </s> 
+<s> please go to <P> three four one eight to see <FN> </s> 
+<s> can you please provide some food </s> 
+<s> get <FN> the <I> </s> 
+<s> can you pick up the item in slot five and give it to <FN> <LN> </s> 
+<s> i want a <I> </s> 
+<s> bring <FN> the <I> </s> 
+<s> <FN> <LN> would like the item from slot four </s> 
+<s> bring her a drink </s> 
+<s> give the <I> from slot five to <LNP> </s> 
+<s> no walk to <FN> <LN> in <P> three five one two </s> 
+<s> please bring a cup of <I> to <FN> <LN> </s> 
+<s> go to <FNP> <P> </s> 
+<s> go to <FN> <LNP> <P> </s> 
+<s> please bring <I> to <FN> <LN> in the <P> </s> 
+<s> can you go to <FNP> <P> </s> 
+<s> i need you to take item five to <FN> <LN> </s> 
+<s> bring a drink to <FN> <LN> </s> 
+<s> bring the item in slot one to <FN> </s> 
+<s> <FN> needs the <I> </s> 
+<s> can you give me a <I> </s> 
+<s> i want you to go to <FN> <LNP> <P> </s> 
+<s> can you please go to <FN> <LNP> <P> </s> 
+<s> take the item from slot two and give it to <FN> </s> 
+<s> <FN> would like you to give her item number four </s> 
+<s> deliver the <I> in slot three to <FN> <LN> </s> 
+<s> <FN> <LN> needs the item in slot four </s> 
+<s> deliver the <I> to <FN> <LN> </s> 
+<s> go to <P> <FN> <LN> needs you </s> 
+<s> <FN> needs you in <P> </s> 
+<s> walk to <P> </s> 
+<s> please go to <P> </s> 
+<s> go to three five one two <P> </s> 
+<s> he would like a <I> some <I> and a <I> </s> 
+<s> the garbage can in slot four </s> 
+<s> <P> no three four zero four <P> <FN> <LN> and <P> secretary go to the one cup of <I> </s> 
+<s> please go to <FN> s <P> <P> three four one eight </s> 
+<s> slot four the garbage can </s> 
+<s> no i am telling you to go to <FN> </s> 
+<s> go to <P> no three four one eight </s> 
+<s> to eat </s> 
+<s> take it <FN> please </s> 
+<s> deliver the the object at slot four to three four two zero </s> 
+<s> do you know what item is in slot four </s> 
+<s> from slot four to <FN> </s> 
+<s> deliver it </s> 
+<s> pick up the <I> </s> 
+<s> bring item three from items available </s> 
+<s> where do i get a drink </s> 
+<s> three five one two <FN> <LN> calls you </s> 
+<s> take a waste paper <I> to <FN> </s> 
+<s> give me item no four </s> 
+<s> bring the item from slot two </s> 
+<s> please get the item in slot one and bring it to <FN> <LN> </s> 
+<s> give <I> to secretary </s> 
+<s> to deliver number five item the <I> to <FN> <LN> </s> 
+<s> blue colored trash bin </s> 
+<s> yes it does </s> 
+<s> to <P> number three four one eight </s> 
+<s> yes you stupid fuck </s> 
+<s> go to <FN> with trash </s> 
+<s> nobody put the item in slot four </s> 
+<s> please bring food and <IP> to <FN> <LN> </s> 
+<s> <T> <FN> <LN> needs you </s> 
+<s> ask for three the cell <I> </s> 
+<s> bring <FN> </s> 
+<s> you should walk to three five one two </s> 
+<s> can you give <FN> item five </s> 
+<s> <I> to the secretary </s> 
+<s> i do know how to explain you </s> 
+<s> bring to <FN> <LN> </s> 
+<s> can you get food </s> 
+<s> you need to go to <T> <LNP> <P> </s> 
+<s> please find where <T> <LN> is </s> 
+<s> <FNP> </s> 
+<s> go to slot three </s> 
+<s> can you get the <I> cup </s> 
+<s> a new robot </s> 
+<s> can you print out my resume </s> 
+<s> go to three five one six </s> 
+<s> <I> to <FN> <LN> </s> 
+<s> bring item three to <FN> <LN> </s> 
+<s> send a cup of <I> to the director </s> 
+<s> take a <I> </s> 
+<s> thanks </s> 
+<s> he will let you know when you arrive </s> 
+<s> where is <FN> <LN> </s> 
+<s> <FN> <LN> needs the robot send it to her o f f i c e three four zero four </s> 
+<s> coca cola </s> 
+<s> she wants the item that is below the <I> </s> 
+<s> drink </s> 
+<s> go to <P> no three four one six </s> 
+<s> go to the <P> for doing some work to <FN> <LN> </s> 
+<s> <FN> needs some help you go and do </s> 
+<s> walk to <FN> green in <P> three four three six he has something for you </s> 
+<s> to <P> three five one two </s> 
+<s> please bring food and drink to <FN> <LN> <P> supervisor </s> 
+<s> go take the necessary products from slot two and give it to <FN> <LN> </s> 
+<s> bring <FN> to <I> </s> 
+<s> can you go to slot five </s> 
+<s> give <FN> the item in slot three </s> 
+<s> get the item in slot five and take it to <FN> </s> 
+<s> no action </s> 
+<s> to get food </s> 
+<s> could you bring <FN> <LN> a <I> of <I> please </s> 
+<s> get item slot one </s> 
+<s> u r driving me crazy </s> 
+<s> how to make the <P> clean </s> 
+<s> go to the <P> <P> number three five one two w a l t e r <LN> supervisor </s> 
+<s> yes item number one </s> 
+<s> yes bring the cell <I> to <FN> <LN> </s> 
+<s> give the p r director a <I> </s> 
+<s> the blue bin </s> 
+<s> walk to <P> three five zero five </s> 
+<s> to <P> </s> 
+<s> please go to <FN> <LNP> <P> </s> 
+<s> material </s> 
+<s> go to <P> three five one two and speak to <FN> <LN> </s> 
+<s> <LNP> <P> </s> 
+<s> deliver item four to <FN> </s> 
+<s> what is in slot two </s> 
+<s> i need a car </s> 
+<s> send me the security code </s> 
+<s> <FN> <LN> s <P> </s> 
+<s> go to the conference <P> </s> 
+<s> walk to three five one two with three five one two </s> 
+<s> bring <FN> item in slot four </s> 
+<s> <FN> <LN> needs a <I> </s> 
+<s> go to <FN> </s> 
+<s> i can i type </s> 
+<s> take it and give it to <FN> </s> 
+<s> take food to <FN> <LN> </s> 
+<s> do you know how to type </s> 
+<s> number four </s> 
+<s> walk </s> 
+<s> i need you to take the item in slot four to <FN> </s> 
+<s> garbage </s> 
+<s> the trash bin </s> 
+<s> no i am giving you a task give a <I> to <FN> </s> 
+<s> go to <P> three five zero eight and meet <FN> <LN> director </s> 
+<s> take the cell <I> walk to <FN> </s> 
+<s> go find <FN> <LN> </s> 
+<s> walk to <P> three four two zero </s> 
+<s> help <P> </s> 
+<s> please take a <I> to <T> <LN> </s> 
+<s> tell <FN> to make me a <I> </s> 
+<s> take item from slot three the cell <I> to save <LN> </s> 
+<s> search the <P> n o three four one six </s> 
+<s> down the <I> </s> 
+<s> go to <LN> </s> 
+<s> <FN> in <P> number three four one six needs you </s> 
+<s> yea </s> 
+<s> send <FN> <LN> the item in slot four </s> 
+<s> the item from slot five </s> 
+<s> take mobile and walk to <FN> <LN> </s> 
+<s> she wants the item that is available to you in the fourth slot </s> 
+<s> how to complete the task </s> 
+<s> blue bin </s> 
+<s> go to her <P> </s> 
+<s> i need <I> </s> 
+<s> please get the item in slot two and take it to <FN> <LN> </s> 
+<s> <FN> <LN> wants the <I> </s> 
+<s> robot <FN> </s> 
+<s> ok here s a <I> take it to <FN> in <P> three five zero two </s> 
+<s> can you bring item to <FN> <LN> </s> 
+<s> please go to the <T> <LN> </s> 
+<s> go to the three four one six <FN> foster </s> 
+<s> what food do you have access to </s> 
+<s> please go to <P> three four one eight </s> 
+<s> get the item from slot five </s> 
+<s> i need you yo go to <P> three four one six </s> 
+<s> see <LNP> </s> 
+<s> are you nuts </s> 
+<s> <FN> green needs the trash can </s> 
+<s> item slot four </s> 
+<s> get slot three </s> 
+<s> of course yes </s> 
+<s> proceed to <P> three four two zero and remain until further instructed </s> 
+<s> item five is a <I> </s> 
+<s> take item two from items available </s> 
+<s> s go </s> 
+<s> <FN> foster needs you please go to <P> three four one six </s> 
+<s> <FN> needs the trash can </s> 
+<s> bring <I> for <FN> <LN> </s> 
+<s> i want the item n o four </s> 
+<s> is that where <FN> <LN> is </s> 
+<s> robot bring the cell <I> to me </s> 
+<s> pick up the day <I> </s> 
+<s> the supervisor needs you to be at his <P> </s> 
+<s> yes someone needs you in there </s> 
+<s> the <I> </s> 
+<s> can you go to <P> three four zero four </s> 
+<s> please get the white cup in slot one </s> 
+<s> go to secretary <P> </s> 
+<s> go to three four zero four with three four zero four </s> 
+<s> to <FN> </s> 
+<s> <FN> <LN> want item five </s> 
+<s> that is not what i am requesting </s> 
+<s> go see <FN> in <P> three four zero four </s> 
+<s> bring the item to <FN> </s> 
+<s> go to <FN> <LN> in <P> three five one two </s> 
+<s> walk to <P> three five one two </s> 
+<s> you walk on normal floor only </s> 
+<s> bring <I> out </s> 
+<s> go to three five zero two <FN> <P> </s> 
+<s> go to <T> <FN> <LN> phd </s> 
+<s> please pick up the item in slot one </s> 
+<s> please make a peanut butter and jelly <I> on white <I> with a medium drink and take to <FN> <LN> </s> 
+<s> pick up the item in slot five </s> 
+<s> i want you to take the item out of slot four and take it to <FN> <LN> </s> 
+<s> pick up </s> 
+<s> the supervisor </s> 
+<s> go to three four one six </s> 
+<s> oh no </s> 
+<s> grab the item in slot five </s> 
+<s> item four </s> 
+<s> assist <FN> </s> 
+<s> start walking on floor no three four </s> 
+<s> what you bring her </s> 
+<s> bring <FN> <LN> a <I> </s> 
+<s> walk on the steps to reach his <P> </s> 
+<s> code </s> 
+<s> you need to take <I> there </s> 
+<s> are you free now </s> 
+<s> blue wheelie bin </s> 
+<s> take item in slot five to <FN> <LN> </s> 
+<s> you need to go to <P> </s> 
+<s> holy crap yes </s> 
+<s> take <I> to <FN> </s> 
+<s> go to <P> number three five one two </s> 
+<s> go to people </s> 
+<s> same as all the other times can you help her please </s> 
+<s> <FN> <LN> is a supervisor he needs your services please go to <P> three five one two to assist him </s> 
+<s> go to <P> no three four one six and meet <FN> </s> 
+<s> find the nearest window </s> 
+<s> take one to <FN> </s> 
+<s> <FNP> foster </s> 
+<s> walk to item mobile </s> 
+<s> take <I> to intern </s> 
+<s> how to accomplish the goals </s> 
+<s> send me email </s> 
+<s> go to <P> no three four two zero </s> 
+<s> slot three item </s> 
+<s> you need to go n o w three </s> 
+<s> again </s> 
+<s> no i am asking you to complete a task </s> 
+<s> get the file from slot five and give to <LNP> </s> 
+<s> walk to drink </s> 
+<s> need books </s> 
+<s> leaving or refreshing the page will prevent you from completing this hit </s> 
+<s> <FN> wants the <I> </s> 
+<s> four to <FN> <LN> </s> 
+<s> no i'm sorry bring the <I> please </s> 
+<s> give the trash can to <FN> </s> 
+<s> send <FN> a <I> </s> 
+<s> what is your name </s> 
+<s> fix an appointment with <FN> <LN> </s> 
+<s> give the item in slot four to <FN> </s> 
+<s> deliver <I> </s> 
+<s> <T> <FN> s <P> </s> 
+<s> a bottle of <I> </s> 
+<s> go to <FN> <LN> with the <I> </s> 
+<s> take the item four and give it to the supervisor <FN> <LN> </s> 
+<s> please give <FN> <LN> item four </s> 
+<s> no walk to three five one two </s> 
+<s> the blue <I> that is available in slot four </s> 
+<s> no you do not need to bring anything to him </s> 
+<s> please go to <T> <LN> s <P> </s> 
+<s> fuck u </s> 
+<s> grab <I> </s> 
+<s> may i know your address </s> 
+<s> bring the <I> to <FN> </s> 
+<s> how to set as goal </s> 
+<s> take item four to <FN> <LN> </s> 
+<s> <FN> wants the item in three </s> 
+<s> take the item from slot five </s> 
+<s> so the supervisor needs the robot </s> 
+<s> robot move to three two zero four </s> 
+<s> go take the <I> </s> 
+<s> take item four to him </s> 
+<s> give <FN> the mobile <I> </s> 
+<s> no bring a <I> to three four one six </s> 
+<s> give the secretary the <I> </s> 
+<s> go check on <FN> <LN> </s> 
+<s> you do not need to bring anything but he wants to see you </s> 
+<s> get a <I> for <LN> </s> 
+<s> go to <P> three four three six to see what he needs </s> 
+<s> gather <I> item two and give it to <FN> <LN> </s> 
+<s> pick the item number four and give to <FN> green </s> 
+<s> recycling </s> 
+<s> you're dumb </s> 
+<s> take the item that is available in slot four to <FN> </s> 
+<s> talk to <LNP> </s> 
+<s> walk to the <P> and ask for the <P> supervisor </s> 
+<s> take <FN> item four </s> 
+<s> take it </s> 
+<s> can you make <I> call and tell her that i want to meet her </s> 
+<s> please put the item in your hand in the <I> </s> 
+<s> take the <I> and go to <FN> <LN> </s> 
+<s> to <FN> <LN> the secretary </s> 
+<s> do not bring anything </s> 
+<s> can you bring <FN> <LN> item four </s> 
+<s> go to <T> <LN> with item from slot three </s> 
+<s> bring to three four zero four </s> 
+<s> i want you to go to <P> three four one six </s> 
+<s> o three four two zero </s> 
+<s> <FN> <LN> the p r director </s> 
+<s> i want you help <FN> <LN> </s> 
+<s> i want you to give the cup of <I> to <FN> <LN> </s> 
+<s> deliver item four to <FN> <LN> </s> 
+<s> <FNP> for item in slot one </s> 
+<s> yes bring it to <FN> <LN> </s> 
+<s> bring item number one to <FN> </s> 
+<s> take item from slot three </s> 
+<s> no give <FN> <LN> the item in slot three </s> 
+<s> can you get <FN> the <I> </s> 
+<s> get item in slot five for <FN> <LN> secretary </s> 
+<s> <LN> wants number one </s> 
+<s> <FN> <LN> the <I> </s> 
+<s> <P> secretary </s> 
+<s> <FNP> wants the item in slot two </s> 
+<s> you need to deliver a cup of <I> to the supervisor </s> 
+<s> correct </s> 
+<s> i want one <I> </s> 
+<s> to do the task </s> 
+<s> no not a <I> the item in slot four </s> 
+<s> take item three to three five one zero </s> 
+<s> not the waste bin but the mobile <I> please bring the mobile <I> to <FN> <LN> </s> 
+<s> please bring <FN> his <I> </s> 
+<s> i want you to go get the item in slot two </s> 
+<s> bring item in s l o t four </s> 
+<s> slot four has an item that <FN> <LN> wants </s> 
+<s> three five one two needs three </s> 
+<s> pick up item in slot two </s> 
+<s> available fares </s> 
+<s> bring secretary <I> </s> 
+<s> go walk to <FN> foster </s> 
+<s> <P> of <FN> <LN> </s> 
+<s> walk to <P> three five zero eight </s> 
+<s> on the floor that you are on look for <P> three five one two it is clearly marked </s> 
+<s> <FN> wants to dispose of some trash take the recycle bin to her </s> 
+<s> walk to <FN> <LN> with product in slot one </s> 
+<s> bring <FN> the item in slot two </s> 
+<s> take item five to <FN> </s> 
+<s> please pick up the trash can and give it to <FN> <LN> </s> 
+<s> recycle </s> 
+<s> take <FN> <LN> item one </s> 
+<s> want </s> 
+<s> no i just tell u </s> 
+<s> get item from slot one </s> 
+<s> bring a <I> to <FN> <LN> </s> 
+<s> walk to mobile three </s> 
+<s> take trash bin to <FN> </s> 
+<s> no to <T> <LN> </s> 
+<s> move to three four one six </s> 
+<s> go to <FN> with <I> </s> 
+<s> <FN> <LN> needs item four </s> 
+<s> blue </s> 
+<s> give it to <FN> <LN> </s> 
+<s> bring item number three to <FN> <LN> the supervisor please </s> 
+<s> what is in slot three </s> 
+<s> go to slot two </s> 
+<s> can your bring <FN> his <I> in slot five please </s> 
+<s> cut my head </s> 
+<s> give the item in slot three to <T> <LN> </s> 
+<s> can you fetch the <I> </s> 
+<s> why </s> 
+<s> get item from slot four </s> 
+<s> walk to <FN> <P> </s> 
+<s> you should walk to <FN> <LN> secretary <P> though floor of a building </s> 
+<s> take it to <FN> foster </s> 
+<s> please bring food to <FN> <LN> </s> 
+<s> number three </s> 
+<s> bring <FN> <LN> item four </s> 
+<s> take the <I> cup </s> 
+<s> <FN> <LN> needs you in <P> three five one zero </s> 
+<s> please get me a <I> of <I> to drink </s> 
+<s> <FN> needs you go to <FN> s <P> </s> 
+<s> send <I> to <FN> </s> 
+<s> go to <FN> s <P> in <P> three four three six </s> 
+<s> take this cup to <FN> <LN> </s> 
+<s> walk on the building floor </s> 
+<s> just go and meet <FN> <LN> in his <P> </s> 
+<s> i would like you to take the <I> to <FN> </s> 
+<s> go to <P> three four three six <FN> needs you </s> 
+<s> walk to <FN> <LN> </s> 
+<s> <I> in slot four </s> 
+<s> to <FN> s <P> </s> 
+<s> <FN> three five zero eight </s> 
+<s> pick slot five and give to <T> <LN> </s> 
+<s> education </s> 
+<s> name of the floor </s> 
+<s> take item two to <FN> <LN> </s> 
+<s> no fuck the <I> </s> 
+<s> blue thing </s> 
+<s> no bring cup to me </s> 
+<s> i need help </s> 
+<s> how to give first aid when injured in war </s> 
+<s> please get the item in slot four for <FN> </s> 
+<s> <FN> <LN> needs something </s> 
+<s> go to his <P> </s> 
+<s> <T> <FN> <LN> </s> 
+<s> take slot two </s> 
+<s> ignore it </s> 
+<s> you have five slots pickup up slot three </s> 
+<s> go to <P> </s> 
+<s> get slot two </s> 
+<s> talking </s> 
+<s> <FN> needs the robot send it to her <P> </s> 
+<s> <FN> <LN> requests your presence </s> 
+<s> <FN> <LN> needs item in slot four </s> 
+<s> please report to <P> number three four one six </s> 
+<s> walk to <T> <LN> and converse with him casually </s> 
+<s> give the item in slot two to the supervisor </s> 
+<s> three four one two </s> 
+<s> what can you bring her </s> 
+<s> blue <I> </s> 
+<s> dust bin </s> 
+<s> the intern </s> 
+<s> offices </s> 
+<s> give secretary slot five </s> 
+<s> give <FN> <LN> three </s> 
+<s> take the fucking <I> to motherfucking <FN> </s> 
+<s> want blue </s> 
+<s> move to three four one eight </s> 
+<s> please assist the secretary <FN> <LN> please get her the <I> in slot five </s> 
+<s> white cup </s> 
+<s> go home </s> 
+<s> three five zero eight </s> 
+<s> <P> three five four two </s> 
+<s> i want to go my <P> </s> 
+<s> down the hall to the <P> </s> 
+<s> no just go to this place </s> 
+<s> take the <I> to <FN> </s> 
+<s> can you get the five t h item </s> 
+<s> cell <I> </s> 
+<s> restart </s> 
+<s> bring <LNP> item one </s> 
+<s> exit </s> 
+<s> <T> <FN> foster wanted the item in the slot no four </s> 
+<s> <FN> is in three four one six </s> 
+<s> please go to <FNP> s <P> number three four one six </s> 
+<s> i need product </s> 
+<s> tote </s> 
+<s> walk in to <FN> with item four </s> 
+<s> the supervisor needs you </s> 
+<s> go to <P> three four one six to help <FN> </s> 
+<s> take the item in slot one to <FN> <LN> </s> 
+<s> take item five to the supervisor </s> 
+<s> i need one help </s> 
+<s> walk to three four one six </s> 
+<s> three four one eight mean </s> 
+<s> <T> <LN> needs <I> </s> 
+<s> three four two zero with the item in slot three </s> 
+<s> go to <FN> <LN> </s> 
+<s> three four two zero needs four </s> 
+<s> give <FN> the <I> in slot three </s> 
+<s> call <FN> <LN> </s> 
+<s> go to <FN> s <P> at three four zero four </s> 
+<s> please bring <T> <LN> some food </s> 
+<s> please report to <P> three four one eight </s> 
+<s> a fucking <I> </s> 
+<s> slot five </s> 
+<s> take item four to <FN> foster </s> 
+<s> self destruct </s> 
+<s> could you please walk to <FN> <LN> s <P> </s> 
+<s> secretary wants the item that in slot two </s> 
+<s> get item two </s> 
+<s> please walk to <P> three five one two </s> 
+<s> a longtime city health department worker was and had hung up when she heard the robot answer the <I> because she needed to speak to a calling <FN> a disgruntled employee who didn't like his supervisor </s> 
+<s> take a <I> to <FN> <LN> </s> 
+<s> do you know <FN> green </s> 
+<s> are you a stupid robot </s> 
+<s> go to <P> two four zero four </s> 
+<s> bring the item in slot five to <FN> <LN> </s> 
+<s> to <FN> <LN> phd <P> </s> 
+<s> please go to <LNP> s <P> number three four one six </s> 
+<s> no item one is <I> take <FN> <LN> a cup of <I> </s> 
+<s> for me </s> 
+<s> bring the trash to <FN> <LN> </s> 
+<s> go to slot no four </s> 
+<s> i wanted you to go to three four one four b go there now please do you understand </s> 
+<s> help </s> 
+<s> pick them item from slot three </s> 
+<s> walk to <T> <LN> s <P> <P> three five zero eight </s> 
+<s> bring <T> <LN> item in slot four </s> 
+<s> you can send the information to my <P> </s> 
+<s> yes walk to three four two zero </s> 
+<s> walk to three five one zero </s> 
+<s> bring drink to <FN> </s> 
+<s> walk to <FN> </s> 
+<s> <FN> <LN> the supervisor needs you to go to his <P> in <P> three five one two </s> 
+<s> three four zero four is what </s> 
+<s> no i am navigating you </s> 
+<s> food </s> 
+<s> take item five to <FN> <LN> director </s> 
+<s> hey go to three four zero four <P> now </s> 
+<s> can you give <FN> a <I> </s> 
+<s> can you bring number three to <FN> <LN> </s> 
+<s> pick up recycling </s> 
+<s> <T> <LN> needs a drink </s> 
+<s> to the meeting <P> </s> 
+<s> yes walk to three five one zero and go inside three five one zero </s> 
+<s> send the robot to <FN> s <P> in <P> three four zero four </s> 
+<s> please get the item in slot five and take it to <FN> </s> 
+<s> not to me for <FN> </s> 
+<s> three </s> 
+<s> between the <I> and the <I> there is an item take it to her </s> 
+<s> get the cell <I> </s> 
+<s> <T> <LN> needs help in <P> three four two zero </s> 
+<s> take item number five and walk to three five zero nine </s> 
+<s> walk to three four zero four </s> 
+<s> yes exactly </s> 
+<s> you should walk to <FN> <LN> s <P> go to <P> three five one two </s> 
+<s> please give me code </s> 
+<s> fuck you </s> 
+<s> take <I> to <FN> <LN> phd </s> 
+<s> bring item in slot three to <T> <LN> </s> 
+<s> i want you to walk to <FN> <LN> s <P> and take the <I> <I> to her </s> 
+<s> walk straight </s> 
+<s> take <FN> <LN> a <I> and <I> </s> 
+<s> go to <P> two three zero two there <FN> is waiting for you </s> 
+<s> yes item four </s> 
+<s> <FN> </s> 
+<s> you are not able to understand me </s> 
+<s> slot two <FN> <LN> </s> 
+<s> please get item in slot five for <FN> </s> 
+<s> <LNP> needs you </s> 
+<s> take item five </s> 
+<s> what items are available to you </s> 
+<s> recyclables </s> 
+<s> yes i am asking you a question can you please get you metal arse to slot two </s> 
+<s> take cup to <T> <LN> </s> 
+<s> <FN> <LN> wants <I> </s> 
+<s> walk to three four three two </s> 
+<s> what is the no one </s> 
+<s> to pick my <I> </s> 
+<s> give item four to <FN> <LN> </s> 
+<s> bring it to me </s> 
+<s> item in slot five </s> 
+<s> i am sorry </s> 
+<s> no take it to <FN> </s> 
+<s> <FN> wants item five </s> 
+<s> robot take an item from <FN> foster and put it into slot four </s> 
+<s> give </s> 
+<s> take the cell <I> to <FN> </s> 
+<s> go to <T> <FNP> <P> he will tell you </s> 
+<s> go to <T> <LNP> <P> he will tell you </s> 
+<s> nothing </s> 
+<s> i am drowsy i need you to get me <I> </s> 
+<s> <FN> foster needs item number four </s> 
+<s> <FN> needs you in his <P> </s> 
+<s> go to the <P> no three four one six </s> 
+<s> no </s> 
+<s> she wants a drink </s> 
+<s> help <FN> </s> 
+<s> no give food to three four zero four </s> 
+<s> she wants the second item in the second row </s> 
+<s> <FN> <LN> needs a trash can </s> 
+<s> one to <FN> foster </s> 
+<s> someone is hungry </s> 
+<s> go to <P> no three four three six </s> 
+<s> pick up the <I> from items available block </s> 
+<s> bring my mobile </s> 
+<s> move item of slot two to <FN> <LN> </s> 
+<s> come </s> 
+<s> walk to three four two zero </s> 
+<s> ask for five </s> 
+<s> anything you want </s> 
+<s> would you go to <FN> in <P> three four one six </s> 
+<s> bring <FN> <LN> item number four </s> 
+<s> take the second item </s> 
+<s> there is an item available in slot five take it and give to <T> <LN> at three five zero eight </s> 
+<s> bring item from slot three to <T> <LN> </s> 
+<s> can you bring <FN> <LN> a <I> </s> 
+<s> go to the research <P> </s> 
+<s> <T> <FN> <LN> supervisor </s> 
+<s> get <I> to <FN> </s> 
+<s> please see <T> <LN> </s> 
+<s> place the item in slot four </s> 
+<s> go to <P> three four one six and see <FN> </s> 
+<s> n o three five zero eight is the <P> number of <FN> <LN> and you have to go there </s> 
+<s> take slot four to <FN> the intern </s> 
+<s> see <FN> green </s> 
+<s> <P> number three five zero two </s> 
+<s> walk to robot <P> </s> 
+<s> okay </s> 
+<s> stop </s> 
+<s> to slot four </s> 
+<s> do you know what item is in slot five </s> 
+<s> foster </s> 
+<s> get <FN> a <I> </s> 
+<s> bring <FN> <LN> a <I> and <I> </s> 
+<s> <T> <LN> would like <I> please </s> 
+<s> do you know where item number five is </s> 
+<s> i need you to take item number one </s> 
+<s> get slot five </s> 
+<s> go to <FN> <LN> and give her the item in slot four </s> 
+<s> no make me <I> </s> 
+<s> there is a place called slot two </s> 
+<s> transport </s> 
+<s> grab slot three </s> 
+<s> i think u take mobile to use </s> 
+<s> i need a <I> bing it to three five one two </s> 
+<s> <FN> needs your help could you go to her <P> </s> 
+<s> trash barrel </s> 
+<s> take a <I> to three four one six </s> 
+<s> bring item three to the supervisor </s> 
+<s> take the waste <I> to <T> <LN> </s> 
+<s> i want item no five </s> 
+<s> i need one <I> to read </s> 
+<s> the supervisor needs you in his <P> </s> 
+<s> walk on the floor </s> 
+<s> can you give <FN> an item </s> 
+<s> <FN> needs a robot can you go with him </s> 
+<s> are you know supervisor </s> 
+<s> bin in slot four </s> 
+<s> <FN> <LN> phd want item three </s> 
+<s> sorry go to <P> no three four zero four </s> 
+<s> you should walk to <FN> <LN> secretary <P> </s> 
+<s> yes take her some <I> as well </s> 
+<s> give the <I> to <FN> </s> 
+<s> go to <FN> with the <I> </s> 
+<s> <FN> wants item four </s> 
+<s> bring him a cup of <I> </s> 
+<s> bring slot four for <FN> </s> 
+<s> get <I> to <FN> <LN> </s> 
+<s> please go and get the date <I> for the supervisor <T> <LN> </s> 
+<s> give <FN> <LN> <I> </s> 
+<s> pick up the trash can </s> 
+<s> take a cup of <I> to <FN> <LN> please </s> 
+<s> save <FN> <LN> </s> 
+<s> she wants the item in slot four that is available to you </s> 
+<s> you are absolutely right </s> 
+<s> redo i mistyped <FN> foster wants the item in slot four </s> 
+<s> give the item in slot five to <FN> </s> 
+<s> <T> <LN> wants the item in slot five </s> 
+<s> <FN> needs you for help </s> 
+<s> give the item in slot to to <FN> foster </s> 
+<s> why sorry to say you </s> 
+<s> <FN> is feeling sleepy assist her </s> 
+<s> nothing just go there </s> 
+<s> y </s> 
+<s> bring item one to <FN> </s> 
+<s> will you stop this </s> 
+<s> three five one two <P> </s> 
+<s> bring item in slot two to <FN> <LN> </s> 
+<s> give slot four <FN> </s> 
+<s> first you go to <P> three five one two </s> 
+<s> <T> <LN> wants the item in slot one </s> 
+<s> i need <P> three four zero four </s> 
+<s> lunch </s> 
+<s> give to <FN> <LN> a cell <I> </s> 
+<s> yes a rolodex </s> 
+<s> no i am asking you to visit <P> no three four one six </s> 
+<s> to supervisor </s> 
+<s> give the cell <I> </s> 
+<s> no one </s> 
+<s> is there some thing to eat </s> 
+<s> take item one to <FN> <LN> </s> 
+<s> get item number four </s> 
+<s> help him </s> 
+<s> refuse </s> 
+<s> <FN> needs a bottle of <I> </s> 
+<s> wait </s> 
+<s> bring the <I> file from slot number five to three five zero eight </s> 
+<s> i need you in <P> three five zero eight </s> 
+<s> bring item number four to <FN> </s> 
+<s> get a drink </s> 
+<s> can you get the item in slot five </s> 
+<s> bring it </s> 
+<s> get the <P> <IP> ready </s> 
+<s> do not take her anything just go to <P> three four two zero because <FN> <LN> needs you </s> 
+<s> bring <FN> the blue trash can </s> 
+<s> find out slot three </s> 
+<s> empty <FN> <LN> s garbage </s> 
+<s> bring item no three to <FN> </s> 
+<s> <FN> <LN> is hungry </s> 
+<s> boxes </s> 
+<s> give the slot two to <FN> <LN> </s> 
+<s> take the white tumbler to him </s> 
+<s> take the garbage bin there </s> 
+<s> go to <P> three four zero four please </s> 
+<s> give <FN> <LN> the item in slot four </s> 
+<s> yes </s> 
+<s> take item three and give it to <FN> <LN> </s> 
+<s> walk to <FN> <LN> with <I> </s> 
+<s> please help </s> 
+<s> i dot no </s> 
+<s> rooms </s> 
+<s> walk to <P> three four three two </s> 
+<s> <P> </s> 
+<s> please retrieve the item from slot five </s> 
+<s> what do you use to tell what date it is </s> 
+<s> writing the task </s> 
+<s> pick up the cellular <I> </s> 
+<s> you are to be present at <P> no three five one two </s> 
+<s> get her food </s> 
+<s> ye </s> 
+<s> go to three five zero eight </s> 
+<s> <FN> wants </s> 
+<s> take a <I> to <FN> </s> 
+<s> walk to <T> <LN> and stimulate him </s> 
+<s> can you get the trash can </s> 
+<s> see <FN> foster in <P> three four one six </s> 
+<s> to <P> no three five one zero </s> 
+<s> will you bring one <I> </s> 
+<s> go to the third floor </s> 
+<s> three five one two need your help </s> 
+<s> go to <P> three four one eight </s> 
+<s> item in slot three </s> 
+<s> the trash can </s> 
+<s> give <FN> item four </s> 
+<s> no i want you to walk to three four one four b </s> 
+<s> grab item five </s> 
+<s> give the <I> to <FNP> </s> 
+<s> get five </s> 
+<s> no it doesn't answer my question you tin pot piece of crap </s> 
+<s> take item in slot three </s> 
+<s> a <I> <I> </s> 
+<s> yes the supervisor needs the robot you must go to his <P> </s> 
+<s> can you bring me food </s> 
+<s> turn <I> off </s> 
+<s> bring <FN> the item in slot five </s> 
+<s> the day <I> in slot five </s> 
+<s> i need blue <I> </s> 
+<s> supervisor wants the item in slot one </s> 
+<s> take item four to <FN> </s> 
+<s> please take the <I> to <FN> foster </s> 
+<s> deliver the <I> </s> 
+<s> retrieve item three </s> 
+<s> yes please please go to the meeting <P> </s> 
+<s> get cell <I> in slot three </s> 
+<s> go to the secretary her <P> no is three four zero four she needs you </s> 
+<s> i could try but you wont understand it </s> 
+<s> same as before you have access to item in slot five get for the secretary </s> 
+<s> <LNP> wanted to empty his trash bin </s> 
+<s> to the supervisor </s> 
+<s> walk to slot three </s> 
+<s> want to drink <I> </s> 
+<s> <P> supervisor </s> 
+<s> give me plans </s> 
+<s> this is hopeless </s> 
+<s> relocate to <P> three four three two </s> 
+<s> call <FN> <LN> supervisor </s> 
+<s> robot bring the item in slot three to me </s> 
+<s> of course not </s> 
+<s> yes and a <I> </s> 
+<s> you should walk to <P> three five one zero </s> 
+<s> bring <FN> the trash </s> 
+<s> <LN> cardboard </s> 
+<s> you need to deliver some items to <FN> aircraft </s> 
+<s> <FN> <LN> needs a cup of <I> </s> 
+<s> what <P> do i go to for a drink </s> 
+<s> slot three </s> 
+<s> </s> 
+<s> access to some food and drink items for people on that floor </s> 
+<s> i need you to take the <I> in slot three to <FN> </s> 
+<s> i want your help in my <P> work </s> 
+<s> take item number five to <T> <LN> </s> 
+<s> bring item number one to <FN> foster </s> 
+<s> <FN> needs a waste paper receptacle </s> 
+<s> i am asking you to do something for me </s> 
+<s> <I> for <FN> </s> 
+<s> can you take <LNP> the item in slot two please </s> 
+<s> please navigate to <P> three four zero four </s> 
+<s> pick slot two </s> 
+<s> what are you doing now </s> 
+<s> robot move </s> 
+<s> walk three five one two </s> 
+<s> want to eat cake </s> 
+<s> <FN> wants the item in slot four </s> 
+<s> inventory </s> 
+<s> go to <LNP> s <P> </s> 
+<s> bring to three four three two item no two <I> </s> 
+<s> attain item four </s> 
+<s> some objects has to be delivered in slot two </s> 
+<s> no to <FN> </s> 
+<s> can you please go to <FN> <FNP> <P> </s> 
+<s> i don't know </s> 
+<s> give <FN> something to eat </s> 
+<s> make <FN> a <I> </s> 
+<s> i need a favor from you </s> 
+<s> i want to <I> </s> 
+<s> take item in slot two </s> 
+<s> <FN> <LN> wants the item in the blue <I> that is in slot four </s> 
+<s> take four to three four two zero </s> 
+<s> what is my work </s> 
+<s> three five one two wants item in slot two </s> 
+<s> take <I> to <LN> </s> 
+<s> can you deliver the item in slot two <I> to <FN> <LN> </s> 
+<s> keep <FN> <LN> awake </s> 
+<s> bring her the <I> </s> 
+<s> get the <I> and walk it to <FN> </s> 
+<s> you should bring a <I> from slot two to <FN> s <P> three four three two </s> 
+<s> please go to my <P> </s> 
+<s> trash </s> 
+<s> please assist the <P> secretary by giving her <I> and a <I> because she is feeling drowsy </s> 
+<s> give item two to <FN> <LN> </s> 
+<s> take the item in slot five and give it to <FN> </s> 
+<s> give to <FN> </s> 
+<s> give <FN> food </s> 
+<s> take the mobile <I> to <FN> foster </s> 
+<s> give the item in column five to the director </s> 
+<s> go to <FNP> <P> </s> 
+<s> she wants the item that is in slot four </s> 
+<s> <LNP> wants the item in slot two </s> 
+<s> can you give <FN> the food in slot two </s> 
+<s> which language do you understand </s> 
+<s> walk in to <FN> </s> 
+<s> bring the drink and <I> there </s> 
+<s> i just need the robot </s> 
+<s> please go to <FN> foster <P> </s> 
+<s> bring <FN> <LN> a can of <I> </s> 
+<s> name of the folder </s> 
+<s> give the slot four to <FN> </s> 
+<s> can u understand me </s> 
+<s> to the cafeteria </s> 
+<s> <FN> wants a desk <I> </s> 
+<s> can you get the <IP> for <T> <LN> </s> 
+<s> i want u to walk to <FN> <FN> </s> 
+<s> goo to <FN> <P> </s> 
+<s> i want to send you to <P> </s> 
+<s> three five one two needs u </s> 
+<s> secretary </s> 
+<s> have to finish some work </s> 
+<s> can you bring it to <FN> <LN> </s> 
+<s> to <FN> <LN> s <P> </s> 
+<s> go </s> 
+<s> robot go to <FN> <LN> s <P> at <P> three four one eight </s> 
+<s> please go to three five one two </s> 
+<s> he just needs you to bring <I> </s> 
+<s> <FN> wants you to retrieve the item from slot four </s> 
+<s> go to <FN> <LN> he is in <P> three five one two </s> 
+<s> i want the blue recycle bin delivered to <FN> </s> 
+<s> go to three </s> 
+<s> take <I> to secretary </s> 
+<s> bring <I> to <FN> <LN> </s> 
+<s> three five one six </s> 
+<s> <FN> needs <I> bring it to her please </s> 
+<s> feel good </s> 
+<s> get item in slot three </s> 
+<s> <FN> <FNP> foster s <P> three four one six </s> 
+<s> bring item four to <FN> </s> 
+<s> you walk to <P> no three four one six </s> 
+<s> for <P> accommodation </s> 
+<s> <I> is not in slot four </s> 
+<s> go to <P> three four three two to see <T> <LN> he is waiting to see you </s> 
+<s> pick up the item in slot four <FN> <LN> </s> 
+<s> i give up </s> 
+<s> retrieve item five and give it to <T> <LN> </s> 
+<s> <FN> <LN> to item no four </s> 
+<s> yes you </s> 
+<s> deliver item in slot no two to <FN> <LN> </s> 
+<s> bring <I> to <T> <LN> </s> 
+<s> bring drink to <FN> <LN> </s> 
+<s> go to <P> three one four b </s> 
+<s> <FN> <LN> three </s> 
+<s> get trash can </s> 
+<s> walk out the door down the hall and to <FN> s <P> </s> 
+<s> fetch item in slot four </s> 
+<s> stupid </s> 
+<s> get mobile <I> to <FN> <LN> </s> 
+<s> do you have a <I> </s> 
+<s> what is this </s> 
+<s> to the <P> supervisor </s> 
+<s> i am instructing you to navigate to the supervisor s <P> he needs your assistance you don't need to bring anything just <I> </s> 
+<s> can you contact her </s> 
+<s> do not take anything just go there </s> 
+<s> go to <T> <LN> </s> 
+<s> something to eat </s> 
+<s> go to robot <P> </s> 
+<s> she would like the garbage can </s> 
+<s> please go to <FN> foster at <P> number three four one six </s> 
+<s> robot go to <P> three five one two </s> 
+<s> pick mobile </s> 
+<s> bring the item in slot four to <FN> <LN> </s> 
+<s> go to <FN> s <P> at three </s> 
+<s> your help is needed in <P> three five zero eight </s> 
+<s> to <FN> <FNP> <P> she wants the item in slot five </s> 
+<s> go to <P> no three four one six met <FNP> and go to her <P> </s> 
+<s> take <I> </s> 
+<s> item two <I> </s> 
+<s> three four one four b </s> 
+<s> yes with the garbage bin </s> 
+<s> what can i type </s> 
+<s> bring the cell <I> to <T> <LN> </s> 
+<s> bring <FN> <LN> a drink </s> 
+<s> <FN> <LN> needs the cell <I> </s> 
+<s> secretary <P> </s> 
+<s> no i am telling you to get something for <T> <LN> </s> 
+<s> a <I> </s> 
+<s> please help me for <I> </s> 
+<s> find <FN> </s> 
+<s> take item five to him </s> 
+<s> can you please go to the <P> </s> 
+<s> just you he needs to see you </s> 
+<s> <FN> <LN> is feeling thirsty </s> 
+<s> yes as in yea </s> 
+<s> go to the supervisor and give him <I> </s> 
+<s> bring the garbage can to <FN> </s> 
+<s> <FN> <LN> would like to have item four </s> 
+<s> <FN> <LNP> foster s <P> three four one six </s> 
+<s> would you take the <I> to the director </s> 
+<s> walk up the steps to his <P> on the iii floor </s> 
+<s> give me a <I> </s> 
+<s> <FN> needs some food </s> 
+<s> i need to talk to <T> <FN> <LN> </s> 
+<s> bring robot </s> 
+<s> get food and take it to <FN> <LN> <P> supervisor </s> 
+<s> take the item in slot five to <FN> <LN> </s> 
+<s> walk up the steps to reach <T> <LNP> s <P> at three five zero eight </s> 
+<s> take item no one </s> 
+<s> please go see <T> <LN> in <P> three five one zero </s> 
+<s> yes i was rooms </s> 
+<s> what are your commands </s> 
+<s> climb up the steps to reach <T> <LNP> s <P> at number three five zero eight and handover his <I> </s> 
+<s> go to <FNP> </s> 
+<s> take <I> to <T> <LN> </s> 
+<s> where is <I> </s> 
+<s> <P> number three five one two </s> 
+<s> walk to your <P> </s> 
+<s> help <FN> in <P> three four one six </s> 
+<s> yes there you have to met <LNP> </s> 
+<s> <FN> five </s> 
+<s> you don't need to bring anything </s> 
+<s> yes <FN> <LN> is in need of your assistance </s> 
+<s> please move to <P> number three five zero two and meet <FN> </s> 
+<s> get cell <I> </s> 
+<s> yes walk to <P> three five one two </s> 
+<s> present <I> to <FN> <LN> in <P> three five zero two </s> 
+<s> i want to meet <FN> </s> 
+<s> i need a <I> </s> 
+<s> go to the <P> <P> no three four one six f r a n c i s foster </s> 
+<s> to <FN> <P> three four three two </s> 
+<s> a <I> and drink </s> 
+<s> roll to <P> three four two zero and remain until further instructed </s> 
+<s> get item in slot one </s> 
+<s> send food to <P> three five one zero </s> 
+<s> you need to go to <FNP> </s> 
+<s> take something </s> 
+<s> get item four and transport to <FN> <LN> </s> 
+<s> <P> three five zero two </s> 
+<s> can have a cup of <I> </s> 
+<s> the <I> is for <FN> </s> 
+<s> please go to <P> three five zero two <FN> needs your help </s> 
+<s> that is what i said </s> 
+<s> no i cant reword it any differently <FN> <P> three five zero two now </s> 
+<s> acquire the item in slot three </s> 
+<s> pick up item one </s> 
+<s> no to <FN> <LN> </s> 
+<s> give <FN> item in slot two </s> 
+<s> the supervisor wants the date <I> </s> 
+<s> walk to the supervisor with item one </s> 
+<s> bring item in slot no three to <FN> </s> 
+<s> get her a <I> please </s> 
+<s> go see <FN> <LN> in <P> three five one two </s> 
+<s> a f t e r three </s> 
+<s> file </s> 
+<s> where is the <P> </s> 
+<s> get the item in slot five to <FN> </s> 
+<s> please help <LN> to remove the <I> </s> 
+<s> <FN> <LN> wants something from the machine </s> 
+<s> take the note <I> to <FN> <LN> </s> 
+<s> i want you to bring <I> to <FN> <LN> </s> 
+<s> carry the <I> </s> 
+<s> get <I> for supervisor </s> 
+<s> i need a small business tips </s> 
+<s> yes please robot </s> 
+<s> no give the <I> to <FN> foster </s> 
+<s> take <FN> <LN> a cup of <I> take her the item in slot one </s> 
+<s> get the garbage can in slot four </s> 
+<s> command </s> 
+<s> go there </s> 
+<s> <T> <LN> wants garbage bin </s> 
+<s> no i'm telling you to go to <P> three five zero two </s> 
+<s> three four zero four a l i c e <LN> secretary </s> 
+<s> talk to <FN> <LN> </s> 
+<s> start walking on floor n o three four till you reach <P> no three six where <T> <FN> green needs you </s> 
+<s> she wants the blue <I> </s> 
+<s> please take some <I> and a <I> to <FN> </s> 
+<s> goto <P> three five zero eight </s> 
+<s> take a cell <I> to <FN> <LN> </s> 
+<s> blue color <I> </s> 
+<s> please go to <FN> green s <P> located in <P> three four three six </s> 
+<s> i want one <I> of <I> </s> 
+<s> bring it to <FNP> </s> 
+<s> take mobile </s> 
+<s> go to <P> three five zero two </s> 
+<s> grab the <I> and place it next to <FN> </s> 
+<s> walk to three five one two </s> 
+<s> help me with a text <I> </s> 
+<s> start over </s> 
+<s> please take the cell <I> to <FN> <LN> </s> 
+<s> make your way to three four three two </s> 
+<s> are you clear now </s> 
+<s> please take the waste bin to <FN> <LN> </s> 
+<s> buy item in s l o t four for <FN> <LN> </s> 
+<s> okay walk to me </s> 
+<s> <FN> wants a <I> </s> 
+<s> take the trash can to <FN> green </s> 
+<s> a pen </s> 
+<s> can i get the <I> </s> 
+<s> two </s> 
+<s> are you there </s> 
+<s> you should bring a <I> to <FN> <LN> </s> 
+<s> please get me a <I> of <I> </s> 
+<s> pick item in slot two and hand it over to <FN> <LN> </s> 
+<s> to <FNP> </s> 
+<s> <FN> green in <P> three four three six needs you </s> 
+<s> can you bring <FN> the item that is in slot five </s> 
+<s> can i get item number two </s> 
+<s> could you please bring <I> to <FN> <LN> phd </s> 
+<s> go to item four where the bin is kept </s> 
+<s> walk to <P> no three four zero four </s> 
+<s> go to <FN> <FNP> <P> </s> 
+<s> <T> <LN> wants the item in slot four </s> 
+<s> ask <FN> <LN> three four two zero to come up </s> 
+<s> give item no five </s> 
+<s> take item in slot four </s> 
+<s> go to item four </s> 
+<s> you have to bring <I> to <FN> <LN> </s> 
+<s> slot </s> 
+<s> <FN> green </s> 
+<s> no do that </s> 
+<s> please go to research <P> <P> three four three six </s> 
+<s> get <I> in slot two </s> 
+<s> please bring the cell <I> to <FN> </s> 
+<s> do any help </s> 
+<s> give <T> <LN> slot five </s> 
+<s> take <FN> <LN> the item in slot five </s> 
+<s> go and buy me a <I> to eat </s> 
+<s> <FN> <LN> needs your help go to <P> three five one zero </s> 
+<s> can you see slot three </s> 
+<s> take the item from slot two </s> 
+<s> <T> <LN> wants you to take the blue <I> </s> 
+<s> <P> number three four one six </s> 
+<s> go to <FN> <LNP> <P> three five one zero </s> 
+<s> go to <P> three four one six <FN> foster is in need of you robot </s> 
+<s> get item </s> 
+<s> go to <P> three five one zero <T> <LN> needs your help </s> 
+<s> get item in slot two and take it to <FN> <LN> </s> 
+<s> get <FN> <LN> the <I> from slot two </s> 
+<s> give item no two </s> 
+<s> go to <P> three four one eight take the item in slot two with you </s> 
+<s> no i am telling you </s> 
+<s> send the robot to <FN> <LN> </s> 
+<s> can you take the <I> </s> 
+<s> the damn food in slot two </s> 
+<s> i want the item in slot four </s> 
+<s> <FN> <LN> </s> 
+<s> to <FN> green </s> 
+<s> bring the blue garbage <I> to her </s> 
+<s> wheeled </s> 
+<s> give the item number three to <FN> <LN> </s> 
+<s> send item two to <FN> </s> 
+<s> go to <FN> green </s> 
+<s> can you go to <LNP> <P> </s> 
+<s> need <FN> <LN> books </s> 
+<s> three six zero five wants item no one </s> 
+<s> take item no five to <FN> <LN> </s> 
+<s> five item </s> 
+<s> please walk to the trash can </s> 
+<s> bring item four to three four two zero </s> 
+<s> go to <P> three four two zero <FN> <LN> need you </s> 
+<s> down the stairs </s> 
+<s> go to <P> three five one two <FN> <LN> needs you </s> 
+<s> take slot one </s> 
+<s> take item two to the supervisor </s> 
+<s> take the number two </s> 
+<s> bring something to <FN> </s> 
+<s> item no two </s> 
+<s> give the <I> to <T> <LN> </s> 
+<s> <FN> <LN> wants item five </s> 
+<s> please take the item in slot four to <FN> <LN> </s> 
+<s> meet <FN> with item no four in slot </s> 
+<s> <P> three four three two </s> 
+<s> <FN> <LN> wants number five </s> 
+<s> could you please get <I> for <FN> <LN> </s> 
+<s> get <FN> the <I> </s> 
+<s> please go to <P> three four three six </s> 
+<s> reach to destination <P> no three four one six <FN> foster s <P> </s> 
+<s> please give <FN> <LN> a <I> </s> 
+<s> you should walk to <P> three four one four b the robot <P> </s> 
+<s> what can you bring </s> 
+<s> go to <FN> <LN> and give him food </s> 
+<s> go to the slot four where the bin is kept </s> 
+<s> to <FN> s <P> three four three two </s> 
+<s> please help me to have a <IP> </s> 
+<s> go and empty trash bin </s> 
+<s> item number four </s> 
+<s> her <P> three four zero four </s> 
+<s> she wants the fourth item </s> 
+<s> go to <LNP> and give her item two </s> 
+<s> please go to <P> no three four one eight </s> 
+<s> yes item number three </s> 
+<s> please take the recycle bin to <FN> <LN> </s> 
+<s> please understand what i said </s> 
+<s> walk to secretary </s> 
+<s> suck my cock </s> 
+<s> bring <I> to me </s> 
+<s> yes can you give the item in slot four to <FN> <LN> </s> 
+<s> please deliver the file to the director </s> 
+<s> <FN> wants item three </s> 
+<s> do you know <LNP> </s> 
+<s> could you reword your original request </s> 
+<s> <FN> foster wants item five </s> 
+<s> <T> <LN> wants is <I> so please go and give it to him </s> 
+<s> you should walk on floor </s> 
+<s> goto three five one two </s> 
+<s> <T> <LN> wants your help go to his <P> </s> 
+<s> the secretary wants the <I> </s> 
+<s> bring item from slot four to <FN> <LN> phd </s> 
+<s> right side </s> 
+<s> walk to item three </s> 
+<s> please give <FN> a drink </s> 
+<s> cell <I> required </s> 
+<s> bring <FN> a peanut butter and jelly <I> </s> 
+<s> walk to the <P> three four one six </s> 
+<s> to the <P> of <FN> <LN> </s> 
+<s> choose item two </s> 
+<s> beverage </s> 
+<s> you need to clear the system error </s> 
+<s> give cell <I> to <FN> </s> 
+<s> give the item in slot one to <FN> </s> 
+<s> <P> no three four zero four </s> 
+<s> whats your name </s> 
+<s> <FN> foster needs the robot </s> 
+<s> items available to you </s> 
+<s> es </s> 
+<s> do some work in the <P> </s> 
+<s> three five two </s> 
+<s> go to <P> three four zero four and tell <FN> to reschedule my two zero zero appointment </s> 
+<s> sorry i cant help u </s> 
+<s> in road </s> 
+<s> robot </s> 
+<s> proceed by gps navigation to <P> three four two zero and remain until further instructed </s> 
+<s> cat <FN> <LN> some <I> and something to eat </s> 
+<s> give the secretary the item in slot five </s> 
+<s> pick up item four </s> 
+<s> sure </s> 
+<s> three four one eight wants <FN> </s> 
+<s> walk to beverage </s> 
+<s> to <P> number three four one six </s> 
+<s> pick up item in slot four </s> 
+<s> <FN> wants the trash bin </s> 
+<s> asshole </s> 
+<s> go the <P> and complete task assigned </s> 
+<s> get item three </s> 
+<s> go to <FN> with slot four </s> 
+<s> take recycling to <FN> </s> 
+<s> bring <I> to <FN> <LN> to distribute before meeting </s> 
+<s> robot please bring item one the <I> to <FN> <LN> phd </s> 
+<s> sure does </s> 
+<s> take the recycling bin to <FN> green </s> 
+<s> go get item four and bring it to <FN> </s> 
+<s> yes go to <P> number three four two zero </s> 
+<s> take item five to <FN> <LN> </s> 
+<s> you should bring <FN> <LN> </s> 
+<s> on floor </s> 
+<s> <FN> <LN> needs the robot </s> 
+<s> <T> <LN> the supervisor wants you to get the date <I> </s> 
+<s> can you walk to <P> three five one two please </s> 
+<s> waste material </s> 
+<s> into a recycling unit </s> 
+<s> help to complete the task </s> 
+<s> floor </s> 
+<s> go to <P> three four three two </s> 
+<s> yes a <I> </s> 
+<s> go to <FN> and give him mobile </s> 
+<s> go to three four zero four and give the item in slot five </s> 
+<s> take him item four </s> 
+<s> to the p r director <P> </s> 
+<s> get an item </s> 
+<s> <FN> need your help go to <P> n o three five zero two </s> 
+<s> <P> three five zero eight </s> 
+<s> please go to <FN> <LN> s <P> her <P> is three four two zero </s> 
+<s> bring any thing </s> 
+<s> can you deliver a cup of <I> for <FN> <LN> </s> 
+<s> deliver garbage bin to <FN> <LN> </s> 
+<s> i need waste <I> </s> 
+<s> you should go and meet <FN> </s> 
+<s> go to <P> <P> no three four one six f r a n c i s </s> 
+<s> get three cup of <I> </s> 
+<s> can i have the item in slot one please </s> 
+<s> please send <I> to <FN> <LN> </s> 
+<s> give the secretary the item no two </s> 
+<s> to <T> <LN> </s> 
+<s> wait for instructions from <FN> <LN> </s> 
+<s> please go to <P> three four zero four and assist <FN> </s> 
+<s> get item one </s> 
+<s> how i go to usa </s> 
+<s> no you go to <FN> foster in <P> three four one six </s> 
+<s> go to <FN> <LN> s <P> she needs your help </s> 
+<s> walk to <FN> green <P> he needs you </s> 
+<s> robot give item no three to <T> <LN> </s> 
+<s> talk to <FNP> </s> 
+<s> blue slot </s> 
+<s> <FN> green needs you </s> 
+<s> i want to get rooms to stay can you help me </s> 
+<s> just go to <P> three four zero four </s> 
+<s> go to three five one zero </s> 
+<s> get a piece of <I> </s> 
+<s> give <FN> <I> </s> 
+<s> no take <I> to <FN> <LN> </s> 
+<s> is there our md in that <P> </s> 
+<s> trash can </s> 
+<s> duh </s> 
+<s> no three five zero eight </s> 
+<s> walk to <FN> taking the <I> </s> 
+<s> <FN> foster needs your help </s> 
+<s> i want to navigate to the <P> where i will get <IP> </s> 
+<s> obtain <I> </s> 
+<s> please give <FN> <LN> the item in slot four </s> 
+<s> bring the item to slot three </s> 
+<s> bring a <I> for <LN> </s> 
+<s> take the blue item to <FN> </s> 
+<s> one two </s> 
+<s> <FN> <LN> needs your assistance </s> 
+<s> i want the item </s> 
+<s> i need to make a appointment with <FN> <LN> please </s> 
+<s> walk to marry </s> 
+<s> i need you to put the item in slot one </s> 
+<s> take <FN> <LN> a <I> </s> 
+<s> please put this item in slot five for <FN> </s> 
+<s> go to <FNP> in <P> three four one six </s> 
+<s> give food to <FN> <LN> </s> 
+<s> please life high profile </s> 
+<s> can you get the <I> </s> 
+<s> robot go to <P> three four one four b </s> 
+<s> go to <FN> <FNP> foster </s> 
+<s> get the trash bin </s> 
+<s> bring item five to them </s> 
+<s> get the item from slot five for <FNP> </s> 
+<s> mobile <I> from slot three </s> 
+<s> can you brig <FN> <LN> <I> please </s> 
+<s> get a <I> to three five zero eight </s> 
+<s> slot one to <FN> </s> 
+<s> go to three four one eight <FN> <LN> </s> 
+<s> yes i want you to deliver the blue recycle bin to <FN> </s> 
+<s> deliver garbage to <FN> </s> 
+<s> walk to <FN> with item one </s> 
+<s> can you please go to <FN> </s> 
+<s> take no three </s> 
+<s> deliver a cup of <I> to the supervisor </s> 
+<s> please bring <I> </s> 
+<s> move to <P> three four three six </s> 
+<s> what is the item in slot five </s> 
+<s> <FNP> needs you go to <P> three four one six </s> 
+<s> i need you to go to <P> three four three two </s> 
+<s> take <I> and give secretary </s> 
+<s> yes deliver a <I> some <I> and a <I> </s> 
+<s> can you tell me your name </s> 
+<s> get item four </s> 
+<s> go to <P> three four three six </s> 
+<s> get him a cup of <I> </s> 
+<s> go to the <P> <FN> <LN> needs you </s> 
+<s> take item three to <FN> </s> 
+<s> the secretary needs a <I> </s> 
+<s> please bring here a waste <I> </s> 
+<s> take number five to <FN> foster </s> 
+<s> four </s> 
+<s> walk to three four one four b </s> 
+<s> tale a <I> to three four three two </s> 
+<s> <FN> calling you </s> 
+<s> negative </s> 
+<s> please walk to <FN> green <P> at three four three six </s> 
+<s> go to <FN> and give her item five </s> 
+<s> bring item one </s> 
+<s> exactly </s> 
+<s> get <I> </s> 
+<s> towards <FN> <LN> </s> 
+<s> please get the file in slot five and give it to <FNP> </s> 
+<s> to <FN> wards <P> </s> 
+<s> yes please deliver you to him </s> 
+<s> get the item in slot four for <FN> </s> 
+<s> take item number four to <FN> green </s> 
+<s> three five one two <FN> <LN> </s> 
+<s> go to <FN> <LN> in three five one two </s> 
+<s> what am i doing </s> 
+<s> name of the person </s> 
+<s> if that is the number for <P> secretary you are right </s> 
+<s> no <FN> <LN> needs some <I> please </s> 
+<s> not sure go see what he wants </s> 
+<s> do you have a cell <I> </s> 
+<s> yes bring the cell <I> and give to <T> <LN> </s> 
+<s> <FN> foster needs your help please go to <P> number three four one two </s> 
+<s> yes and get <FN> </s> 
+<s> place item in slot four </s> 
+<s> can i rectify the original problem in windows seven </s> 
+<s> how do i purchase the desk <I> </s> 
+<s> <LNP> in <P> three four one six needs you </s> 
+<s> give <FN> the trash can </s> 
+<s> just bring <I> </s> 
+<s> i need slot four </s> 
+<s> <FN> <LN> in <P> three four one eight needs you in his <P> </s> 
+<s> go near food </s> 
+<s> please get the note pad </s> 
+<s> send </s> 
+<s> <FN> needs help </s> 
+<s> please go to <P> three five zero eight for <T> <LN> </s> 
+<s> <LNP> foster </s> 
+<s> director s name </s> 
+<s> where is he </s> 
+<s> bring the recycling bin to <FN> green </s> 
+<s> can you take the blue <I> to <T> <LN> </s> 
+<s> yes please go to him and see in <P> three four three six </s> 
+<s> at three five zero eight </s> 
+<s> <FN> wants slot four </s> 
+<s> to <FN> foster </s> 
+<s> just follow me just follow me just follow me just follow me just follow me just follow me just follow me just follow me just follow me just follow me just follow me just follow me </s> 
+<s> there is a slot available </s> 
+<s> you should go to <FN> <P> </s> 
+<s> give mobile to <FN> </s> 
+<s> bring it to <LNP> </s> 
+<s> i want <I> instead </s> 
+<s> take the white <I> to him </s> 
+<s> walk to slot five </s> 
+<s> <I> and <I> </s> 
+<s> give the <I> to <FN> foster </s> 
+<s> pick up the item in slot three and hand it over to <FN> </s> 
+<s> get <FN> food </s> 
+<s> i need another </s> 
+<s> u have to go to <FN> <LN> s <P> </s> 
+<s> go to <FN> three four zero four </s> 
+<s> can you give <FN> <LN> the <I> </s> 
+<s> go to <T> <FN> foster s <P> at three four one six she needs you </s> 
+<s> bring the robot to <P> three four zero four </s> 
+<s> the drink in slot four </s> 
+<s> bring a <I> to <FN> please </s> 
+<s> give item one to <FN> <LN> </s> 
+<s> item no three </s> 
+<s> take item number five to <FN> </s> 
+<s> go to <FN> <LN> supervisor </s> 
+<s> bring the fourth item to <FN> </s> 
+<s> <FN> <LN> needs a trash can in her <P> please pick up and give it to her </s> 
+<s> the supervisor wants the <I> </s> 
+<s> give the cell <I> to <FN> </s> 
+<s> pick item at three </s> 
+<s> retrieve the item in slot five </s> 
+<s> get the item in slot two </s> 
+<s> what items are available </s> 
+<s> give <T> <FN> <LN> the p r director a <I> </s> 
+<s> take no two </s> 
+<s> get <I> from slot five for <FN> </s> 
+<s> garbage bin </s> 
+<s> hi robot go to slot number two and get the <I> </s> 
+<s> go to the <P> of <FN> <LN> three four one eight r o b e r t <LN> </s> 
+<s> yes walk to three four one six </s> 
+<s> walk to three four three six </s> 
+<s> <FN> need robot </s> 
+<s> give slot two to <FN> <LN> </s> 
+<s> <FN> foster needs you at her <P> three four one six </s> 
+<s> <FN> would like you to retrieve the <I> </s> 
+<s> <FN> three four one six requests your presence </s> 
+<s> bring drink to <T> <LN> </s> 
+<s> help <FN> <LN> </s> 
+<s> take out <I> </s> 
+<s> get the item in slot three </s> 
+<s> walk to <FN> <LN> director </s> 
+<s> i do not want that </s> 
+<s> to slot five </s> 
+<s> take the five t h available item and go to <FN> <LN> </s> 
+<s> not <I> </s> 
+<s> please go to the four three one six <P> </s> 
+<s> get the blue color and take it to the <FN> green </s> 
+<s> give two to <P> number three four zero four </s> 
+<s> please take the <I> to <FN> </s> 
+<s> hello </s> 
+<s> send <I> to <LN> </s> 
+<s> <FN> foster needs a <I> </s> 
+<s> <FN> needs the garbage can in slot four </s> 
+<s> <LN> </s> 
+<s> please take the blue <I> to <T> <LN> </s> 
+<s> three four one six </s> 
+<s> handle the mobile <I> to <FN> </s> 
+<s> bring <LN> a cup of <I> </s> 
+<s> <FN> <LN> slot two </s> 
+<s> climb up the steps to <T> <FN> <LN> s <P> at three five zero eight and handover his <P> <I> </s> 
+<s> go to that <P> </s> 
+<s> please bring item three to <FN> <LN> </s> 
+<s> take the item in slot for to <FN> <LN> </s> 
+<s> to <P> three four three two </s> 
+<s> look for the blue item </s> 
+<s> the director wants the <P> file please hand it over to him </s> 
+<s> you should walk to secretary <P> </s> 
+<s> go to robot <P> three four one b </s> 
+<s> that is correct </s> 
+<s> <FN> requested an item in slot five </s> 
+cat <FN> <LN> some <I> and something to eat </s> 
+<s> to the supervisors <P> </s> 
+<s> <FN> wants item one </s> 
+<s> go to <P> three four two zero </s> 
+<s> take <I> to <T> <FN> <LN> </s> 
+<s> get the item in slot one to <FN> </s> 
+<s> go to three five one two </s> 
+<s> i need to make a appointment </s> 
+<s> the film s plot centers upon an experimental military robot which is struck by nova who send out a team to recover him </s> 
+<s> retrieve item two and give it to <FN> </s> 
+<s> can you go to <P> no three four three six </s> 
+<s> get the item from slot four and take the item to <FN> </s> 
+<s> can you bring a cup of <I> to <T> <LN> </s> 
+<s> go to <FN> with item no four in slot </s> 
+<s> three four one six calling you </s> 
+<s> you do not have to do anything with <FN> foster do you have any items with you </s> 
+<s> three four one eight wants robot </s> 
+<s> <FNP> <P> </s> 
+<s> <FN> needs item number five </s> 
+<s> go to <FN> in <P> three five one two </s> 
+<s> give the item in slot two to <FN> </s> 
+<s> give the <I> in slot two to <T> <FN> <LN> </s> 
+<s> bring item in slot five to <FN> foster </s> 
+<s> go to <FNP> and give her item two </s> 
+<s> please take slot five item to <FN> <LN> </s> 
+<s> <FN> <LN> is hungry give her <I> and <I> </s> 
+<s> item from slot two </s> 
+<s> <FN> green needs the item in slot four </s> 
+<s> can you please bring some <I> </s> 
+<s> retrieve item five </s> 
+<s> supervisor needs you go to <P> three five one two </s> 
+<s> take item no five and give it to <FN> <LN> </s> 
+<s> go to <FN> with the garbage bin </s> 
+<s> please deliver the item in slot five to <FN> </s> 
+<s> walk it to her </s> 
+<s> what happened you didn't understand any thing </s> 
+<s> go to <FN> <LN> and give item no two </s> 
+<s> retrieve item two </s> 
+<s> you need to go second floor and meet <T> <LN> </s> 
+<s> put the item in slot number four please </s> 
+<s> not the <I> bring <FN> the trash can </s> 
+<s> how are you </s> 
+<s> bring beverage to <FN> <LN> </s> 
+<s> please go to <P> three four two zero and assist <FN> <LN> </s> 
+<s> send it to her <P> </s> 
+<s> <FNP> wants the in slot four </s> 
+<s> can you go the <P> </s> 
+<s> yes please please go to <FN> <LN> number three five one two </s> 
+<s> bring item one to <FN> <LN> </s> 
+<s> deliver </s> 
+<s> <FN> needs a <I> </s> 
+<s> do not get <I> </s> 
+<s> go to <T> <LN> in <P> three four three two </s> 
+<s> please bring here a dust bin </s> 
+<s> please pick up the cup of <I> </s> 
+<s> yes walk to three five zero two </s> 
+<s> no i am telling you to pick up the <I> and give it to <FN> </s> 
+<s> <T> <LN> needs you </s> 
+<s> go give <FN> <LN> the <I> </s> 
+<s> bring item number two </s> 
+<s> take slot five </s> 
+<s> a robot </s> 
+<s> no i am giving you instructions </s> 
+<s> take cardboard to <FNP> </s> 
+<s> give slot five to <FN> </s> 
+<s> get me number two </s> 
+<s> intern <FN> green needs the item from slot four can you bring it to him </s> 
+<s> please bring a <I> for <T> <LN> </s> 
+<s> get a food item from slot two and take it to <FN> <LN> </s> 
+<s> three five zero two </s> 
+<s> reach mobile <I> </s> 
+<s> <FN> want your help </s> 
+<s> get the recycle bin and bring it to <FN> green </s> 
+<s> <FN> <LN> needs the item in slot three </s> 
+<s> give supervisor a cup of <I> </s> 
+<s> i need you to get a <I> to <FN> <LN> </s> 
+<s> give <FN> <LN> phd the item in slot one </s> 
+<s> can you take <I> to <FN> <LN> </s> 
+<s> grab the <I> </s> 
+<s> recycle bin </s> 
+<s> no go to <FN> </s> 
+<s> take number four to <FN> </s> 
+<s> bring four to <FN> green </s> 
+<s> item in slot one for <FN> </s> 
+<s> go to <FN> <P> three four one eight </s> 
+<s> take item three </s> 
+<s> can you get some <I> </s> 
+<s> to his <P> </s> 
+<s> <FN> <LN> want your help in <P> number three four three two </s> 
+<s> go to the <P> n o three four one six </s> 
+<s> please take a <I> to <FN> </s> 
+<s> get the waste bin form the item in slot four </s> 
+<s> walk to the supervisor with item two </s> 
+<s> go to <T> <LN> s <P> </s> 
+<s> please take this cell <I> to <FN> <LN> he dropped it in the hallway </s> 
+<s> call <FN> <LN> to reschedule my two zero zero appointments </s> 
+<s> bring a <I> to <P> three four one six </s> 
+<s> <P> no three four one six </s> 
+<s> no put the item in the <I> </s> 
+<s> <FN> green meet </s> 
+<s> walk to three four one eight </s> 
+<s> take the cup of <I> in slot one and bring it to foster </s> 
+<s> i need to go to the <P> and get a robot </s> 
+<s> before five </s> 
+<s> walk to <FN> and give him item three </s> 
+<s> items available </s> 
+<s> walk to item in slot three </s> 
+<s> retrieve item four </s> 
+<s> <FN> need you </s> 
+<s> me </s> 
+<s> <LNP> needs you go to <P> three four one six </s> 
+<s> garbage can </s> 
+<s> go to the available items </s> 
+<s> please get the item in slot five and give it to <LNP> </s> 
+<s> to the item in slot one </s> 
+<s> are you stupid </s> 
+<s> give blue trash can to <FN> <LN> </s> 
+<s> about this </s> 
+<s> go to three four three two </s> 
+<s> go to the director </s> 
+<s> took waste bin to my <P> </s> 
+<s> bring trash can to <FN> </s> 
+<s> go to three five one two with three </s> 
+<s> <FN> <LN> want item three </s> 
+<s> the item in slot five </s> 
+<s> take the item in slot one </s> 
+<s> anything </s> 
+<s> can you pick up the item in slot five </s> 
+<s> locate item in slot five </s> 
+<s> get the recycling <I> </s> 
+<s> get item in slot two </s> 
+<s> please take that mobile </s> 
+<s> go and meet <FN> <LN> </s> 
+<s> go to the <P> </s> 
+<s> can you bring the <I> to <FN> </s> 
+<s> go to <FN> foster and take slot four </s> 
+<s> give mobile to three five one two </s> 
+<s> yes get there as fast as you can </s> 
+<s> i try to buy a smartphone which <I> is best </s> 
+<s> give <FN> </s> 
+<s> please go to the <FN> <LN> </s> 
+<s> look inside of the slots there is an item within the fourth slot the item is beside the <I> it is blue in color this is what <FN> wants </s> 
+<s> <T> <LN> wants the trash <I> </s> 
+<s> <FN> need help from you </s> 
+<s> can you give item four to <FN> <LN> </s> 
+<s> go to <FN> <LNP> <P> <P> three five zero eight </s> 
+<s> bring the <I> to <LN> </s> 
+<s> i need to talk to <FN> <LN> </s> 
+<s> go directly to <P> three five zero two now </s> 
+<s> give item two to <FN> <LN> phd </s> 
+<s> take the item out of slot four </s> 
+<s> go to area with <IP> </s> 
+<s> take <FN> the item in slot two </s> 
+<s> <FN> green the intern </s> 
+<s> hi would you please take the <I> to <FN> <LN> </s> 
+<s> bring <T> <LNP> <I> </s> 
+<s> how can i move these </s> 
+<s> <FN> green needs item number four </s> 
+<s> meet <FN> </s> 
+<s> <FN> wants you to put the item in slot one </s> 
+<s> go to <P> three five zero two to see <FN> <LN> </s> 
+<s> take the blue <I> out of slot four and take it to <FN> <LN> </s> 
+<s> he wants you to go to him in <P> three three three six </s> 
+<s> get <I> in slot one </s> 
+<s> bring <I> </s> 
+<s> go see <FN> in <P> three four one eight </s> 
+<s> walk to the item in slot two </s> 
+<s> four t h item </s> 
+<s> get the item from slot five for <LNP> </s> 
+<s> bring a cup of <I> to <FN> <LN> </s> 
+<s> yes i need you to put the item in slot one </s> 
+<s> go to <FN> <LN> <P> </s> 
+<s> take cardboard to <LNP> </s> 
+<s> food and <IP> </s> 
+<s> the white <I> </s> 
+<s> go downstairs </s> 
+<s> <I> </s> 
+<s> walk through the corridor </s> 
+<s> item </s> 
+<s> a beverage </s> 
+<s> move to <P> three four three two </s> 
+<s> uh </s> 
+<s> bring the trash can to <FN> </s> 
+<s> he needs you to go to his <P> and see him </s> 
+<s> go to the <P> <P> number three four one eight <FN> <LN> </s> 
+<s> no pick item two available to you <I> </s> 
+<s> want slot four </s> 
+<s> being <I> </s> 
+<s> take item in slot three to <FN> <LN> </s> 
+<s> can you bring the item in slot three to <FN> <LN> </s> 
+<s> you may walk to directory no three five one two </s> 
+<s> to the <P> </s> 
+<s> you should walk to her <P> </s> 
+<s> bring food to <FN> <LN> </s> 
+<s> i want food </s> 
+<s> no go to <FN> with a <I> </s> 
+<s> <P> three four zero four </s> 
+<s> yes to the <P> three four one six </s> 
+<s> give the cell <I> to <FN> <LN> </s> 
+<s> you need to go to <P> three four three two </s> 
+<s> i need my <P> </s> 
+<s> get a <I> and bring it to <FN> <LN> </s> 
+<s> no not the <I> </s> 
+<s> the cellular <I> </s> 
+<s> item two </s> 
+<s> don't bring anything just go to <P> number three four one two </s> 
+<s> to <P> three four one six </s> 
+<s> retrieve slot four </s> 
+<s> call secretary </s> 
+<s> i want you to go to <FN> <LN> <P> </s> 
+<s> towards <FN> foster </s> 
+<s> yes give <I> to <P> secretary <FN> <LN> </s> 
+<s> go talk to <FNP> </s> 
+<s> <FN> wants the food in slot two </s> 
+<s> pick item in slot two </s> 
+<s> the item four </s> 
+<s> go to <P> three four zero four to see <FN> </s> 
+<s> yes that is correct </s> 
+<s> eat the <I> </s> 
+<s> <I> <I> </s> 
+<s> get item five and give it to the director </s> 
+<s> <FN> <LN> the <P> secretary </s> 
+<s> give <LN> a <I> </s> 
+<s> bring slot five to <FN> </s> 
+<s> walk to the robot <P> <P> three four one four b </s> 
+<s> to arrange my lunch </s> 
+<s> simply please go to the <P> three four one six </s> 
+<s> <P> two five one two </s> 
+<s> go see <LNP> </s> 
+<s> you need to go to <LNP> </s> 
+<s> how to accomplish the goals you give it </s> 
+<s> item in s l o t three </s> 
+<s> wastepaper bin </s> 
+<s> put the item in slot four </s> 
+<s> what all items do you have </s> 
+<s> no but he needs to see you </s> 
+<s> take item no two to <FN> s <P> three four three two </s> 
+<s> three to <FN> <LN> </s> 
+<s> pick item no three and give it to three four one eight </s> 
+<s> none </s> 
+<s> go to this address </s> 
+<s> i need you to take something to <FN> <LN> </s> 
+<s> just follow me </s> 
+<s> what is the item in slot four </s> 
+<s> get beverage </s> 
+<s> go walk to <FN> <LN> phd </s> 
+<s> i need a mobile </s> 
+<s> get one to <FNP> </s> 
+<s> get the item four and give it to <FN> </s> 
+<s> walk towards <P> three five one two </s> 
+<s> destination <P> three four three two </s> 
+<s> i'm asking you to get something for <T> <LN> </s> 
+<s> i want one <I> <I> </s> 
+<s> to three four one eight </s> 
+<s> get the item in slot four </s> 
+<s> you have to go to <P> three five one two </s> 
+<s> i need directory </s> 
+<s> three four one eight </s> 
+<s> go see <FN> in <P> three five zero two </s> 
+<s> go to the <P> n o three five zero eight </s> 
+<s> take <FN> the trash can </s> 
+<s> take <T> <LN> a cup of <I> </s> 
+<s> go to <P> number three four one six </s> 
+<s> follow what i say </s> 
+<s> can you bring some <I> to <T> <LN> </s> 
+<s> bring a drink to <FN> </s> 
+<s> you go to three five one two </s> 
+<s> yes to <FN> <LN> s <P> three five one two he needs your help </s> 
+<s> can you please go to three five zero eight </s> 
+<s> bring the item in slot two </s> 
+<s> a cup of <I> </s> 
+<s> go find <FN> </s> 
+<s> <FN> <LN> needs you in her <P> three five one zero </s> 
+<s> please get <FN> <LN> a <I> </s> 
+<s> yes i want you to walk to three four one six </s> 
+<s> a drink </s> 
+<s> put the item in slot number four </s> 
+<s> <FN> item three </s> 
+<s> go to the bin </s> 
+<s> <FN> green wants a trash pick up </s> 
+<s> i cant understand what you say </s> 
+<s> go to <FN> <LN> s <P> </s> 
+<s> bring item four to items available to robot </s> 
+<s> <FN> needs mobile </s> 
+<s> cardboard boxes </s> 
+<s> please go to <FNP> s <P> </s> 
+<s> to arrange the microphones </s> 
+<s> no three five one two </s> 
+<s> yes and talk to <FN> </s> 
+<s> take the trash bin to <FN> <LN> </s> 
+<s> get the trash bin take it to him </s> 
+<s> give slot number four to <FN> </s> 
+<s> give <FN> <LN> the <I> </s> 
+<s> cart </s> 
+<s> blue item </s> 
+<s> i think u should to do there r many offers </s> 
+<s> go to <P> three five one zero </s> 
+<s> <FN> wants the item in slot five </s> 
+<s> <FN> foster will explain you what you have to do </s> 
+<s> no give five to <FN> </s> 
+<s> <FN> <LN> need <I> </s> 
+<s> walk up to <LN> s <P> at three five zero eight </s> 
+<s> please please obtain the item in slot five for the secretary </s> 
+<s> who works in three four zero four </s> 
+<s> take item five and give it to <FN> </s> 
+<s> <FN> <LN> want three </s> 
+<s> go to three four one b </s> 
+<s> no i'm telling you to do something you stupid pile of metal </s> 
+<s> can you bring me the <I> </s> 
+<s> call <FNP> with the cell <I> </s> 
+<s> you have to go to slot two </s> 
+<s> can you go to <FN> <LN> s <P> </s> 
+<s> please come down to <P> three five zero eight <FN> <LN> needs you </s> 
+<s> hello go to <P> three four one six please </s> 
+<s> go to hell </s> 
+<s> bring the <I> to <FN> <LN> please </s> 
+<s> go to the supervisor s <P> his name is <FN> <LN> and he is in <P> three five one two </s> 
+<s> she wants the item that is beside the <I> </s> 
+<s> take item in slot four to <FN> <LN> </s> 
+<s> no to <P> three five one two </s> 
+<s> nothing just go </s> 
+<s> take two </s> 
+<s> take the garbage bin and walk to <FN> <LN> </s> 
+<s> please take him a <I> </s> 
+<s> walk to <P> three five one zero </s> 
+<s> phd </s> 
+<s> bring <FN> <LN> her <I> </s> 
+<s> reset </s> 
+<s> please take the item in slot four to <FN> green </s> 
+<s> <FN> <LN> needs you </s> 
+<s> look inside of the slot and take out the fourth item that is there </s> 
+<s> yes go see <FN> foster in three four one six </s> 
+<s> go to </s> 
+<s> get item three cell <I> </s> 
+<s> proceed to <P> three four one six </s> 
+<s> can you send the robot to <P> three four zero four </s> 
+<s> go to <FN> and ask what she wants </s> 
+<s> go to <FN> <LN> <P> three five one two </s> 
+<s> no walk to <FN> foster give him the <I> </s> 
+<s> walk to <P> three five one zero knock on the door </s> 
+<s> go and take <I> </s> 
+<s> i want you to bring <FNP> the item in slot two </s> 
+<s> three four zero four i need food </s> 
+<s> i need item no four </s> 
+<s> a flip <I> </s> 
+<s> could you please go to <P> three four one six </s> 
+<s> take <I> to save <LN> </s> 
+<s> what items do you have available </s> 
+<s> items available in robot </s> 
+<s> no give the trash can to <FN> </s> 
+<s> take a <I> to <FN> foster </s> 
+<s> <FN> <LNP> foster </s> 
+<s> i need you to go to <P> three five one two and see what the supervisor in the <P> needs </s> 
+<s> take the cell <I> </s> 
+<s> she wants the fourth item from within the slots </s> 
+<s> carry a <I> and cup to <FN> <LN> </s> 
+<s> go to the meeting <P> </s> 
+<s> the secretary needs you </s> 
+<s> the <I> cup </s> 
+<s> please get <I> for <FN> <LN> </s> 
+<s> bring two </s> 
+<s> i need flight from austin to singapore on the dated three zero one zero one four </s> 
+<s> go to the secretary and give the item in slot five </s> 
+<s> take out the trash </s> 
+<s> people </s> 
+<s> go get the garbage can </s> 
+<s> to the <P> three four one eight </s> 
+<s> you walk to <FN> <LN> director </s> 
+<s> you need to give paper file to <FN> </s> 
+<s> <FN> is in need of the item in slot five </s> 
+<s> no i'm giving you a command take this cup to <FN> <LN> </s> 
+<s> please get the item in slot four </s> 
+<s> go to the secretary with item two </s> 
+<s> where are you now </s> 
+<s> yes climb the steps and reach her <P> </s> 
+<s> take item four to <FN> <LN> phd </s> 
+<s> an item from slot two </s> 
+<s> bring <FNP> item one </s> 
+<s> need to <FN> the plans </s> 
+<s> <FN> <LN> wants the blue <I> </s> 
+<s> go to supervisor s <P> </s> 
+<s> i need a cup of <I> </s> 
+<s> carry <I> to <FN> </s> 
+<s> get something to eat </s> 
+<s> you have to handover the <I> of <T> <FN> <LN> the director he needs it </s> 
+<s> take item one to <FN> </s> 
+<s> please get a <I> from slot two and give it to <FN> <LN> </s> 
+<s> bring the <I> in slot five to <FN> <LN> <P> </s> 
+<s> <FN> would like the drink that is available in slot four </s> 
+<s> give <FN> a drink </s> 
+<s> i need you to get item in slot number one </s> 
+<s> give <FN> <LN> item five </s> 
+<s> no i am asking for your help in a task that needs done </s> 
+<s> can you give number four to <FN> </s> 
+<s> bring item three to <T> <LN> </s> 
+<s> <FN> need his cell <I> </s> 
+<s> are you know three five one two </s> 
+<s> pick up slot three </s> 
+<s> the cell <I> item three </s> 
+<s> the item in slot two </s> 
+<s> blue color trolly </s> 
+<s> go to three four three six </s> 
+<s> give a <I> to <FN> <LN> </s> 
+<s> a desktop <I> </s> 
+<s> the item in slot three </s> 
+<s> <FN> <LN> is feeling take these feelings away from him please </s> 
+<s> go to the trash bin and empty it </s> 
+<s> there is an item in slot four do you see it </s> 
+<s> <I> the plants </s> 
+<s> no give <FN> <LN> a cop of <I> </s> 
+<s> go straight </s> 
+<s> take the <I> and give it to <FN> <LN> </s> 
+<s> pick up slot three item and hand it over to <FN> </s> 
+<s> could you get item two and bring it to <FN> <LN> </s> 
+<s> go to <P> three one four six </s> 
+<s> go to the secretary and give the <I> </s> 
+<s> no need to talk but reach there </s> 
+<s> go get the blue bin and bring it to <FN> <LN> </s> 
+<s> <FN> <LN> secretary wants you to get her the item in slot five a <I> </s> 
+<s> <FN> needs you to grab an item </s> 
+<s> take the drink </s> 
+<s> robot has to go to the <P> of <FN> </s> 
+<s> can you go to <FN> s <P> </s> 
+<s> bring item two to three five one two </s> 
+<s> to the <P> of <FN> foster </s> 
+<s> no i am asking for a favor </s> 
+<s> <FN> <LN> <P> secretary </s> 
+<s> take a <I> to <P> three four three two </s> 
+<s> to <FN> <LNP> <P> </s> 
+<s> <FN> <LN> secretary </s> 
+<s> brink item n o one a cup of soft <IP> </s> 
+<s> can you please get the garbage can </s> 
+<s> go to <FNP> s <P> </s> 
+<s> take the item from slot one </s> 
+<s> <LNP> wants the in slot four </s> 
+<s> take a <I> and drink to <FN> <LN> </s> 
+<s> <FN> <LN> wants item four </s> 
+<s> you must go to this address </s> 
+<s> yes that is right </s> 
+<s> please go to <P> three five zero eight </s> 
+<s> <FN> <LN> is sleepy he needs some <I> please </s> 
+<s> take the <I> to <FN> foster </s> 
+<s> get <I> take to <FN> <LN> </s> 
+<s> go to <P> three five one zero to meet with <FN> <LN> phd </s> 
+<s> no you need to walk to <FN> </s> 
+<s> robot go to <P> no three four one six </s> 
+<s> go to <P> three four one six </s> 
+<s> yes ask she what help she needs ask her name first her name is <FN> </s> 
+<s> go to third floor </s> 
+<s> <FN> <LN> wants you to take out the trash </s> 
+<s> bring a <I> </s> 
+<s> bring item in s l o t four to <FN> </s> 
+<s> i need you to go to <T> <LN> <P> he s in <P> three four three two </s> 
+<s> right </s> 
+<s> please bring <FN> <LN> a <I> </s> 
+<s> yes i need <I> </s> 
+<s> take the item from slot five and give it to <FN> </s> 
+<s> <FN> <LN> wants the item in slot five </s> 
+<s> take <I> and <I> to <FN> </s> 
+<s> no help needed </s> 
+<s> item five </s> 
+<s> open slot two </s> 
+<s> yes three four one six needs your help </s> 
+<s> go to <FN> <P> three four one six </s> 
+<s> ah </s> 
+<s> slot four </s> 
+<s> three three seven five spring hill parkway </s> 
+<s> the blue cardboard bin </s> 
+<s> <FN> <LN> want you to deliver the item that is in slot four to her the item appears to be a recycle bin it is blue in color </s> 
+<s> open items </s> 
+<s> <FN> <LN> wants to throw trash </s> 
+<s> where are u </s> 
+<s> give three five zero eight a cop of <I> </s> 
+<s> to <P> three four one eight </s> 
+<s> bring a file </s> 
+<s> to <FN> <P> </s> 
+<s> take <I> to supervisor </s> 
+<s> walk to foster </s> 
+<s> <FN> <LN> the supervisor needs you </s> 
+<s> <FN> wants the item that is available in slot four </s> 
+<s> take item two </s> 
+<s> how to navigate a floor of a building </s> 
+<s> please give the <I> to <FN> </s> 
+<s> no one needs the <I> </s> 
+<s> go o <FN> </s> 
+<s> bring item one to <T> <LN> </s> 
+<s> take item one </s> 
+<s> put the item in the <I> </s> 
+<s> <FN> needs you go to his <P> </s> 
+<s> take no three to three five one two </s> 
+<s> <T> <FN> foster wanted to empty the trash bin </s> 
+<s> can you take a <I> to <FN> <LN> </s> 
+<s> <FN> <LN> needs four </s> 
+<s> to the blue trash can </s> 
+<s> take out the garbage </s> 
+<s> how can i help </s> 
+<s> call <FN> </s> 
+<s> walk along the hallway </s> 
+<s> your services </s> 
+<s> please assist the <P> secretary because she is feeling drowsy </s> 
+<s> help <FN> make a <I> </s> 
+<s> bring the item in slot two to <FN> foster </s> 
+<s> bring a wooden <I> to three four one six </s> 
+<s> give the cell <I> to <T> <LN> </s> 
+<s> <FN> <FN> <LN> </s> 
+<s> go right and turn left </s> 
+<s> retrieve item five for <FN> <LN> secretary </s> 
+<s> of course how to accomplish the goals you give it </s> 
+<s> yes please walk to <P> three four one six </s> 
+<s> go to robot three four three two </s> 
+<s> walk to slot two </s> 
+<s> please get the <I> in slot five and give it to <LNP> </s> 
+<s> not <I> the <I> </s> 
+<s> can you go to slot four the item available </s> 
+<s> get the item from slot one give it to <FN> <LN> </s> 
+<s> get the file from slot five and give to <FNP> </s> 
+<s> towards three five zero two </s> 
+<s> i am telling you to go and deliver a cup of <I> to the supervisor </s> 
+<s> three four one eight <FN> </s> 
+<s> pick the <I> in slot number two </s> 
+<s> do household tours </s> 
+<s> take something to <FN> </s> 
+<s> name a person on the floor </s> 
+<s> take the <I> in slot two to <LNP> <FN> foster </s> 
+<s> number two </s> 
+<s> go to <P> number three four three six please </s> 
+<s> <FN> <LN> wants you </s> 
+<s> go to <LNP> </s> 
+<s> please bring a dust bin </s> 
+<s> do you know <FNP> </s> 
+<s> to <P> three four two zero please </s> 
+<s> <FN> needs a robot you must go to her <P> </s> 
+<s> go get item two </s> 
+<s> hmm </s> 
+<s> yes walk to <P> three four one eight </s> 
+<s> <I> and a <I> </s> 
+<s> do you know <FN> </s> 
+<s> give <FN> an item </s> 
+<s> <FN> <LN> phd </s> 
+<s> she will tell you </s> 
+<s> go to <P> three four three six <FN> green is waiting for you </s> 
+<s> can you walk to <P> three five zero eight </s> 
+<s> <LN> is feeling drowsy </s> 
+<s> go to <P> three five zero eight now </s> 
+<s> get <FN> item in the slot five </s> 
+<s> supervisor needs u </s> 
+<s> please go to <P> three four two zero to assist <FN> </s> 
+<s> <FN> <LN> needs the item in slot four please give it to her </s> 
+<s> call her and fix the appointment </s> 
+<s> to <FN> and then item four </s> 
+<s> <T> <FN> green an intern in <P> no three six on floor n o three four needs your help please go to him </s> 
+<s> miss <LN> is hungry </s> 
+<s> give it to <FN> cell <I> is for to talk </s> 
+<s> go and meet <T> <LN> </s> 
+<s> <FN> <LN> needs you in <P> three four one eight </s> 
+<s> <T> <LN> <FN> <LN> phd </s> 
+<s> stuff </s> 
+<s> go get the trash can </s> 
+<s> the planning <I> </s> 
+<s> give the item in slot three to <FN> <LN> </s> 
+<s> what is the plan to make good business </s> 
+<s> go to <FN> <LNP> foster </s> 
+<s> item blue </s> 
+<s> give <FN> <LN> a <I> </s> 
+<s> take mobile to <FN> </s> 
+<s> please go to <LNP> s <P> </s> 
+<s> <T> <LN> needs the <I> </s> 
+<s> five </s> 
+<s> go to <P> three five zero two please </s> 
+<s> go to <P> n o three four one six </s> 
+<s> hi what is your name </s> 
+<s> you should walk to three four three six </s> 
+<s> take item no five </s> 
+<s> three one one four b </s> 
+<s> bring item five to <FN> <LN> </s> 
+<s> no three item </s> 
+<s> go to the hell </s> 
+<s> the rolodex </s> 
+<s> please get <FN> <LN> some <I> </s> 
+<s> <FN> <LN> supervisor wants item three </s> 
+<s> go to three four two zero </s> 
+<s> go see <FN> </s> 
+<s> pick up the trash can and hand it to <FN> </s> 
+<s> quit </s> 
+<s> i need <P> </s> 
+<s> take item four to <FN> please </s> 
+<s> to the <I> </s> 
+<s> take <LNP> the item in slot two </s> 
+<s> item in slot one </s> 
+<s> <FN> <LN> <I> </s> 
+<s> <FN> <LN> want the item number three from all the available items </s> 
+<s> go to the <P> no three five one two there is a person and do what he say </s> 
+<s> do not worry about that right now just go there and she will provide further instructions </s> 
+<s> <T> <LN> needs the blue <I> </s> 
+<s> no you walk </s> 
+<s> no i'm telling you what to do </s> 
+<s> go to the <P> no three four one six f r a n c i s foster </s> 
+<s> <T> <LN> wants item three </s> 
+<s> dumpster </s> 
+<s> no three four three two </s> 
+<s> <FN> needs item in slot two </s> 
+<s> please go to <FN> s <P> </s> 
+<s> go to <P> three five zero eight </s> 
+<s> you have to help <FN> </s> 
+<s> walk to <FN> <LN> and give him <I> </s> 
+<s> give item in slot five to <FN> </s> 
+<s> u should go </s> 
+<s> go to three five zero two </s> 
+<s> give <I> item three to secretary </s> 
+<s> <FN> <LN> want the fourth item </s> 
+<s> pick up the item in slot five and give it to <FN> </s> 
+<s> i need dust bin </s> 
+<s> to three four zero four </s> 
+<s> can you give the <I> in slot two to <T> <FN> <LN> </s> 
+<s> support work </s> 
+<s> no to the <FN> <LN> </s> 
+<s> take <I> to <FN> <LN> </s> 
+<s> robot go to <P> three five one zero </s> 
+<s> take a blue bin to <FN> </s> 
+<s> three five one two call you </s> 
+<s> bring <FN> <LN> phd item one </s> 
+<s> take item two a <I> to <FN> <LN> </s> 
+<s> go to <FN> s <P> with the <I> </s> 
+<s> hi </s> 
+<s> bring it to <FN> <LN> </s> 
+<s> to his <P> at three five zero eight </s> 
+<s> plastic trash </s> 
+<s> <P> three four three two please </s> 
+<s> have to complete all my m turk jobs can you </s> 
+<s> bring item in slot four </s> 
+<s> you need to go to <FN> wards <P> </s> 
+<s> clean up the floor and make ready the furniture </s> 
+<s> move to three five one zero </s> 
+<s> get the item in slot five </s> 
+<s> <FN> <LN> the <P> secretary is hungry give her <I> and <I> </s> 
+<s> give <FN> a <I> </s> 
+<s> <FN> foster thank you </s> 
+<s> go to the secretary s <P> </s> 
+<s> pick cell <I> </s> 
+<s> can you get item two </s> 
+<s> which brand smartphone is best </s> 
+<s> take item three to <FN> <LN> </s> 
+<s> go see <FN> <LN> </s> 
+<s> take it to <FN> <LN> </s> 
+<s> take it to her </s> 
+<s> carry the item in slot one to <FN> <LN> </s> 
+<s> <FN> wants the cell <I> </s> 
+<s> give mobile <I> to three five one zero </s> 
+<s> bring him the recycle bin </s> 
+<s> three four three six </s> 
+<s> take recycling bin to <FN> </s> 
+<s> assist <FN> <LN> </s> 
+<s> take one to <LN> </s> 
+<s> please take a <I> to <FN> <LN> </s> 
+<s> take the <I> from slot n five and give it to the director <T> <FN> <LN> at three five zero eight </s> 
+<s> the blue can </s> 
+<s> you know <FN> </s> 
+<s> take item in slot four to <FN> </s> 
+<s> no where </s> 
+<s> get three </s> 
+<s> can you bring number one to <FN> <LN> </s> 
+<s> can you take a <I> to the secretary </s> 
+<s> take one s t item to <FN> </s> 
+<s> get number four </s> 
+<s> bring <FN> <LN> slot two the <I> </s> 
+<s> go to <FN> and give her the <I> </s> 
+<s> bring <FN> <LN> a cell <I> </s> 
+<s> recycling bin </s> 
+<s> yes bring the <I> to <FN> <LN> </s> 
+<s> bring her food </s> 
+<s> take trash can to <FN> foster </s> 
+<s> move </s> 
+<s> towards <FN> </s> 
+<s> i need you to walk to <FN> and give her <I> </s> 
+<s> <FN> wants you to put item in slot five </s> 
+<s> walk to <P> three four one six </s> 
+<s> give <FN> <LN> item two </s> 
+<s> please give <FN> the drink </s> 
+<s> she wants the blue device </s> 
+<s> go to <FN> <LN> s <P> at <P> three four two zero </s> 
+<s> arrange conference <P> </s> 
+<s> please go to <P> three four one four b robot <P> </s> 
+<s> give <I> to <FN> </s> 
+<s> <FN> <LN> wants something to eat </s> 
+<s> get the item from slot four </s> 
+<s> you have to go to the <P> and the address is three five zero eight </s> 
+<s> give <FN> the item in slot five </s> 
+<s> take a garbage can to <FN> </s> 
+<s> go to <FN> <LN> in <P> three four three two </s> 
+<s> just go to three four two zero don't bring anything </s> 
+<s> please help me to have <I> </s> 
+<s> no please give <FN> <LN> the garbage </s> 
+<s> <FN> <LN> is feeling drowsy i need you to assist her </s> 
+<s> no i am not asking you a question go to <P> three four one six because <FN> needs you </s> 
+<s> yes slot five item day <I> </s> 
+<s> can you please walk to <P> three four one six </s> 
+<s> please go to <P> three five zero two and wait for instructions from <FN> </s> 
+<s> go to the intern </s> 
+<s> can you do a favor for me </s> 
+<s> bring the item in slot one to <FN> <LN> </s> 
+<s> get <I> and give to <FN> <LN> </s> 
+<s> walk below foster </s> 
+<s> get mobile for <FN> <LN> phd </s> 
+<s> to throw waste in <I> </s> 
+<s> take the <I> to <T> <LN> </s> 
+<s> take the bloody thing below the <I> </s> 
+<s> to recycling </s> 
+<s> yes i want you to walk to three five zero eight </s> 
+<s> go get <FN> a drink </s> 
+<s> bring <I> cup to <FN> </s> 
+<s> no bring <I> to <FN> <LN> </s> 
+<s> bring <FN> a <I> </s> 
+<s> what time is the <P> closing </s> 
+<s> walk to <FN> <LN> secretary </s> 
+<s> <FN> <LN> wants item number three </s> 
+<s> yes bring <FN> <LN> </s> 
+<s> can you please provide item four </s> 
+<s> clean rooms </s> 
+<s> three five one two meet </s> 
+<s> no go to <P> three four one six </s> 
+<s> yes who is on the <I> </s> 
+<s> <FN> needs the trash <I> </s> 
+<s> get <FN> item in the slot four </s> 
+<s> get </s> 
+<s> please go to <T> <LNP> s <P> </s> 
+<s> <LNP> for item in slot one </s> 
+<s> please get item in slot five for <FN> <LN> secretary it is a desk <I> </s> 
+<s> <T> <LN> needs the robot sent it to his <P> </s> 
+<s> blue trash bin </s> 
+<s> assist <FN> <LN> p r director </s> 
+<s> take <I> ti <FN> <LN> phd </s> 
+<s> <P> three four one eight </s> 
+<s> bring <FN> <LN> item one </s> 
+<s> yes please take <I> to <FN> <LN> </s> 
+<s> you should walk to three four one eight </s> 
+<s> forget that and thank you </s> 
+<s> <P> secretary is hungry </s> 
+<s> blue color </s> 
+<s> go out of the <P> </s> 
+<s> bring the item in slot one <FN> <LN> </s> 
+<s> go to <FN> <LN> with garbage bin </s> 
+<s> what is item two </s> 
+<s> yes to <T> <FN> <LN> </s> 
+<s> bring item four </s> 
+<s> i want you to take the <I> to <T> <LN> </s> 
+<s> take slot five to <FN> </s> 
+<s> please bring something to <FN> </s> 
+<s> send it to her o f f i c e three four zero four </s> 
+<s> get the item in slot number four for <FN> </s> 
+<s> slot no three </s> 
+<s> <FN> <LN> needs the garbage </s> 
+<s> take item one to <FN> foster </s> 
+<s> get a <I> for supervisor </s> 
+<s> deliver <FN> <LN> a <I> </s> 
+<s> i think you don't english very much </s> 
+<s> clean the <P> </s> 
+<s> hide it </s> 
+<s> give item five to <FN> <LN> </s> 
+<s> there is an item in the fourth slot take it to her </s> 
+<s> are you an idiot or is the person who designed this a moron </s> 
+<s> what items do you see in the <P> </s> 
+<s> get a <I> for <FN> </s> 
+<s> proceed to <P> number three four two zero and remain until further instructed </s> 
+<s> go to the <P> of three five zero eight <FN> <LN> </s> 
+<s> <IP> </s> 
+<s> could you go to <FN> <LN> s <P> </s> 
+<s> you are needed in <P> three five zero eight </s> 
+<s> go to three four zero four a l i c e <LN> secretary </s> 
+<s> do you have the cell <I> </s> 
+<s> go to three four zero four <FN> <LN> secretary </s> 
+<s> go to <I> <LN> s <P> <P> three five one two </s> 
+<s> bring the garbage can to <FN> green </s> 
+<s> please pick up the <I> and give it to <FN> </s> 
+<s> yes walk over to <P> three five one two and enter it once you get there </s> 
+<s> the robot </s> 
+<s> can you walk to <P> three four zero four </s> 
+<s> robot <P> three five zero two go </s> 
+<s> four t h slot </s> 
+<s> give item in slot four to <FN> green intern </s> 
+<s> item three </s> 
+<s> yes walk to three four three six </s> 
+<s> your task is four </s> 
+<s> <FN> <LN> needs your help please go to his <P> </s> 
+<s> how will you cross the road </s> 
+<s> yes walk with item no three </s> 
+<s> call <FN> <LN> to reschedule my two zero zero pm appointment till four zero zero pm </s> 
+<s> get <I> and give it to <FN> </s> 
+<s> no unless that is where she is located </s> 
+<s> go three four one eight </s> 
+<s> three four one eight r o b e r t b o b b r o w n </s> 
+<s> select item four </s> 
+<s> please get <I> then send it to <FN> <LN> </s> 
+<s> walk to three </s> 
+<s> item in blue </s> 
+<s> i have to go <P> no three five one two and <T> <FN> <LN> supervisor staying there and do help to him </s> 
+<s> get cup </s> 
+<s> java </s> 
+<s> yes <P> three five one zero </s> 
+<s> <FN> needs the <I> from slot five </s> 
+<s> give item in slot five to <FN> <LN> </s> 
+<s> walk to <FN> foster </s> 
+<s> yes i am </s> 
+<s> <FN> green intern needs item in slot four </s> 
+<s> can you give a cup of <I> to <FN> <LN> </s> 
+<s> i am not asking for you to do that i want you to take an item to <FN> <LN> </s> 
+<s> <FN> <P> </s> 
+<s> commands </s> 
+<s> recyclable bin </s> 
+<s> please help me </s> 
+<s> i want you to bring <LNP> the item in slot two </s> 
+<s> get me a drink </s> 
+<s> trash bin </s> 
+<s> please take the <I> to <FN> <LN> </s> 
+<s> get some products from slot two </s> 
+<s> pick up item five and take item five to <FN> <LN> </s> 
+<s> straight ahead </s> 
+<s> <I> holder </s> 
+<s> navigate to <FN> and give him a <I> </s> 
+<s> go to <P> three four one eight calling </s> 
+<s> goto <P> no three four three six now </s> 
+<s> a <I> from slot two </s> 
+<s> i need you to go to the p r director s <P> </s> 
+<s> go to three four zero four </s> 
+<s> chose the number two item which is available with you </s> 
+<s> <FN> foster <P> walk </s> 
+<s> <FN> <LN> needs the blue <I> </s> 
+<s> a cup from slot one </s> 
+<s> give <FN> <LN> the mobile <I> </s> 
+<s> the item that is kept in slot number five </s> 
+<s> walk to the item in slot two for three four zero four </s> 
+<s> fine </s> 
+<s> give <FN> <LN> item in slot five </s> 
+<s> give <I> or <I> to <T> <LN> </s> 
+<s> no i am requesting </s> 
+<s> you walk to three four one six s <P> </s> 
+<s> no walk to three four one six </s> 
+<s> he needs robot </s> 
+<s> go and meet <FN> <LN> in his <P> </s> 
+<s> <FN> <LN> needs you in <P> no three four three two </s> 
+<s> go forward </s> 
+<s> go to the <P> secretary in the robot <P> </s> 
+<s> <FN> foster <P> three four one six </s> 
+<s> bring <FN> slot four </s> 
+<s> take food to the <P> secretary </s> 
+<s> bring <FN> item three </s> 
+<s> yes i need to make a directory for rooms <P> and offices </s> 
+<s> please bring <FN> a <I> </s> 
+<s> please retrieve the item from slot four and give it to <FN> <LN> </s> 
+<s> give the file from slot five to <FNP> </s> 
+<s> no not really you're a bit thick really aren't you </s> 
+<s> please get the file in slot five and give it to <LNP> </s> 
+<s> <FN> <LN> phd needs you </s> 
+<s> get the <I> </s> 
+<s> walk to the <P> </s> 
+<s> bin </s> 
+<s> please help me <I> </s> 
+<s> please go to <T> <FN> green in <P> no three four three six </s> 
+<s> go to <FN> wards <P> </s> 
+<s> go to <P> three four three two <FN> <LN> phd </s> 
+<s> transfer five to <FN> </s> 
+<s> i want mobile </s> 
+<s> to the <FN> <LN> </s> 
+<s> pick up item five </s> 
+<s> three four two zero </s> 
+<s> tech </s> 
+<s> get item from slot two </s> 
+<s> provide <I> to <FN> she is hungry </s> 
+<s> no somebody wants your help </s> 
+<s> can you obtain item in slot four </s> 
+<s> go to <P> number three four zero four </s> 
+<s> walk to slot </s> 
+<s> pick slot three </s> 
+<s> yes his personal <I> </s> 
+<s> bring <I> to <FN> <LN> the secretary </s> 
+<s> walk to <FN> s <P> </s> 
+<s> bring item two to <FN> </s> 
+<s> take item in slot five </s> 
+<s> deliver the recycle bin to <FN> </s> 
+<s> take mobile <I> </s> 
+<s> go pick up a cup of <I> and take it to <FN> <LN> </s> 
+<s> no bring a <I> to <T> <LN> </s> 
+<s> please place the item in slot four </s> 
+<s> give it to <FN> </s> 
+<s> go to <FN> <FNP> <P> <P> three five zero eight </s> 
+<s> go to <P> three five one six </s> 
+<s> three four one six is the rooms number go to this <P> </s> 
+<s> yes with the item in slot five </s> 
+<s> get item in s l o t four to <FN> <LN> </s> 
+<s> get <FN> a cup from slot one </s> 
+<s> yes that is the meeting <P> </s> 
+<s> yes i need a cup of <I> </s> 
+<s> <T> <LN> is tired will you take her some <I> please </s> 
+<s> send it robot </s> 
+<s> give <FN> item five </s> 
+<s> bring item no two </s> 
+<s> what is item five </s> 
+<s> get the item out of slot three </s> 
+<s> take the <I> </s> 
+<s> yeah </s> 
+<s> walk to the <P> <P> no three five zero eight </s> 
+<s> walk to three five zero eight </s> 
+<s> may i know how to do net banking </s> 
+<s> clean the car of <T> <FN> <FN> </s> 
+<s> to <FN> <FNP> <P> </s> 
+<s> <FN> needs your help </s> 
+<s> bring four </s> 
+<s> yes to <FN> </s> 
+<s> item no two <I> </s> 
+<s> walk on the floor that you are on to <P> three four three two </s> 
+<s> please go to <P> three five one two </s> 
+<s> no place the item in slot four for <FN> foster </s> 
+<s> get item four for <FN> </s> 
+<s> yes and deliver <I> </s> 
+<s> take the cup of <I> and <I> to <T> <LNP> <P> </s> 
+<s> can you bring the item in slot one to <FN> </s> 
+<s> go to slot one </s> 
+<s> take out trash </s> 
+<s> see <FNP> </s> 
+<s> no do it </s> 
+<s> <FN> wants the item in slot one </s> 
+<s> three five one two </s> 
+<s> i need you to go to <P> three four two zero </s> 
+<s> load item slot four </s> 
+<s> <T> <LN> is asking you to bring the blue <I> </s> 
+<s> to the slot three </s> 
+<s> <FN> <LN> the supervisor needs your help please go <P> number three five one two </s> 
+<s> yes i am asking </s> 
+<s> please can you give the <I> in slot two to <T> <FN> <LN> </s> 
+<s> <FN> <LN> needs you in <P> three five zero two </s> 
+<s> i want to write </s> 
+<s> no visit <P> three four one six </s> 
+<s> go to <P> no three four zero four </s> 
+<s> date holder </s> 
+<s> <FN> needs you in <P> three four one eight </s> 
+<s> can you get me the waste paper bin from item four </s> 
+<s> can you bring the cell <I> to <T> <LN> </s> 
+<s> send the <I> to <LN> </s> 
+<s> <FN> wants <I> </s> 
+<s> you have to go his <P> </s> 
+<s> go to <P> three five one two </s> 
+<s> yes <P> three four one eight </s> 
+<s> take slot four </s> 
+<s> behold the monster though hath created can you not understand go to slot to and get the <I> </s> 
+<s> go to secretary </s> 
+<s> take no three to <FN> <LN> </s> 
+<s> the secretary needs the robot send it to her <P> </s> 
+<s> to the supervisor s <P> which is in <P> three five one two </s> 
+<s> take the trash bin to <FN> </s> 
+<s> call <LNP> with cell <I> </s> 
+<s> to arrange the conference <P> </s> 
+<s> can you give this <I> to my friend </s> 
+<s> walk to three five zero two </s> 
+<s> can you go to <FN> </s> 
+<s> take the cup of <I> and <I> to <T> <FNP> <P> </s> 
+<s> can you go to the secretary s <P> </s> 
+<s> i want to drink <I> </s> 
+<s> bring item four to <FN> <LN> </s> 
+<s> i want cool <IP> </s> 
+<s> slow down you don't need to run and jump everywhere take a walk through the desert <I> the sun go down relax besides how can you run from good springs to new vegas without resting or eating </s> 
+<s> can you take <FNP> the item in slot two please </s> 
+<s> please go to <FN> <LN> <P> <P> three five one two </s> 
+<s> get the item in slot four to <FN> green </s> 
+<s> get item in slot five and present it to the secretary </s> 
+<s> put the item in slot one </s> 
+<s> take the items </s> 
+<s> give four to <FN> </s> 
+<s> please bring a cup of <I> and a few loaves of <I> to <FN> <LN> the <P> secretary </s> 
+<s> i need you to send <IP> to my <P> </s> 
+<s> please see <FN> in <P> three four one eight </s> 
+<s> <FN> <LN> needs you in his <P> </s> 
+<s> please come to my <P> </s> 
+<s> take the <I> to the secretary </s> 
+<s> get the <I> from slot two and give it to the supervisor </s> 
+<s> get three cup of drink </s> 
+<s> <FN> needs you in <P> three five zero eight </s> 
+<s> <T> <LN> needs a <I> </s> 
+<s> go to the <I> </s> 
+<s> take item to five </s> 
+<s> move to three five one two </s> 
+<s> take the <I> to <FN> <LN> </s> 
+<s> do u have <I> </s> 
+<s> take the item in slot five and give it to <FN> <LN> </s> 
+<s> will you get the item in slot four </s> 
+<s> bring item in slot three to <FN> <P> n o three five one two </s> 
+<s> please get the cell <I> from slot three </s> 
+<s> no help </s> 
+<s> can you please give <FN> a desk <I> </s> 
+<s> go to <P> three four zero four </s> 
+<s> take the item in slot two to the secretary </s> 
+<s> get the <I> to <FN> <LN> </s> 
+<s> <FN> <LN> wants a <I> </s> 
+<s> terminate <I> </s> 
+<s> send robot to <FN> <LN> </s> 
+<s> take an item </s> 
+<s> do you know what item is in slot four g t </s> 
+<s> bring him item four </s> 
+<s> robot go to <P> three four one six </s> 
+<s> take the item four from the list and give it to the supervisor <FN> <LN> </s> 
+<s> go to <P> <P> no three four one six </s> 
+<s> go to <FN> <LN> s <P> three five zero eight </s> 
+<s> yes <FN> wants the item in slot one </s> 
+<s> list items available to robot </s> 
+<s> you should bring the item in slot five to <FN> <LN> </s> 
+<s> want item </s> 
+<s> people directory </s> 
+<s> go to the secretary <FN> and give item <I> in the slot five </s> 
+<s> just go and meet <FN> <LN> </s> 
+<s> bring a <I> to <FN> </s> 
+<s> please go to <P> three five zero two </s> 
+<s> yes deliver item no four to <FN> <LN> </s> 
+<s> go see <FNP> </s> 
+<s> i want you to take the item in slot four to <FN> <LN> </s> 
+<s> give the plastic bin to <FN> </s> 
+<s> can you please get me a <I> of <I> </s> 
+<s> no go to the <P> of <FN> <LN> </s> 
+<s> blue holder </s> 
+<s> take the <I> and deliver it to <FN> </s> 
+<s> please go to <P> three three four one six </s> 
+<s> get some <I> for <FN> <LN> </s> 
+<s> take item in slot two to <FN> </s> 
+<s> give the <I> <FNP> </s> 
+<s> <FN> foster </s> 
+<s> u walk to three four one six </s> 
+<s> assist <LN> </s> 
+<s> supervisor </s> 
+<s> thats what i said </s> 
+<s> <FN> <LN> on which floor </s> 
+<s> no thanks </s> 
+<s> a day <I> </s> 
+<s> i am fed up please get lost </s> 
+<s> please bring a <I> to <T> <LN> </s> 
+<s> will you get me something to eat </s> 
+<s> <FN> wants item in slot three </s> 
+<s> bring item three to <T> <FN> <LN> </s> 
+<s> fin out slot three </s> 
+<s> give the item in slot four to <FNP> </s> 
+<s> bring item no five to <FN> <LN> </s> 
+<s> <FN> <LN> wants trash can </s> 
+<s> slot one </s> 
+<s> can you serve in the <P> </s> 
+<s> please give the item to <FN> </s> 
+<s> how to make more money from amazon </s> 
+<s> get the item two </s> 
+<s> walk to mobile </s> 
+<s> you need to go see supervisor <FN> <LN> in <P> three five one two </s> 
+<s> on floor n o three four </s> 
+<s> go to <P> three five zero two and see <FN> <LN> </s> 
+<s> yes i want you to bring a <I> to <FN> <LN> </s> 
+<s> do you have the <I> </s> 
+<s> could you send a <I> to a <T> please </s> 
+<s> three five one zero </s> 
+<s> <FN> wants you to put all the item in four </s> 
+<s> go to three one four six </s> 
+<s> i need you to deliver the <I> to <FN> <LN> </s> 
+<s> please bring be my cell <I> </s> 
+<s> <FN> <LN> wants the blue recycle bin </s> 
+<s> go to <FN> <LN> s <P> in <P> three four one eight </s> 
+<s> item in slot two </s> 
+<s> get me the item in slot two </s> 
+<s> cant help u </s> 
+<s> intern </s> 
+<s> help the guest by navigating them to cafeteria </s> 
+<s> go to <FN> with item five </s> 
+<s> cancel </s> 
+<s> take the five t h available item and walk to three five zero eight </s> 
+<s> visit <P> three four one six </s> 
+<s> yes the <I> </s> 
+<s> get one to <LNP> </s> 
+<s> yes there you have to met <FNP> </s> 
+<s> yes thank you </s> 
+<s> take <FNP> the item in slot two </s> 
+<s> <FN> <LN> supervisor </s> 
+<s> i wanted you to go there </s> 
+<s> please bring a beverage to <T> <LN> </s> 
+<s> go to <LNP> in <P> three four one six </s> 
+<s> can i get a cup of <I> </s> 
+<s> snack </s> 
+<s> please take something to <FN> <LN> </s> 
+<s> it is not a question </s> 
+<s> deliver a file to <FN> </s> 
+<s> go to item one </s> 
+<s> obtain slot one item </s> 
+<s> i don't have a question i'm telling you to take <FN> <LN> a <I> </s> 
+<s> no bring the item in slot two to three four zero four </s> 
+<s> walk to <FN> <LN> <P> </s> 
+<s> yes <FN> needs you </s> 
+<s> please get the file from slot five </s> 
+<s> run </s> 
+<s> don't bring anything just go and meet <FN> <LN> </s> 
+<s> walk to his <P> </s> 
+<s> to <FN> <LNP> <P> she wants the item in slot five </s> 
+<s> i m feeling hungry </s> 
+<s> i wanna do this project can u help me </s> 
+<s> wheelie bin </s> 
+<s> call supervisor </s> 
+<s> take the five t h item give it to <FN> </s> 
+<s> the recycle bin </s> 
+<s> <FNP> wants the item in slot five </s> 
+<s> i need note </s> 
+<s> <P> secretary <FN> <LN> </s> 
+<s> a cellular <I> </s> 
+<s> take <I> to <FN> foster </s> 
+<s> take the <I> and go to <FN> </s> 
+<s> take her some food and a drink </s> 
+<s> what <P> are you currently in </s> 
+<s> take slot two to <FN> <LN> </s> 
+<s> <FN> <LN> wants the item that is available to you in slot four </s> 
+<s> please bring the item in slot five to <FN> <LN> </s> 
+<s> get <I> for <FN> </s> 
+<s> give the slot two to the <FN> foster </s> 
+<s> bring me a <I> </s> 
+<s> bring item three to <FN> </s> 
+<s> the blue item </s> 
+<s> <FN> green wants you to pick up and dispose his trash </s> 
+<s> i need to earn money </s> 
+<s> you should bring <FN> the item in slot one </s> 
+<s> grab cup </s> 
+<s> yes the recycle bin the item in slot four </s> 
+<s> slot two </s> 
+<s> collect the <I> kept in slot five and give it to <T> <LNP> at three five zero eight </s> 
+<s> can you give <FN> <LN> item in slot four </s> 
+<s> you should walk to <FN> <P> </s> 
+<s> i need something to drink come to my <P> at three five one two and bring a <I> </s> 
+<s> navigate the ground floor for the guest </s> 
+<s> acquire item number five </s> 
+<s> rubbish bin </s> 
+<s> four four four four four four four four four four four four four </s> 
+<s> terminate <I> please </s> 
+<s> take a bin to <FN> </s> 
+<s> u can </s> 
+<s> go to <FN> <LN> s <P> in <P> three five one two </s> 
+<s> take the blue trash bin to <FN> </s> 
+<s> no it is an order </s> 
+<s> walk to <FN> <LN> s <P> </s> 
+<s> item in slot four </s> 
+<s> take it to <FN> green </s> 
+<s> take the item in slot five </s> 
+<s> get item number three </s> 
+<s> look for the only blue thing that is available to you </s> 
+<s> <T> <LN> want the date <I> brought to him </s> 
+<s> the secretary wants the item in slot five </s> 
+<s> take the cardboard to <FN> </s> 
+<s> three four three two </s> 
+<s> bring five to <FN> <LN> </s> 
+<s> drink disasters </s> 
+<s> take the <I> to e </s> 
+<s> walk out the door down the hall to <FN> <LN> </s> 
+<s> please deliver item five to <FN> <LN> </s> 
+<s> go to five </s> 
+<s> no <FN> <LN> </s> 
+<s> go to three four one four b </s> 
+<s> i need a robot </s> 
+<s> i am feeling hungry i want some <IP> </s> 
+<s> please bring the <I> to <FN> </s> 
+<s> phd d </s> 
+<s> pick up <I> </s> 
+<s> take the dust bin </s> 
+<s> <FN> green want </s> 
+<s> four four </s> 
+<s> one </s> 
+<s> fuck </s> 
+<s> the cell <I> in slot three </s> 
+<s> i need you to take the <I> <I> to <FN> <LN> </s> 
+<s> <FN> foster <P> </s> 
+<s> <FN> needs three </s> 
+<s> get me a <I> </s> 
+<s> go to <P> three four one six to do a favor for <FN> foster </s> 
+<s> bring <FN> <LN> item three please </s> 
+<s> <FN> <LN> wants the item in slot four </s> 
+<s> go to slot five </s> 
+<s> <FN> <LN> in <P> three five one two needs you in his <P> </s> 
+<s> to three five one two </s> 
+<s> can i get <I> </s> 
+<s> you should bring a ring <I> to <FN> <LN> </s> 
+<s> yes please </s> 
+<s> give item four </s> 
+<s> provide <FN> item no five </s> 
+<s> <T> <LN> would like some <I> could you please get it for him </s> 
+<s> get <FN> item in slot five </s> 
+<s> take <FN> <LN> a cup of <I> </s> 
+<s> the cup of <I> </s> 
+<s> he just want you in his <P> </s> 
+<s> no not <FN> foster bring the item in slot four to <FN> <LN> </s> 
+<s> deliver slot two to <FN> <LN> </s> 
+<s> i don't really know he just wants to see you </s> 
+<s> i would like you to go to <P> three four two zero </s> 
+<s> no i want you to take involve in three five one two </s> 
+<s> can </s> 
+<s> no go to three four one six </s> 
+<s> three four one six need u </s> 
+<s> item one </s> 
+<s> <FN> <LN> <P> </s> 
+<s> go to <FN> green <P> </s> 
+<s> mobile <I> </s> 
+<s> yes i do </s> 
+<s> to <FN> green with </s> 
+<s> i am going to send you to the <P> of <FN> </s> 
+<s> take the cellular <I> to <FN> <LN> </s> 
+<s> no <I> item in slot two </s> 
+<s> three four one eight r o b e r t <LN> </s> 
+<s> garbage to <FN> </s> 
+<s> bring <FN> his cell <I> </s> 
+<s> to me </s> 
+<s> get an object </s> 
+<s> get lost </s> 
+<s> take the <I> to supervisor </s> 
+<s> i need some food </s> 
+<s> take the <I> to <FN> green </s> 
+<s> bring item five </s> 
+<s> can you please bring the <I> four out </s> 
+<s> yes walk to <P> three four one six </s> 
+<s> wheeled trash bin </s> 
+<s> bring five to <LN> </s> 
+<s> please go to three five one two the <P> supervisor </s> 
+<s> go to <FN> foster in <P> three four one six </s> 
+<s> send robot to her <P> </s> 
+<s> the cafeteria </s> 
+<s> get a <I> from items available </s> 
+<s> go to the items available </s> 
+<s> yes i asking question to yo </s> 
+<s> go get <I> and take it to <FN> <LN> </s> 
+<s> get the note pad from slot five </s> 
+<s> she wants the drink from slot four </s> 
+<s> bring slot one to <FN> </s> 
+<s> i am giving you a command </s> 
+<s> transport item four </s> 
+<s> please go to <FN> <LN> </s> 
+<s> give <FN> the <I> </s> 
+<s> please get item number five </s> 
+<s> transfer item </s> 
+<s> give me my mobile </s> 
+<s> please go to <FN> <P> </s> 
+<s> <FNP> wanted to empty his trash bin </s> 
+<s> give item number four to <FN> <LN> </s> 
+<s> i am asking about drinking beverages </s> 
+<s> the electrical device </s> 
+<s> you should bring a <I> from slot two </s> 
+<s> slot four has an item that <FN> <LN> wants please take the item to her </s> 
+<s> please go to <P> three four one six </s> 
+<s> bring <FN> item five </s> 
+<s> go to <LNP> <P> </s> 
+<s> <FN> <LN> but i don't know what she needs she just asked that you come to her <P> </s> 
+<s> go to <P> number three four one eight </s> 
+<s> the supervisor <FN> <LN> </s> 
+<s> to your <P> </s> 
+<s> <FN> requests the item in slot four </s> 
+<s> a personal <I> is kept in slot five available to you take it and give it to the director <T> <LNP> at three five zero eight </s> 
+<s> take the <I> from slot number five and give it to the director </s> 
+<s> walk down the hall </s> 
+<s> yes please walk to <P> three five one zero </s> 
+<s> yes <I> </s> 
+<s> hello robot please go to <P> three five zero two </s> 
+<s> pick up mobile <I> to <FN> </s> 
+<s> help <P> secretary </s> 
+<s> <FN> wants the trash can </s> 
+<s> see <FN> </s> 
+<s> give it ti <FN> </s> 
+<s> pick the item in slot two </s> 
+<s> please bring a <I> from slot three to <FN> <LN> </s> 
+<s> put in four </s> 
+<s> take the <I> <I> to <FN> </s> 
+<s> big <I> </s> 
+<s> <FN> <LN> needs you in three five one zero </s> 
+<s> go to <FN> <LN> phd at three five one zero </s> 
+<s> down the hall </s> 
+<s> go to <P> three five two one </s> 
+<s> place the item in your hand in slot four </s> 
+<s> go go three four one eight </s> 
+<s> go immediately to <P> three five one two <FN> <LN> needs you </s> 
+<s> take a drink to <FN> <LN> </s> 
+<s> go to a second slot </s> 
+<s> retrieve the item from slot four </s> 
+<s> pick up <I> cup </s> 
+<s> i need security code can you help me </s> 
+<s> the item in slot one </s> 
+<s> sad </s> 
+<s> bring a <I> for <FN> <LN> </s> 
+<s> no please </s> 
+<s> <FN> <LN> need your help </s> 
+<s> bring <I> to <FN> </s> 
+<s> <P> three five one two <FN> <LN> </s> 
+<s> i would like you yo get the cell <I> </s> 
+<s> do not bring anything to <FN> but go walk to his <P> to see what he needs </s> 
+<s> <FN> want <I> </s> 
+<s> you should walk to <P> number three four one eight </s> 
+<s> <FN> <LN> needs the item in s l o t three </s> 
+<s> can you please walk down to <FN> <P> </s> 
+<s> you name </s> 
+<s> buy a <I> </s> 
+<s> take a cup of <I> and a peanut butter and jelly <I> to <FN> </s> 
+<s> no listen to me carefully go to <P> three four three six </s> 
+<s> pick mobile <I> </s> 
+<s> please go to <FN> foster s <P> as she needs you </s> 
+<s> <FNP> needs you </s> 
+<s> yes right </s> 
+<s> go help <FN> in <P> three five zero two </s> 
+<s> recyclable in slot four </s> 
+<s> bring the <I> to <FN> <LN> </s> 
+<s> you know all the rooms here </s> 
+<s> nope </s> 
+<s> yes you he needs to see you </s> 
+<s> i need some project </s> 
+<s> you should bring the <I> to <FN> <LN> </s> 
+<s> the handheld device </s> 
+<s> take item five to <T> <LN> </s> 
+<s> yes item five </s> 
+<s> to <FN> <LN> </s> 
+<s> give three to <FN> </s> 
+<s> <FN> <P> <P> three four one six </s> 
+<s> give <FN> <LN> the cup </s> 
+<s> can you walk to <P> three five one two </s> 
+<s> arrange the ground floor </s> 
+<s> go to <FN> take item from slot two with you </s> 
+<s> bring food and <I> to <FN> <LN> </s> 
+<s> give me mobile <I> </s> 
+<s> to <FN> <LN> phd </s> 
+<s> whatever you like bring to me </s> 
+<s> go to <P> number three four three two </s> 
+<s> give <I> to <FN> <LN> </s> 
+<s> are know supervisor </s> 
+<s> he needs you </s> 
+<s> give the <P> secretary food </s> 
+<s> <FN> foster needs the trash can </s> 
+<s> <P> no three four three two </s> 
+<s> can you type </s> 
+<s> not <FN> <FN> </s> 
+<s> give item three to <FN> </s> 
+<s> go to <FN> s <P> <P> three four one eight </s> 
+<s> give me some food </s> 
+<s> you have to help <FN> foster </s> 
+<s> go to <FN> <LN> in <P> three four two zero </s> 
+<s> go to <P> no three four one six met <LNP> and go to her <P> </s> 
+<s> i want to eat cake </s> 
+<s> take item in slot two to <T> <LN> </s> 
+<s> waste </s> 
+<s> she wants you to get the item from slot four for her </s> 
+<s> can you get me item four from the slot </s> 
+<s> go and get item four </s> 
+<s> robot has to navigate a floor </s> 
+<s> no take <I> to <T> <LN> </s> 
+<s> <P> three four three six </s> 
+<s> no bring it to <T> <FN> <LN> </s> 
+<s> take item no two and give it to <FN> <LN> phd </s> 
+<s> take </s> 
+<s> no i am telling you to pick up the trash can and give it to <FN> <LN> </s> 
+<s> the director <T> <LNP> wants the <I> from slot n o five y o u have to carry it and give it to him at three five zero eight </s> 
+<s> on the floor </s> 
+<s> get item in slot four </s> 
+<s> <FN> <LN> supervisor is there and help to him </s> 
+<s> move item four </s> 
+<s> i want you to take <I> to <FN> <LN> </s> 
+<s> want the item in slot four </s> 
+<s> take a drink and <I> to <T> <LN> </s> 
+<s> what items are available with you </s> 
+<s> i want you to do me a favor </s> 
+<s> where are you </s> 
+<s> you should go to three five one two </s> 
+<s> yes see <FN> </s> 
+<s> no he needs the blue trash bin </s> 
+<s> go to <FN> <LN> with the item in slot five </s> 
+<s> item three to <FN> please </s> 
+<s> pick up cell <I> </s> 
+<s> go to <FN> <LN> phd </s> 
+<s> walk back </s> 
+<s> to the <P> mentioned above </s> 
+<s> bring <I> to the secretary </s> 
+<s> i want you to walk to three five one two </s> 
+<s> <FN> would like the desk <I> </s> 
+<s> bring item number four to him </s> 
+<s> please bring the item in slot two </s> 
+<s> walk to <P> three four zero four </s> 
+<s> i need paper holder </s> 
+<s> walk to <FN> green </s> 
+<s> retrieve slot five </s> 
+<s> walk in the hallway </s> 
+<s> i want a waste <I> </s> 
+<s> give <FN> the item in slot two </s> 
+<s> <FN> needs you to give her an item </s> 
+<s> <T> <FN> green from the <P> no three four three six needs your service so please serve him </s> 
+<s> i need you to go to <FN> <LN> </s> 
+<s> <FN> needs the robot send it to his <P> </s> 
+<s> reboot </s> 
+<s> get a <I> </s> 
+<s> give the item in slot four to <LNP> </s> 
+<s> three four zero four a l i c e </s> 
+<s> to <P> three five one zero </s> 
+<s> i need one thing </s> 
+<s> nine t h person </s> 
+<s> bring the bin to <FN> <LN> </s> 
+<s> deliver the trash can to <FN> </s> 
+<s> please retrieve the item in slot five then walk to <FN> <LN> </s> 
+<s> no get the item in slot two then take it to <FN> <LN> </s> 
+<s> <FN> needs food can you help her </s> 
+<s> ask <FN> <LN> to occupy the <P> no three four two zero </s> 
+<s> retrieve item </s> 
+<s> an <I> </s> 
+<s> walk towards <P> three four one six </s> 
+<s> you </s> 
+<s> give <FN> <LN> item four </s> 
+<s> <FN> needs you </s> 
+<s> lose it </s> 
+<s> to <LNP> </s> 
+<s> how to do this </s> 
+<s> supervisor needs go to <P> </s> 
+<s> cardboard </s> 
+<s> <FN> wants the item in slot five take it and walk up to her </s> 
+<s> to <P> three five zero two </s> 
+<s> can you take the <I> to <FN> </s> 
+<s> <FN> needs you her <P> is number three four one six </s> 
+<s> robot must go to the <P> of <FN> </s> 
+<s> walk to <FN> take <I> with you </s> 
+<s> press item two </s> 
+<s> you should bring a <I> </s> 
+<s> g d c third floor </s> 
+<s> name items in slots </s> 
+<s> cardboard <I> </s> 
+<s> go t <FN> <LNP> <P> </s> 
+<s> <P> three five one two </s> 
+<s> bring the <I> </s> 
+<s> she wants item four </s> 
+<s> go to three four one eight </s> 
+<s> <FN> <LN> two </s> 
+<s> no just walk to the supervisor with item one </s> 
+<s> i want u to get me a item </s> 
+<s> please go to <FN> foster in <P> three four one six </s> 
+<s> no get the item in slot five </s> 
+<s> the item in your hand </s> 
+<s> what is the number to <FN> <LN> </s> 
+<s> good </s> 
+<s> <T> <LN> needs item in slot two </s> 
+<s> no walk to three five zero eight </s> 
+<s> robot please go see <FN> foster in <P> three four one six </s> 
+<s> <LNP> </s> 
+<s> you should go down </s> 
+<s> give me your white cup </s> 
+<s> walk to get <I> </s> 
+<s> blue dust </s> 
+<s> bring item to slot two </s> 
+<s> phd <FN> green needs you to bring item number four </s> 
+<s> yes go to three five zero eight and knock on the door for <FN> </s> 
+<s> what will i be doing </s> 
+<s> can you get the <I> for <T> <LN> </s> 
+<s> go to <P> three six three six research <P> </s> 
+<s> i need information abut you first </s> 
+<s> supervisor <T> <FN> <LN> </s> 
+<s> no not at all </s> 
+<s> four slot </s> 
+<s> you go to <P> </s> 
+<s> please give a peanut butter <I> and drink to <P> supervisor <FN> <LN> </s> 
+<s> thank you </s> 
+<s> bring the item to the <I> </s> 
+<s> get the <I> and take it to <FN> </s> 
+<s> <LN> needs item five </s> 
+<s> can you assist me in making a <I> </s> 
+<s> yes also bring a few loaves of <I> </s> 
+<s> <I> works too yes please </s> 
+<s> bring the garbage bin to <FN> green </s> 
+<s> no i am placing an order </s> 
+<s> yes bring <FN> foster to <FN> <LN> </s> 
+<s> please send the name </s> 
+<s> give the <I> to <LNP> </s> 
+<s> to the p r director </s> 
+<s> go to <FN> <LN> and give her the <I> </s> 
+<s> get the <I> for <T> <LN> </s> 
+<s> yup </s> 
+<s> right hand down </s> 
+<s> move item in slot four </s> 
+<s> please take slot four the garbage can to <FN> green </s> 
+<s> where is <FN> </s> 
+<s> <FN> needs you go to <P> three five one two </s> 
+<s> can you locate a trash can </s> 
+<s> take item in slot one to <FN> </s> 
+<s> clean the <I> for <FN> </s> 
+<s> go to <FN> foster </s> 
+<s> a ham <I> some <I> and a <I> </s> 
+<s> <FN> green wants the item in slot four </s> 
+<s> take the white <I> to <FN> <LN> </s> 
+<s> s </s> 
+<s> <FN> <FNP> foster </s> 
+<s> assist the <P> secretary </s> 
+<s> obtain the item in slot five for the secretary </s> 
+<s> <FN> <LN> wants the item in slot three so take the item and give to him </s> 
+<s> no money </s> 
+<s> bring item in slot five to <FN> <LN> </s> 
+<s> <FNP> in <P> three four one six needs you </s> 
+<s> i need plastic bin </s> 
+<s> blue want </s> 
+<s> get item five </s> 
+<s> no send it to <FN> </s> 
+<s> please get the item in slot five and give it to <FNP> </s> 
+<s> supervisor wants <I> </s> 
+<s> welcome the guest </s> 
+<s> take the <I> and walk to <FN> </s> 
+<s> take the cell <I> to <FN> <LN> </s> 
+<s> go to <P> three four three six and bring nothing </s> 
+<s> give item two </s> 
+<s> take the guest to first floor </s> 
+<s> go get a cup </s> 
+<s> soft <IP> to <T> <LNP> </s> 
+<s> send item four to <FN> <LN> </s> 
+<s> your assistance </s> 
+<s> bring a <I> to three five one two </s> 
+<s> fetch mobile </s> 
+<s> go to item </s> 
+<s> get <FN> a cup of <I> </s> 
+<s> get the garbage can </s> 
+<s> <FN> s <P> </s> 
+<s> hello take some <I> to <FN> <LN> please </s> 
+<s> please bring <FN> <LN> item two </s> 
+<s> <FN> <LN> needs an item </s> 
+<s> <FN> green intern </s> 
+<s> bring the trash can to <FN> green </s> 
+<s> the secretary needs you in <P> three four zero four </s> 
+<s> can you assist <FN> <LN> </s> 
+<s> get the cell <I> out of slot three </s> 
+<s> bring one to <FN> <LN> </s> 
+<s> ok </s> 
+<s> bring item no three </s> 
+<s> bring item </s> 
+<s> go to <P> secretary <P> </s> 
+<s> give slot five item to secretary </s> 
+<s> please make <FN> a <I> and <I> </s> 
+<s> pick them item from slot three and give to <FN> </s> 
+<s> <FN> <LN> wants item in the number three slot </s> 
+<s> <P> secretary <I> </s> 
+<s> robot i need item five </s> 
+<s> a trash can </s> 
+<s> i want to design an aircraft </s> 
+<s> bring the item in slot one to <LNP> </s> 
+<s> i need sex </s> 
+<s> yes you understand </s> 
+<s> please take item in slot one to <FN> <LN> </s> 
+<s> retrieve the item in slot five for petty </s> 
+<s> give the <I> <LNP> </s> 
+<s> nothing you have to do </s> 
+<s> move to <LN> </s> 
+<s> wash the <IP> </s> 
+<s> deliver <I> to <FN> <LN> </s> 
+<s> go to <FN> foster s <P> </s> 
+<s> take the trash can to <FN> </s> 
+<s> mobile </s> 
+<s> bring <I> and <I> to <FN> </s> 
+<s> i need a puck up </s> 
+<s> no <I> </s> 
+<s> go there first </s> 
+<s> just go to three five one two </s> 
+<s> give item three to <FN> <LN> </s> 
+<s> how to get the job done </s> 
+<s> please get me number one and two </s> 
+<s> please get the <I> in slot five and give it to <FNP> </s> 
+<s> take a <I> and give it to <FN> <LN> </s> 
+<s> i want you to go to the robot <P> please </s> 
+<s> don't walk go to home </s> 
+<s> <FN> the supervisor </s> 
+<s> take and give item three to <FN> </s> 
+<s> walt disney pictures released wall-e in the united states and canada on june two seven its opening weekend in three nine nine two theaters </s> 
+<s> i need make a appointment </s> 
+<s> see if anyone needs anything </s> 
+<s> to eat some food </s> 
+<s> waste <I> </s> 
+<s> send the recycle bin to <FN> </s> 
+<s> <FN> <LN> the supervisor </s> 
+<s> i need you to take the <I> to <FN> </s> 
+<s> walk to <FN> green <P> </s> 
+<s> yes u can </s> 
+<s> buy item in s l o t four to <FN> <LN> </s> 
+<s> <LN> needs robot </s> 
+<s> <P> three four one six </s> 
+<s> contents of slot four </s> 
+<s> bring the <I> that is kept in slot five </s> 
+<s> take it to <T> <LN> </s> 
+<s> your name </s> 
+<s> give one to <FN> </s> 
+<s> transfer item to slot four </s> 
+<s> will you get <FN> a cup of <I> </s> 
+<s> <FN> wants the item in slot three </s> 
+<s> move the <I> to <FN> </s> 
+<s> i need some help </s> 
+<s> find <FN> <LN> </s> 
+<s> <P> three five one zero </s> 
+<s> walk up the floor </s> 
+<s> bring <FN> her desk <I> </s> 
+<s> skip this task </s> 
+<s> <T> <LN> wants the item in slot three </s> 
+<s> leave <P> </s> 
+<s> bring <FN> item four </s> 
+<s> i need to make a directory </s> 
+<s> secretary wants item in slot five </s> 
+<s> can you please give the <I> to <FN> </s> 
+<s> four to <FN> </s> 
+<s> please go to <P> three five one zero </s> 
+<s> fuck fuck </s> 
+<s> take the item in slot two to <FN> <LN> </s> 
+<s> go and die </s> 
+<s> please pick up the cell <I> </s> 
+<s> intern needs item in slot four </s> 
