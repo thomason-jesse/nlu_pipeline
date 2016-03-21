@@ -1,6 +1,5 @@
 import ctypes
 import threading
-import pygame
 import random
 import sys
 import os
@@ -141,6 +140,9 @@ class ScriptGenerator:
         self.option_font = pygame.font.SysFont('monospace', 15)
         self.instructions = "OPTIONS: [space_bar = toggle recording] [r = re-record phrase] "
         self.instructions += "[d = delete recording] [right_arrow = move to next phrase]"
+
+    def setPrefix(self, prefix):
+        self.prefix = prefix
 
     def genPhrase(self, screen):
         #Generates the phrase itself. (i.e. the text)
@@ -562,7 +564,7 @@ class ScriptGenerator:
         return ';'.join([str(self.user_id), str(self.phrase_num - 1), self.phrase, self.denotation, self.semantic_form])
 
     #Saves data packet received from main machine on extra machine. 
-    def saveDataPacket(self, data):
+    def saveDataPacket(self, data, prefix):
         dataList = data.split(';')
 
         #Updates data structures. 
@@ -603,7 +605,8 @@ class Recorder:
     #Recording method for other machines in recording session. 
     def recordExtra(self, host, port):
         client = Client(host, port)
-        scriptGenerator = ScriptGenerator(prefix = self.prefix)
+        scriptGenerator = ScriptGenerator()
+        scriptGenerator.setPrefix(self.prefix)
         running = True
 
         #Waits for messages until told to stop. 
@@ -635,6 +638,8 @@ class Recorder:
 
     #Recording method for main machine in recording session. 
     def recordToggle(self):
+        import pygame
+
         #Initializes pygame window to read spacebar presses. 
         pygame.init()
 
