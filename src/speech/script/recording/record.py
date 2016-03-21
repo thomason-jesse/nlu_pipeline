@@ -564,7 +564,7 @@ class ScriptGenerator:
         return ';'.join([str(self.user_id), str(self.phrase_num - 1), self.phrase, self.denotation, self.semantic_form])
 
     #Saves data packet received from main machine on extra machine. 
-    def saveDataPacket(self, data, prefix):
+    def saveDataPacket(self, data):
         dataList = data.split(';')
 
         #Updates data structures. 
