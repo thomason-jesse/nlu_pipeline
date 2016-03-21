@@ -9,18 +9,15 @@ import KBGrounder
 import CKYParser
 import StaticDialogPolicy
 import ActionSender
-<<<<<<< HEAD
 from TemplateBasedGenerator import TemplateBasedGenerator
 from StaticDialogAgent import StaticDialogAgent
 from DialogAgent import DialogAgent
 from utils import *
-=======
 import pygame
 import os
 import threading
 import pickle
 from std_msgs.msg import String
->>>>>>> fec3ba2bcc5a8fcff5845323a760282e0ec1a761
 
 class InputFromKeyboard:
     def __init__(self):
@@ -60,10 +57,9 @@ class OutputToStdout:
     def say(self, s):
         print "SYSTEM: "+s
 
-<<<<<<< HEAD
 # Fixing the random seed for debugging
 numpy.random.seed(10)
-=======
+
 class OutputWithSpeech:
     def __init__(self):
         pass
@@ -77,7 +73,6 @@ class OutputWithSpeech:
 
 #Path for argument files. 
 path = './src/nlu_pipeline/src/speech/data/parser/'
->>>>>>> fec3ba2bcc5a8fcff5845323a760282e0ec1a761
 
 print "calling ROSpy init"
 rospy.init_node('test_NLU_pipeline')
@@ -98,7 +93,6 @@ print "entries: " + str(lex.entries)
 print "instantiating KBGrounder"
 grounder = KBGrounder.KBGrounder(ont)
 
-<<<<<<< HEAD
 #print "instantiating Parser"
 parser = CKYParser.CKYParser(ont, lex, use_language_model=True)
 # Set parser hyperparams to best known values for training
@@ -121,7 +115,7 @@ parser.max_hypothesis_categories_for_unknown_token_beam = 2  # for unknown token
 
 grounder.parser = parser
 grounder.ontology = parser.ontology
-=======
+
 print "instantiating Parser from pickle file"
 pickledParser = open(path + 'parser.pickle', 'r')
 parser = pickle.load(pickledParser)
@@ -138,7 +132,6 @@ while True:
     token_responses = generator.reverse_parse_semantic_form(form, n=1, c=1)
     print "token responses: "+str(token_responses)
 generator.flush_seen_nodes()
->>>>>>> fec3ba2bcc5a8fcff5845323a760282e0ec1a761
 
 print "instantiating DialogAgent"
 u_in = InputFromSpeechNode()
@@ -156,10 +149,9 @@ while True:
     if s == 'stop':
         break
     a = A.initiate_dialog_to_get_action(s)
-<<<<<<< HEAD
     if a is not None :
         print response_generator.get_action_sentence(a)
-=======
+    
     print "ACTION: "+str(a)
     r = action_sender.take_action(a)
     print "RESULT: "+str(r)
@@ -203,4 +195,3 @@ while True:
 
     token_responses = generator.reverse_parse_semantic_form(form, n=1)
     print "token responses: "+str(token_responses)
->>>>>>> fec3ba2bcc5a8fcff5845323a760282e0ec1a761

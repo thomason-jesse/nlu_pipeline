@@ -131,4 +131,3 @@ Then make sure that /usr/local/lib is included in your LD_LIBRARY_PATH
 $ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
 
 should fix the error. 
->>>>>>> fec3ba2bcc5a8fcff5845323a760282e0ec1a761
