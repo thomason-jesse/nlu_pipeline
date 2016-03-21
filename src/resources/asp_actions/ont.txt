@@ -1,6 +1,7 @@
 #conf preds
 yes:c
 no:c
+none:c
 
 #atoms
 peter:e

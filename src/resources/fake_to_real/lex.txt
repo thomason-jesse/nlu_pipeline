@@ -1,0 +1,65 @@
+#imperative
+search :- M/PP/NP : lambda r:e.(lambda p:e.(searchroom(p,r)))
+search :- M/PP/PP : lambda p:e.(lambda r:e.(searchroom(p,r)))
+bring :- M/NP/NP : lambda y:e.(lambda x:e.(bring(x,y)))
+bring :- M/PP/NP : lambda x:e.(lambda y:e.(bring(x,y)))
+walk :- M/PP : lambda x:e.(at(x))
+
+#prepositional arguments to commands
+for :- PP/NP : lambda x:e.(x)
+of :- PP/NP : lambda x:e.(x)
+in :- PP/NP : lambda x:e.(x)
+about :- PP/NP : lambda x:e.(x)
+to :- PP/NP : lambda x:e.(x)
+
+#confirmations
+yes :- C : yes
+no :- C : no
+none :- C : none
+
+#these are weird now bc there's some implicit knowledge in hasoffice that the second arg is an office
+'s office :- NP\NP : lambda x:e.(the(lambda y:e.(hasoffice(x,y))))
+office of :- N/NP : lambda x:e.(lambda y:e.(hasoffice(x,y)))
+
+#entity descriptor words
+#can be type-raised to N/N : lambda x:e.(pred(x))
+room :- N : room
+person :- N : person
+item :- N : item
+
+#closed category
+the :- NP/(N/N) : lambda P:<e,t>.(the(lambda x:e.(P(x))))
+a :- NP/(N/N) : lambda P:<e,t>.(a(lambda x:e.(P(x))))
+
+#atoms
+chips :- NP : chips
+coffee :- NP : coffee
+hamburger :- NP : hamburger
+juice :- NP : juice
+muffin :- NP : muffin
+
+alice :- NP : stacy
+bob :- NP : jesse
+carol :- NP : shiqi
+dave :- NP : jivko
+eve :- NP : aishwarya
+frannie :- NP : scott
+george :- NP : rodolfo
+mallory :- NP : peter
+peggy :- NP : dana
+walter :- NP : ray
+
+3404 :- NP : l3_404
+3512 :- NP : l3_512
+3510 :- NP : l3_510
+3508 :- NP : l3_508
+3432 :- NP : l3_432
+3420 :- NP : l3_420
+3502 :- NP : l3_502
+3414b :- NP : l3_414b
+
+
+
+
+
+

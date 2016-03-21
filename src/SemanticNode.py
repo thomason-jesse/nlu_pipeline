@@ -12,9 +12,9 @@ class SemanticNode:
         self.category = category
         self.is_lambda = is_lambda
         if ((self.is_lambda and (lambda_name is None or is_lambda_instantiation is None)) or
-            (not self.is_lambda and idx is None)):
-                sys.exit("Invalid SemanticNode instantiation (" +
-                         str([self.is_lambda, lambda_name, is_lambda_instantiation, idx]) + ")")
+           (not self.is_lambda and idx is None)):
+            sys.exit("Invalid SemanticNode instantiation (" +
+                     str([self.is_lambda, lambda_name, is_lambda_instantiation, idx]) + ")")
         self.idx = idx
         self.lambda_name = lambda_name
         self.is_lambda_instantiation = is_lambda_instantiation
@@ -54,41 +54,30 @@ class SemanticNode:
             self.return_type = candidate_type
 
     # copy attributes of the given SemanticNode into this one (essentially, clone the second into this space)
-    def copy_attributes(self, A, lambda_enumeration=0, preserve_parent=False, preserve_children=False):
-        self.set_category(A.category)
-        self.type = A.type
-        self.is_lambda = A.is_lambda
-        self.idx = A.idx
-        self.lambda_name = None if A.lambda_name is None else A.lambda_name + lambda_enumeration
-        self.is_lambda_instantiation = A.is_lambda_instantiation
+    def copy_attributes(self, a, lambda_enumeration=0, preserve_parent=False, preserve_children=False):
+        self.set_category(a.category)
+        self.type = a.type
+        self.is_lambda = a.is_lambda
+        self.idx = a.idx
+        self.lambda_name = None if a.lambda_name is None else a.lambda_name + lambda_enumeration
+        self.is_lambda_instantiation = a.is_lambda_instantiation
         if not preserve_parent:
-            self.parent = A.parent
+            self.parent = a.parent
         if not preserve_children:
-            if A.children is None:
+            if a.children is None:
                 self.children = None
             else:
-                self.children = [SemanticNode(self, 0, 0, False, 0) for i in range(0, len(A.children))]
-                for i in range(0, len(A.children)):
-                    self.children[i].copy_attributes(A.children[i], lambda_enumeration, preserve_parent=True)
-        self.return_type = A.return_type
+                self.children = [SemanticNode(self, 0, 0, False, 0) for _ in range(0, len(a.children))]
+                for i in range(0, len(a.children)):
+                    self.children[i].copy_attributes(a.children[i], lambda_enumeration, preserve_parent=True)
+        self.return_type = a.return_type
 
     def print_little(self):
         return "(" + ",".join(
             [str(self.is_lambda), str(self.type), str(self.lambda_name) if self.is_lambda else str(self.idx)]) + ")"
 
     def __str__(self):
-        s = "(" + ",".join(
-            [str(self.is_lambda), str(self.category), str(self.type), str(self.lambda_name)
-                if self.is_lambda else str(self.idx)]) + ")"
-        if self.children is not None:
-            for c in self.children:
-                s += "\n"
-                curr = self
-                while curr is not None:
-                    s += "\t"
-                    curr = curr.parent
-                s += str(c)
-        return s
+        return str(self.__key())
 
     def renumerate_lambdas(self, lambdas):
         if self.is_lambda:
@@ -126,11 +115,11 @@ class SemanticNode:
     # as long as the roots and children down are identical categories
 
     def equal_allowing_commutativity(self, other, commutative_idxs, ignore_syntax=True, ontology=None):
-        A = copy.deepcopy(self)
-        B = copy.deepcopy(other)
-        A.commutative_raise_node(commutative_idxs, ontology=ontology)
-        B.commutative_raise_node(commutative_idxs, ontology=ontology)
-        return A.equal_ignoring_syntax(B, ignore_syntax=ignore_syntax)
+        a = copy.deepcopy(self)
+        b = copy.deepcopy(other)
+        a.commutative_raise_node(commutative_idxs, ontology=ontology)
+        b.commutative_raise_node(commutative_idxs, ontology=ontology)
+        return a.equal_ignoring_syntax(b, ignore_syntax=ignore_syntax)
 
     def commutative_raise_node(self, commutative_idxs, ontology=None):  # support function
         to_expand = [self]
@@ -147,7 +136,8 @@ class SemanticNode:
                     curr.children = new_c
                     if ontology is not None:
                         curr.set_type_from_children_return_types(curr.children[0].return_type, ontology)
-                    to_expand.extend(curr.children)
+            elif curr.children is not None:
+                to_expand.extend(curr.children)
 
     # given children, add types as necessary to make func take them and return r
     def set_type_from_children_return_types(self, r, ontology):

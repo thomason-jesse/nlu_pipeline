@@ -1,1 +1,1 @@
-bring(a(lambda x:e.(chips(x))),dana)
+bring(a(lambda x:e.(and(half-full(x), cellphone(x)))),ray)

@@ -1,0 +1,145 @@
+#imperative
+search :- M/PP/NP : lambda r:e.(lambda p:e.(searchroom(p,r)))
+search :- M/PP/PP : lambda p:e.(lambda r:e.(searchroom(p,r)))
+bring :- M/NP/NP : lambda y:e.(lambda x:e.(bring(x,y)))
+bring :- M/PP/NP : lambda x:e.(lambda y:e.(bring(x,y)))
+walk :- M/PP : lambda x:e.(at(x))
+
+#prepositional arguments to commands
+for :- PP/NP : lambda x:e.(x)
+of :- PP/NP : lambda x:e.(x)
+in :- PP/NP : lambda x:e.(x)
+about :- PP/NP : lambda x:e.(x)
+to :- PP/NP : lambda x:e.(x)
+
+#confirmations
+yes :- C : yes
+no :- C : no
+none :- C : none
+
+#these are weird now bc there's some implicit knowledge in hasoffice that the second arg is an office
+'s office :- NP\NP : lambda x:e.(the(lambda y:e.(hasoffice(x,y))))
+office of :- N/NP : lambda x:e.(lambda y:e.(hasoffice(x,y)))
+
+#entity descriptor words
+#can be type-raised to N/N : lambda x:e.(pred(x))
+room :- N : room
+person :- N : person
+item :- N : item
+
+#closed category
+the :- NP/(N/N) : lambda P:<e,t>.(the(lambda x:e.(P(x))))
+a :- NP/(N/N) : lambda P:<e,t>.(a(lambda x:e.(P(x))))
+
+# atoms - items
+phone :- NP : chips
+cellphone :- NP : chips
+cell phone :- NP : chips
+mobile phone :- NP : chips
+mobilephone :- NP : chips
+cell :- NP : chips
+mobile :- NP : chips
+
+coffee :- NP : coffee
+cup of coffee :- NP : coffee
+
+hamburger :- NP : hamburger
+burger :- NP : hamburger
+cheeseburger :- NP : hamburger
+sandwich :- NP : hamburger
+
+trashcan :- NP : juice
+trash can :- NP : juice
+dustbin :- NP : juice
+bin :- NP : juice
+waste basket :- NP : juice
+wastepaper basket :- NP : juice
+waste paper basket :- NP : juice
+
+calendar :- NP : muffin
+planner :- NP : muffin
+calender :- NP : muffin
+diary :- NP : muffin
+book :- NP : muffin
+notebook :- NP : muffin
+
+# atoms - people
+alice :- NP : stacy
+alice ashcraft :- NP : stacy
+ashcraft :- NP : stacy
+
+bob :- NP : jesse
+bob brown :- NP : jesse
+robert :- NP : jesse
+robert brown :- NP : jesse
+brown :- NP : jesse
+
+carol :- NP : shiqi
+carol clark :- NP : shiqi
+clark :- NP : shiqi
+dr clark :- NP : shiqi
+dr carol clark :- NP : shiqi
+dr carol :- NP : shiqi
+
+dave :- NP : jivko
+dave daniel :- NP : jivko
+daniel :- NP : jivko
+dr daniel :- NP : jivko
+dr dave daniel :- NP : jivko
+dr dave :- NP : jivko
+
+eve :- NP : aishwarya
+evelyn :- NP : aishwarya
+evelyn eckhart :- NP : aishwarya
+eve eckhart :- NP : aishwarya
+eckhart :- NP : aishwarya
+
+frannie :- NP : scott
+francis :- NP : scott
+francis foster :- NP : scott
+foster :- NP : scott
+frannie foster :- NP : scott
+
+george :- NP : rodolfo
+george green :- NP : rodolfo
+green :- NP : rodolfo
+intern :- NP : rodolfo
+
+mallory :- NP : peter
+mallory morgan :- NP : peter
+morgan :- NP : peter
+director :- NP : peter
+dr mallory :- NP : peter
+dr mallory morgan :- NP : peter
+dr morgan :- NP : peter
+prof mallory :- NP : peter
+prof mallory morgan :- NP : peter
+prof morgan :- NP : peter
+
+peggy :- NP : dana
+peggy parker :- NP : dana
+parker :- NP : dana
+
+walter :- NP : ray
+walter ward :- NP : ray
+ward :- NP : ray
+supervisor :- NP : ray
+dr walter :- NP : ray
+dr walter ward :- NP : ray
+dr ward :- NP : ray
+prof walter :- NP : ray
+prof walter ward :- NP : ray
+prof ward :- NP : ray
+
+# atoms - rooms
+3404 :- NP : l3_502
+3416 :- NP : l3_404
+3418 :- NP : l3_414b
+3420 :- NP : l3_420
+3432 :- NP : l3_432
+3436 :- NP : l3_414b
+3502 :- NP : l3_414b
+3508 :- NP : l3_508
+3510 :- NP : l3_510
+3512 :- NP : l3_512
+

@@ -1,0 +1,35 @@
+search walter 's office for bob
+M : searchroom(bob,the(lambda x:e.(hasoffice(walter,x))))
+
+check frannie 's office for eve
+M : searchroom(eve,the(lambda x:e.(hasoffice(frannie,x))))
+
+bring chips to george
+M : bring(chips,george)
+
+bring mallory coffee
+M : bring(coffee,mallory)   
+
+bring alice a hamburger
+M : bring(hamburger,alice)
+
+deliver a hamburger to alice
+M : bring(hamburger,alice)
+
+get coffee for bob
+M : bring(coffee,bob)
+
+walk to 3512
+M : at(l3_512)
+
+walk to alice 's office
+M : at(the(lambda x:e.(hasoffice(alice,x))))
+
+go to alice 's office
+M : at(the(lambda x:e.(hasoffice(alice,x))))
+
+search for george in alice 's office
+M : searchroom(george,the(lambda x:e.(hasoffice(alice,x))))
+
+burger
+NP : hamburger

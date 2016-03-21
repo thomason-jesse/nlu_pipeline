@@ -1,0 +1,95 @@
+#imperative
+search :- M/PP/NP : lambda r:e.(lambda p:e.(searchroom(p,r)))
+ask :- M/PP/NP : lambda p1:e.(lambda p2:e.(askperson(p1,p2)))
+remind :- M/PP/PP/NP : lambda p:e.(lambda m:e.(lambda r:e.(remind(p,m,r))))
+bring :- M/NP/NP : lambda y:e.(lambda x:e.(bring(x,y)))
+bring :- M/PP/NP : lambda x:e.(lambda y:e.(bring(x,y)))
+walk :- M/PP : lambda x:e.(at(x))
+
+# 'to' as recipient argument of a command (eg. ``bring coffee to peter'')
+to :- PP/NP : lambda x:e.(x)
+
+# basic declarative constructions
+is :- D/NP\NP : lambda x:e.(lambda y:e.(declare_equal(x, y)))
+is :- D/(N/N)\NP : lambda x:e.(lambda P:<e,t>.(declare_satpred(x, P)))
+is :- D/(N/N)\(N/N) : lambda P:<e,t>.(lambda Q:<e,t>.(declare_predimp(P, Q)))
+
+#prepositional arguments to commands
+for :- PP/NP : lambda x:e.(x)
+of :- PP/NP : lambda x:e.(x)
+in :- PP/NP : lambda x:e.(x)
+about :- PP/NP : lambda x:e.(x)
+
+#confirmations
+yes :- C : yes
+no :- C : no
+none :- C : none
+
+#these are weird now bc there's some implicit knowledge in hasoffice that the second arg is an office
+'s office :- NP\NP : lambda x:e.(the(lambda y:e.(hasoffice(x,y))))
+office of :- N/NP : lambda x:e.(lambda y:e.(hasoffice(x,y)))
+
+#other interrogatives
+is :- I/NP/NP : lambda x:e.(lambda y:e.(equals(x,y)))
+is :- I/(N/N)/NP : lambda x:e.(lambda P:<e,t>.(satpred(x,P)))
+is :- I/(N/N)/(N/N) : lambda P:<e,t>.(lambda Q:<e,t>.(predimp(P,Q)))
+in :- I/NP\NP : lambda p:e.(lambda r:e.(inroom(p,r)))
+in :- I\NP : lambda p:e.(inoffice(p))
+where is :- M/NP : lambda x:e.(speak_e(x))
+who is :- M/NP : lambda x:e.(speak_e(x))
+which is :- M/NP : lambda x:e.(speak_e(x))
+
+#entity descriptor words
+#can be type-raised to N/N : lambda x:e.(pred(x))
+room :- N : room
+person :- N : person
+group :- N : group
+office :- N : office
+object :- N : object
+chair :- N : chair
+blue :- N : blue
+yellow :- N : yellow
+heavy :- N : heavy
+light :- N : light
+
+#closed category
+is :- I/I : lambda x:t.(x)
+not :- I/I : lambda x:t.(not(x))
+the :- NP/(N/N) : lambda P:<e,t>.(the(lambda x:e.(P(x))))
+a :- NP/(N/N) : lambda P:<e,t>.(a(lambda x:e.(P(x))))
+
+# conjuctions
+and :- I/I\I : lambda x:t.(lambda y:t.(and(x,y)))
+or :- I/I\I : lambda x:t.(lambda y:t.(or(x,y)))
+and :- D/D\D : lambda x:d.(lambda y:d.(and_dec(x,y)))
+or :- N/N\N : lambda x:e.(lambda y:e.(or_e(x,y)))
+or :- NP/NP\NP : lambda x:e.(lambda y:e.(or_e(x,y)))
+
+#atoms
+room 3506 :- NP : 3506
+bruce :- NP : bruce
+chair :- NP : aeron_chair
+
+peter :- NP : peter
+ray :- NP : ray
+dana :- NP : dana
+kazunori :- NP : kazunori
+matteo :- NP : matteo
+shiqi :- NP : shiqi
+jivko :- NP : jivko
+stacy :- NP : stacy
+yuqian :- NP : yuqian
+max :- NP : max
+pato :- NP : pato
+bwi :- NP : bwi
+bwi meeting :- NP : bwi_m
+3516 :- NP : l3_516
+3508 :- NP : l3_508
+3512 :- NP : l3_512
+3510 :- NP : l3_510
+3402 :- NP : l3_402
+3418 :- NP : l3_418
+3420 :- NP : l3_420
+3432 :- NP : l3_432
+3502 :- NP : l3_502
+3414b :- NP : l3_414b
