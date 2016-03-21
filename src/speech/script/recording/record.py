@@ -79,8 +79,6 @@ class ScriptGenerator:
         #i.e. we don't need any data structure initialization. 
         if displayInfo == None:
             return
-        else:
-            import pygame
     
         #Initializes data structure for generating phrases. 
         self.templates = {}
@@ -154,8 +152,6 @@ class ScriptGenerator:
         self.drawPhrase(screen)
 
     def drawPhrase(self, screen):
-        import pygame
-
         #The text object to render to screen. 
         self.phraseText = self.font.render(self.phrase, 1, self.textColor)
         self.option_text = self.option_font.render(self.instructions, 1, self.textColor)
@@ -642,8 +638,6 @@ class Recorder:
 
     #Recording method for main machine in recording session. 
     def recordToggle(self):
-        import pygame
-
         #Initializes pygame window to read spacebar presses. 
         pygame.init()
 
@@ -843,6 +837,9 @@ if record:
 
     #Determines if current machine is main machine or not. 
     if is_server == 'y':
+        #Imports pygame for recording. 
+        import pygame
+
         recorder.recordUser()
     else:
         host = sys.argv[5]
