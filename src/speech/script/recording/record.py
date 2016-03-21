@@ -75,7 +75,7 @@ class Client:
         self.s.send(confirm_code)
 
 class ScriptGenerator:
-    def __init__(self, displayInfo = None, user_id = None, mode = "normal", recording = True):
+    def __init__(self, displayInfo = None, user_id = None, mode = "normal", prefix = None, recording = True):
         #If display is none, then this is a run on one of the extra machines. 
         #i.e. we don't need any data structure initialization. 
         if displayInfo == None:
@@ -101,6 +101,9 @@ class ScriptGenerator:
 
         #Mode for generating items. 
         self.mode = mode
+
+        #Prefix for saving user data. 
+        self.prefix = prefix
 
         #Distribution for actions.
         self.walk_prob = ["walk", 0.3]
@@ -529,10 +532,9 @@ class ScriptGenerator:
             return word
 
     def saveData(self):
-        prefix = 'results/' + str(self.user_id)
-        phraseFile = open(prefix + '/phrases/' + str(self.user_id) + '_' + 'phrase_' + str(self.phrase_num), 'w')
-        denotationFile = open(prefix + '/denotations/' + str(self.user_id) + '_' + 'denotation_' + str(self.phrase_num), 'w')
-        semanticFile = open(prefix + '/semantic_forms/' + str(self.user_id) + '_' + 'semantic_' + str(self.phrase_num), 'w')
+        phraseFile = open(self.prefix + '/phrases/' + str(self.user_id) + '_' + 'phrase_' + str(self.phrase_num), 'w')
+        denotationFile = open(self.prefix + '/denotations/' + str(self.user_id) + '_' + 'denotation_' + str(self.phrase_num), 'w')
+        semanticFile = open(self.prefix + '/semantic_forms/' + str(self.user_id) + '_' + 'semantic_' + str(self.phrase_num), 'w')
 
         #Writes data. 
         phraseFile.write(self.phrase)
@@ -540,7 +542,7 @@ class ScriptGenerator:
         semanticFile.write(self.semantic_form)
 
         #Copies temp recording file to permanent location.
-        shutil.copy("temp_record.raw", prefix + '/recordings/' + str(self.user_id) + '_' + 'recording_' + str(self.phrase_num)) 
+        shutil.copy("temp_record.raw", self.prefix + '/recordings/' + str(self.user_id) + '_' + 'recording_' + str(self.phrase_num)) 
 
         print "----------------------------------"
         print "PHRASE: " + self.phrase
@@ -574,7 +576,7 @@ class ScriptGenerator:
         self.saveData()
 
 class Recorder:
-    def __init__(self, user_id, mode):
+    def __init__(self, user_id, mode, prefix):
         import ctypes
 
         if True: #TODO Allow path specification is None:
@@ -584,6 +586,7 @@ class Recorder:
 
         self.user_id = user_id
         self.mode = mode
+        self.prefix = prefix
         self.phrase_num = 0
         self.scriptGenerator = None
 
@@ -600,7 +603,7 @@ class Recorder:
     #Recording method for other machines in recording session. 
     def recordExtra(self, host, port):
         client = Client(host, port)
-        scriptGenerator = ScriptGenerator()
+        scriptGenerator = ScriptGenerator(prefix = self.prefix)
         running = True
 
         #Waits for messages until told to stop. 
@@ -659,7 +662,7 @@ class Recorder:
         running = True
 
         #Creates the phrase generating object. 
-        self.scriptGenerator = ScriptGenerator(displayInfo, self.user_id, self.mode)
+        self.scriptGenerator = ScriptGenerator(displayInfo, self.user_id, self.mode, self.prefix)
 
         #Creates server object to communicate with other recording machines. 
         server = Server()
@@ -806,7 +809,8 @@ if not len(sys.argv) >= 5:
     sys.exit()
 
 user_id = sys.argv[1]
-mode = sys.argv[2]
+mode = "mix"
+prefix = sys.argv[2]
 
 if not (mode == "normal" or mode == "adjective" or mode == "mix"):
     print "Mode not recognized, correct values: normal, adjective, mix."
@@ -826,7 +830,7 @@ else:
 #Sets up recording interface if necessary. 
 if record:
     is_server = sys.argv[4]
-    recorder = Recorder(user_id, mode)
+    recorder = Recorder(user_id, mode, prefix)
 
     #Determines if current machine is main machine or not. 
     if is_server == 'y':
