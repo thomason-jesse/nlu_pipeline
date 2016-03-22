@@ -646,7 +646,7 @@ class Recorder:
 
         #Gets monitor information and uses it to go to fullscreen mode. 
         displayInfo = pygame.display.Info()
-        screen = pygame.display.set_mode((displayInfo.current_w-100, displayInfo.current_h-100))
+        screen = pygame.display.set_mode((displayInfo.current_w, displayInfo.current_h - 10))
 
         #Information for "recording" circle. 
         red = (255, 0, 0)
@@ -688,14 +688,14 @@ class Recorder:
                     server.sendMessage("interrupt")
 
                 if pressed == space:
-                    #Waits for space to be released. 
-                    self.waitForRelease(space)
-
                     #Sends start record message to other machines. 
                     server.sendMessage("start")
 
                     #Starts recording from mic to file. 
                     self.libHandle.startRecord()
+
+                    #Waits for space to be released. 
+                    self.waitForRelease(space)
 
                     #Draws circle to signify recording. 
                     pygame.draw.circle(screen, red, circPos, 20, 0) 
