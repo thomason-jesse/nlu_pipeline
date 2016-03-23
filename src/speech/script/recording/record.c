@@ -31,13 +31,13 @@ int isInterrupted() {
 	return interrupted; 
 }
 
-void initMics() {
-	initMic(&m1, "default", 1);
+void initMics(unsigned int sample_rate) {
+	initMic(&m1, "default", 1, sample_rate);
 
 	//TODO Generalize to multiple microphones. 
 }
 
-int initMic(struct micParams *mp, char* dev_name, int num_channels){
+int initMic(struct micParams *mp, char* dev_name, int num_channels, unsigned int sample_rate){
 	int rc = 0; 
 
   	/* Open PCM device for recording (capture). */
@@ -93,8 +93,8 @@ int initMic(struct micParams *mp, char* dev_name, int num_channels){
 		return -1; 
 	}
 
-  	/* 16000 bits/second (i.e. Hz) sampling rate for Sphinx */
-  	mp->val = 44100;
+  	/* sample rate bits/second (i.e. Hz) sampling rate for Sphinx */
+  	mp->val = sample_rate;
   	
 	rc = snd_pcm_hw_params_set_rate_near(mp->handle, mp->params,
                                   &mp->val, &mp->dir);
@@ -150,7 +150,7 @@ void closeMic(struct micParams *mp) {
   		free(mp->buffer);
 }
 
-int record1600Hz(char * fileName) {
+int record(char * fileName) {
 	int rc = 0; 
 
 	//Clears buffer in case there is any data left over from last recording. 
