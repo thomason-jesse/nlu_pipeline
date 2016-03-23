@@ -593,14 +593,14 @@ class Recorder:
         self.scriptGenerator = None
 
         #Initialize microphone. 
-        self.libHandle.initMics()
+        self.libHandle.initMics(16000)
 
     def __del__(self):
         self.libHandle.closeMics()
 
     def record(self):
         while not self.libHandle.isInterrupted():
-            self.libHandle.record1600Hz("temp_record.raw")
+            self.libHandle.record("temp_record.raw")
 
     #Recording method for other machines in recording session. 
     def recordExtra(self, host, port):

@@ -16,16 +16,40 @@ the undergrad : rodolfo
 <P>
 the kitchen : kitchen
 the lab : l3_414b
-room 3402 : l3_402
-room 3414b : l3_414b
-room 3418 : l3_418
-room 3420 : l3_420
-room 3432 : l3_432
-room 3502 : l3_502
-room 3508 : l3_508
-room 3510 : l3_510
-room 3512 : l3_512
-room 3516 : l3_516
+room three four zero two : l3_402
+room thirty-four zero two : l3_402
+room three four one four B : l3_414b
+room thirty-four fourteen B : l3_414b
+room thirty-four one four B : l3_414b
+room three four fourteen B : l3_414b
+room three four one eight : l3_418
+room thirty-four eighteen : l3_418 
+room thirty-four one eight : l3_418
+room three four eighteen : l3_418
+room three four two zero : l3_420
+room thirty-four twenty : l3_420
+room thirty-four two zero : l3_420
+room three four twenty : l3_420
+room three four three two : l3_432
+room thirty-four thirty-two : l3_432
+room thirty-four three two : l3_432
+room three four thirty-two : l3_432
+room three five zero two : l3_502
+room thirty-five zero two : l3_502
+room three five zero eight : l3_508
+room thirty-five zero eight : l3_508
+room three five one zero : l3_510
+room thirty-five ten : l3_510
+room thirty-five one zero : l3_510
+room three five ten : l3_510
+room three five one two : l3_512
+room thirty-five twelve : l3_512
+room thirty-five one two : l3_512
+room three five twelve : l3_512
+room three five one six : l3_516
+room thirty-five sixteen : l3_516
+room thirty-five one six : l3_516
+room three five sixteen : l3_516
 </C>
 Full name : titles : denotation : office (if any)
 <C>

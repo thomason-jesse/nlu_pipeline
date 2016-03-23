@@ -11,4 +11,4 @@ mkdir -p results/mic/$USER_ID/recordings
 mkdir -p results/mic/$USER_ID/semantic_forms
 
 #Runs recording program with given arguments.
-python record.py $USER_ID results/mic/$USER_ID y n $HOST $PORT
+python record44100Hz.py $USER_ID results/mic/$USER_ID y n $HOST $PORT

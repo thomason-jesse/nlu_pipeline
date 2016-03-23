@@ -11,4 +11,4 @@ mkdir -p results/headset/$USER_ID/recordings
 mkdir -p results/headset/$USER_ID/semantic_forms
 
 #Runs recording program with given arguments.
-python record.py $USER_ID results/headset/$USER_ID y n $HOST $PORT
+python record1600Hz.py $USER_ID results/headset/$USER_ID y n $HOST $PORT
