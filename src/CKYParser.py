@@ -414,8 +414,8 @@ class CKYParser:
         self.commutative_idxs = [self.ontology.preds.index('and'), self.ontology.preds.index('or')]
         self.max_multiword_expression = 2  # max span of a multi-word expression to be considered during tokenization
         self.max_new_senses_per_utterance = 2  # max number of new word senses that can be induced on a training example
-        self.max_cky_trees_per_token_sequence_beam = 1000  # for tokenization of an utterance, max cky trees considered
-        self.max_hypothesis_categories_for_unknown_token_beam = 5  # for unknown token, max syntax categories tried
+        self.max_cky_trees_per_token_sequence_beam = 100  # for tokenization of an utterance, max cky trees considered
+        self.max_hypothesis_categories_for_unknown_token_beam = 2  # for unknown token, max syntax categories tried
 
         # behavioral parameters
         self.safety = True  # set to False once confident about node combination functions' correctness

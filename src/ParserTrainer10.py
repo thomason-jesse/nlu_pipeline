@@ -31,7 +31,7 @@ class ParserTrainer:
         self.semantic_forms = dict()
         self.people_used = list()
         
-        #print 'names possessive ', self.names_possessive
+        print 'names possessive ', self.names_possessive
 
     #Generates dictionary of tags and their elements from lex.txt. 
     def genTags(self):
@@ -167,7 +167,7 @@ class ParserTrainer:
 
         self.genDenotationAndSemForm(templateType)
 
-        #print 'command = ', command
+        print 'command = ', command
         return ' '.join(command)
 
     #Generates denotation for phrase.
@@ -190,12 +190,12 @@ class ParserTrainer:
             self.semantic_form += self.semantic_forms["<P>"] + ")"
         
     def genNormalItem(self):
-        #print 'In genNormalItem'
+        print 'In genNormalItem'
         expansionIndex = random.randint(0, len(self.tags["<I>"]) - 1)
         expansionList = self.tags["<I>"][expansionIndex].split(':')
         expansion = expansionList[1].strip()
         denotation = expansionList[0].strip()
-        #print 'expansion = ', expansion, ', denotation = ', denotation
+        print 'expansion = ', expansion, ', denotation = ', denotation
 
         #Stores denotation. 
         self.denotations["<I>"] = denotation
@@ -260,18 +260,18 @@ class ParserTrainer:
 
     
 if __name__ == '__main__' :
-    #print "reading in Ontology"
+    print "reading in Ontology"
     ont = Ontology.Ontology(sys.argv[1])
-    #print "predicates: " + str(ont.preds)
-    #print "types: " + str(ont.types)
-    #print "entries: " + str(ont.entries)
+    print "predicates: " + str(ont.preds)
+    print "types: " + str(ont.types)
+    print "entries: " + str(ont.entries)
 
-    #print "reading in Lexicon"
+    print "reading in Lexicon"
     lex = Lexicon.Lexicon(ont, sys.argv[2])
-    #print "surface forms: " + str(lex.surface_forms)
-    #print "categories: " + str(lex.categories)
-    #print "semantic forms: " + str(lex.semantic_forms)
-    #print "entries: " + str(lex.entries)
+    print "surface forms: " + str(lex.surface_forms)
+    print "categories: " + str(lex.categories)
+    print "semantic forms: " + str(lex.semantic_forms)
+    print "entries: " + str(lex.entries)
     
     parser_trainer = ParserTrainer()
     parser = CKYParser.CKYParser(ont, lex, use_language_model=True)
@@ -284,21 +284,17 @@ if __name__ == '__main__' :
 
     # Create train set
     D = parser.read_in_paired_utterance_semantics(sys.argv[3])
-    #for i in range(1, 10) :
-        #command = parser_trainer.genCommand()
-        ##print 'command = ', command, '\nsem form = ', parser_trainer.semantic_form
-        #print command
-        #print 'M : ' + parser_trainer.semantic_form
-        #print 
+    for i in range(1, 10) :
+        command = parser_trainer.genCommand()
+        print 'command = ', command, '\nsem form = ', parser_trainer.semantic_form
         
-        #ccg = parser.lexicon.read_category_from_str('M')
-        #form = parser.lexicon.read_semantic_form_from_str(parser_trainer.semantic_form, 
-                                                    #None, None, [], allow_expanding_ont=False)
-        #form.category = ccg
+        ccg = parser.lexicon.read_category_from_str('M')
+        form = parser.lexicon.read_semantic_form_from_str(parser_trainer.semantic_form, 
+                                                    None, None, [], allow_expanding_ont=False)
+        form.category = ccg
 
-        #D.append((command, form))
+        D.append((command, form))
     converged = parser.train_learner_on_semantic_forms(D, 10, reranker_beam=10)
-    print 'converged = ', converged
-    #filename = '/u/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/models/parser_condor_1000_easy.pkl'
-    #save_obj_general(parser, filename)
+    filename = '/u/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/models/parser_condor_10_easy.pkl'
+    save_obj_general(parser, filename)
     

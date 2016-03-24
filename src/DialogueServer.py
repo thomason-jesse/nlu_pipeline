@@ -326,7 +326,7 @@ class DialogueServer :
                     self.started_users.add(req.user_id)     
                     success = True
                 except KeyboardInterrupt, SystemExit :
-                    pass
+                    raise
                 except :
                     error = str(sys.exc_info()[0])
                     self.error_log.write(error + '\n')
@@ -340,12 +340,14 @@ class DialogueServer :
                     return success 
             else :
                 self.user_log.flush()
+                self.error_log.write('Repeated user ID ' + req.user_id + '\n')
                 self.error_log.flush()
                 return False
         else :
             # The system is currently handling another user
             print 'Could not acquire lock'
             self.user_log.flush()
+            self.error_log.write('Could not acquire lock\n')
             self.error_log.flush()
             return False
 

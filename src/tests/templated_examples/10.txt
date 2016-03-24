@@ -1,0 +1,27 @@
+please take a burger for evelyn
+M : bring(hamburger,aishwarya)
+
+dr clark would like a coffee
+M : bring(coffee,shiqi)
+
+run over to dr morgan's office
+M : at(the(lambda x:e.(hasoffice(peter, x))))
+
+can you bring a coffee to go to mallory
+M : bring(coffee,peter)
+
+bring george juice
+M : bring(juice,rodolfo)
+
+give a drink to dr mallory morgan
+M : bring(juice,peter)
+
+can you deliver a dessert to alice ashcraft
+M : bring(muffin,stacy)
+
+is a intern in 3420
+M : searchroom(rodolfo,l3_420)
+
+can you go to 3414b
+M : at(l3_414b)
+

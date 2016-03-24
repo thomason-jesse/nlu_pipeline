@@ -7,9 +7,9 @@ Executable = /usr/bin/python
 +Project = "AI_ROBOTICS"
 +ProjectDescription = "Training semantic parser using template generated examples"
 
-Log = /u/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/condor_log/parser_training.log
-Output = /u/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/condor_log/parser_training.out
-Error = /u/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/condor_log/parser_training.err
+Log = /u/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/condor_log/parser_training_1000_easy.log
+Output = /u/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/condor_log/parser_training_1000_easy.out
+Error = /u/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/condor_log/parser_training_1000_easy.err
 
 Notification = complete
 Notify_user = aish@cs.utexas.edu
