@@ -10,18 +10,18 @@ import socket
 class Server:
     def __init__(self):
         self.s1 = socket.socket()
-        self.s2 = socket.socket()
+        #self.s2 = socket.socket()
         self.host = ''
-        self.port1 = 65300
-        self.port2 = 65301
+        self.port1 = 12345
+        #self.port2 = 65301
 
         self.addr1 = None
-        self.addr2 = None
+        #self.addr2 = None
         self.conn1 = None
-        self.conn2 = None
+        #self.conn2 = None
 
         self.s1.bind((self.host, self.port1))
-        self.s2.bind((self.host, self.port2))
+        #self.s2.bind((self.host, self.port2))
 
         self.waitForConnections()
 
@@ -29,8 +29,8 @@ class Server:
         self.s1.listen(num_connections)
         self.conn1, self.addr1 = self.s1.accept()
 
-        self.s2.listen(num_connections)
-        self.conn2, self.addr2 = self.s2.accept()
+        #self.s2.listen(num_connections)
+        #self.conn2, self.addr2 = self.s2.accept()
 
         print "Server connected to both clients."
 
@@ -41,11 +41,11 @@ class Server:
             print "Confirm code incorrect!" 
             sys.exit()
 
-        m2 = self.conn2.recv(1024)
+        #m2 = self.conn2.recv(1024)
 
-        if not m2 == confirm_code:
-            print "Confirm code incorrect!"
-            sys.exit()
+        #if not m2 == confirm_code:
+        #    print "Confirm code incorrect!"
+        #    sys.exit()
 
 
     #Sends given message to extra machines. 
@@ -54,7 +54,7 @@ class Server:
         confirm_code = str(random.random())
     
         self.conn1.send(message + '|' + confirm_code)
-        self.conn2.send(message + '|' + confirm_code)
+        #self.conn2.send(message + '|' + confirm_code)
 
         #Waits for confirmation of receipt. 
         self.waitForConfirm(confirm_code)
