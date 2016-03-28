@@ -754,11 +754,11 @@ class CKYParser:
 
         # print "most_likely_tree_generator: called for ccg_tree: "+str(ccg_tree)  # DEBUG
         parse_roots, parse_leaves_keys = self.form_root_from_leaves(parse_leaves, ccg_tree)
-        # print "parse_leaves: "+str(parse_leaves)  # DEBUG
+        # print "parse_roots: "+str([self.print_parse(p.node) for p in parse_roots])  # DEBUG
 
         # yield parse and total score (leaves+syntax) if structure matches
         # set of new lexical entries required is empty in this case
-        if len(parse_roots) == 1:
+        if len(parse_roots) == 1 and parse_roots[0].node is not None:
             yield parse_roots[0], []  # the ParseNode root of the finished parse tree
 
         # if structure does not match and there are None nodes, perform top-down generation from
@@ -889,36 +889,41 @@ class CKYParser:
         # print "root_key: "+str(root_key)  # DEBUG
         # print "ccg_tree: "+str(ccg_tree)  # DEBUG
 
-        # greedily take children with best score until we get a category match
-        children_generator = self.get_most_likely_children_from_root(parse_root.node)
-        for children, children_score in children_generator:
-            # when we find children with syntax matching ccg tree, save and see whether either should expand
-            if children[0].category == ccg_tree[ccg_tree[root_key][1]][0] and \
-               children[1].category == ccg_tree[ccg_tree[root_key][2]][0]:
-                # print "...category match"  # DEBUG
-                parse_root.children = []
-                for c in range(0, 2):  # save calculated semantic children wrapped in ParseNodes
-                    parse_root.children.append(ParseNode.ParseNode(parse_root, children[c]))
-                if ccg_tree[root_key][1] in known_leaf_keys and ccg_tree[root_key][2] in known_leaf_keys:
-                    # print "...get_most_likely_tree_from_root yielding two known leaf keys"  # DEBUG
-                    yield parse_root, children_score
-                for c in range(0, 2):  # expand children
-                    subtree_generators = [self.get_most_likely_tree_from_root(parse_root.children[c],
-                                                                              ccg_tree[root_key][1+c],
-                                                                              ccg_tree,
-                                                                              known_leaf_keys)
-                                          for c in range(0, 2)]
-                    if ccg_tree[root_key][1+c] not in known_leaf_keys:
-                        for child1, score1 in subtree_generators[c]:
-                            parse_root.children[c] = child1
-                            if ccg_tree[root_key][1+((c+1) % 2)] not in known_leaf_keys:
-                                for child2, score2 in subtree_generators[(c+1) % 2]:
-                                    parse_root.children[(c+1) % 2] = child2
-                                    # print "...get_most_likely_tree_from_root yielding deeper children"  # DEBUG
-                                    yield parse_root, children_score+score1+score2
-                            else:
-                                # print "...get_most_likely_tree_from_root yielding deeper child"  # DEBUG
-                                yield parse_root, children_score+score1
+        # if root key is the only entry in the chart, can only associate it with the known parse root
+        if len(ccg_tree.keys()) == 1:
+            yield parse_root, 0
+        else:
+
+            # greedily take children with best score until we get a category match
+            children_generator = self.get_most_likely_children_from_root(parse_root.node)
+            for children, children_score in children_generator:
+                # when we find children with syntax matching ccg tree, save and see whether either should expand
+                if children[0].category == ccg_tree[ccg_tree[root_key][1]][0] and \
+                   children[1].category == ccg_tree[ccg_tree[root_key][2]][0]:
+                    # print "...category match"  # DEBUG
+                    parse_root.children = []
+                    for c in range(0, 2):  # save calculated semantic children wrapped in ParseNodes
+                        parse_root.children.append(ParseNode.ParseNode(parse_root, children[c]))
+                    if ccg_tree[root_key][1] in known_leaf_keys and ccg_tree[root_key][2] in known_leaf_keys:
+                        # print "...get_most_likely_tree_from_root yielding two known leaf keys"  # DEBUG
+                        yield parse_root, children_score
+                    for c in range(0, 2):  # expand children
+                        subtree_generators = [self.get_most_likely_tree_from_root(parse_root.children[c],
+                                                                                  ccg_tree[root_key][1+c],
+                                                                                  ccg_tree,
+                                                                                  known_leaf_keys)
+                                              for c in range(0, 2)]
+                        if ccg_tree[root_key][1+c] not in known_leaf_keys:
+                            for child1, score1 in subtree_generators[c]:
+                                parse_root.children[c] = child1
+                                if ccg_tree[root_key][1+((c+1) % 2)] not in known_leaf_keys:
+                                    for child2, score2 in subtree_generators[(c+1) % 2]:
+                                        parse_root.children[(c+1) % 2] = child2
+                                        # print "...get_most_likely_tree_from_root yielding deeper children"  # DEBUG
+                                        yield parse_root, children_score+score1+score2
+                                else:
+                                    # print "...get_most_likely_tree_from_root yielding deeper child"  # DEBUG
+                                    yield parse_root, children_score+score1
 
     # yields next most likely pair of children from a given semantic root using production rule parameter scores
     def get_most_likely_children_from_root(self, n):
