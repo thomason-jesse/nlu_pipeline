@@ -1,0 +1,3 @@
+yes | cp -r bwi_kr_execution.launch ../../../../../bwi_common/bwi_kr_execution/launch
+yes | cp -r domain_amt ../../../../../bwi_common/bwi_kr_execution
+yes | cp -r simulation.launch.xml ../../../../../bwi/bwi_launch/launch/includes

@@ -1,0 +1,56 @@
+# imperative
+bring :- M/NP/NP : lambda y:e.(lambda x:e.(bring(x, y)))
+bring :- M/PP/NP : lambda x:e.(lambda y:e.(bring(x, y)))
+walk :- M/PP : lambda x:e.(walk(x))
+
+# 'to' as recipient argument of a command (eg. ``bring coffee to peter'')
+to :- PP/NP : lambda x:e.(x)
+
+# basic declarative constructions
+is :- D/NP\NP : lambda x:e.(lambda y:e.(declare_equal(x, y)))
+is :- D/(N/N)\NP : lambda x:e.(lambda P:<e,t>.(declare_satpred(x, P)))
+is :- D/(N/N)\(N/N) : lambda P:<e,t>.(lambda Q:<e,t>.(declare_predimp(P, Q)))
+
+# confirmations
+yes :- C : yes
+no :- C : no
+
+# for "bob 's office"; "office of the chair"
+'s :- NP/(N/N)\NP : lambda x:e.(lambda P:<e,t>.(the(lambda y:e.(and(P(y), possesses(x, y))))))
+of :- NP\(N/N)/NP : lambda x:e.(lambda P:<e,t>.(lambda y:e.(and(P(y), possesses(x, y)))))
+
+# known atoms
+peter :- NP : peter
+ray :- NP : ray
+room 3506 :- NP : 3506
+bruce :- NP : bruce
+chair :- NP : aeron_chair
+
+# identifier predicates
+office :- N/N : lambda x:e.(office(x))
+object :- N/N : lambda x:e.(object(x))
+chair :- N/N : lambda x:e.(chair(x))
+
+# adjectival predicates
+blue :- N/N : lambda x:e.(blue(x))
+yellow :- N/N : lambda x:e.(yellow(x))
+heavy :- N/N : lambda x:e.(heavy(x))
+light :- N/N : lambda x:e.(light(x))
+
+# conjuctions
+and :- I/I\I : lambda x:t.(lambda y:t.(and(x,y)))
+or :- I/I\I : lambda x:t.(lambda y:t.(or(x,y)))
+and :- D/D\D : lambda x:d.(lambda y:d.(and_dec(x,y)))
+or :- N/N\N : lambda x:e.(lambda y:e.(or_e(x,y)))
+or :- NP/NP\NP : lambda x:e.(lambda y:e.(or_e(x,y)))
+
+# interrogative identities
+is :- I/NP/NP : lambda x:e.(lambda y:e.(equals(x,y)))
+is :- I/(N/N)/NP : lambda x:e.(lambda P:<e,t>.(satpred(x,P)))
+is :- I/(N/N)/(N/N) : lambda P:<e,t>.(lambda Q:<e,t>.(predimp(P,Q)))
+
+# determiners
+the :- NP/(N/N) : lambda P:<e,t>.(the(lambda x:e.(P(x))))
+the :- NP/N : lambda x:e.(x)
+a :- NP/(N/N) : lambda P:<e,t>.(a(lambda x:e.(P(x))))
+a :- NP/N : lambda x:e.(x)

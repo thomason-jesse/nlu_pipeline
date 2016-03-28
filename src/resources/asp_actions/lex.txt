@@ -15,6 +15,7 @@ about :- PP/N : lambda x:e.(x)
 #confirmations
 yes :- C : yes
 no :- C : no
+none :- C : none
 
 #these are weird now bc there's some implicit knowledge in hasoffice that the second arg is an office
 's office :- N\N : lambda x:e.(the(lambda y:e.(hasoffice(x,y))))

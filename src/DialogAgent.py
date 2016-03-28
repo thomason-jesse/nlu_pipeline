@@ -3,17 +3,21 @@ __author__ = 'jesse'
 import random
 import copy
 import sys
+import re
+import time
+import multiprocessing
+import Queue
 import Action
 import StaticDialogState
-
+import traceback
 
 class DialogAgent:
 
-    def __init__(self, parser, generator, grounder, policy, u_input, output, parse_depth=10):
+    def __init__(self, parser, grounder, policy, u_input, output, parse_depth=10, max_parse_beam=20):
         self.parser = parser
-        self.generator = generator
         self.grounder = grounder
         self.parse_depth = parse_depth
+        self.max_parse_beam = max_parse_beam
         self.state = None
         self.policy = policy
         self.input = u_input
@@ -22,6 +26,14 @@ class DialogAgent:
         # define action names and functions they correspond to
         self.dialog_actions = ["repeat_goal", "confirm_action", "request_missing_param"]
         self.dialog_action_functions = [self.request_user_initiative, self.confirm_action, self.request_missing_param]
+        
+        self.num_turns_across_dialogs = 0
+        self.num_not_parsed = 0
+        
+        self.max_allowed_unks = 2
+        self.max_allowed_length = 7
+        
+        self.error_log = None
 
     # initiate a new dialog with the agent with initial utterance u
     def initiate_dialog_to_get_action(self, u):
@@ -76,14 +88,15 @@ class DialogAgent:
         self.state.update_requested_user_turn()
 
         # get n best parses for confirmation
-        n_best_parses = self.parser.parse_expression(u, n=self.parse_depth)
+        #n_best_parses = self.parser.parse_expression(u, n=self.parse_depth)
+        n_best_parses = self.get_n_best_parses(u)
 
         # try to digest parses to confirmation
         success = False
         for i in range(0, len(n_best_parses)):
             # print self.parser.print_parse(n_best_parses[i][0])  # DEBUG
             # print self.parser.print_semantic_parse_result(n_best_parses[i][1])  # DEBUG
-            g = self.grounder.groundSemanticNode(n_best_parses[i][0], [], [], [])
+            g = self.grounder.groundSemanticNode(n_best_parses[i][0].node, [], [], [])
             answer = self.grounder.grounding_to_answer_set(g)
             if len(answer) == 1:
                 success = True
@@ -107,17 +120,18 @@ class DialogAgent:
         self.state.update_requested_user_turn()
 
         # get n best parses for confirmation
-        n_best_parses = self.parser.parse_expression(c, n=self.parse_depth)
+        #n_best_parses = self.parser.parse_expression(c, n=self.parse_depth)
+        n_best_parses = self.get_n_best_parses(c)
 
         # try to digest parses to confirmation
         success = False
         for i in range(0, len(n_best_parses)):
             # print self.parser.print_parse(n_best_parses[i][0])  # DEBUG
             # print self.parser.print_semantic_parse_result(n_best_parses[i][1])  # DEBUG
-            if n_best_parses[i][0].idx == self.parser.ontology.preds.index('yes'):
+            if n_best_parses[i][0].node.idx == self.parser.ontology.preds.index('yes'):
                 success = True
                 self.state.update_from_action_confirmation(a, True)
-            elif n_best_parses[i][0].idx == self.parser.ontology.preds.index('no'):
+            elif n_best_parses[i][0].node.idx == self.parser.ontology.preds.index('no'):
                 success = True
                 self.state.update_from_action_confirmation(a, False)
         if not success:
@@ -125,23 +139,20 @@ class DialogAgent:
 
     # update state after asking user-initiative (open-ended) question about user goal
     def update_state_from_user_initiative(self, u):
-        # print "Inside update_state_from_user_initiative"
         self.state.update_requested_user_turn()
 
         # get n best parses for utterance
-        n_best_parses = self.parser.parse_expression(u, n=self.parse_depth)
-        print 'n_best_parses - ', n_best_parses
+        #print 'n_best_parses - ', n_best_parses #DEBUG
+        n_best_parses = self.get_n_best_parses(u)
 
         # try to digest parses to action request
         success = False
         for i in range(0, len(n_best_parses)):
-            #print "Digesting parse ", i
             #print self.parser.print_parse(n_best_parses[i][0])  # DEBUG
             #print self.parser.print_semantic_parse_result(n_best_parses[i][1])  # DEBUG
-            success = self.update_state_from_action_parse(n_best_parses[i][0])
+            success = self.update_state_from_action_parse(n_best_parses[i][0].node)
             if success:
                 break
-        # print "Finished trying to digest parses" 
 
         # no parses could be resolved into actions for state update
         if not success:
@@ -150,16 +161,13 @@ class DialogAgent:
 
     # get dialog state under assumption that utterance is an action
     def update_state_from_action_parse(self, p):
-        # print "Inside update_state_from_action_parse"         
-
         # get action, if any, from the given parse
         try:
             p_action = self.get_action_from_parse(p)
         except SystemError:
             p_action = None
-        # print "Tried getting action from parse"
         if p_action is not None:
-            # print "Going to update state from action"
+            print 'Here'
             self.state.update_from_action(p_action, p)
             return True
 
@@ -224,7 +232,7 @@ class DialogAgent:
                     try:
                         # print "parse: " + self.parser.print_parse(n_best_parses[i][0])  # DEBUG
                         # print self.parser.print_semantic_parse_result(n_best_parses[i][1])  # DEBUG
-                        a_candidate = self.get_action_from_parse(n_best_parses[i][0])
+                        a_candidate = self.get_action_from_parse(n_best_parses[i][0].node)
                         # print "candidate: "+str(a_candidate)  # DEBUG
                     except SystemError:
                         a_candidate = Action.Action()
@@ -247,94 +255,91 @@ class DialogAgent:
             self.parser.learner.learn_from_actions(train_data)
         return False
 
-    def jointly_train_parser_and_generator_from_utterance_action_pairs(
-            self, pairs, epochs=10, parse_beam=10, generator_beam=10):
-        for e in range(0, epochs):
-            print "training epoch "+str(e)
-            random.shuffle(pairs)
-            train_data = []
-            num_actions_correct = 0
-            num_tokens_correct = 0
-            for t, r, a in pairs:
-                generator_genlex = [self.generator, t, r]
-                self.generator.flush_seen_nodes()
-                n_best_parses = self.parser.parse_tokens(t, n=parse_beam, generator_genlex=generator_genlex)
-                if len(n_best_parses) == 0:
-                    print "WARNING: no parses found for tokens "+str(t)
+    def calc_num_unk_words(self, tokens) :
+        num_unks = 0
+        for token in tokens :
+            if token not in self.parser.lexicon.surface_forms :
+                num_unks += 1
+            else :
+                sur_idx = self.parser.lexicon.surface_forms.index(token)
+                if sur_idx >= len(self.parser.lexicon.entries) :
+                    num_unks += 1
+                elif len(self.parser.lexicon.entries[sur_idx]) == 0 :
+                    num_unks += 1
+        return num_unks
+
+    def is_parseable(self, response) :
+        tokens = self.parser.tokenize(response)[0]
+        #print 'tokens = ', tokens
+        if len(tokens) == 0 or len(tokens) > self.max_allowed_length :
+            self.num_not_parsed += 1
+            # The parser will hang on too long a sentence
+            return False
+        num_unks = self.calc_num_unk_words(tokens)
+        if num_unks > self.max_allowed_unks :
+            self.num_not_parsed += 1
+            # The parser is very unlikely to be able to parse this
+            return False
+        return True
+
+    def get_n_best_parses(self, response, num_parses_needed=None) :
+        self.num_turns_across_dialogs += 1
+        if len(response) == 0 :
+            return []
+        if num_parses_needed is None :
+            num_parses_needed = self.parse_depth
+            
+        # Parser expects a space between 's and the thing it is applied 
+        # to, for example "alice 's" rather than "alice's"
+        response = re.sub("'s", " 's", response)
+        
+        if not self.is_parseable(response) :
+            return []
+        
+        parses = list()
+        try :    
+            #print 'Possibly parseable'    
+            parse_generator = self.parser.most_likely_cky_parse(response)
+            #print 'Parser returned'
+            
+            num_parses_obtained = 0
+            num_parses_examined = 0
+            
+            for (parse, score, _) in parse_generator :
+                num_parses_examined += 1
+                if num_parses_examined == self.max_parse_beam :
+                    break
+                if parse is None :
+                    break
+                if parse.node.is_lambda and parse.node.is_lambda_instantiation :
+                    # Lambda headed parses are very unlikely to be correct. Drop them
                     continue
-                a_chosen = None
-                a_candidate = None
-                correct_action_found = False
-                for i in range(0, len(n_best_parses)):
-                    try:
-                        # print "parse: " + self.parser.print_parse(n_best_parses[i][0])  # DEBUG
-                        # print self.parser.print_semantic_parse_result(n_best_parses[i][1])  # DEBUG
-                        a_candidate = self.get_action_from_parse(n_best_parses[i][0])
-                        # print "candidate: "+str(a_candidate)  # DEBUG
-                    except SystemError:
-                        a_candidate = Action.Action()
-                    if i == 0:
-                        a_chosen = a_candidate
-                    if a_candidate.__eq__(a):
-                        correct_action_found = True
-                        self.parser.add_genlex_entries_to_lexicon_from_partial(n_best_parses[i][1])
-                        break  # the action matches gold and this parse should be used in training
-                if correct_action_found:
-                    if a_chosen != a_candidate:
-                        print "adding parsing training pair"  # DEBUG
-                        print "chosen: "+str(n_best_parses[0])  # DEBUG
-                        print "best: "+str(n_best_parses[i])  # DEBUG
-                        train_data.append([t, n_best_parses[0], a_chosen, t, n_best_parses[i], a])
-                    else:
-                        num_actions_correct += 1
-                else:
-                    print "WARNING: could not find correct action '"+str(a)+"' for tokens "+str(t)
-                # reverse parse based on semantic form rather than action, since from action we would need
-                # to un-ground each atom as part of our potential expansions (a possible area of future work)
-                n_best_sequences = self.generator.reverse_parse_semantic_form(r, c=generator_beam, n=generator_beam)
-                if len(n_best_sequences) == 0:
-                    print "WARNING: no sequences found for action "+str(a)+" with form "+self.parser.print_parse(r)
+                top_level_category = self.parser.lexicon.categories[parse.node.category]
+                if top_level_category not in ['M', 'NP', 'C'] :
+                    # M - imperative (full action), C - confirmation, NP - noun phrase for params
                     continue
-                t_chosen = None
-                t_chosen_str = None
-                t_candidate_str = None
-                correct_tokens_found = False
-                t_str = ' '.join(t)
-                for i in range(0, len(n_best_sequences)):
-                    t_chosen = n_best_sequences[i][0]
-                    t_candidate_str = ' '.join(t_chosen)
-                    if i == 0:
-                        t_chosen_str = t_candidate_str
-                    if t_candidate_str == t_str:
-                        correct_tokens_found = True
-                        break
-                if correct_tokens_found:
-                    if t_chosen_str != t_candidate_str:
-                        print "adding generation training pair"  # DEBUG
-                        print "chosen: "+str(n_best_sequences[0])  # DEBUG
-                        chosen_parse_like = [n_best_sequences[0][2][-1][0], n_best_sequences[0][1],
-                                             n_best_sequences[0][2]]
-                        print "best: "+str(n_best_sequences[i])  # DEBUG
-                        correct_parse_like = [n_best_sequences[i][2][-1][0], n_best_sequences[i][1],
-                                              n_best_sequences[i][2]]
-                        train_data.append([t_chosen, chosen_parse_like, a, t, correct_parse_like, a])
-                    else:
-                        num_tokens_correct += 1
-                else:
-                    print "WARNING: could not find correct tokens "+str(t)+" for action '"+str(a)+"' with form " +\
-                        self.parser.print_parse(r)
-            print "\t"+str(num_actions_correct)+"/"+str(len(pairs))+" top parsing choices"
-            print "\t"+str(num_tokens_correct)+"/"+str(len(pairs))+" top generation choices"
-            if num_actions_correct == len(pairs) and num_tokens_correct == len(pairs):
-                print "WARNING: training converged at epoch "+str(e)+"/"+str(epochs)
-                return True
-            self.parser.learner.learn_from_actions(train_data)
-        return False
+                #print 'parse = ', self.parser.print_parse(parse.node, show_category=True), ', score = ', score 
+                parses.append((parse, score))
+                num_parses_obtained += 1
+                if num_parses_obtained == num_parses_needed :
+                    break
+        except (KeyboardInterrupt, SystemExit):
+            raise
+        except :
+            error = str(sys.exc_info()[0])
+            if self.error_log is not None :
+                self.error_log.write('Parser error for string: ' + response)
+                self.error_log.write(error + '\n')
+                self.error_log.write(traceback.format_exc() + '\n\n\n')
+                self.error_log.flush() 
+            print traceback.format_exc()
+            
+        return parses 
 
     def get_action_from_parse(self, root):
 	# print "Inside get_action_from_parse"
 
-        # print "parse to get action from: " + self.parser.print_parse(root)  # DEBUG
+        print "parse to get action from: " + self.parser.print_parse(root)  # DEBUG
 
         root.set_return_type(self.parser.ontology)  # in case this was not calculated during parsing
 
@@ -343,16 +348,14 @@ class DialogAgent:
             # assume for now that logical connectives do not operate over actions (eg. no (do action a and action b))
             # ground action arguments
             action = self.parser.ontology.preds[root.idx]
-            # print "action: "+action  # DEBUG
+            #print "action: "+action  # DEBUG
             g_args = []
             # print "Going to enter loop"
             for arg in root.children:
-                # print "In loop"
+                #print 'Grounding ', self.parser.print_parse(arg, show_category=True)
                 g = self.grounder.groundSemanticNode(arg, [], [], [])
-                # print "Grounded"
-                # print "arg: "+str(g)  # DEBUG
+                #print "arg: "+str(g)  # DEBUG
                 answer = self.grounder.grounding_to_answer_set(g)
-                # print "Interpreted grounding"
                 if len(answer) == 0:
                     # print "Single answer found"
                     if action == "speak_t":
@@ -360,9 +363,11 @@ class DialogAgent:
                     elif action == "speak_e":
                         g_args.append(None)
                     else:
-                        raise SystemError("action argument unrecognized. arg: '"+str(answer)+"'")
+                        #raise SystemError("action argument unrecognized. arg: '"+str(answer)+"'")
+                        return None
                 elif len(answer) > 1:
-                    raise SystemError("multiple interpretations of action argument renders command ambiguous. arg: '"+str(answer)+"'")
+                    #raise SystemError("multiple interpretations of action argument renders command ambiguous. arg: '"+str(answer)+"'")
+                    return None
                 else:
                     # print "No answer found"
                     if action == "speak_t":
@@ -373,4 +378,5 @@ class DialogAgent:
             return Action.Action(action, g_args)
 
         else:
-            raise SystemError("cannot get action from return type "+str(self.parser.ontology.types[root.return_type]))
+            #raise SystemError("cannot get action from return type "+str(self.parser.ontology.types[root.return_type]))
+            return None

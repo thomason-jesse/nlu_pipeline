@@ -1,0 +1,42 @@
+#conf preds
+yes:c
+no:c
+
+#atoms
+peter:e
+ray:e
+3506:e
+bruce:e
+aeron_chair:e
+
+#dec preds
+declare_equal:<e,<e,d>>
+declare_satpred:<e,<<e,t>,d>>
+declare_predimp:<<e,t>,<<e,t>,d>>
+
+#imp preds
+walk:<e,a>
+bring:<e,<e,a>>
+
+#int preds
+plural:<e,t>
+singular:<e,t>
+location:<e,<e,t>>
+possesses:<e,<e,t>>
+a:<<e,t>,e>
+the:<<e,t>,e>
+and:<t,<t,t>>
+and_dec:<d,<d,d>>
+or:<t,<t,t>>
+or_e:<e,<e,e>>
+equals:<e,<e,t>>
+satpred:<e,<<e,t>,t>>
+predimp:<<e,t>,<<e,t>,t>>
+exists:<<e,t>,t>
+office:<e,t>
+object:<e,t>
+chair:<e,t>
+blue:<e,t>
+heavy:<e,t>
+yellow:<e,t>
+light:<e,t>

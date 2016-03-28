@@ -1,0 +1,59 @@
+bring ray peter
+M : bring(peter,ray)
+
+fetch peter for ray
+M : bring(peter,ray)
+
+take ray to peter
+M : bring(ray,peter)
+
+bring peter ray
+M : bring(ray,peter)
+
+take ray peter
+M : bring(peter,ray)
+
+peter 's office
+NP : the(lambda x:e.(and(office(x),possesses(peter,x))))
+
+room 3506 is ray 's office
+D : declare_equal(3506,the(lambda x:e.(and(office(x),possesses(ray,x)))))
+
+is room 3506 ray 's office
+I : equals(3506,the(lambda x:e.(and(office(x),possesses(ray,x)))))
+
+walk to room 3506
+M : walk(3506)
+
+bring the heavy blue object to ray
+M : bring(the(lambda 1:e.(and(and(heavy(1),blue(1)),object(1)))),ray)
+
+bring the yellow light object to ray
+M : bring(the(lambda 1:e.(and(and(yellow(1),light(1)),object(1)))),ray)
+
+fetch doctor stone for ray
+M : bring(peter,ray)
+
+the chair 's office
+NP : the(lambda x:e.(and(office(x),possesses(bruce,x))))
+
+bring peter to the chair
+M : bring(peter, bruce)
+
+bring doctor mooney to the chair
+M : bring(ray, bruce)
+
+fetch the chair for ray
+M : bring(bruce, ray)
+
+ray 's chair
+NP : the(lambda x:e.(and(chair(x),possesses(ray,x))))
+
+the chair 's chair
+NP : the(lambda x:e.(and(chair(x),possesses(bruce,x))))
+
+please bring peter to ray
+M : bring(peter,ray)
+
+bring ray to peter
+M : bring(ray,peter)
