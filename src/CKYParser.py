@@ -9,7 +9,7 @@ import ParseNode
 import SemanticNode
 
 neg_inf = float('-inf')
-random.seed(100)
+
 
 class Parameters:
     def __init__(self, ont, lex, use_language_model=False):
@@ -411,8 +411,8 @@ class CKYParser:
         self.commutative_idxs = [self.ontology.preds.index('and'), self.ontology.preds.index('or')]
         self.max_multiword_expression = 2  # max span of a multi-word expression to be considered during tokenization
         self.max_new_senses_per_utterance = 2  # max number of new word senses that can be induced on a training example
-        self.max_cky_trees_per_token_sequence_beam = 1000  # for tokenization of an utterance, max cky trees considered
-        self.max_hypothesis_categories_for_unknown_token_beam = 5  # for unknown token, max syntax categories tried
+        self.max_cky_trees_per_token_sequence_beam = 100  # for tokenization of an utterance, max cky trees considered
+        self.max_hypothesis_categories_for_unknown_token_beam = 2  # for unknown token, max syntax categories tried
 
         # behavioral parameters
         self.safety = True  # set to False once confident about node combination functions' correctness
@@ -665,9 +665,7 @@ class CKYParser:
 
                 # create generator for current sequence set and get most likely parses
 
-                ccg_parse_tree_generator = self.most_likely_ccg_parse_tree(curr_tk_seqs,
-                                                                           root_is_known=False
-                                                                           if known_root is None else True)
+                ccg_parse_tree_generator = self.most_likely_ccg_parse_tree(curr_tk_seqs)
                 # get next most likely CCG parse tree out of CKY algorithm
                 ccg_tree, tree_score, tks = next(ccg_parse_tree_generator)
                 # ccg_tree indexed by spans (i, j) valued at [CCG category, left span, right span]
@@ -1033,9 +1031,9 @@ class CKYParser:
     # yields the next most likely ccg parse tree given a set of possible token sequences
     # finds the best parse tree given each token sequence and returns in-order the one
     # with the highest score
-    def most_likely_ccg_parse_tree(self, tk_seqs, root_is_known=False):
+    def most_likely_ccg_parse_tree(self, tk_seqs):
 
-        ccg_parse_tree_generators = [self.most_likely_ccg_parse_tree_given_tokens(tks, root_is_known=root_is_known)
+        ccg_parse_tree_generators = [self.most_likely_ccg_parse_tree_given_tokens(tks)
                                      for tks in tk_seqs]
         best_per_seq = [next(ccg_parse_tree_generators[idx])
                         for idx in range(0, len(tk_seqs))]
@@ -1076,8 +1074,7 @@ class CKYParser:
                 if leaf_sense_limits[best_idx] < self.max_new_senses_per_utterance:
                     leaf_sense_limits[best_idx] += 1
                     ccg_parse_tree_generators[best_idx] = self.most_likely_ccg_parse_tree_given_tokens(
-                        tk_seqs[best_idx], new_sense_leaf_limit=leaf_sense_limits[best_idx],
-                        root_is_known=root_is_known)
+                        tk_seqs[best_idx], new_sense_leaf_limit=leaf_sense_limits[best_idx])
                     candidate, score = next(ccg_parse_tree_generators[best_idx])
                     if candidate is not None:
                         best_per_seq[best_idx] = [candidate, score]
@@ -1092,7 +1089,7 @@ class CKYParser:
         yield None, neg_inf, None
 
     # yields the next most likely ccg parse tree given a set of tokens
-    def most_likely_ccg_parse_tree_given_tokens(self, tks, new_sense_leaf_limit=0, root_is_known=False):
+    def most_likely_ccg_parse_tree_given_tokens(self, tks, new_sense_leaf_limit=0):
 
         # print "most_likely_ccg_parse_tree_given_tokens initialized with tks="+str(tks) + \
         #       ", new_sense_leaf_limit="+str(new_sense_leaf_limit)  # DEBUG
@@ -1121,11 +1118,11 @@ class CKYParser:
                 if exp in self.lexicon.surface_forms:
                     sf_idx = self.lexicon.surface_forms.index(exp)
                     cats = [self.lexicon.semantic_forms[sem_idx].category for sem_idx in self.lexicon.entries[sf_idx]]
-                    for cat in cats:
-                        score = self.theta.CCG_given_token[(cat, sf_idx)] \
-                            if (cat, sf_idx) in self.theta.CCG_given_token \
-                            else self.theta.CCG_given_token[(cat, -1)]
-                        chart[pos].append([cat, None, None, score])
+                    for cat_idx in cats:
+                        score = self.theta.CCG_given_token[(cat_idx, sf_idx)] \
+                            if (cat_idx, sf_idx) in self.theta.CCG_given_token \
+                            else self.theta.CCG_given_token[(cat_idx, -1)]
+                        chart[pos].append([cat_idx, None, None, score])
                     if max_entries[1] is None or max_entries[1] < len(self.lexicon.entries[sf_idx]):
                         max_entries[0] = pos
                         max_entries[1] = len(self.lexicon.entries[sf_idx])
@@ -1152,7 +1149,16 @@ class CKYParser:
         # print "leaf missing: "+str(missing)  # DEBUG
         # _ = raw_input()  # DEBUG
 
-        # populate chart
+        # populate chart for length 1 utterance
+        if len(tks) == 1:
+            # chart entries should be all top-level CCG categories (those that don't take arguments)
+            pos = (0, 1)
+            for cat_idx in range(0, len(self.lexicon.categories)):
+                if type(self.lexicon.categories[cat_idx]) is str:
+                    score = self.theta.CCG_given_token[(cat_idx, -1)]
+                    chart[pos].append([cat_idx, None, None, score])
+
+        # populate chart using CKY
         for width in range(2, len(tks)+1):
             # print "width: "+str(width)  # DEBUG
             for start in range(0, len(tks)-width+1):
