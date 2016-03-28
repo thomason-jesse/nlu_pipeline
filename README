@@ -46,23 +46,29 @@ In a new tab for catkin_ws/, you can test the pipeline with
 
 $ rosrun nlu_pipeline test_pipeline.py [ontology text file] [lexicon text file] [training text file]
 
-rosrun nlu_pipeline test_pipeline.py src/nlu_pipeline/src/resources/amt_expt/ont.txt src/nlu_pipeline/src/resources/amt_expt/lex.txt src/nlu_pipeline/src/resources/amt_expt/utterance_action_pairs.txt
+rosrun nlu_pipeline test_pipeline.py src/nlu_pipeline/src/resources/fake_to_real/ont.txt src/nlu_pipeline/src/resources/fake_to_real/lex.txt src/nlu_pipeline/src/resources/fake_to_real/utterance_sem_forms.txt
 
 TESTING POMDP:
 
-rosrun nlu_pipeline TestPomdpPipeline.py src/nlu_pipeline/src/resources/amt_expt/ont.txt src/nlu_pipeline/src/resources/amt_expt/lex.txt src/nlu_pipeline/src/resources/amt_expt/utterance_action_pairs.txt
+rosrun nlu_pipeline test_pomdp_pipeline.py src/nlu_pipeline/src/resources/fake_to_real/ont.txt src/nlu_pipeline/src/resources/fake_to_real/lex.txt src/nlu_pipeline/src/resources/fake_to_real/utterance_sem_forms.txt
 
 POMDP AMT Experiment
 
-rosrun nlu_pipeline DialogueServer.py src/nlu_pipeline/src/resources/amt_expt/ont.txt src/nlu_pipeline/src/resources/amt_expt/lex.txt src/nlu_pipeline/src/resources/amt_expt/utterance_action_pairs.txt
+rosrun nlu_pipeline DialogueServer.py src/nlu_pipeline/src/resources/fake_to_real/ont.txt src/nlu_pipeline/src/resources/fake_to_real/lex.txt src/nlu_pipeline/src/resources/fake_to_real/utterance_sem_forms.txt
 
 Training POMDP :
 
-rosrun nlu_pipeline TrainPomdpPipeline.py src/nlu_pipeline/src/resources/amt_expt/ont.txt src/nlu_pipeline/src/resources/amt_expt/lex.txt src/nlu_pipeline/src/resources/amt_expt/utterance_action_pairs.txt
+rosrun nlu_pipeline train_pomdp_pipeline.py src/nlu_pipeline/src/resources/old_ijcai_domain/ont.txt src/nlu_pipeline/src/resources/old_ijcai_domain/lex.txt src/nlu_pipeline/src/resources/old_ijcai_domain/utterance_sem_forms.txt
+
+rosrun nlu_pipeline train_pomdp_pipeline.py src/nlu_pipeline/src/resources/fake_to_real/ont.txt src/nlu_pipeline/src/resources/fake_to_real/lex.txt src/nlu_pipeline/src/resources/fake_to_real/utterance_sem_forms.txt
 
 Rosbridge server:
 
 roslaunch rosbridge_server rosbridge_websocket.launch
+
+Train Parser :
+
+rosrun nlu_pipeline ParserTrainer.py src/nlu_pipeline/src/resources/fake_to_real/ont.txt src/nlu_pipeline/src/resources/fake_to_real/lex.txt src/nlu_pipeline/src/resources/fake_to_real/utterance_sem_forms.txt
 
 NOTE:
   Right now there will be an initial "testing Generator" prompt. You can skip this by typing "stop".
@@ -73,7 +79,7 @@ Format of various logs -
     2. log - The text of the dialogue, named as user_id.txt.
     3. log_special - Files that contain aggregtae data for an experiment, for example the list of user ids
     4. object_log - This has a pickle named user_id.pkl for each dialogue. The pickle is a tuple with
-            - A string : 'static' or 'pomdp' indicating whether a static policy or POMDP policy was used
+            - A string : One of 'only_parser_learning', 'only_dialog_learning', 'both_parser_and_dialog_learning'
             - A list of lists, each of which corresponds to a turn. Each turn is a list of
                 - The system action of type SystemAction or a string 'take_action'
                 - The text of the user response (None if the previous system action is of action_type 'take_action')

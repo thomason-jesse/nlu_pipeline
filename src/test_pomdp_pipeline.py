@@ -78,7 +78,10 @@ u_in = InputFromKeyboard()
 u_out = OutputToStdout()
 
 knowledge = Knowledge()
-policy = PomdpKtdqPolicy(knowledge, False)
+#policy = PomdpKtdqPolicy(knowledge, False)
+policy = load_model('ktdq_policy_corrected_hc_ol1')
+policy.untrained = False
+policy.training = False
 A = PomdpDialogAgent(parser, grounder, policy, u_in, u_out)
 A.dialog_objects_logfile = 'src/nlu_pipeline/src/models/trial_log.pkl'
 

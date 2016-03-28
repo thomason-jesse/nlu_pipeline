@@ -9,20 +9,33 @@ class TemplateBasedGenerator :
     
     def __init__(self) :
         self.init_room_str()
-        self.rooms = ['l3_516','l3_508','l3_512','l3_510','l3_402','l3_418','l3_420','l3_432','l3_502','l3_414b']
-    
+        self.init_person_str()
+        self.rooms = self.room_str.keys()
+        self.people = self.person_str.keys()
+        
     def init_room_str(self) :
         self.room_str = dict()
-        self.room_str['l3_516'] = '3516'
+        self.room_str['l3_404'] = '3404'
         self.room_str['l3_508'] = '3508'
         self.room_str['l3_512'] = '3512'
         self.room_str['l3_510'] = '3510'
-        self.room_str['l3_402'] = '3402'
-        self.room_str['l3_418'] = '3418'
-        self.room_str['l3_420'] = '3420'
         self.room_str['l3_432'] = '3432'
+        self.room_str['l3_420'] = '3420'
         self.room_str['l3_502'] = '3502'
         self.room_str['l3_414b'] = '3414b'
+        
+    def init_person_str(self) :
+        self.person_str = dict()
+        self.person_str['stacy'] = 'Alice'
+        self.person_str['jesse'] = 'Bob'
+        self.person_str['shiqi'] = 'Carol'
+        self.person_str['jivko'] = 'Dave'
+        self.person_str['aishwarya'] = 'Eve'
+        self.person_str['scott'] = 'Frannie'
+        self.person_str['rodolfo'] = 'George'
+        self.person_str['peter'] = 'Mallory'
+        self.person_str['dana'] = 'Peggy'
+        self.person_str['ray'] = 'Walter'
     
     def get_param(self, system_action, param_name) :
         if system_action.referring_params is None :
@@ -31,8 +44,10 @@ class TemplateBasedGenerator :
             param_value = system_action.referring_params[param_name]
             if param_value in self.rooms :
                 return self.room_str[param_value]
+            elif param_value in self.people :
+                return self.person_str[param_value]
             else :
-                return param_value 
+                return param_value
         else :
             return None
     
@@ -46,17 +61,23 @@ class TemplateBasedGenerator :
             f.close()
             os.chmod(logfile, mode)
         if action.name == 'searchroom' :
-            if str(action.params[1]) in self.rooms :
-                return 'I searched for ' + str(action.params[0]) + ' in ' + self.room_str[str(action.params[1])] + '.'
-            else :
-                return 'I searched for ' + str(action.params[0]) + ' in ' + str(action.params[1]) + '.'
+            room = str(action.params[1])
+            if room in self.rooms :
+                room = self.room_str[room]
+            person = str(action.params[0])
+            if person in self.people :
+                person = self.person_str[person]
+            return 'I searched for ' + person + ' in ' + room + '.'   
         elif action.name == 'bring' :
-            return 'I brought ' + str(action.params[0]) + ' to ' + str(action.params[1]) + '.'
+            person = str(action.params[1])
+            if person in self.people :
+                person = self.person_str[person]
+            return 'I brought ' + str(action.params[0]) + ' to ' + person + '.'
         elif action.name == 'at' :
-            if str(action.params[0]) in self.rooms :
-                return 'I went to ' + self.room_str[str(action.params[0])] + '.'
-            else :
-                return 'I went to ' + str(action.params[0]) + '.'
+            room = str(action.params[0])
+            if room in self.rooms :
+                room = self.room_str[room]
+            return 'I went to ' + room  + '.'
         else :
             if len(action.params) == 0 :
                 return 'I took action ' + action.name + '.'

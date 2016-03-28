@@ -15,6 +15,7 @@ class UtteranceBasedStaticDialogState(StaticDialogState):
     # Update state given an Utterance u that specifies a complete action 
     # Assumes typechecking has already been done on the Utterance u
     def update_from_action(self, u):
+        print 'In update_from_action'
         if u.referring_goal is None :
             return
     
@@ -80,6 +81,7 @@ class UtteranceBasedStaticDialogState(StaticDialogState):
     # This also avoids updation if the utterance type does not match 
     # what is expected
     def update(self, m, u_list, grounder) :
+        print 'In update'
         if len(u_list) > 0 :
             u = u_list[0]
             if m.action_type == 'repeat_goal' :

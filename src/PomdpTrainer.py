@@ -1,16 +1,32 @@
 __author__ = 'aishwarya'
 
-import sys, random, math, copy, ast
+import sys, random, math, copy, ast, traceback, csv, itertools
 from os import listdir
 from os.path import isfile, join
 import numpy as np
+from sklearn import linear_model
 
+from HISBeliefState import HISBeliefState
 from SummaryState import SummaryState
-#from PomdpGpSarsaPolicy import PomdpGpSarsaPolicy
 from PomdpKtdqPolicy import PomdpKtdqPolicy
 from SystemAction import SystemAction
 from PomdpDialogAgent import PomdpDialogAgent
 from utils import *
+
+class FeatureWrapper :
+    def __init__(self, init_arg=None) :
+        self.feature_vector = None
+        self.num_dialog_turns = 1
+        #print 'init_arg = ', init_arg
+        #print 'type(init_arg) = ', type(init_arg)
+        if type(init_arg) == list :
+            self.feature_vector = init_arg
+        elif isinstance(init_arg, SummaryState) :
+            self.feature_vector = init_arg.get_feature_vector()
+    
+    def get_feature_vector(self) :
+        return self.feature_vector
+    
 
 # This class is supposed to read log files and convert them into a form 
 # that can be used for training a policy. It requires the ability to 
@@ -18,9 +34,119 @@ from utils import *
 # It extends PomdpDialogAgent for code reuse
 class PomdpTrainer(PomdpDialogAgent) :
 
-    def __init__(self, parser, grounder, policy, parse_depth=10):
+    def __init__(self, parser, grounder, policy, parse_depth=10, param_mapping_file=None):
         PomdpDialogAgent.__init__(self, parser, grounder, policy, None, None, parse_depth)
+        if param_mapping_file is not None :
+            # Map params from old IJCAI ontology to current ontology
+            self.init_param_mapping(param_mapping_file)   
 
+    def init_param_mapping(self, param_mapping_file) :
+        f = open(param_mapping_file, 'r')
+        reader = csv.reader(f)
+        self.param_map = dict()
+        for row in reader :
+            key = row[0]
+            value = row[1]
+            if len(value) == 0 :
+                value = None
+            self.param_map[key] = value 
+            
+    def get_mapped_value(self, value) :
+        if value in self.param_map :
+            return self.param_map[value]
+        else :
+            return None
+            
+    def test_ktdq_features(self) :
+        b = [np.log(0.9), np.log(0.01), 1, 0, 1, 1, 'inform_full', 'at']
+        print str(b)
+        w = FeatureWrapper(b)
+        f = self.policy.get_feature_vector(w, 'confirm_action')
+            
+    def init_weights_from_hand_coded_policy(self) :
+        probs = [np.log(p) for p in [0, 0.00001, 0.2, 0.4, 0.6, 0.8, 1.0]]
+        num_goals = [1 ,2 ,3]
+        num_uncertain_params = [0, 1, 2, 3]
+        last_utterance_type = ['inform_full', 'inform_param', 'affirm', 'deny']
+        zero = [0]
+        training_examples = list(itertools.product(probs, probs, num_goals, num_uncertain_params, zero, zero, last_utterance_type, zero))
+        print 'len(training_examples) = ', len(training_examples)
+        i = 1
+        t = 0
+        c = 0
+        p = 0
+        r = 0
+        train_features = None
+        train_outputs = None
+        sample_weights = None
+        to_print = []
+        for example in training_examples :
+            #print 'Example no ', i
+            i += 1
+            sample_weight = 1
+            (top_prob, sec_prob, num_goals, num_uncertain_params, _, _, last_utterance_type, _) = example
+            action = None
+            if num_goals == 1 :
+                if num_uncertain_params == 0 :
+                    if top_prob < np.log(0.8) :
+                        action = 'confirm_action'
+                        sample_weight = 100
+                        c += 1
+                    else :
+                        action = 'take_action'
+                        sample_weight = 100
+                        t += 1
+                else :
+                    action = 'request_missing_param'
+                    p += 1
+            else :
+                action = 'repeat_goal'
+                r += 1
+            
+            example_list = list(example)
+            #print 'example_list = ', example_list
+            wrapper = FeatureWrapper(example_list)
+            for a in self.knowledge.summary_system_actions :
+                new_feature_vector = self.policy.get_feature_vector(wrapper, a)
+                if a == action :
+                    value = 1
+                else :
+                    value = 0
+                if train_features is None :
+                    train_features = np.matrix(new_feature_vector).T
+                    train_outputs = np.matrix(value).T
+                    sample_weights = np.array(sample_weight)
+                else :
+                    train_features = np.vstack((train_features, np.matrix(new_feature_vector).T))
+                    train_outputs = np.vstack((train_outputs, np.matrix(value).T))
+                    sample_weights = np.hstack((sample_weights, sample_weight))
+        print 'train_features.shape = ', train_features.shape
+        print 'train_outputs.shape = ', train_outputs.shape
+        print 't = ', t, ', c = ', c, ', p = ', p, ', r = ', r
+        train_features = np.tile(train_features, (5,1))
+        train_outputs = np.tile(train_outputs, (5,1))
+        print 'type(sample_weights) = ', type(sample_weights)
+        sample_weights = np.tile(sample_weights, (1, 5))[0,:]
+        print 'sample_weights.shape = ', sample_weights.shape 
+        print 'type(sample_weights) = ', type(sample_weights)
+        model = linear_model.Ridge(alpha=0.5, fit_intercept=True)
+        model.fit(train_features, train_outputs, sample_weights)
+        preds = model.predict(train_features)
+        print 'Train loss = ', sum(np.square(preds - train_outputs)) / train_features.shape[0]
+        #print '\n'.join([str(t) for t in to_print])
+        #print 'Weights = ', model.coef_
+        self.policy.theta = model.coef_.T
+        save_model(self.policy, 'ktdq_policy_object')
+        
+        b = [np.log(0.9), np.log(0.01), 1, 0, 0, 0, 'inform_full', 0]
+        print str(b)
+        w = FeatureWrapper(b)
+        for a in self.knowledge.summary_system_actions :
+            f = self.policy.get_feature_vector(w, a)
+            print 'f.shape = ', f.shape 
+            print 'a = ', a, ', pred = ', model.predict(f.T)
+        
+            
     # Train the policy using logs from the IJCAI 2015 experiment
     # This makes assumptions on the formatting of the logs
     def train_from_old_logs(self, success_dir, fail_dir) :
@@ -31,14 +157,19 @@ class PomdpTrainer(PomdpDialogAgent) :
         while success_idx < len(success_files) or fail_idx < len(fail_files) :
             r = np.random.uniform()
             if r < 0.5 :
-                fname = success_dir + '/' + success_files[success_idx]
-                self.train_policy_from_single_old_log(fname, True)
-                success_idx += 1
+                if success_idx < len(success_files) :
+                    fname = success_dir + '/' + success_files[success_idx]
+                    self.train_policy_from_single_old_log(fname, True)
+                    success_idx += 1
             else :
-                fname = fail_dir + '/' + fail_files[fail_idx]
-                self.train_policy_from_single_old_log(fname, False)
-                fail_idx += 1
-            save_model(policy, 'ktdq_policy_object')
+                if fail_idx < len(fail_files) :
+                    fname = fail_dir + '/' + fail_files[fail_idx]
+                    self.train_policy_from_single_old_log(fname, False)
+                    fail_idx += 1
+            save_model(self.policy, 'ktdq_policy_object')
+        
+        print 'Number of responses = ', self.num_turns_across_dialogs    
+        print 'Number of responses that could not be parsed = ', self.num_not_parsed
             
     # Train the policy using logs from the IJCAI 2015 experiment
     # This makes assumptions on the formatting of the logs
@@ -46,6 +177,7 @@ class PomdpTrainer(PomdpDialogAgent) :
         conv_log = open(conv_log_name, 'r')
         self.max_prob_user_utterances = list()
         self.parser_train_data = dict()
+        self.state = HISBeliefState(self.knowledge)
         for line in conv_log :
             parts = line.split('\t')
             print '---------------------------------------'
@@ -53,21 +185,30 @@ class PomdpTrainer(PomdpDialogAgent) :
             print '---------------------------------------'
             if parts[0] == 'USER' :
                 if self.previous_system_action is not None :
-                    prev_state = SummaryState(self.state)
-                    response = parts[1]
-                    print 'Updating state for response :', response
-                    self.update_state(response)
-                    next_state = SummaryState(self.state)
-                    print '---------------------------------------'
-                    print '---------------------------------------'
-                    print 'prev_state : ', str(prev_state)
-                    print '---------------------------------------'
-                    print 'action : ', str(self.previous_system_action)
-                    print '---------------------------------------'
-                    print 'next_state : ', str(next_state)
-                    print '---------------------------------------'
-                    self.policy.train(prev_state, self.previous_system_action.action_type, next_state, self.knowledge.per_turn_reward)
-                    self.previous_system_action = None
+                    try :
+                        print 'Start of try'
+                        prev_state = SummaryState(self.state)
+                        response = parts[1]
+                        print 'Updating state for response :', response
+                        self.update_state(response)
+                        next_state = SummaryState(self.state)
+                        print '---------------------------------------'
+                        print '---------------------------------------'
+                        print 'prev_state : ', str(prev_state)
+                        print '---------------------------------------'
+                        print 'action : ', str(self.previous_system_action)
+                        print '---------------------------------------'
+                        print 'next_state : ', str(next_state)
+                        print '---------------------------------------'
+                        self.policy.train(prev_state, self.previous_system_action.action_type, next_state, self.knowledge.per_turn_reward)
+                        self.previous_system_action = None
+                        print 'End of try'
+                    except :
+                        self.num_not_parsed += 1
+                        print "Exception in user code:"
+                        print '-'*60
+                        traceback.print_exc(file=sys.stdout)
+                        print '-'*60 
             else :
                 if len(parts) != 6 :
                     continue
@@ -82,13 +223,13 @@ class PomdpTrainer(PomdpDialogAgent) :
                     if details[0] == 'at' :
                         goal = 'at'
                         if details[2] is not None :
-                            params['location'] = details[2].strip().split(':')[0]
+                            params['location'] = self.get_mapped_value(details[2].strip())
                     elif details[0] == 'served' :
                         goal = 'bring'
                         if details[1] is not None :
-                            params['patient'] = details[1].strip().split(':')[0]
+                            params['patient'] = self.get_mapped_value(details[1].strip())
                         if details[2] is not None :
-                            params['recipient'] = details[2].strip().split(':')[0]
+                            params['recipient'] = self.get_mapped_value(details[2].strip())
                     target = parts[5].strip()
                     details_header = ['action', 'patient', 'recipient']
                     if target in details_header :
@@ -112,4 +253,52 @@ class PomdpTrainer(PomdpDialogAgent) :
             self.policy.train(prev_state, 'take_action', None, self.knowledge.correct_action_reward)
         else :
             self.policy.train(prev_state, 'take_action', None, self.knowledge.wrong_action_reward)
+        
+    # Train from new log files
+    def train_policy_and_parser_from_single_new_log(self, conv_log_name, parser_train_type=None) :
+        self.retrain_parser = False # This is not going to run like a 
+                                    # normal dialog so retraining will be 
+                                    # done explicitly
+        log = load_obj_general(conv_log_name)
+        
+        # log is a tuple of
+        #   (agent_type, [(system_action, response)...], final_action, parser_train_data)
+        #   agent_type = 'pomdp' or 'static'
+        #   system_action can be of type SystemAction or a string 'take_action'
+        #   response is either a string or None
+        
+        # KTDQ is an off policy algorithm so it can be trained on data 
+        # from both pomdp and static agents. However, since the experiment
+        # compares the agents, we want to train it only from pomdp instances
+        if log[0] == 'pomdp' :
+            self.state = HISBeliefState(self.knowledge)
+            
+            # For each system_action, response pair, update state and
+            # train policy with standard per turn reward
+            for [system_action, response] in log[1] :
+                prev_state = SummaryState(self.state)
+                next_state = None
+                action_type = system_action
+                if isinstance(system_action, SystemAction) :
+                    self.previous_system_action = system_action
+                    self.update_state(response)
+                    next_state = SummaryState(self.state)
+                    action_type = system_action.action_type
+                self.policy.train(prev_state, action_type, next_state, self.knowledge.per_turn_reward)
+                
+            if log[3] :
+                # Dialogue was successful
+                self.policy.train(prev_state, 'take_action', None, self.knowledge.correct_action_reward)
+                
+                # Retrain parser
+                self.parser_train_data = log[4]
+                self.train_parser_from_dialogue(log[2])
+            else :
+                self.policy.train(prev_state, 'take_action', None, self.knowledge.wrong_action_reward)
+            
+                
+                    
+                    
+                    
+                                     
         

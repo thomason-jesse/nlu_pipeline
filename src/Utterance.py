@@ -142,6 +142,7 @@ class Utterance:
             for param_name in relevant_params :
                 if param_name in self.referring_params :
                     argument = self.referring_params[param_name]
+                    print 'param_name = ', param_name, ', argument = ', argument 
                     for true_pred in knowledge.true_constraints[goal][param_name] :
                         if not predicate_holds(true_pred, argument, grounder) :
                             # A predicate that should hold does not

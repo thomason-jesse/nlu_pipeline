@@ -20,6 +20,7 @@ class StaticDialogAgent(PomdpDialogAgent):
     def __init__(self, parser, grounder, policy, u_input, output, parse_depth=10):
         PomdpDialogAgent.__init__(self, parser, grounder, policy, u_input, output, parse_depth)    
         self.dialogue_stopped = False
+        self.log_header = 'static'
 
     # initiate a new dialog with the agent with initial utterance u
     def initiate_dialog_to_get_action(self, u):
@@ -31,7 +32,7 @@ class StaticDialogAgent(PomdpDialogAgent):
         
         self.cur_turn_log = [self.state, 'repeat_goal', u]
         self.dialog_objects_log = [self.cur_turn_log]
-
+        self.previous_system_action = SystemAction('repeat_goal')
         self.update_state(u)
 
         # select next action from state
@@ -54,17 +55,25 @@ class StaticDialogAgent(PomdpDialogAgent):
                     print 'Dialogue stopped'
                     return None
         
-        complete_log_object = ('static', self.dialog_objects_log, action, self.parser_train_data)
+        success = False
+        if action is not None :
+            self.output.say(self.response_generator.get_action_sentence(action, self.final_action_log) + ' Was this the right action? (y/n)')
+            response = self.input.get()
+            if response == '<ERROR/>' or response.lower() == 'y' or response.lower() == 'yes' :
+                success = True
+        
+        complete_log_object = (self.log_header, self.dialog_objects_log, action, success, self.parser_train_data)
         if self.dialog_objects_logfile is not None :
             save_obj_general(complete_log_object, self.dialog_objects_logfile)
         
-        if action is not None :
+        if action is not None and success and self.retrain_parser :
             self.train_parser_from_dialogue(action)
 
         return action
 
     # request the user repeat their original goal
     def request_user_initiative(self, args):
+        print 'In request_user_initiative'
         self.previous_system_action = SystemAction('repeat_goal')
         output = self.response_generator.get_sentence(self.previous_system_action)
         self.output.say(output)

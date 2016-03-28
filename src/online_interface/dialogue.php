@@ -65,16 +65,8 @@
         serviceType : 'nlu_pipeline/register_user'
     });
     var tryingToRegisterUser = null;
-    var pythonTalkClient = new ROSLIB.Service({
-        ros : ros,
-        name : '/dialogue_python_talk',
-        serviceType : 'nlu_pipeline/dialogue_python_talk'
-    });
-    var jsTalkClient = new ROSLIB.Service({
-        ros : ros,
-        name : '/dialogue_js_talk',
-        serviceType : 'nlu_pipeline/dialogue_js_talk'
-    });
+    var pythonTalkClient = null;
+    var jsTalkClient = null;
 
     function decideTask() {
         var tasks = ['walk', 'deliver', 'search'];
@@ -233,6 +225,19 @@
             //alert('User accepted');
             clearInterval(tryingToRegisterUser);
             
+            // Create appropriate clients
+            pythonTalkClient = new ROSLIB.Service({
+                ros : ros,
+                name : '/dialogue_python_talk_' + user_id,
+                serviceType : 'nlu_pipeline/dialogue_python_talk'
+            });
+            jsTalkClient = new ROSLIB.Service({
+                ros : ros,
+                name : '/dialogue_js_talk_' + user_id,
+                serviceType : 'nlu_pipeline/dialogue_js_talk'
+            });
+            
+            //alert('Requesting service');
             var request = new ROSLIB.ServiceRequest({});
             pythonTalkClient.callService(request, invokeDialogAgentOutput);
         } 

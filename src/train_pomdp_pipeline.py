@@ -56,10 +56,18 @@ grounder.parser = parser
 grounder.ontology = parser.ontology
 
 knowledge = Knowledge()
-policy = PomdpKtdqPolicy(knowledge, False)
+policy = PomdpKtdqPolicy(knowledge)
 print "instantiating Trainer"
-A = PomdpTrainer(parser, grounder, policy)
+param_mapping_file = 'src/nlu_pipeline/src/resources/old_ijcai_domain/ontology_mapping.csv'
+A = PomdpTrainer(parser, grounder, policy, param_mapping_file = param_mapping_file)
 
 success_dir = '/u/aish/Documents/Research/rlg/logs_only/second/valid'
 fail_dir = '/u/aish/Documents/Research/rlg/logs_only/second/invalid'
+#A.test_ktdq_features()
+A.init_weights_from_hand_coded_policy()
 A.train_from_old_logs(success_dir, fail_dir)
+#A.train_from_old_logs(success_dir, fail_dir)
+#A.train_from_old_logs(success_dir, fail_dir)
+#A.train_from_old_logs(success_dir, fail_dir)
+#A.train_from_old_logs(success_dir, fail_dir)
+#A.train_policy_and_parser_from_single_new_log('src/nlu_pipeline/src/models/trial_log.pkl')

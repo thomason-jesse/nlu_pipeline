@@ -5,18 +5,28 @@ import pickle, numpy
 # For typechecking
 from SemanticNode import SemanticNode
 
+models_path = 'src/nlu_pipeline/src/models/'
+#models_path = '../../Documents/Code/catkin_ws/src/nlu_pipeline/src/models/'
+
 def save_model(obj, name):
-    with open('src/nlu_pipeline/src/models/'+ str(name) + '.pkl', 'wb') as f:
+    with open(models_path + str(name) + '.pkl', 'wb') as f:
         pickle.dump(obj, f, pickle.HIGHEST_PROTOCOL)
         
 def save_obj_general(obj, name):
     print 'Saving log'
     with open(str(name), 'wb') as f:
         pickle.dump(obj, f, pickle.HIGHEST_PROTOCOL)
+        
+def load_obj_general(name) :
+    try :
+        f = open(name, 'rb')
+        return pickle.load(f)
+    except :
+        return None
 
 def load_model(name):
     try :
-        with open('src/nlu_pipeline/src/models/' + str(name) + '.pkl', 'r') as f:
+        with open(models_path + str(name) + '.pkl', 'r') as f:
             return pickle.load(f)
     except :
         return None

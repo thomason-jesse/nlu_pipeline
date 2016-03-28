@@ -1,0 +1,58 @@
+Position : denotation 
+<C>
+<PS>
+a supervisor : ray
+a secretary : stacy
+a director : peter
+a intern : rodolfo
+</C>
+place reference : denotation 
+<C>
+<P>
+3502 : l3_502
+3414b : l3_414b
+3420 : l3_420
+3432 : l3_432
+3404 : l3_404
+3508 : l3_508
+3510 : l3_510
+3512 : l3_512
+</C>
+Full name : titles : denotation : office (if any)
+<C>
+<FN>
+alice-NA-ashcraft : ms_secretary : stacy : l3_502
+robert-bob-brown : mr : jesse : l3_414b
+carol-NA-clark : ms_dr : shiqi : l3_420
+dave-NA-daniel : mr_dr : jivko : l3_432
+evelyn-eve-eckhart : ms : aishwarya : l3_414b
+francis-frannie-foster : ms : scott : l3_404
+george-NA-green : mr : rodolfo : l3_414b
+mallory-NA-morgan : dr : peter : l3_508
+peggy-NA-parker : dr : dana : l3_510
+walter-NA-ward : dr : ray : l3_512
+</C>
+denotation : determiner and reference 
+<C>
+<I>
+muffin : a muffin
+muffin : a cake
+muffin : a cupcake
+muffin : a dessert
+chips : a bag of chips
+chips : chips
+chips : crisps
+chips : lays
+chips : potato chips
+coffee : a beverage
+coffee : a coffee
+coffee : a coffee cup
+coffee : a coffee to go
+coffee : a cup of coffee
+hamburger : a burger
+hamburger : a cheeseburger
+hamburger : a hamburger
+juice : a drink
+juice : a glass of juice
+juice : juice
+</C>
