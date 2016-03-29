@@ -20,4 +20,4 @@ rm -f src/run_tests_data.txt
 rm -f src/Testing.txt
 git add -A
 git commit -m "$*"
-git push origin aishwarya
+git push origin master
