@@ -538,9 +538,7 @@ class CKYParser:
                 else:
                     return False
             random.shuffle(t)
-            print 'Before parameter update'
             self.theta.update_learned_parameters(t)
-            print 'After parameter update'
         return False
 
     # take in data set d=(x,y) for x strings and y correct semantic forms and calculate training pairs
@@ -554,12 +552,9 @@ class CKYParser:
         num_fails = 0
         num_genlex_only = 0
         for [x, y] in d:
-            #print 'x = ', x
-            #print 'y = ', y
             correct_parse = None
             correct_new_lexicon_entries = []
             cky_parse_generator = self.most_likely_cky_parse(x, reranker_beam=reranker_beam, known_root=y)
-            #print 'Attempting to parse'
             chosen_parse, chosen_score, chosen_new_lexicon_entries = next(cky_parse_generator)
             current_parse = chosen_parse
             correct_score = chosen_score
@@ -615,8 +610,6 @@ class CKYParser:
     # providing it as an argument to this method allows top-down generation
     # to find new lexical entries for surface forms not yet recognized
     def most_likely_cky_parse(self, s, reranker_beam=1, known_root=None):
-        print 'Trying to parse : ', s
-
         if len(s) == 0:
             raise AssertionError("Cannot parse provided string of length zero")
 
@@ -1053,7 +1046,6 @@ class CKYParser:
         best_per_seq = [next(ccg_parse_tree_generators[idx])
                         for idx in range(0, len(tk_seqs))]
         leaf_sense_limits = [0 for _ in range(0, len(tk_seqs))]
-        #print 'Obatined best tree given tokens'
 
         # remove candidates for which we have no surface forms at all
         while [None, neg_inf] in best_per_seq:
@@ -1183,8 +1175,6 @@ class CKYParser:
                     right = chart[r_key] if r_key in chart else []
                     #print "l_key: "+str(l_key)  # DEBUG
                     #print "r_key: "+str(r_key)  # DEBUG
-                    #print 'No of iterations = ', len(left) * len(right) * len(self.theta.CCG_production)
-                    #x = raw_input()  
                     for l_idx in range(0, len(left)):
                         l = left[l_idx]
                         #if debug_chr == 'y' : # DEBUG 
