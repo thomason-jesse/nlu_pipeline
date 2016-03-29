@@ -32,7 +32,7 @@ class ParserTrainer:
         self.semantic_forms = dict()
         self.people_used = list()
         
-        #print 'names possessive ', self.names_possessive
+        #print 'names possessive ', self.names_possessive   # DEBUG
 
     #Generates dictionary of tags and their elements from lex.txt. 
     def genTags(self):
@@ -168,7 +168,7 @@ class ParserTrainer:
 
         self.genDenotationAndSemForm(templateType)
 
-        #print 'command = ', command
+        #print 'command = ', command    # DEBUG
         return ' '.join(command)
 
     #Generates denotation for phrase.
@@ -191,12 +191,11 @@ class ParserTrainer:
             self.semantic_form += self.semantic_forms["<P>"] + ")"
         
     def genNormalItem(self):
-        #print 'In genNormalItem'
         expansionIndex = random.randint(0, len(self.tags["<I>"]) - 1)
         expansionList = self.tags["<I>"][expansionIndex].split(':')
         expansion = expansionList[1].strip()
         denotation = expansionList[0].strip()
-        #print 'expansion = ', expansion, ', denotation = ', denotation
+        #print 'expansion = ', expansion, ', denotation = ', denotation # DEBUG
 
         #Stores denotation. 
         self.denotations["<I>"] = denotation
@@ -261,18 +260,8 @@ class ParserTrainer:
 
     
 if __name__ == '__main__' :
-    #print "reading in Ontology"
     ont = Ontology.Ontology(sys.argv[1])
-    #print "predicates: " + str(ont.preds)
-    #print "types: " + str(ont.types)
-    #print "entries: " + str(ont.entries)
-
-    #print "reading in Lexicon"
     lex = Lexicon.Lexicon(ont, sys.argv[2])
-    #print "surface forms: " + str(lex.surface_forms)
-    #print "categories: " + str(lex.categories)
-    #print "semantic forms: " + str(lex.semantic_forms)
-    #print "entries: " + str(lex.entries)
     
     parser_trainer = ParserTrainer()
     parser = CKYParser.CKYParser(ont, lex, use_language_model=True)

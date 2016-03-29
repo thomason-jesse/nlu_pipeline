@@ -11,7 +11,6 @@ import StaticDialogPolicy
 import ActionSender
 from TemplateBasedGenerator import TemplateBasedGenerator
 from StaticDialogAgent import StaticDialogAgent
-from DialogAgent import DialogAgent
 from utils import *
 
 class InputFromKeyboard:
@@ -79,7 +78,6 @@ u_in = InputFromKeyboard()
 u_out = OutputToStdout()
 static_policy = StaticDialogPolicy.StaticDialogPolicy()
 A = StaticDialogAgent(parser, grounder, static_policy, u_in, u_out)
-#A = DialogAgent(parser, grounder, static_policy, u_in, u_out)
 A.dialog_objects_logfile = 'src/nlu_pipeline/src/models/trial_log.pkl'
 
 response_generator = TemplateBasedGenerator()

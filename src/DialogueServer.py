@@ -97,7 +97,7 @@ class InputFromService:
             
     def receive_msg(self, req) :
         text = req.js_response[:-1]
-        print 'Received ', text 
+        print 'Received ', text # DEBUG
         while True :
             if self.prev_msg is None :
                 print 'self.prev_msg is None'
@@ -122,7 +122,7 @@ class InputFromService:
                     if success :
                         break
             else :
-                print 'self.prev_msg = ', self.prev_msg
+                print 'self.prev_msg = ', self.prev_msg # DEBUG
         return True
     
 class OutputToService:
@@ -147,7 +147,7 @@ class OutputToService:
         self.lock.acquire()
         try :
             self.response = response
-            print 'Saying: ', response
+            print 'Saying: ', response  # DEBUG
         except KeyboardInterrupt, SystemExit :
             pass
         except :
@@ -216,7 +216,7 @@ class DialogueServer :
         self.load_models_from_file = False
         if len(args) > 4 :
             if args[4].lower() == 'true' :
-                print 'Going to load from file'
+                print 'Going to load from file' # DEBUG
                 self.load_models_from_file = True
         
         self.lock = Lock()
@@ -306,21 +306,20 @@ class DialogueServer :
     # Since calls to this function involve writes to come common files
     # like user_log, it involves locking
     def on_user_receipt(self, req):
-        #print 'Received user ', req.user_id
+        #print 'Received user ', req.user_id    # DEBUG
         self.error_log.write('Received user ' + str(req.user_id) + '\n')
         self.error_log.flush()
-        #x = raw_input()
         
         # Try to acquire lock but do not wait
         acquired_lock = self.lock.acquire(False)
 
         if acquired_lock :
-            print 'Acquired lock'
+            print 'Acquired lock'   # DEBUG
             if req.user_id not in self.started_users :
                 success = False
                 try :
                     self.handle_user(req.user_id)   
-                    print 'Returned'
+                    print 'Returned'    # DEBUG
                     self.started_users.add(req.user_id)     
                     success = True
                 except KeyboardInterrupt, SystemExit :
@@ -344,7 +343,7 @@ class DialogueServer :
                 return False
         else :
             # The system is currently handling another user
-            print 'Could not acquire lock'
+            print 'Could not acquire lock'  # DEBUG
             self.user_log.flush()
             self.error_log.write('Could not acquire lock\n\n')
             self.error_log.flush()

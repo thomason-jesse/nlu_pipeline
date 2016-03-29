@@ -52,8 +52,8 @@ class HISBeliefState:
     # that they match in goal and params. In the case of a confirm system
     # action, it does not check whether the user said yes or no    
     def make_all_matching_partitions(self, system_action, utterance, grounder) :
-        #print 'In make_all_matching_partitions'
-        #print '**********************************************'
+        #print 'In make_all_matching_partitions'    # DEBUG
+        #print '**********************************************' # DEBUG
         required_goal = None
         if system_action.referring_goal != None :
             required_goal = system_action.referring_goal
@@ -80,14 +80,14 @@ class HISBeliefState:
         # superset of what is required
         new_partitions = list()
         for partition in self.partitions :
-            #print '#########################'
-            #print str(partition)
-            #print 'Superset : ', partition.is_superset(required_goal, required_params)
-            #print 'Equal : ', partition.is_equal(required_goal, required_params)
-            #print '#########################'
+            #print '#########################'  # DEBUG
+            #print str(partition)   # DEBUG
+            #print 'Superset : ', partition.is_superset(required_goal, required_params) # DEBUG
+            #print 'Equal : ', partition.is_equal(required_goal, required_params)   # DEBUG
+            #print '#########################'  # DEBUG
             if partition.is_superset(required_goal, required_params) and not partition.is_equal(required_goal, required_params) :
-                #print 'Entered if'
-                #print '#########################'
+                #print 'Entered if' # DEBUG
+                #print '#########################'  # DEBUG
                 # This is a partition to be split
                 goal_split_partitions = list()
                 if required_goal != None :  # Split based on goal
@@ -125,54 +125,54 @@ class HISBeliefState:
                 # required goal and params so don't split it
                 new_partitions = new_partitions + [partition]    
         self.partitions = new_partitions
-        #print '**********************************************'
+        #print '**********************************************' # DEBUG
 
     # Perform belief monitoring update using the system action and n best 
     # parses
     def update(self, system_action, n_best_utterances, grounder) :
-        #print 'In update'
-        #print '----------------------------------------------'
-        #print str(system_action)
+        #print 'In update'  # DEBUG
+        #print '----------------------------------------------' # DEBUG
+        #print str(system_action)   # DEBUG
         for utterance in n_best_utterances :
-            #print str(utterance)
+            #print str(utterance)   # DEBUG
             # Check whether there are partitions that exactly match the 
             # system action-utterance pair
             matching_partitions = self.get_matching_partitions(system_action, utterance)
-            #print 'len(matching_partitions) = ', len(matching_partitions)
+            #print 'len(matching_partitions) = ', len(matching_partitions)  # DEBUG
             if len(matching_partitions) == 0 :
                 # if there are no matching partitions, split all partitions
                 # that are supersets of the goal and param values of this 
                 # pair to obtain matching partitions
                 self.make_all_matching_partitions(system_action, utterance, grounder)
-            #else :
-                #for partition in matching_partitions :
-                    #print str(partition)
-        #print '----------------------------------------------'
+            #else : # DEBUG
+                #for partition in matching_partitions : # DEBUG
+                    #print str(partition)   # DEBUG
+        #print '----------------------------------------------' # DEBUG
         hypothesis_beliefs = dict()
 
         # Clean up partitions
         self.remove_invalid_partitions(grounder)
         self.merge_duplicate_partitions()
         
-        #print 'Updation'
+        #print 'Updation'   # DEBUG
         for partition in self.partitions :
             for utterance in n_best_utterances :
                 if utterance.action_type != '-OTHER-' :
-                    #print '---------------------------------'
-                    #print str(partition)
-                    #print str(utterance)
-                   
+                    #print '---------------------------------'  # DEBUG
+                    #print str(partition)   # DEBUG
+                    #print str(utterance)   # DEBUG
+                    
                     hypothesis = (partition, utterance)
                     obs_prob = utterance.parse_prob # Pr(o'/u)
-                    #print 'obs_prob = ', obs_prob
+                    #print 'obs_prob = ', obs_prob  # DEBUG
                     type_prob = numpy.log(self.knowledge.action_type_probs[system_action.action_type][utterance.action_type])
-                    #print 'type_prob = ', type_prob # Pr(T(u)/T(m))
+                    #print 'type_prob = ', type_prob # Pr(T(u)/T(m))    # DEBUG
                     param_match_prob = numpy.log(int(utterance.match(partition, system_action))) # Pr(M(u)/p,m)
-                    #print 'param_match_prob = ', param_match_prob 
+                    #print 'param_match_prob = ', param_match_prob  # DEBUG
                     hypothesis_beliefs[hypothesis] = obs_prob + type_prob + param_match_prob + partition.belief 
                         # b(p,u') = k * Pr(o'/u) * Pr(T(u)/T(m)) * Pr(M(u)/p,m) * b(p)
-                    #print 'Belief = ', hypothesis_beliefs[hypothesis]
-                    #print '---------------------------------'
+                    #print 'Belief = ', hypothesis_beliefs[hypothesis]  # DEBUG
+                    #print '---------------------------------'  # DEBUG
                 else :
                     hypothesis = (partition, '-OTHER-')
                     obs_prob = utterance.parse_prob
@@ -185,14 +185,14 @@ class HISBeliefState:
             sum_hypothesis_beliefs = add_log_probs(sum_hypothesis_beliefs, hypothesis_beliefs[hypothesis])
                 
         partitionwise_sum = dict()
-        #print 'Hypotheses - '
+        #print 'Hypotheses - '  # DEBUG
         for (partition, utterance) in hypothesis_beliefs.keys() :
            hypothesis_beliefs[(partition, utterance)] -= sum_hypothesis_beliefs
-           #print '---------------------------------'
-           #print str(partition)
-           #print str(utterance)
-           #print 'Belief = ', hypothesis_beliefs[(partition, utterance)]
-           #print '---------------------------------'
+           #print '---------------------------------'   # DEBUG
+           #print str(partition)    # DEBUG
+           #print str(utterance)    # DEBUG
+           #print 'Belief = ', hypothesis_beliefs[(partition, utterance)]   # DEBUG
+           #print '---------------------------------'   # DEBUG
            if partition not in partitionwise_sum :
                partitionwise_sum[partition] = hypothesis_beliefs[(partition, utterance)]
            else : 
