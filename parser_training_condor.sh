@@ -14,7 +14,7 @@ Error = /u/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/condor_lo
 Notification = complete
 Notify_user = aish@cs.utexas.edu
 
-Arguments = ParserTrainer.py /u/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/resources/fake_to_real/ont.txt /u/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/resources/fake_to_real/lex.txt /u/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/resources/fake_to_real/utterance_sem_forms.txt
+Arguments = ParserTrainer.py /u/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/resources/fake_to_real/ont.txt /u/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/resources/fake_to_real/lex.txt /u/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/tests/templated_examples/1000.txt
 
 Queue 1
 

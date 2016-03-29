@@ -36,7 +36,7 @@ if (!isset($_POST['comment']))
 //$path_to_log = '../../Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/log/';
 //$path_to_log_special = '../../Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/log_special/';
 //$path_to_executed_action = '../../Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/executed_action/';
-$path_to_log = 'log/';
+$path_to_log = 'log_text/';
 $path_to_log_special = 'log_special/';
 $path_to_executed_action = 'executed_actions/'; 
 
@@ -189,7 +189,7 @@ fclose($input_file);
 // Write MTurk code to output
 //$output = $output."<p>task_success = ".(int)$task_success."</p>";
 //$output = $output."<p>failure reason = ".$failure_reason."</p>";
-//$output = $output."</p>"."<p>Thank you for your participation!</p><p>Copy the code below, return to Mechanical Turk, and enter it to receive payment:<br/>".$mturk_code."</p>";
-$output = "<p>Thank you for your participation!</p>";
+$output = $output."</p>"."<p>Thank you for your participation!</p><p>Copy the code below, return to Mechanical Turk, and enter it to receive payment:<br/>".$mturk_code."</p>";
+//$output = "<p>Thank you for your participation!</p>";
 echo $output
 ?>

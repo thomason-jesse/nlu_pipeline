@@ -34,11 +34,33 @@ class FeatureWrapper :
 # It extends PomdpDialogAgent for code reuse
 class PomdpTrainer(PomdpDialogAgent) :
 
-    def __init__(self, parser, grounder, policy, parse_depth=10, param_mapping_file=None):
+    def __init__(self, parser, grounder, policy, parse_depth=10, param_mapping_file=None, vocab_mapping_file=None):
         PomdpDialogAgent.__init__(self, parser, grounder, policy, None, None, parse_depth)
         if param_mapping_file is not None :
             # Map params from old IJCAI ontology to current ontology
             self.init_param_mapping(param_mapping_file)   
+        if vocab_mapping_file is not None :
+            self.init_vocab_mapping(vocab_mapping_file)
+
+    def init_vocab_mapping(self, vocab_mapping_file) :
+        f = open(vocab_mapping_file, 'r')
+        reader = csv.reader(f, delimiter='\t')
+        self.vocab_map = dict()
+        for row in reader :
+            if len(row) > 2 and len(row[2]) > 0 :
+                key = row[0]
+                value = row[2]
+                self.vocab_map[key] = value 
+
+    def map_text_to_desired_vocab(self, text) :
+        tokens = self.parser.tokenize(text)[0]
+        mapped_tokens = list()
+        for token in tokens :
+            mapped_token = token
+            if self.vocab_map is not None and token in self.vocab_map :
+                mapped_token = self.vocab_map[token]
+            mapped_tokens.append(mapped_token)
+        return ' '.join(mapped_tokens)
 
     def init_param_mapping(self, param_mapping_file) :
         f = open(param_mapping_file, 'r')
@@ -52,7 +74,7 @@ class PomdpTrainer(PomdpDialogAgent) :
             self.param_map[key] = value 
             
     def get_mapped_value(self, value) :
-        if value in self.param_map :
+        if self.param_map is not None and value in self.param_map :
             return self.param_map[value]
         else :
             return None
@@ -189,6 +211,7 @@ class PomdpTrainer(PomdpDialogAgent) :
                         print 'Start of try'
                         prev_state = SummaryState(self.state)
                         response = parts[1]
+                        response = self.map_text_to_desired_vocab(response)
                         print 'Updating state for response :', response
                         self.update_state(response)
                         next_state = SummaryState(self.state)

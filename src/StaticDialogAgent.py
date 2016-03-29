@@ -57,7 +57,7 @@ class StaticDialogAgent(PomdpDialogAgent):
         
         success = False
         if action is not None :
-            self.output.say(self.response_generator.get_action_sentence(action, self.final_action_log) + ' Was this the right action? (y/n)')
+            self.output.say(self.response_generator.get_action_sentence(action, self.final_action_log) + ' Was this the right action? ')
             response = self.input.get()
             if response == '<ERROR/>' or response.lower() == 'y' or response.lower() == 'yes' :
                 success = True

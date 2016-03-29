@@ -1,27 +1,27 @@
-please take a burger for evelyn
-M : bring(hamburger,aishwarya)
+can you search for the intern in 3414b
+M : searchroom(rodolfo,l3_414b)
 
-dr clark would like a coffee
-M : bring(coffee,shiqi)
+take juice for frannie
+M : bring(juice,scott)
 
-run over to dr morgan's office
-M : at(the(lambda x:e.(hasoffice(peter, x))))
+give chips to peggy
+M : bring(chips,dana)
 
-can you bring a coffee to go to mallory
-M : bring(coffee,peter)
+please go to 3510
+M : at(l3_510)
 
-bring george juice
-M : bring(juice,rodolfo)
+search ms eckhart's office for george
+M : searchroom(rodolfo,the(lambda x:e.(hasoffice(aishwarya, x))))
 
-give a drink to dr mallory morgan
-M : bring(juice,peter)
+find carol clark in mr george green's office
+M : searchroom(shiqi,the(lambda x:e.(hasoffice(rodolfo, x))))
 
-can you deliver a dessert to alice ashcraft
-M : bring(muffin,stacy)
+see whether robert brown is in 3510
+M : searchroom(jesse,l3_510)
 
-is a intern in 3420
-M : searchroom(rodolfo,l3_420)
+search for dave in carol's office
+M : searchroom(jivko,the(lambda x:e.(hasoffice(shiqi, x))))
 
-can you go to 3414b
-M : at(l3_414b)
+check for the secretary in bob's office
+M : searchroom(stacy,the(lambda x:e.(hasoffice(jesse, x))))
 

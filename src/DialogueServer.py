@@ -45,13 +45,12 @@ DIALOG_ERROR_LOG_PATH = 'error/'
 
 class InputFromService:
     def __init__(self, user_id,  error_log, logfile=None):
-        self.js_talk_service = rospy.Service('dialogue_js_talk_' + user_id, dialogue_js_talk, self.receive_msg)
         self.lock = Lock()
+        self.js_talk_service = rospy.Service('dialogue_js_talk_' + user_id, dialogue_js_talk, self.receive_msg)
         self.prev_msg = None
         self.logfile = logfile
         self.error_log = error_log
         self.last_get = ''  
-        self.lock = Lock()
 
     def get(self):
         print 'In get'
@@ -128,12 +127,12 @@ class InputFromService:
     
 class OutputToService:
     def __init__(self, user_id,  input_from_topic, error_log, logfile=None):
+        self.lock = Lock()
         self.python_talk_service = rospy.Service('dialogue_python_talk_' + user_id, dialogue_python_talk, self.send_msg)
         self.response = None
         self.logfile = logfile  
         self.error_log = error_log  
         self.input_from_topic = input_from_topic
-        self.lock = Lock()
 
     def say(self, response):
         if self.logfile is not None :
@@ -220,11 +219,8 @@ class DialogueServer :
                 print 'Going to load from file'
                 self.load_models_from_file = True
         
-        
-        self.service = rospy.Service('register_user', register_user, self.on_user_receipt)
-        
         self.lock = Lock()
-        
+        self.service = rospy.Service('register_user', register_user, self.on_user_receipt)
         
     def create_static_dialog_agent(self) :
         ont = copy.deepcopy(self.ont)
@@ -250,7 +246,7 @@ class DialogueServer :
         # Set parser hyperparams to best known values for test time
         parser.max_multiword_expression = 2  # max span of a multi-word expression to be considered during tokenization
         parser.max_new_senses_per_utterance = 2  # max number of new word senses that can be induced on a training example
-        parser.max_cky_trees_per_token_sequence_beam = 1000  # for tokenization of an utterance, max cky trees considered
+        parser.max_cky_trees_per_token_sequence_beam = 100  # for tokenization of an utterance, max cky trees considered
         parser.max_hypothesis_categories_for_unknown_token_beam = 2  # for unknown token, max syntax categories tried
 
         grounder.parser = parser
@@ -311,6 +307,8 @@ class DialogueServer :
     # like user_log, it involves locking
     def on_user_receipt(self, req):
         #print 'Received user ', req.user_id
+        self.error_log.write('Received user ' + str(req.user_id) + '\n')
+        self.error_log.flush()
         #x = raw_input()
         
         # Try to acquire lock but do not wait
@@ -339,20 +337,22 @@ class DialogueServer :
                     self.error_log.flush()
                     return success 
             else :
+                self.lock.release()
                 self.user_log.flush()
-                self.error_log.write('Repeated user ID ' + req.user_id + '\n')
+                self.error_log.write('Repeated user ID ' + req.user_id + '\n\n')
                 self.error_log.flush()
                 return False
         else :
             # The system is currently handling another user
             print 'Could not acquire lock'
             self.user_log.flush()
-            self.error_log.write('Could not acquire lock\n')
+            self.error_log.write('Could not acquire lock\n\n')
             self.error_log.flush()
             return False
 
     def handle_user(self, user_id) :
-        print 'Handling user ', user_id
+        self.error_log.write('Handling user ' + str(user_id) + '\n')
+        self.error_log.flush()
         text_log = MAIN_LOG_PATH + TEXT_LOG_PATH + user_id + '.txt'
         
         u_in = InputFromService(user_id, self.error_log, text_log)
@@ -363,7 +363,8 @@ class DialogueServer :
             error_log = MAIN_LOG_PATH + DIALOG_ERROR_LOG_PATH + user_id + '.txt'
             
             # Randomly choose an agent
-            r = numpy.random.random_sample()
+            #r = numpy.random.random_sample()
+            r = 0.1
             if r < 1.0 / 3 :   
                 print 'Only parser learning'
                 self.user_log.write(user_id + ',only_parser\n')
@@ -374,6 +375,7 @@ class DialogueServer :
                 static_agent.final_action_log = final_action_log
                 static_agent.dialog_objects_logfile = log
                 static_agent.log_header = 'only_parser_learning'
+                static_agent.error_log = open(error_log, 'a')
                 
                 dialog_thread = Thread(target=self.run_static_dialog, args=((static_agent,)))
                 dialog_thread.daemon = True
@@ -388,6 +390,7 @@ class DialogueServer :
                 pomdp_agent.final_action_log = final_action_log
                 pomdp_agent.dialog_objects_logfile = log
                 pomdp_agent.log_header = 'only_dialog_learning'
+                pomdp_agent.error_log = open(error_log, 'a')
                 
                 dialog_thread = Thread(target=self.run_pomdp_dialog, args=((pomdp_agent,)))
                 dialog_thread.daemon = True
@@ -402,6 +405,7 @@ class DialogueServer :
                 pomdp_agent.final_action_log = final_action_log
                 pomdp_agent.dialog_objects_logfile = log
                 pomdp_agent.log_header = 'both_parser_and_dialog_learning'
+                pomdp_agent.error_log = open(error_log, 'a')
                 
                 dialog_thread = Thread(target=self.run_pomdp_dialog, args=((pomdp_agent,)))
                 dialog_thread.daemon = True
@@ -418,7 +422,6 @@ class DialogueServer :
             print traceback.format_exc()
             self.error_log.write(traceback.format_exc() + '\n\n\n')
             self.error_log.flush()
-
 
     def launch(self) :
         print 'Waiting for users...'

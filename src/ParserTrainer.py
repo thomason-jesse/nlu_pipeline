@@ -6,6 +6,7 @@ import sys
 import Ontology
 import Lexicon
 import CKYParser
+from utils import *
 
 path = '/u/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/resources/parser_training/'
 
@@ -276,11 +277,12 @@ if __name__ == '__main__' :
     parser_trainer = ParserTrainer()
     parser = CKYParser.CKYParser(ont, lex, use_language_model=True)
     
-    # Set parser hyperparams to best known values for training
+    ## Set parser hyperparams to best known values for training
     parser.max_multiword_expression = 2  # max span of a multi-word expression to be considered during tokenization
     parser.max_new_senses_per_utterance = 2  # max number of new word senses that can be induced on a training example
-    parser.max_cky_trees_per_token_sequence_beam = 100  # for tokenization of an utterance, max cky trees considered
-    parser.max_hypothesis_categories_for_unknown_token_beam = 2  # for unknown token, max syntax categories tried
+    parser.max_cky_trees_per_token_sequence_beam = 1000  # for tokenization of an utterance, max cky trees considered
+    parser.max_hypothesis_categories_for_unknown_token_beam = 5  # for unknown token, max syntax categories tried
+    parser.max_expansions_per_non_terminal = 5
 
     # Create train set
     D = parser.read_in_paired_utterance_semantics(sys.argv[3])
@@ -299,6 +301,9 @@ if __name__ == '__main__' :
         #D.append((command, form))
     converged = parser.train_learner_on_semantic_forms(D, 10, reranker_beam=10)
     print 'converged = ', converged
-    #filename = '/u/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/models/parser_condor_1000_easy.pkl'
-    #save_obj_general(parser, filename)
+    if len(sys.argv) > 4 :
+        filename = str(sys.argv[4])
+    else :
+        filename = '/u/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/models/parser_condor_1000_easy.pkl'
+    save_obj_general(parser, filename)
     
