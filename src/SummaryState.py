@@ -52,19 +52,16 @@ class SummaryState :
         
         # No of params in the top partition required by its action that are uncertain
         num_params_uncertain = 0
-        #uncertain_params = []
         if num_goals_allowed == 1 :
             goal = self.top_hypothesis[0].possible_goals[0]
             param_order = self.knowledge.param_order[goal]
-            #print 'goal = ', goal, 'param_order = ',param_order
+            #print 'goal = ', goal, 'param_order = ',param_order    # DEBUG
             for param_name in param_order :
                 if len(self.top_hypothesis[0].possible_param_values[param_name]) != 1 :
                     num_params_uncertain += 1
-                    #uncertain_params.append(param_name)
         else :
             num_params_uncertain = len(self.knowledge.goal_params)
         feature.append(num_params_uncertain)           
-        #print 'uncertain_params = ', uncertain_params             
         
         # Number of dialog turns used so far
         feature.append(self.num_dialog_turns)
@@ -103,22 +100,6 @@ class SummaryState :
             feature.append('None')
         
         return feature
-        
-    # Calculate the distance between this summary state and the other
-    # summary state
-    #def distance_to(self, other_summary_state) :
-        #distance = 0.0
-        #cts_distance = 0.0
-        #self_feature_vector = self.get_feature_vector()
-        #other_feature_vector = other_summary_state.get_feature_vector()
-        #weights = self.knowledge.summary_space_distance_weights
-        #for i in xrange(0, len(self_feature_vector)) :
-            #if i in SummaryState.discrete_features :
-                #distance += weights[i] * (1.0 - float(self_feature_vector[i] == other_feature_vector[i]))
-            #else :
-                #cts_distance += weights[i] * (self_feature_vector[i] - other_feature_vector[i]) * (self_feature_vector[i] - other_feature_vector[i])
-        #distance += math.sqrt(cts_distance)        
-        #return distance
         
     def calc_kernel(self, other_summary_state) :
         p = self.knowledge.kernel_degree

@@ -9,7 +9,6 @@ import SemanticNode
 
 neg_inf = float('-inf')
 
-
 class Parameters:
     def __init__(self, ont, lex, use_language_model=False):
         self.ontology = ont
@@ -412,6 +411,9 @@ class CKYParser:
         self.max_new_senses_per_utterance = 2  # max number of new word senses that can be induced on a training example
         self.max_cky_trees_per_token_sequence_beam = 100  # for tokenization of an utterance, max cky trees considered
         self.max_hypothesis_categories_for_unknown_token_beam = 2  # for unknown token, max syntax categories tried
+        self.max_expansions_per_non_terminal = sys.maxint 
+            # Decides how many expansions to store per non-terminal in each cell 
+            # in CKY chart. Set to sys.maxint if all parses must be stored
 
         # behavioral parameters
         self.safety = True  # set to False once confident about node combination functions' correctness
@@ -603,13 +605,12 @@ class CKYParser:
     # providing it as an argument to this method allows top-down generation
     # to find new lexical entries for surface forms not yet recognized
     def most_likely_cky_parse(self, s, reranker_beam=1, known_root=None):
-
         if len(s) == 0:
             raise AssertionError("Cannot parse provided string of length zero")
 
         tk_seqs = self.tokenize(s)
-        # print "number of token sequences for '"+s+"': "+str(len(tk_seqs))  # DEBUG
-        # print "tk_seqs: "+str(tk_seqs)  # DEBUG
+        #print "number of token sequences for '"+s+"': "+str(len(tk_seqs))  # DEBUG
+        #print "tk_seqs: "+str(tk_seqs)  # DEBUG
 
         # calculate skip scores of each token in each sequence
         skip_scores = []
@@ -627,7 +628,7 @@ class CKYParser:
                             if st in self.lexicon.surface_forms:
                                 skip_score[idx] = math.log((len(tks)-1)/float(len(tks)))
             skip_scores.append(skip_score)
-        # print "skip_scores: "+str(skip_scores)  # DEBUG
+        #print "skip_scores: "+str(skip_scores)  # DEBUG
 
         skips_allowed = 0
         while skips_allowed < 2:  # skip at most one token in a given sequence at a time
@@ -660,7 +661,7 @@ class CKYParser:
                         curr_tk_seqs.append(tk_seqs_with_skips[idx].pop(0))
                 if len(curr_tk_seqs) == 0:
                     continue
-                # print "curr_tk_seqs: "+str(curr_tk_seqs)  # DEBUG
+                #print "curr_tk_seqs: "+str(curr_tk_seqs)  # DEBUG
 
                 # create generator for current sequence set and get most likely parses
 
@@ -670,10 +671,10 @@ class CKYParser:
                 # ccg_tree indexed by spans (i, j) valued at [CCG category, left span, right span]
                 while ccg_tree is not None:
 
-                    # print "ccg tree: "+str(tree_score)  # DEBUG
-                    # for span in ccg_tree:  # DEBUG
-                    #     print str(span) + ": [" + self.lexicon.compose_str_from_category(ccg_tree[span][0]) + \
-                    #         "," + str(ccg_tree[span][1]) + "," + str(ccg_tree[span][2]) + "]"  # DEBUG
+                    #print "ccg tree: "+str(tree_score)  # DEBUG
+                    #for span in ccg_tree:  # DEBUG
+                        #print str(span) + ": [" + self.lexicon.compose_str_from_category(ccg_tree[span][0]) + \
+                            #"," + str(ccg_tree[span][1]) + "," + str(ccg_tree[span][2]) + "]"  # DEBUG
 
                     # get next most likely assignment of semantics to given CCG categories
                     semantic_assignment_generator = self.most_likely_semantic_leaves(tks, ccg_tree,
@@ -1035,8 +1036,7 @@ class CKYParser:
     # yields the next most likely ccg parse tree given a set of possible token sequences
     # finds the best parse tree given each token sequence and returns in-order the one
     # with the highest score
-    def most_likely_ccg_parse_tree(self, tk_seqs):
-
+    def most_likely_ccg_parse_tree(self, tk_seqs, root_is_known=False):
         ccg_parse_tree_generators = [self.most_likely_ccg_parse_tree_given_tokens(tks)
                                      for tks in tk_seqs]
         best_per_seq = [next(ccg_parse_tree_generators[idx])
@@ -1065,9 +1065,9 @@ class CKYParser:
             for idx in tied_idxs:  # among those tied in score, select ccg parse with most tokens (fewest multi-word)
                 if len(tk_seqs[idx]) > len(tk_seqs[best_idx]):
                     best_idx = idx
-            # print "most_likely_ccg_parse_tree: yielding " + \
-            #       str(best_per_seq[best_idx][0])+" with score "+str(best_score) + \
-            #       " from tokens "+str(tk_seqs[best_idx])  # DEBUG
+            #print "most_likely_ccg_parse_tree: yielding " + \
+                  #str(best_per_seq[best_idx][0])+" with score "+str(best_score) + \
+                  #" from tokens "+str(tk_seqs[best_idx])  # DEBUG
             yield best_per_seq[best_idx][0], best_score, tk_seqs[best_idx]
             candidate, score = next(ccg_parse_tree_generators[best_idx])
             empty = True
@@ -1095,8 +1095,9 @@ class CKYParser:
     # yields the next most likely ccg parse tree given a set of tokens
     def most_likely_ccg_parse_tree_given_tokens(self, tks, new_sense_leaf_limit=0):
 
-        # print "most_likely_ccg_parse_tree_given_tokens initialized with tks="+str(tks) + \
-        #       ", new_sense_leaf_limit="+str(new_sense_leaf_limit)  # DEBUG
+        #print "most_likely_ccg_parse_tree_given_tokens initialized with tks="+str(tks) + \
+              #", new_sense_leaf_limit="+str(new_sense_leaf_limit)  # DEBUG
+        #debug_chr = raw_input()
 
         # indexed by position in span (i, j) in parse tree
         # value is list of tuples [CCG category, [left key, left index], [right key, right index], score]
@@ -1164,31 +1165,47 @@ class CKYParser:
 
         # populate chart using CKY
         for width in range(2, len(tks)+1):
-            # print "width: "+str(width)  # DEBUG
+            #print "width: "+str(width)  # DEBUG
             for start in range(0, len(tks)-width+1):
                 end = start + width
                 key = (start, end)
                 if key not in chart:
                     chart[key] = []
-                # print "key: "+str(key)  # DEBUG
+                #print "key: "+str(key)  # DEBUG
                 for mid in range(start+1, end):
                     l_key = (start, mid)
                     r_key = (mid, end)
                     left = chart[l_key] if l_key in chart else []
                     right = chart[r_key] if r_key in chart else []
-                    # print "l_key: "+str(l_key)  # DEBUG
-                    # print "r_key: "+str(r_key)  # DEBUG
+                    #print "l_key: "+str(l_key)  # DEBUG
+                    #print "r_key: "+str(r_key)  # DEBUG
                     for l_idx in range(0, len(left)):
                         l = left[l_idx]
-                        # print "l: "+str(l)+", cat="+self.lexicon.compose_str_from_category(l[0])  # DEBUG
+                        #if debug_chr == 'y' : # DEBUG 
+                            #print "l: "+str(l)+", cat="+self.lexicon.compose_str_from_category(l[0])  # DEBUG
                         for r_idx in range(0, len(right)):
                             r = right[r_idx]
-                            # print "r: "+str(r)+", cat="+self.lexicon.compose_str_from_category(r[0])  # DEBUG
+                            #if debug_chr == 'y' : # DEBUG
+                                #print "r: "+str(r)+", cat="+self.lexicon.compose_str_from_category(r[0])  # DEBUG
                             for prod in self.theta.CCG_production:
-                                # print "prod: "+str([self.lexicon.compose_str_from_category(c) for c in prod])  # DEBUG
+                                #if debug_chr == 'y' : # DEBUG
+                                    #print "prod: "+str([self.lexicon.compose_str_from_category(c) for c in prod])  # DEBUG
                                 if prod[1] == l[0] and prod[2] == r[0]:
                                     new_score = self.theta.CCG_production[prod] + l[3] + r[3]
-                                    chart[key].append([prod[0], [l_key, l_idx], [r_key, r_idx], new_score])
+                                    # Find all expansions of this non-terminal in the cell
+                                    expansions = [expansion for expansion in chart[key] if expansion[0] == prod[0]]
+                                    if len(expansions) < self.max_expansions_per_non_terminal - 1:
+                                        chart[key].append([prod[0], [l_key, l_idx], [r_key, r_idx], new_score])
+                                    else :
+                                        # Sort expansions in order of score
+                                        scores_and_expansions = [(expansion[-1], expansion) for expansion in expansions]
+                                        scores_and_expansions.sort() 
+                                        if new_score > scores_and_expansions[0][0] :
+                                            # Remove the least scoring existing expansion and
+                                            # add the one just found
+                                            chart[key].remove(scores_and_expansions[0][1])
+                                            chart[key].append([prod[0], [l_key, l_idx], [r_key, r_idx], new_score])
+                                            
                                     # print "new chart entry "+str(key)+" : "+str(chart[key][-1])  # DEBUG
                     lr_keys = [l_key, r_key]
                     lr_dirs = [left, right]

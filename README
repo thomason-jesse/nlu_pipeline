@@ -54,11 +54,9 @@ rosrun nlu_pipeline test_pomdp_pipeline.py src/nlu_pipeline/src/resources/fake_t
 
 POMDP AMT Experiment
 
-rosrun nlu_pipeline DialogueServer.py src/nlu_pipeline/src/resources/fake_to_real/ont.txt src/nlu_pipeline/src/resources/fake_to_real/lex.txt src/nlu_pipeline/src/resources/fake_to_real/utterance_sem_forms.txt
+rosrun nlu_pipeline DialogueServer.py src/nlu_pipeline/src/resources/fake_to_real/ont.txt src/nlu_pipeline/src/resources/fake_to_real/lex.txt src/nlu_pipeline/src/resources/fake_to_real/utterance_sem_forms.txt true
 
 Training POMDP :
-
-rosrun nlu_pipeline train_pomdp_pipeline.py src/nlu_pipeline/src/resources/old_ijcai_domain/ont.txt src/nlu_pipeline/src/resources/old_ijcai_domain/lex.txt src/nlu_pipeline/src/resources/old_ijcai_domain/utterance_sem_forms.txt
 
 rosrun nlu_pipeline train_pomdp_pipeline.py src/nlu_pipeline/src/resources/fake_to_real/ont.txt src/nlu_pipeline/src/resources/fake_to_real/lex.txt src/nlu_pipeline/src/resources/fake_to_real/utterance_sem_forms.txt
 
@@ -68,7 +66,9 @@ roslaunch rosbridge_server rosbridge_websocket.launch
 
 Train Parser :
 
-rosrun nlu_pipeline ParserTrainer.py src/nlu_pipeline/src/resources/fake_to_real/ont.txt src/nlu_pipeline/src/resources/fake_to_real/lex.txt src/nlu_pipeline/src/resources/fake_to_real/utterance_sem_forms.txt
+From catkin_ws/src/nlu_pipeline/src/bootstrapping run 
+
+python train_parser_iterative.py ../resources/fake_to_real/ont.txt ../resources/fake_to_real/lex.txt ../resources/fake_to_real/utterance_sem_forms.txt ../tests/templated_examples/1000.txt
 
 NOTE:
   Right now there will be an initial "testing Generator" prompt. You can skip this by typing "stop".

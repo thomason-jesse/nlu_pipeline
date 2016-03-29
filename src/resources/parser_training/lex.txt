@@ -1,10 +1,10 @@
 Position : denotation 
 <C>
 <PS>
-a supervisor : ray
-a secretary : stacy
-a director : peter
-a intern : rodolfo
+the supervisor : ray
+the secretary : stacy
+the director : peter
+the intern : rodolfo
 </C>
 place reference : denotation 
 <C>
@@ -47,7 +47,6 @@ chips : potato chips
 coffee : a beverage
 coffee : a coffee
 coffee : a coffee cup
-coffee : a coffee to go
 coffee : a cup of coffee
 hamburger : a burger
 hamburger : a cheeseburger

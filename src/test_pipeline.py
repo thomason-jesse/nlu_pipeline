@@ -11,7 +11,6 @@ import StaticDialogPolicy
 import ActionSender
 from TemplateBasedGenerator import TemplateBasedGenerator
 from StaticDialogAgent import StaticDialogAgent
-from DialogAgent import DialogAgent
 from utils import *
 
 class InputFromKeyboard:
@@ -60,7 +59,7 @@ converged = parser.train_learner_on_semantic_forms(d, 10, reranker_beam=10)
 if not converged:
     raise AssertionError("Training failed to converge to correct values.")
 save_model(parser, 'parser')
-#parser = load_model('parser')
+# parser = load_model('parser')
 
 # Set parser hyperparams to best known values for test time
 parser.max_multiword_expression = 2  # max span of a multi-word expression to be considered during tokenization

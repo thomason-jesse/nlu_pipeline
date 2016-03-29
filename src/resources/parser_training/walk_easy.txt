@@ -1,0 +1,8 @@
+walk to <P>
+please walk to <P>
+can you walk to <P>
+can you go to <P>
+go to <P>
+please go to <P>
+run over to <P>
+you should go to <P>

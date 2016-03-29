@@ -1,0 +1,13 @@
+is <N> in <P>
+can you find <N> in <P>
+can you search for <N> in <P>
+find <N> in <P>
+check <P> for <N>
+check for <N> in <P>
+search <P> for <N>
+search for <N> in <P>
+look for <N> in <P>
+look whether <N> is in <P>
+look if <N> is in <P>
+see if <N> is in <P>
+see whether <N> is in <P>

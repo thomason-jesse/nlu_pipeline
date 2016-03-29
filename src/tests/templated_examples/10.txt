@@ -1,0 +1,27 @@
+can you search for the intern in 3414b
+M : searchroom(rodolfo,l3_414b)
+
+take juice for frannie
+M : bring(juice,scott)
+
+give chips to peggy
+M : bring(chips,dana)
+
+please go to 3510
+M : at(l3_510)
+
+search ms eckhart's office for george
+M : searchroom(rodolfo,the(lambda x:e.(hasoffice(aishwarya, x))))
+
+find carol clark in mr george green's office
+M : searchroom(shiqi,the(lambda x:e.(hasoffice(rodolfo, x))))
+
+see whether robert brown is in 3510
+M : searchroom(jesse,l3_510)
+
+search for dave in carol's office
+M : searchroom(jivko,the(lambda x:e.(hasoffice(shiqi, x))))
+
+check for the secretary in bob's office
+M : searchroom(stacy,the(lambda x:e.(hasoffice(jesse, x))))
+

@@ -6,6 +6,7 @@ import sys
 import Ontology
 import Lexicon
 import CKYParser
+from utils import *
 
 path = '/u/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/resources/parser_training/'
 
@@ -31,7 +32,7 @@ class ParserTrainer:
         self.semantic_forms = dict()
         self.people_used = list()
         
-        print 'names possessive ', self.names_possessive
+        #print 'names possessive ', self.names_possessive   # DEBUG
 
     #Generates dictionary of tags and their elements from lex.txt. 
     def genTags(self):
@@ -61,9 +62,9 @@ class ParserTrainer:
 
     #Generates templates from files. 
     def genTemplates(self):
-        self.templates['walk'] = [line for line in open(path + 'walkTemplates.txt', 'r')]
-        self.templates['search'] = [line for line in open(path + 'searchTemplates.txt', 'r')]
-        self.templates['bring'] = [line for line in open(path + 'bringTemplates.txt', 'r')]
+        self.templates['walk'] = [line for line in open(path + 'walk_easy.txt', 'r')]
+        self.templates['search'] = [line for line in open(path + 'search_easy.txt', 'r')]
+        self.templates['bring'] = [line for line in open(path + 'bring_easy.txt', 'r')]
         
     #Generates list of all possible references to people. 
     def genNames(self): 
@@ -167,7 +168,7 @@ class ParserTrainer:
 
         self.genDenotationAndSemForm(templateType)
 
-        print 'command = ', command
+        #print 'command = ', command    # DEBUG
         return ' '.join(command)
 
     #Generates denotation for phrase.
@@ -190,12 +191,11 @@ class ParserTrainer:
             self.semantic_form += self.semantic_forms["<P>"] + ")"
         
     def genNormalItem(self):
-        print 'In genNormalItem'
         expansionIndex = random.randint(0, len(self.tags["<I>"]) - 1)
         expansionList = self.tags["<I>"][expansionIndex].split(':')
         expansion = expansionList[1].strip()
         denotation = expansionList[0].strip()
-        print 'expansion = ', expansion, ', denotation = ', denotation
+        #print 'expansion = ', expansion, ', denotation = ', denotation # DEBUG
 
         #Stores denotation. 
         self.denotations["<I>"] = denotation
@@ -260,40 +260,39 @@ class ParserTrainer:
 
     
 if __name__ == '__main__' :
-    print "reading in Ontology"
     ont = Ontology.Ontology(sys.argv[1])
-    print "predicates: " + str(ont.preds)
-    print "types: " + str(ont.types)
-    print "entries: " + str(ont.entries)
-
-    print "reading in Lexicon"
     lex = Lexicon.Lexicon(ont, sys.argv[2])
-    print "surface forms: " + str(lex.surface_forms)
-    print "categories: " + str(lex.categories)
-    print "semantic forms: " + str(lex.semantic_forms)
-    print "entries: " + str(lex.entries)
     
     parser_trainer = ParserTrainer()
     parser = CKYParser.CKYParser(ont, lex, use_language_model=True)
     
-    # Set parser hyperparams to best known values for training
+    ## Set parser hyperparams to best known values for training
     parser.max_multiword_expression = 2  # max span of a multi-word expression to be considered during tokenization
     parser.max_new_senses_per_utterance = 2  # max number of new word senses that can be induced on a training example
-    parser.max_cky_trees_per_token_sequence_beam = 100  # for tokenization of an utterance, max cky trees considered
-    parser.max_hypothesis_categories_for_unknown_token_beam = 2  # for unknown token, max syntax categories tried
+    parser.max_cky_trees_per_token_sequence_beam = 1000  # for tokenization of an utterance, max cky trees considered
+    parser.max_hypothesis_categories_for_unknown_token_beam = 5  # for unknown token, max syntax categories tried
+    parser.max_expansions_per_non_terminal = 5
 
     # Create train set
     D = parser.read_in_paired_utterance_semantics(sys.argv[3])
-    for i in range(1, 1000) :
-        command = parser_trainer.genCommand()
-        print 'command = ', command, '\nsem form = ', parser_trainer.semantic_form
+    #for i in range(1, 10) :
+        #command = parser_trainer.genCommand()
+        ##print 'command = ', command, '\nsem form = ', parser_trainer.semantic_form
+        #print command
+        #print 'M : ' + parser_trainer.semantic_form
+        #print 
         
-        ccg = parser.lexicon.read_category_from_str('M')
-        form = parser.lexicon.read_semantic_form_from_str(parser_trainer.semantic_form, 
-                                                    None, None, [], allow_expanding_ont=False)
-        form.category = ccg
+        #ccg = parser.lexicon.read_category_from_str('M')
+        #form = parser.lexicon.read_semantic_form_from_str(parser_trainer.semantic_form, 
+                                                    #None, None, [], allow_expanding_ont=False)
+        #form.category = ccg
 
-        D.append((command, form))
+        #D.append((command, form))
     converged = parser.train_learner_on_semantic_forms(D, 10, reranker_beam=10)
-    save_model(parser, 'parser_1000')
+    print 'converged = ', converged
+    if len(sys.argv) > 4 :
+        filename = str(sys.argv[4])
+    else :
+        filename = '/u/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/models/parser_condor_1000_easy.pkl'
+    save_obj_general(parser, filename)
     

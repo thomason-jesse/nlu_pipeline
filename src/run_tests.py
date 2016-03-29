@@ -6,6 +6,8 @@ import time
 
 tests = [('aish',
           'python tests/aish/main.py tests/aish/ont.txt tests/aish/lex.txt tests/aish/samples.txt'),
+         ('templated_examples',
+          'python tests/templated_examples/main.py tests/templated_examples/ont.txt tests/templated_examples/lex.txt tests/templated_examples/10.txt'),
          ('cky_parser_basics',
           'python tests/cky_parser_basics/main.py tests/cky_parser_basics/ont.txt \
           tests/cky_parser_basics/lex.txt tests/cky_parser_basics/samples.txt \

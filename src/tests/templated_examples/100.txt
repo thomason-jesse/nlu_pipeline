@@ -1,0 +1,297 @@
+go to eve eckhart's office
+M : at(the(lambda x:e.(hasoffice(aishwarya, x))))
+
+please walk to 3432
+M : at(l3_432)
+
+can you bring a drink to the director
+M : bring(juice,peter)
+
+can you walk to walter ward's office
+M : at(the(lambda x:e.(hasoffice(ray, x))))
+
+check francis foster's office for dr morgan
+M : searchroom(peter,the(lambda x:e.(hasoffice(scott, x))))
+
+see if carol clark is in bob's office
+M : searchroom(shiqi,the(lambda x:e.(hasoffice(jesse, x))))
+
+search for ms francis foster in 3502
+M : searchroom(scott,l3_502)
+
+check for mr george green in dave's office
+M : searchroom(rodolfo,the(lambda x:e.(hasoffice(jivko, x))))
+
+please take a coffee cup for dr dave daniel
+M : bring(coffee,jivko)
+
+mr robert brown wants a cake
+M : bring(muffin,jesse)
+
+go to secretary alice ashcraft's office
+M : at(the(lambda x:e.(hasoffice(stacy, x))))
+
+search for ms eckhart in robert's office
+M : searchroom(aishwarya,the(lambda x:e.(hasoffice(jesse, x))))
+
+look if walter ward is in 3510
+M : searchroom(ray,l3_510)
+
+please go to robert's office
+M : at(the(lambda x:e.(hasoffice(jesse, x))))
+
+look for mr dave daniel in 3404
+M : searchroom(jivko,l3_404)
+
+deliver a glass of juice to mr green
+M : bring(juice,rodolfo)
+
+look for ms evelyn eckhart in walter's office
+M : searchroom(aishwarya,the(lambda x:e.(hasoffice(ray, x))))
+
+go to mallory's office
+M : at(the(lambda x:e.(hasoffice(peter, x))))
+
+bring dave daniel lays
+M : bring(chips,jivko)
+
+look if the supervisor is in 3404
+M : searchroom(ray,l3_404)
+
+take a beverage to ms evelyn eckhart
+M : bring(coffee,aishwarya)
+
+run over to 3510
+M : at(l3_510)
+
+walk to 3404
+M : at(l3_404)
+
+please go to 3508
+M : at(l3_508)
+
+please bring a beverage to mr dave daniel
+M : bring(coffee,jivko)
+
+please bring a burger to alice ashcraft
+M : bring(hamburger,stacy)
+
+the supervisor wants a burger
+M : bring(hamburger,ray)
+
+find walter in 3432
+M : searchroom(ray,l3_432)
+
+search for ms ashcraft in evelyn's office
+M : searchroom(stacy,the(lambda x:e.(hasoffice(aishwarya, x))))
+
+walk to 3508
+M : at(l3_508)
+
+please go to 3512
+M : at(l3_512)
+
+go to peggy's office
+M : at(the(lambda x:e.(hasoffice(dana, x))))
+
+can you search for francis foster in 3512
+M : searchroom(scott,l3_512)
+
+peggy would like a cheeseburger
+M : bring(hamburger,dana)
+
+search 3512 for dr clark
+M : searchroom(shiqi,l3_512)
+
+you should go to mr dave daniel's office
+M : at(the(lambda x:e.(hasoffice(jivko, x))))
+
+see if mr dave daniel is in 3508
+M : searchroom(jivko,l3_508)
+
+can you take a drink to mallory morgan
+M : bring(juice,peter)
+
+walk to frannie's office
+M : at(the(lambda x:e.(hasoffice(scott, x))))
+
+please give potato chips to carol
+M : bring(chips,shiqi)
+
+look whether ms ashcraft is in 3508
+M : searchroom(stacy,l3_508)
+
+find secretary ashcraft in 3414b
+M : searchroom(stacy,l3_414b)
+
+can you walk to 3404
+M : at(l3_404)
+
+can you walk to 3404
+M : at(l3_404)
+
+can you go to 3510
+M : at(l3_510)
+
+take a burger to frannie foster
+M : bring(hamburger,scott)
+
+can you bring a glass of juice to dave daniel
+M : bring(juice,jivko)
+
+please bring a cake for walter ward
+M : bring(muffin,ray)
+
+please deliver lays to mallory
+M : bring(chips,peter)
+
+can you walk to dave daniel's office
+M : at(the(lambda x:e.(hasoffice(jivko, x))))
+
+search for robert in 3512
+M : searchroom(jesse,l3_512)
+
+mr daniel would like a drink
+M : bring(juice,jivko)
+
+can you search for mallory in dr peggy parker's office
+M : searchroom(peter,the(lambda x:e.(hasoffice(dana, x))))
+
+can you walk to 3512
+M : at(l3_512)
+
+bring a beverage for bob brown
+M : bring(coffee,jesse)
+
+please go to eve eckhart's office
+M : at(the(lambda x:e.(hasoffice(aishwarya, x))))
+
+search dr parker's office for bob brown
+M : searchroom(jesse,the(lambda x:e.(hasoffice(dana, x))))
+
+bring a burger to walter
+M : bring(hamburger,ray)
+
+take a beverage for the intern
+M : bring(coffee,rodolfo)
+
+bring frannie foster chips
+M : bring(chips,scott)
+
+can you find francis in eve eckhart's office
+M : searchroom(scott,the(lambda x:e.(hasoffice(aishwarya, x))))
+
+give a cupcake to secretary ashcraft
+M : bring(muffin,stacy)
+
+bring ms alice ashcraft a coffee
+M : bring(coffee,stacy)
+
+can you deliver juice to the director
+M : bring(juice,peter)
+
+deliver a burger to mr george green
+M : bring(hamburger,rodolfo)
+
+can you walk to 3414b
+M : at(l3_414b)
+
+please give chips to francis foster
+M : bring(chips,scott)
+
+please bring a cheeseburger for frannie
+M : bring(hamburger,scott)
+
+please give a cheeseburger to dave daniel
+M : bring(hamburger,jivko)
+
+go to evelyn eckhart's office
+M : at(the(lambda x:e.(hasoffice(aishwarya, x))))
+
+get a bag of chips for mr robert brown
+M : bring(chips,jesse)
+
+can you find ms ashcraft in walter ward's office
+M : searchroom(stacy,the(lambda x:e.(hasoffice(ray, x))))
+
+bring a beverage to mr brown
+M : bring(coffee,jesse)
+
+see whether mr green is in walter ward's office
+M : searchroom(rodolfo,the(lambda x:e.(hasoffice(ray, x))))
+
+is robert brown in 3512
+M : searchroom(jesse,l3_512)
+
+see whether eve eckhart is in 3502
+M : searchroom(aishwarya,l3_502)
+
+deliver a cup of coffee to george green
+M : bring(coffee,rodolfo)
+
+see whether carol clark is in 3502
+M : searchroom(shiqi,l3_502)
+
+please go to 3510
+M : at(l3_510)
+
+search for mr green in eve eckhart's office
+M : searchroom(rodolfo,the(lambda x:e.(hasoffice(aishwarya, x))))
+
+see if dr peggy parker is in 3508
+M : searchroom(dana,l3_508)
+
+please walk to 3512
+M : at(l3_512)
+
+please bring a coffee cup to mr daniel
+M : bring(coffee,jivko)
+
+get juice for dr carol clark
+M : bring(juice,shiqi)
+
+check for ms alice ashcraft in 3502
+M : searchroom(stacy,l3_502)
+
+look for peggy in 3420
+M : searchroom(dana,l3_420)
+
+can you go to walter ward's office
+M : at(the(lambda x:e.(hasoffice(ray, x))))
+
+you should go to 3420
+M : at(l3_420)
+
+go to 3420
+M : at(l3_420)
+
+frannie foster would like chips
+M : bring(chips,scott)
+
+can you search for dr dave daniel in walter ward's office
+M : searchroom(jivko,the(lambda x:e.(hasoffice(ray, x))))
+
+can you bring a dessert to carol clark
+M : bring(muffin,shiqi)
+
+can you search for eve eckhart in francis's office
+M : searchroom(aishwarya,the(lambda x:e.(hasoffice(scott, x))))
+
+dr parker would like lays
+M : bring(chips,dana)
+
+see if walter ward is in alice ashcraft's office
+M : searchroom(ray,the(lambda x:e.(hasoffice(stacy, x))))
+
+can you walk to dr clark's office
+M : at(the(lambda x:e.(hasoffice(shiqi, x))))
+
+is dr daniel in frannie's office
+M : searchroom(jivko,the(lambda x:e.(hasoffice(scott, x))))
+
+can you walk to 3512
+M : at(l3_512)
+
+bring francis foster juice
+M : bring(juice,scott)
+
