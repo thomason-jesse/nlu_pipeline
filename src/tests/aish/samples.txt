@@ -1,3 +1,6 @@
+burger
+NP : hamburger
+
 search walter 's office for bob
 M : searchroom(bob,the(lambda x:e.(hasoffice(walter,x))))
 
@@ -30,6 +33,3 @@ M : at(the(lambda x:e.(hasoffice(alice,x))))
 
 search for george in alice 's office
 M : searchroom(george,the(lambda x:e.(hasoffice(alice,x))))
-
-burger
-NP : hamburger
