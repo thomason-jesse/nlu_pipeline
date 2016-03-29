@@ -8,6 +8,7 @@ rm -f src/online_interface/*~
 rm -f srv/*~
 rm -f src/not_in_use/*~
 rm -f src/resources/*~
+rm -f src/bootstrapping/*~
 rm -f src/resources/amt_expt/*~
 rm -f src/resources/amt_expt/other_changes/*~
 rm -f src/resources/amt_expt/other_changes/domain_amt/*~
