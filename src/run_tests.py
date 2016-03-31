@@ -17,7 +17,12 @@ tests = [('aish',
           tests/grounding_recall/lex.txt tests/grounding_recall/samples.txt'),
          ('action_grounding',
          'rosrun nlu_pipeline src/tests/action_grounding/main.py tests/action_grounding/ont.txt \
-          tests/action_grounding/lex.txt tests/action_grounding/utterance_action_pairs.txt')]
+          tests/action_grounding/lex.txt tests/action_grounding/utterance_action_pairs.txt'),
+         ('navigation',
+          'python tests/navigation/main.py tests/navigation/ont.txt \
+          tests/navigation/lex.txt tests/navigation/samples.txt'),
+         ('merge_op',
+          'python tests/merge_op/main.py tests/merge_op/parser_1000 tests/merge_op/samples.txt')]
 
 # read command line arguments
 tests_to_run = [t[0] for t in tests]
