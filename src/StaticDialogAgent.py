@@ -38,7 +38,7 @@ class StaticDialogAgent(PomdpDialogAgent):
         # select next action from state
         action = None
         while action is None:
-            self.cur_turn_log = [self.state]
+            self.cur_turn_log = []
             print "dialog state: "+str(self.state)  # DEBUG
             action = self.policy.resolve_state_to_action(self.state)
 
@@ -53,12 +53,15 @@ class StaticDialogAgent(PomdpDialogAgent):
                 self.dialog_objects_log.append(self.cur_turn_log)
                 if self.dialogue_stopped :
                     print 'Dialogue stopped'
+                    complete_log_object = (self.log_header, self.dialog_objects_log, None, False, self.parser_train_data)
+                    if self.dialog_objects_logfile is not None :
+                        save_obj_general(complete_log_object, self.dialog_objects_logfile)
                     return None
         
         success = False
         if action is not None :
             self.output.say(self.response_generator.get_action_sentence(action, self.final_action_log) + ' Was this the right action? ')
-            response = self.input.get()
+            response = self.get_user_input()
             if response == '<ERROR/>' or response.lower() == 'y' or response.lower() == 'yes' :
                 success = True
         
@@ -77,7 +80,7 @@ class StaticDialogAgent(PomdpDialogAgent):
         self.previous_system_action = SystemAction('repeat_goal')
         output = self.response_generator.get_sentence(self.previous_system_action)
         self.output.say(output)
-        u = self.input.get()
+        u = self.get_user_input()
         self.cur_turn_log = [self.previous_system_action, u]
         self.dialog_objects_log.append(self.cur_turn_log)
         if u.lower().strip() == 'stop' :
@@ -105,7 +108,7 @@ class StaticDialogAgent(PomdpDialogAgent):
         
         response = self.response_generator.get_sentence(self.previous_system_action)    
         self.output.say(response)
-        u = self.input.get()
+        u = self.get_user_input()
         self.cur_turn_log = [self.previous_system_action, u]
         self.dialog_objects_log.append(self.cur_turn_log)
         
@@ -136,7 +139,7 @@ class StaticDialogAgent(PomdpDialogAgent):
         
         response = self.response_generator.get_sentence(self.previous_system_action)    
         self.output.say(response)
-        c = self.input.get()
+        c = self.get_user_input()
         self.cur_turn_log = [self.previous_system_action, c]
         self.dialog_objects_log.append(self.cur_turn_log)
         

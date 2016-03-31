@@ -67,7 +67,7 @@ class PomdpDialogAgent(DialogAgent) :
                 action = dialog_action_arg
                 output = self.response_generator.get_action_sentence(action, self.final_action_log)
                 self.output.say(output + " Was this the correct action?")
-                response = self.input.get().lower()  
+                response = self.get_user_input().lower()  
                 if response == '<ERROR/>' :
                     # Benefit of doubt - assume the action was correct
                     self.policy.update_final_reward(self.knowledge.correct_action_reward)
@@ -124,6 +124,28 @@ class PomdpDialogAgent(DialogAgent) :
                 #print 'dialog_action = ', dialog_action # DEBUG
                 #print str(dialog_action_arg)            # DEBUG
             self.first_turn = False
+
+    # A wrapper method to call self.input.get() that ensures that logs
+    # get saved if a timeout or stop error is raised
+    def get_user_input(self) :
+        try :
+            response = self.input.get()
+        except KeyboardInterrupt as e :
+            complete_log_object = (self.log_header, self.dialog_objects_log, None, False, self.parser_train_data)
+            if self.dialog_objects_logfile is not None :
+                save_obj_general(complete_log_object, self.dialog_objects_logfile)
+            raise e
+        except SystemExit as e :
+            complete_log_object = (self.log_header, self.dialog_objects_log, None, False, self.parser_train_data)
+            if self.dialog_objects_logfile is not None :
+                save_obj_general(complete_log_object, self.dialog_objects_logfile)
+            raise e
+        except RuntimeError as e :
+            complete_log_object = (self.log_header, self.dialog_objects_log, None, False, self.parser_train_data)
+            if self.dialog_objects_logfile is not None :
+                save_obj_general(complete_log_object, self.dialog_objects_logfile)
+            raise e
+        return response
         
     # Request the user to state/repeat their goal
     def request_user_initiative(self):
@@ -132,7 +154,7 @@ class PomdpDialogAgent(DialogAgent) :
         output = self.response_generator.get_sentence(self.previous_system_action)
         print 'output = ', output   # DEBUG
         self.output.say(output)
-        response = self.input.get()
+        response = self.get_user_input()
         if 'full' in self.parser_train_data :
             self.parser_train_data['full'].append(response)
         else :
@@ -143,7 +165,7 @@ class PomdpDialogAgent(DialogAgent) :
     def request_missing_param(self):
         output = self.response_generator.get_sentence(self.previous_system_action)
         self.output.say(output)
-        response = self.input.get()
+        response = self.get_user_input()
         param_name = self.previous_system_action.extra_data[0]
         if param_name in self.parser_train_data :
             self.parser_train_data[param_name].append(response)
@@ -174,7 +196,7 @@ class PomdpDialogAgent(DialogAgent) :
         # for now, just use a.name and a.params raw
         output = self.response_generator.get_sentence(self.previous_system_action)
         self.output.say(output)                        
-        response = self.input.get()
+        response = self.get_user_input()
         return response
 
     # Converts an object of type Action to type Utterance assuming it is
@@ -394,7 +416,7 @@ class PomdpDialogAgent(DialogAgent) :
             if utterances is not None and len(utterances) > 0:
                 for utterance in utterances :
                     utterance.parse = parse
-                    utterance.parse_prob = conf 
+                    utterance.parse_prob = conf - numpy.log(len(utterances))
                     self.n_best_utterances.append(utterance)
         
         # Clean up by removing duplicates and invalid utterances    
@@ -415,7 +437,15 @@ class PomdpDialogAgent(DialogAgent) :
             sum_log_prob = add_log_probs(sum_log_prob, utterance.parse_prob)
 
         sum_prob = math.exp(sum_log_prob)
-        non_n_best_prob = max(self.knowledge.min_obs_by_non_n_best_prob, self.knowledge.max_obs_by_non_n_best_prob - sum_prob)
+        non_n_best_prob = 1.0 - sum_prob
+        if non_n_best_prob < self.knowledge.min_obs_by_non_n_best_prob :
+            non_n_best_prob = self.knowledge.min_obs_by_non_n_best_prob
+        elif non_n_best_prob > self.knowledge.max_obs_by_non_n_best_prob :
+            non_n_best_prob = self.knowledge.max_obs_by_non_n_best_prob 
+        print 'non_n_best_prob = ', non_n_best_prob
+        print 'self.knowledge.min_obs_by_non_n_best_prob = ', self.knowledge.min_obs_by_non_n_best_prob
+        print 'self.knowledge.max_obs_by_non_n_best_prob = ', self.knowledge.max_obs_by_non_n_best_prob
+        
         other_utterance = Utterance('-OTHER-', parse_prob=numpy.log(non_n_best_prob))
         self.n_best_utterances.append(other_utterance)
         sum_log_prob = add_log_probs(sum_log_prob, numpy.log(non_n_best_prob))
