@@ -45,7 +45,7 @@ print "instantiating Parser"
 #if not converged:
     #raise AssertionError("Training failed to converge to correct values.")
 #save_model(parser, 'parser')
-parser = load_model('parsers/parser_1000')
+parser = load_model('parsers/parser_1500')
 
 # Set parser hyperparams to best known values for test time
 parser.max_multiword_expression = 2  # max span of a multi-word expression to be considered during tokenization
@@ -70,18 +70,18 @@ fail_dir = '/u/aish/Documents/Research/rlg/logs_only/second/invalid'
 A.init_weights_from_hand_coded_policy()
 file_name = file_path + 'hand_coded' + '.pkl'
 save_obj_general(A.policy, file_name)
-A.train_from_old_logs(success_dir, fail_dir)
-file_name = file_path + 'batch0.pkl'
-save_obj_general(A.policy, file_name)
-A.train_from_old_logs(success_dir, fail_dir)
-file_name = file_path + 'batch1.pkl'
-save_obj_general(A.policy, file_name)
-A.train_from_old_logs(success_dir, fail_dir)
-file_name = file_path + 'batch2.pkl'
-save_obj_general(A.policy, file_name)
-A.train_from_old_logs(success_dir, fail_dir)
-file_name = file_path + 'batch3.pkl'
-save_obj_general(A.policy, file_name)
-A.train_from_old_logs(success_dir, fail_dir)
-file_name = file_path + 'batch4.pkl'
-save_obj_general(A.policy, file_name)
+#A.train_from_old_logs(success_dir, fail_dir)
+#file_name = file_path + 'batch0.pkl'
+#save_obj_general(A.policy, file_name)
+#A.train_from_old_logs(success_dir, fail_dir)
+#file_name = file_path + 'batch1.pkl'
+#save_obj_general(A.policy, file_name)
+#A.train_from_old_logs(success_dir, fail_dir)
+#file_name = file_path + 'batch2.pkl'
+#save_obj_general(A.policy, file_name)
+#A.train_from_old_logs(success_dir, fail_dir)
+#file_name = file_path + 'batch3.pkl'
+#save_obj_general(A.policy, file_name)
+#A.train_from_old_logs(success_dir, fail_dir)
+#file_name = file_path + 'batch4.pkl'
+#save_obj_general(A.policy, file_name)

@@ -35,15 +35,15 @@ class PomdpKtdqPolicy(AbstractPolicy) :
         self.training = True
         
         # Calculate number of features
-        #self.n = 3
-        self.n = 1
+        self.n = 3
+        #self.n = 1
         #self.n += len(self.knowledge.ktdq_rbf_centres)
         self.n += len(self.knowledge.ktdq_prob_bins)
-        #self.n += len(self.knowledge.ktdq_prob_bins)
+        self.n += len(self.knowledge.ktdq_prob_bins)
         self.n += len(self.knowledge.goal_actions)
         self.n += len(self.knowledge.goal_params) + 1
         self.n += len(self.knowledge.user_dialog_actions)
-        #self.n += len(self.knowledge.goal_actions) + 1
+        self.n += len(self.knowledge.goal_actions) + 1
         self.n *= len(self.knowledge.summary_system_actions)
         
         # Initialize params
@@ -90,10 +90,10 @@ class PomdpKtdqPolicy(AbstractPolicy) :
             new_state_feature_vector.append(feature_value)
         
         # Probability of second hypothesis
-        #s2 = numpy.exp(orig_feature_vector[1])     
-        #for canonical_prob_value in self.knowledge.ktdq_prob_bins :
-            #feature_value = numpy.abs(s2 - canonical_prob_value)
-            #new_state_feature_vector.append(feature_value)
+        s2 = numpy.exp(orig_feature_vector[1])     
+        for canonical_prob_value in self.knowledge.ktdq_prob_bins :
+            feature_value = numpy.abs(s2 - canonical_prob_value)
+            new_state_feature_vector.append(feature_value)
         
         # No of goals allowed by the top partition     
         s3 = orig_feature_vector[2]
@@ -111,15 +111,15 @@ class PomdpKtdqPolicy(AbstractPolicy) :
             new_state_feature_vector.append(int(i == s4))
         #print '----------------'
         
-        ## Number of dialog turns used so far    
-        #s5 = orig_feature_vector[4]        
-        ## 0-1 : Is dialogue too long?
-        #new_state_feature_vector.append(int(s5 > self.knowledge.ktdq_long_dialogue_thresh))
+        # Number of dialog turns used so far    
+        s5 = orig_feature_vector[4]        
+        # 0-1 : Is dialogue too long?
+        new_state_feature_vector.append(int(s5 > self.knowledge.ktdq_long_dialogue_thresh))
         
-        ## Do the top and second hypothesis use the same partition: yes/no  
-        #s6 = orig_feature_vector[5]
-        ## 0-1 : Do the top and second hypothesis use the same partition?
-        #new_state_feature_vector.append(int(s6 == 'yes'))
+        # Do the top and second hypothesis use the same partition: yes/no  
+        s6 = orig_feature_vector[5]
+        # 0-1 : Do the top and second hypothesis use the same partition?
+        new_state_feature_vector.append(int(s6 == 'yes'))
 
         # Type of last user utterance - inform_full/inform_param/affirm/deny        
         s7 = orig_feature_vector[6]
@@ -130,10 +130,10 @@ class PomdpKtdqPolicy(AbstractPolicy) :
         #print '----------------'
             
         # Goal in top hypothesis partition or 'None' if this is not unique
-        #s8 = orig_feature_vector[7]
-        ## Delta function for each possible value
-        #for value in self.knowledge.goal_actions + [None] :
-            #new_state_feature_vector.append(int(s8 == value))
+        s8 = orig_feature_vector[7]
+        # Delta function for each possible value
+        for value in self.knowledge.goal_actions + [None] :
+            new_state_feature_vector.append(int(s8 == value))
             
         # For each feature in the state feature vectors, create 4 
         # features by multiplying with delta function of each action

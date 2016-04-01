@@ -297,15 +297,15 @@ class AbstractPolicy :
         last_utterance_type = feature_vector[6]
         if num_goals == 1 :
             if num_uncertain_params == 0 :
-                if state.top_hypothesis_prob < numpy.log(0.3) :
+                if feature_vector[0] < numpy.log(0.3) :
                     return 'request_missing_param'
                 if last_utterance_type == 'affirm' or last_utterance_type == 'deny' :
-                    if state.top_hypothesis_prob < numpy.log(0.75) :
+                    if feature_vector[0] < numpy.log(0.75) :
                         return 'repeat_goal'      
                     else :
                         return 'take_action'
                 else :
-                    if state.top_hypothesis_prob < numpy.log(0.99) :
+                    if feature_vector[0] < numpy.log(0.99) :
                         return 'confirm_action'
                     else :
                         return 'take_action'

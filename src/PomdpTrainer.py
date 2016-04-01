@@ -101,31 +101,16 @@ class PomdpTrainer(PomdpDialogAgent) :
         sample_weights = None
         to_print = []
         for example in training_examples :
-            #print 'Example no ', i
             i += 1
             sample_weight = 1
-            (top_prob, sec_prob, num_goals, num_uncertain_params, _, _, last_utterance_type, _) = example
-            action = None
-            if num_goals == 1 :
-                if num_uncertain_params == 0 :
-                    if top_prob < np.log(0.8) :
-                        action = 'confirm_action'
-                        sample_weight = 100
-                        c += 1
-                    else :
-                        action = 'take_action'
-                        sample_weight = 100
-                        t += 1
-                else :
-                    action = 'request_missing_param'
-                    p += 1
-            else :
-                action = 'repeat_goal'
-                r += 1
-            
             example_list = list(example)
-            #print 'example_list = ', example_list  # DEBUG
             wrapper = FeatureWrapper(example_list)
+            action = self.policy.get_action_from_hand_coded_policy(wrapper)
+            if action == 'confirm_action' or action == 'take_action' :
+                # These actions are rarer and need high sample weight to 
+                # be learned
+                sample_weight = 100
+            
             for a in self.knowledge.summary_system_actions :
                 new_feature_vector = self.policy.get_feature_vector(wrapper, a)
                 if a == action :
@@ -140,9 +125,6 @@ class PomdpTrainer(PomdpDialogAgent) :
                     train_features = np.vstack((train_features, np.matrix(new_feature_vector).T))
                     train_outputs = np.vstack((train_outputs, np.matrix(value).T))
                     sample_weights = np.hstack((sample_weights, sample_weight))
-        #print 'train_features.shape = ', train_features.shape  # DEBUG
-        #print 'train_outputs.shape = ', train_outputs.shape    # DEBUG
-        #print 't = ', t, ', c = ', c, ', p = ', p, ', r = ', r # DEBUG
         train_features = np.tile(train_features, (5,1))
         train_outputs = np.tile(train_outputs, (5,1))
         sample_weights = np.tile(sample_weights, (1, 5))[0,:]
@@ -150,19 +132,9 @@ class PomdpTrainer(PomdpDialogAgent) :
         model.fit(train_features, train_outputs, sample_weights)
         preds = model.predict(train_features)
         print 'Train loss = ', sum(np.square(preds - train_outputs)) / train_features.shape[0]      # DEBUG
-        #print 'Weights = ', model.coef_    # DEBUG
         self.policy.theta = model.coef_.T
         save_model(self.policy, 'ktdq_policy_object')
         
-        b = [np.log(0.9), np.log(0.01), 1, 0, 0, 0, 'inform_full', 0]
-        print str(b)
-        w = FeatureWrapper(b)
-        for a in self.knowledge.summary_system_actions :
-            f = self.policy.get_feature_vector(w, a)
-            print 'f.shape = ', f.shape 
-            print 'a = ', a, ', pred = ', model.predict(f.T)
-        
-            
     # Train the policy using logs from the IJCAI 2015 experiment
     # This makes assumptions on the formatting of the logs
     def train_from_old_logs(self, success_dir, fail_dir) :

@@ -63,7 +63,7 @@ grounder = KBGrounder.KBGrounder(ont)
 #if not converged:
     #raise AssertionError("Training failed to converge to correct values.")
 #save_model(parser, 'parser')
-parser = load_model('parsers/parser_1000')
+parser = load_model('parsers/parser_1500')
 
 # Set parser hyperparams to best known values for test time
 parser.max_multiword_expression = 2  # max span of a multi-word expression to be considered during tokenization
