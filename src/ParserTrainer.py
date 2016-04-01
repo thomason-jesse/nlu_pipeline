@@ -274,25 +274,25 @@ if __name__ == '__main__' :
     parser.max_expansions_per_non_terminal = 5
 
     # Create train set
-    D = parser.read_in_paired_utterance_semantics(sys.argv[3])
-    #for i in range(1, 10) :
-        #command = parser_trainer.genCommand()
-        ##print 'command = ', command, '\nsem form = ', parser_trainer.semantic_form
-        #print command
-        #print 'M : ' + parser_trainer.semantic_form
-        #print 
+    #D = parser.read_in_paired_utterance_semantics(sys.argv[3])
+    for i in range(1, 1500) :
+        command = parser_trainer.genCommand()
+        #print 'command = ', command, '\nsem form = ', parser_trainer.semantic_form
+        print command
+        print 'M : ' + parser_trainer.semantic_form
+        print 
         
-        #ccg = parser.lexicon.read_category_from_str('M')
-        #form = parser.lexicon.read_semantic_form_from_str(parser_trainer.semantic_form, 
-                                                    #None, None, [], allow_expanding_ont=False)
-        #form.category = ccg
+        ccg = parser.lexicon.read_category_from_str('M')
+        form = parser.lexicon.read_semantic_form_from_str(parser_trainer.semantic_form, 
+                                                    None, None, [], allow_expanding_ont=False)
+        form.category = ccg
 
         #D.append((command, form))
-    converged = parser.train_learner_on_semantic_forms(D, 10, reranker_beam=10)
-    print 'converged = ', converged
-    if len(sys.argv) > 4 :
-        filename = str(sys.argv[4])
-    else :
-        filename = '/u/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/models/parser_condor_1000_easy.pkl'
-    save_obj_general(parser, filename)
+    #converged = parser.train_learner_on_semantic_forms(D, 10, reranker_beam=10)
+    #print 'converged = ', converged
+    #if len(sys.argv) > 4 :
+        #filename = str(sys.argv[4])
+    #else :
+        #filename = '/u/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/models/parser_condor_1000_easy.pkl'
+    #save_obj_general(parser, filename)
     

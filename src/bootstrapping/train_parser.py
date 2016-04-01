@@ -40,8 +40,8 @@ if __name__ == '__main__' :
     converged = parser.train_learner_on_semantic_forms(easy_data, 10, reranker_beam=10)
     print '\n\n\nHand designed examples: converged = ', converged
 
-    file_name = file_path + 'basic.pkl'
-    save_obj_general(parser, file_name)
+    #file_name = file_path + 'basic.pkl'
+    #save_obj_general(parser, file_name)
     
     hard_data = parser.read_in_paired_utterance_semantics(sys.argv[4])
     usable_data = list()
@@ -49,9 +49,10 @@ if __name__ == '__main__' :
         tokens = parser.tokenize(utterance)[0]
         if len(tokens) <= 7 :
             usable_data.append((utterance, semantic_form))
+    usable_data = easy_data + usable_data
     
     converged = parser.train_learner_on_semantic_forms(usable_data, 10, reranker_beam=10)
     print '\n\n\nTemplated examples: converged = ', converged
     
-    file_name = '../models/parser_1000.pkl'
+    file_name = '../models/parser_1500.pkl'
     save_obj_general(parser, file_name)
