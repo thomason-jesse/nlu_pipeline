@@ -55,8 +55,8 @@ def move_logs_with_codes() :
 
 # Get a list of IDs of users who completed the HIT and whose pickle log 
 # was created 
-def get_ids_having_pickle_logs() :
-    path = path_to_batch + 'completed/log/'
+def get_ids_having_pickle_logs(path=path_to_batch + 'completed/log/') :
+    #path = path_to_batch + 'completed/log/'
     files = [f for f in listdir(path) if isfile(join(path, f))]
     ids_having_pickle_logs = [filename[:-9] for filename in files]
     return ids_having_pickle_logs   
@@ -103,11 +103,18 @@ def remap_target_command(fake_people_command) :
 #       Use ground truth to decide whether the task succeeded or failed
 #       The state was being logged in the first turn. Deleting this. 
 def check_and_correct_pickle_logs() :
-    ids_having_pickle_logs = get_ids_having_pickle_logs()
-    log_path = path_to_batch + 'completed/log/'
-    tc_path = path_to_batch + 'completed/target_commands/'
-    ea_path = path_to_batch + 'completed/executed_actions/'
-    dst_path = path_to_batch + 'corrected_pickle_logs/'
+    #ids_having_pickle_logs = get_ids_having_pickle_logs()
+    #log_path = path_to_batch + 'completed/log/'
+    #tc_path = path_to_batch + 'completed/target_commands/'
+    #ea_path = path_to_batch + 'completed/executed_actions/'
+    #dst_path = path_to_batch + 'corrected_pickle_logs/'
+    
+    log_path = path_to_batch + 'invalid/log/'
+    ids_having_pickle_logs = get_ids_having_pickle_logs(log_path)
+    tc_path = path_to_batch + 'invalid/target_commands/'
+    ea_path = path_to_batch + 'invalid/executed_actions/'
+    dst_path = path_to_batch + 'all_corrected_pickle_logs/'
+    
     for user_id in ids_having_pickle_logs :
         log_file = open(log_path + user_id + '_main.pkl', 'rb')
         log = pickle.load(log_file)

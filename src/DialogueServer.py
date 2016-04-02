@@ -222,41 +222,6 @@ class DialogueServer :
         self.lock = Lock()
         self.service = rospy.Service('register_user', register_user, self.on_user_receipt)
         
-    def create_static_dialog_agent(self) :
-        ont = copy.deepcopy(self.ont)
-        lex = copy.deepcopy(self.lex)
-        
-        print "instantiating KBGrounder"
-        grounder = KBGrounder.KBGrounder(ont)
-             
-        if self.load_models_from_file :
-            parser = load_model('only_parser_parser')
-        else :
-            parser = CKYParser.CKYParser(ont, lex, use_language_model=True)
-            # Set parser hyperparams to best known values for training
-            parser.max_multiword_expression = 2  # max span of a multi-word expression to be considered during tokenization
-            parser.max_new_senses_per_utterance = 3  # max number of new word senses that can be induced on a training example
-            parser.max_cky_trees_per_token_sequence_beam = 100  # for tokenization of an utterance, max cky trees considered
-            parser.max_hypothesis_categories_for_unknown_token_beam = 3  # for unknown token, max syntax categories tried
-            # Train parser
-            d = parser.read_in_paired_utterance_semantics(self.parser_train_file)
-            converged = parser.train_learner_on_semantic_forms(d, 10, reranker_beam=10)
-            save_model(parser, 'only_parser_parser')
-            
-        # Set parser hyperparams to best known values for test time
-        parser.max_multiword_expression = 2  # max span of a multi-word expression to be considered during tokenization
-        parser.max_new_senses_per_utterance = 2  # max number of new word senses that can be induced on a training example
-        parser.max_cky_trees_per_token_sequence_beam = 100  # for tokenization of an utterance, max cky trees considered
-        parser.max_hypothesis_categories_for_unknown_token_beam = 2  # for unknown token, max syntax categories tried
-
-        grounder.parser = parser
-        grounder.ontology = parser.ontology
-  
-        static_policy = StaticDialogPolicy.StaticDialogPolicy()
-        static_agent = StaticDialogAgent(parser, grounder, static_policy, None, None)
-        static_agent.retrain_parser = False
-        return static_agent
-
     def create_pomdp_dialog_agent(self, parser_file=None) :
         ont = copy.deepcopy(self.ont)
         lex = copy.deepcopy(self.lex)
@@ -367,15 +332,17 @@ class DialogueServer :
                 print 'Only parser learning'
                 self.user_log.write(user_id + ',only_parser\n')
                 self.error_log.write(user_id + ',only_parser\n') 
-                static_agent = self.create_static_dialog_agent()
-                static_agent.input = u_in
-                static_agent.output = u_out
-                static_agent.final_action_log = final_action_log
-                static_agent.dialog_objects_logfile = log
-                static_agent.log_header = 'only_parser_learning'
-                static_agent.error_log = open(error_log, 'a')
+                pomdp_agent = self.create_pomdp_dialog_agent('only_parser_parser')
+                pomdp_agent.input = u_in
+                pomdp_agent.output = u_out
+                pomdp_agent.final_action_log = final_action_log
+                pomdp_agent.dialog_objects_logfile = log
+                pomdp_agent.log_header = 'only_parser_learning'
+                pomdp_agent.policy.training = False
+                pomdp_agent.policy.untrained = True
+                pomdp_agent.error_log = open(error_log, 'a')
                 
-                dialog_thread = Thread(target=self.run_static_dialog, args=((static_agent,)))
+                dialog_thread = Thread(target=self.run_pomdp_dialog, args=((pomdp_agent,)))
                 dialog_thread.daemon = True
                 dialog_thread.start()
             elif r < 2.0 / 3 :
@@ -425,25 +392,6 @@ class DialogueServer :
         print 'Waiting for users...'
         rospy.spin()
 
-    def run_static_dialog(self, agent) :
-        print 'Starting static agent...'
-        try :
-            agent.output.say("How can I help?")
-            s = agent.input.get()
-            if s == 'stop':
-               agent.output.say("<END/>")
-               return
-            a = agent.initiate_dialog_to_get_action(s)
-            agent.output.say("<END/>")
-        except KeyboardInterrupt, SystemExit :
-            pass
-        except :
-            error = str(sys.exc_info()[0])
-            self.error_log.write(error + '\n')
-            print traceback.format_exc()
-            self.error_log.write(traceback.format_exc() + '\n\n\n')
-            self.error_log.flush()  
-        
     def run_pomdp_dialog(self, agent) :
         print 'Starting POMDP agent ...'
         try :

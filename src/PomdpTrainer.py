@@ -240,9 +240,26 @@ class PomdpTrainer(PomdpDialogAgent) :
             self.policy.train(prev_state, 'take_action', None, self.knowledge.correct_action_reward)
         else :
             self.policy.train(prev_state, 'take_action', None, self.knowledge.wrong_action_reward)
+    
+    # Train the policy using pickle logs from new experiment
+    def train_from_new_logs(self, log_dir) :
+        self.num_turns_across_dialogs = 0
+        self.num_not_parsed = 0
+        
+        files = [f for f in listdir(log_dir) if isfile(join(log_dir, f))]
+        random.shuffle(files)
+        idx = 0
+        for idx in range(0, len(files)) :
+            fname = log_dir + '/' + files[idx]
+            train_policy_and_parser_from_single_new_log(fname, train_parser=False)
+            save_model(self.policy, 'ktdq_policy_object')
+        
+        print 'Number of responses = ', self.num_turns_across_dialogs   # DEBUG
+        print 'Number of responses that could not be parsed = ', self.num_not_parsed    # DEBUG
+    
         
     # Train from new log files
-    def train_policy_and_parser_from_single_new_log(self, conv_log_name, parser_train_type=None) :
+    def train_policy_and_parser_from_single_new_log(self, conv_log_name, train_parser=False) :
         self.retrain_parser = False # This is not going to run like a 
                                     # normal dialog so retraining will be 
                                     # done explicitly
@@ -257,7 +274,7 @@ class PomdpTrainer(PomdpDialogAgent) :
         # KTDQ is an off policy algorithm so it can be trained on data 
         # from both pomdp and static agents. However, since the experiment
         # compares the agents, we want to train it only from pomdp instances
-        if log[0] == 'pomdp' :
+        if log[0] == 'only_parser' :
             self.state = HISBeliefState(self.knowledge)
             
             # For each system_action, response pair, update state and
@@ -271,6 +288,11 @@ class PomdpTrainer(PomdpDialogAgent) :
                     self.update_state(response)
                     next_state = SummaryState(self.state)
                     action_type = system_action.action_type
+                elif type(system_action) == 'str' and system_action == 'repeat_goal' :
+                    self.previous_system_action = SystemAction('repeat_goal')
+                    self.update_state(response)
+                    next_state = SummaryState(self.state)
+                    action_type = system_action.action_type
                 self.policy.train(prev_state, action_type, next_state, self.knowledge.per_turn_reward)
                 
             if log[3] :
@@ -278,8 +300,9 @@ class PomdpTrainer(PomdpDialogAgent) :
                 self.policy.train(prev_state, 'take_action', None, self.knowledge.correct_action_reward)
                 
                 # Retrain parser
-                self.parser_train_data = log[4]
-                self.train_parser_from_dialogue(log[2])
+                if train_parser :
+                    self.parser_train_data = log[4]
+                    self.train_parser_from_dialogue(log[2])
             else :
                 self.policy.train(prev_state, 'take_action', None, self.knowledge.wrong_action_reward)
             
