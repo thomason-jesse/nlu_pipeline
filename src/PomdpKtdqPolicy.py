@@ -51,6 +51,8 @@ class PomdpKtdqPolicy(AbstractPolicy) :
         sigma = self.knowledge.ktdq_init_theta_std_dev
         self.theta = np.matrix(np.random.normal(mu, sigma, self.n)).T
         self.P = self.knowledge.ktdq_lambda * np.matrix(np.eye(self.n))
+        
+        # Hyperparameters
         self.eta = self.knowledge.ktdq_eta
         self.P_n = self.knowledge.ktdq_P_n
         self.kappa = self.knowledge.ktdq_kappa

@@ -2,7 +2,7 @@ import sys, csv
 from os import listdir
 from os.path import isfile, join
 
-path_to_batch = '/u/aish/Documents/Research/AMT_results/Batch1/'
+path_to_batch = '/u/aish/Documents/Research/AMT_results/Batch2/'
 
 def load_submitted_codes() :
     filename = path_to_batch + 'amt.csv'
@@ -25,7 +25,7 @@ def load_submitted_codes() :
     return (submitted_codes, repeated_codes)
         
 def load_generated_codes() :
-    path = path_to_batch + 'codes/'
+    path = path_to_batch + 'completed/codes/'
     files = [f for f in listdir(path) if isfile(join(path, f))]
     generated_codes = dict()
     repeated_codes = dict()
@@ -90,7 +90,7 @@ def approve_reject() :
             search_sel = generated_codes[code][6]
             if walk_sel != '0' or bring_sel != '1' or search_sel != '2' :
                 user_id = generated_codes[code][0]
-                print 'Incorrect understanding: ', user_id
+                print 'Incorrect understanding: ', user_id, code
                 new_row = submitted_codes[code] + ['', 'Worker does not seem to have understood the task']    
             else :
                 if generated_codes[code][1] == '1' :
@@ -102,4 +102,4 @@ def approve_reject() :
             writer.writerow(new_row)
 
 if __name__ == '__main__' :
-    combine_stats()
+    approve_reject()

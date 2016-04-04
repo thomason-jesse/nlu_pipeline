@@ -286,6 +286,10 @@ class DialogueServer :
                     self.handle_user(req.user_id)   
                     print 'Returned'    # DEBUG
                     self.started_users.add(req.user_id)     
+                    self.user_log.close()
+                    self.error_log.close()
+                    self.user_log = open(MAIN_LOG_PATH + USER_LOG_FILE, 'a')
+                    self.error_log = open(MAIN_LOG_PATH + MAIN_ERROR_LOG_FILE, 'a')
                     success = True
                 except KeyboardInterrupt, SystemExit :
                     raise

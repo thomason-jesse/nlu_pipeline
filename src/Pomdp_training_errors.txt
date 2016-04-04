@@ -1,0 +1,23 @@
+Error when training on file :/u/aish/Documents/Research/AMT_results/Batch1/all_corrected_pickle_logs/56fb165f76b05_main.pklTraceback (most recent call last):
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 258, in train_from_new_logs
+    self.train_policy_and_parser_from_single_new_log(fname, train_parser=False)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 300, in train_policy_and_parser_from_single_new_log
+    self.update_state(response)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 183, in update_state
+    self.get_n_best_utterances_from_parses(n_best_parses)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 413, in get_n_best_utterances_from_parses
+    utterances = self.create_utterances_of_parse(parse)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 272, in create_utterances_of_parse
+    g = self.grounder.groundSemanticNode(parse, [], [], [])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 87, in groundSemanticNode
+    child_grounds.append(self.groundSemanticNode(c, lambda_names, lambda_types, lambda_assignments))
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 56, in groundSemanticNode
+    grounding_results = self.groundSemanticNode(root.children[0], new_names, new_types, new_assignments)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 108, in groundSemanticNode
+    satisfied = self.grounding_to_answer_set(child_grounds[0][child_ground_idx[0]])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 36, in grounding_to_answer_set
+    return [gr[1] for gr in g]
+IndexError: list index out of range
+
+
+

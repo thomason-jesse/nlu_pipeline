@@ -58,7 +58,8 @@ grounder.parser = parser
 grounder.ontology = parser.ontology
 
 knowledge = Knowledge()
-policy = PomdpKtdqPolicy(knowledge)
+#policy = PomdpKtdqPolicy(knowledge)
+policy = load_model('policy_training/old_batch4')
 print "instantiating Trainer"
 param_mapping_file = 'src/nlu_pipeline/src/resources/old_ijcai_domain/ontology_mapping.csv'
 vocab_mapping_file = 'src/nlu_pipeline/src/bootstrapping/Vocabulary.txt'
@@ -69,18 +70,18 @@ success_dir = '/u/aish/Documents/Research/rlg/logs_only/second/valid'
 fail_dir = '/u/aish/Documents/Research/rlg/logs_only/second/invalid'
 
 # Initialize using hand-coded policy
-A.init_weights_from_hand_coded_policy()
-file_name = file_path + 'hand_coded' + '.pkl'
-save_obj_general(A.policy, file_name)
+#A.init_weights_from_hand_coded_policy()
+#file_name = file_path + 'hand_coded' + '.pkl'
+#save_obj_general(A.policy, file_name)
 
 # Train using old logs
-for i in range(0, 5) :
-    A.train_from_old_logs(success_dir, fail_dir)
-    file_name = file_path + 'old_batch' + str(i) + '.pkl'
-    save_obj_general(A.policy, file_name)
+#for i in range(0, 5) :
+#    A.train_from_old_logs(success_dir, fail_dir)
+#    file_name = file_path + 'old_batch' + str(i) + '.pkl'
+#    save_obj_general(A.policy, file_name)
 
 # Train using new logs
-new_logs_dir = '/u/aish/Documents/Research/AMT_results/Batch1/all_corrected_pickle_logs'
+new_logs_dir = '/u/aish/Documents/Research/AMT_results/Batch1/all_corrected_pickle_logs/'
 for i in range(0, 5) :
     A.train_from_new_logs(new_logs_dir)
     file_name = file_path + 'new_batch' + str(i) + '.pkl'

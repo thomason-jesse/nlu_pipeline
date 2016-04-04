@@ -88,6 +88,7 @@ Format of various logs -
                 - The system action of type SystemAction or a string 'take_action'
                 - The text of the user response (None if the previous system action is of action_type 'take_action')
             - The final action understood, of type Action
+            - Was the task successful
             - Train data for the parser. This is a dict with keys
                 - full - Text corresponding to a complete action
                 - <param_name> - Value for the parameter <param_name>. Currently the parameter names in use are patient, recipient and location

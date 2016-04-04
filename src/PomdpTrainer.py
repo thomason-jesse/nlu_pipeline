@@ -242,69 +242,95 @@ class PomdpTrainer(PomdpDialogAgent) :
             self.policy.train(prev_state, 'take_action', None, self.knowledge.wrong_action_reward)
     
     # Train the policy using pickle logs from new experiment
-    def train_from_new_logs(self, log_dir) :
+    def train_from_new_logs(self, log_dir, train_parser=False, train_policy=False, policy_save_name='ktdq_policy_object', parser_save_name='parser') :
         self.num_turns_across_dialogs = 0
         self.num_not_parsed = 0
         
         files = [f for f in listdir(log_dir) if isfile(join(log_dir, f))]
         random.shuffle(files)
         idx = 0
+
+        err_log = open('src/nlu_pipeline/src/Pomdp_training_errors.txt', 'w')
+
         for idx in range(0, len(files)) :
-            fname = log_dir + '/' + files[idx]
-            train_policy_and_parser_from_single_new_log(fname, train_parser=False)
-            save_model(self.policy, 'ktdq_policy_object')
-        
+            try : 
+                fname = log_dir + files[idx]
+                self.train_policy_and_parser_from_single_new_log(fname, train_parser, train_policy)
+                save_model(self.policy, policy_save_name)
+                save_model(self.parser, parser_save_name)
+            except KeyboardInterrupt, SystemExit :
+                raise
+            except :
+                err_log.write('Error when training on file :' + log_dir + files[idx])
+                err_log.write(traceback.format_exc() + '\n\n\n')
+                err_log.flush()
+
+        err_log.close()        
         print 'Number of responses = ', self.num_turns_across_dialogs   # DEBUG
         print 'Number of responses that could not be parsed = ', self.num_not_parsed    # DEBUG
     
         
     # Train from new log files
-    def train_policy_and_parser_from_single_new_log(self, conv_log_name, train_parser=False) :
+    def train_policy_and_parser_from_single_new_log(self, conv_log_name, train_parser=False, train_policy=False) :
         self.retrain_parser = False # This is not going to run like a 
                                     # normal dialog so retraining will be 
                                     # done explicitly
         log = load_obj_general(conv_log_name)
+        print log
         
         # log is a tuple of
         #   (agent_type, [(system_action, response)...], final_action, parser_train_data)
         #   agent_type = 'pomdp' or 'static'
         #   system_action can be of type SystemAction or a string 'take_action'
         #   response is either a string or None
+        relevant_log_type = None
+        if not train_parser and not train_policy :
+            return
+        elif train_parser and not train_policy :
+            relevant_log_type = 'only_parser_learning'
+        elif not train_parser and train_policy :
+            relevant_log_type = 'only_dialog_learning'
+        else :
+            relevant_log_type = 'both_parser_and_dialog_learning'
         
         # KTDQ is an off policy algorithm so it can be trained on data 
         # from both pomdp and static agents. However, since the experiment
         # compares the agents, we want to train it only from pomdp instances
-        if log[0] == 'only_parser' :
-            self.state = HISBeliefState(self.knowledge)
-            
-            # For each system_action, response pair, update state and
-            # train policy with standard per turn reward
-            for [system_action, response] in log[1] :
-                prev_state = SummaryState(self.state)
-                next_state = None
-                action_type = system_action
-                if isinstance(system_action, SystemAction) :
-                    self.previous_system_action = system_action
-                    self.update_state(response)
-                    next_state = SummaryState(self.state)
-                    action_type = system_action.action_type
-                elif type(system_action) == 'str' and system_action == 'repeat_goal' :
-                    self.previous_system_action = SystemAction('repeat_goal')
-                    self.update_state(response)
-                    next_state = SummaryState(self.state)
-                    action_type = system_action.action_type
-                self.policy.train(prev_state, action_type, next_state, self.knowledge.per_turn_reward)
+        if log[0] == relevant_log_type :
+            if train_policy :
+                self.state = HISBeliefState(self.knowledge)
                 
-            if log[3] :
-                # Dialogue was successful
-                self.policy.train(prev_state, 'take_action', None, self.knowledge.correct_action_reward)
+                # For each system_action, response pair, update state and
+                # train policy with standard per turn reward
+                for [system_action, response] in log[1] :
+                    prev_state = SummaryState(self.state)
+                    next_state = None
+                    action_type = system_action
+                    if isinstance(system_action, SystemAction) :
+                        self.previous_system_action = system_action
+                        self.update_state(response)
+                        next_state = SummaryState(self.state)
+                        action_type = system_action.action_type
+                    elif type(system_action) == 'str' and system_action == 'repeat_goal' :
+                        self.previous_system_action = SystemAction('repeat_goal')
+                        self.update_state(response)
+                        next_state = SummaryState(self.state)
+                        action_type = system_action.action_type
+                    self.policy.train(prev_state, action_type, next_state, self.knowledge.per_turn_reward)
+                
+            if log[3] : # Dialogue was successful
+                if train_policy :
+                    # Train policy from success of dialogue    
+                    self.policy.train(prev_state, 'take_action', None, self.knowledge.correct_action_reward)
                 
                 # Retrain parser
                 if train_parser :
                     self.parser_train_data = log[4]
                     self.train_parser_from_dialogue(log[2])
             else :
-                self.policy.train(prev_state, 'take_action', None, self.knowledge.wrong_action_reward)
+                if train_policy :
+                    # Train policy from failure of dialogue
+                    self.policy.train(prev_state, 'take_action', None, self.knowledge.wrong_action_reward)
             
                 
                     

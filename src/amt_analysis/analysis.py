@@ -1,39 +1,14 @@
-import sys, csv, shutil, os, pickle, re
+import sys, shutil, pickle, re, csv 
 from os import listdir
 from os.path import isfile, join, isdir
 sys.path.append('../')
 
-path_to_batch = '/u/aish/Documents/Research/AMT_results/Batch1/'
+path_to_batch = '/u/aish/Documents/Research/AMT_results/Batch2/'
 
-people_map = {'alice' : 'stacy', 'bob' : 'jesse', 'carol' : 'shiqi', \
-    'dave' : 'jivko', 'eve' : 'aishwarya', 'frannie' : 'scott', \
-    'george' : 'rodolfo', 'mallory' : 'peter', 'peggy' : 'dana', \
-    'walter' : 'ray'}
-
-# Get IDs of users who completed the task all the way and received a code
-def get_ids_with_codes() :
-    path = path_to_batch + 'original/codes/'
-    files = [f for f in listdir(path) if isfile(join(path, f))]
-    ids_with_codes = dict()
-    for filename in files :
-        #print 'Processing file ', filename
-        file_handle = open(path + filename, 'r')
-        line = file_handle.read()
-        if len(line) > 0 :
-            data = line.split(',')
-            code = data[3]
-            user_id = data[0]
-            if len(user_id) > 0 :
-                ids_with_codes[user_id] = code
-    return ids_with_codes
-
-# Separate users who went till the stage of getting a code and those who 
-# didn't
-def move_logs_with_codes() :
-    ids_with_codes = get_ids_with_codes()
-    src_path = path_to_batch + 'invalid/'
-    dst_path = path_to_batch + 'completed/'
-    for user_id in ids_with_codes.keys() :
+def move_to_invalid(rejected_user_ids) :
+    src_path = path_to_batch + 'completed/'
+    dst_path = path_to_batch + 'invalid/'
+    for user_id in rejected_user_ids :
         if isfile(src_path + 'codes/' + user_id + '.txt') :
             shutil.move(src_path + 'codes/' + user_id + '.txt', dst_path + 'codes/' + user_id + '.txt')
         if isfile(src_path + 'error/' + user_id + '_main.txt') :
@@ -53,93 +28,137 @@ def move_logs_with_codes() :
         if isfile(src_path + 'validations/' + user_id + '_query.txt') :
             shutil.move(src_path + 'validations/' + user_id + '_query.txt', dst_path + 'validations/' + user_id + '_query.txt')
 
-# Get a list of IDs of users who completed the HIT and whose pickle log 
-# was created 
-def get_ids_having_pickle_logs(path=path_to_batch + 'completed/log/') :
-    #path = path_to_batch + 'completed/log/'
+def get_ids_with_codes() :
+    path = path_to_batch + 'completed/codes/'
     files = [f for f in listdir(path) if isfile(join(path, f))]
-    ids_having_pickle_logs = [filename[:-9] for filename in files]
-    return ids_having_pickle_logs   
-
-# Some pickle logs did not get created. Collate information required to 
-# recreate these    
-def collate_files_for_reconstructing_pickle_logs() :
+    ids_with_codes = dict()
+    for filename in files :
+        file_handle = open(path + filename, 'r')
+        line = file_handle.read()
+        if len(line) > 0 :
+            data = line.split(',')
+            code = data[3]
+            user_id = data[0]
+            if len(user_id) > 0 :
+                ids_with_codes[user_id] = code
+    return ids_with_codes
+    
+def collate_results() :
     ids_with_codes = get_ids_with_codes()
-    ids_having_pickle_logs = get_ids_having_pickle_logs()
-    src_path = path_to_batch + 'completed/'
-    dst_path = path_to_batch + 'without_pickle_logs/'
-    #dst_path = path_to_batch + 'with_pickle_logs/'
-    for user_id in ids_with_codes :
-        if user_id not in ids_having_pickle_logs :
-        #if user_id not in ids_having_pickle_logs :
-            os.mkdir(dst_path + user_id)
-            if isfile(src_path + 'executed_actions/' + user_id + '_main.txt') :
-                shutil.copy(src_path + 'executed_actions/' + user_id + '_main.txt', dst_path + user_id + '/executed_action.txt')
-            shutil.copy(src_path + 'target_commands/' + user_id + '_main.txt', dst_path + user_id + '/target_command.txt')
-            shutil.copy(src_path + 'log_text/' + user_id + '_main.txt', dst_path + user_id + '/log_text.txt')
-
-# Assuming you have subfolders named by user_id each of which has a 
-# log_text.txt file, check those files for the word "stop" and print 
-# user ids where it is present        
-def check_for_stops() :
-    path = path_to_batch + 'with_pickle_logs/'
-    dirs = [f for f in listdir(path) if isdir(join(path, f))]    
-    for user_id in dirs :
-        file_handle = open(path + user_id + '/log_text.txt', 'r')
-        text = file_handle.read()
-        if 'stop' in text :
-            print user_id
-
-def remap_target_command(fake_people_command) :
-    parts = re.split('[(,)]', fake_people_command)
-    if parts[0] == 'search' :
-        parts[0] = 'searchroom'
-        parts[1] = people_map[parts[1]]
-    elif parts[0] == 'bring' :
-        parts[2] = people_map[parts[2]]
-    return parts[0] + '(' + parts[1] + ',' + parts[2] + ')'
-
-# Performs 2 clean-up operations on pickle logs -
-#       Use ground truth to decide whether the task succeeded or failed
-#       The state was being logged in the first turn. Deleting this. 
-def check_and_correct_pickle_logs() :
-    #ids_having_pickle_logs = get_ids_having_pickle_logs()
-    #log_path = path_to_batch + 'completed/log/'
-    #tc_path = path_to_batch + 'completed/target_commands/'
-    #ea_path = path_to_batch + 'completed/executed_actions/'
-    #dst_path = path_to_batch + 'corrected_pickle_logs/'
+    log_path = path_to_batch + 'completed/log/'
+    #log_path = path_to_batch + 'corrected_pickle_logs/'
+    survey_path = path_to_batch + 'completed/surveys/'
     
-    log_path = path_to_batch + 'invalid/log/'
-    ids_having_pickle_logs = get_ids_having_pickle_logs(log_path)
-    tc_path = path_to_batch + 'invalid/target_commands/'
-    ea_path = path_to_batch + 'invalid/executed_actions/'
-    dst_path = path_to_batch + 'all_corrected_pickle_logs/'
+    filename = path_to_batch + 'results.csv'
+    #filename = path_to_batch + 'results_corrected.csv'
+    file_handle = open(filename, 'w')
+    writer = csv.writer(file_handle, delimiter=',')
     
-    for user_id in ids_having_pickle_logs :
-        log_file = open(log_path + user_id + '_main.pkl', 'rb')
-        log = pickle.load(log_file)
+    header = ["user_id", "code", "agent_type", "performed_action", "correct_action", "task_easy", "robot_understood", "robot_delayed", "asked_sensible_questions", "conversation_too_long", "comment"]
+    writer.writerow(header)
+    
+    for (user_id, code) in ids_with_codes.items() :
+        log_file_handle = open(log_path + user_id + '_main.pkl', 'rb')
+        log = pickle.load(log_file_handle)
+        row = [user_id, code, log[0], int(log[2] != None), int(log[3])]
+        survey_file_handle = open(survey_path + user_id + '.txt', 'r')
+        lineno = 0
+        comment = ''
+        for line in survey_file_handle :
+            line = line.strip()
+            if lineno == 0 :
+                row = row + line.strip().split(',')
+            elif lineno == 1 :
+                comment = line 
+            else :
+                comment = comment + line 
+            lineno += 1
+        comment = re.sub('\n', ' ', comment)
+        row = row + [comment] 
+        writer.writerow(row)
         
-        conv = log[1]
-        if len(conv[0]) == 3 :
-            conv[0] = conv[0][1:]
+    file_handle.close()
+    
+def summarize_results_by_agent_type() :
+    results_file = open(path_to_batch + 'results.csv', 'r')
+    #results_file = open(path_to_batch + 'results_corrected.csv', 'r')
+    reader = csv.reader(results_file, delimiter=',')
+    sums = dict()
+    num_rows = dict()
+    cols_to_ignore = header = ["user_id", "code", "agent_type", "comment"]
+    header = reader.next()
+    type_idx = header.index("agent_type")
+    for row in reader :
+        agent_type = row[type_idx]
+        if agent_type not in sums :
+            sums[agent_type] = dict()
+        if agent_type not in num_rows :
+            num_rows[agent_type] = 0
+        num_rows[agent_type] = num_rows[agent_type] + 1
+        for (idx, col) in enumerate(header) :
+            if col not in cols_to_ignore :
+                if col not in sums[agent_type] :
+                    sums[agent_type][col] = 0
+                sums[agent_type][col] = sums[agent_type][col] + int(row[idx])
+    
+    filename = path_to_batch + 'summary.csv'
+    file_handle = open(filename, 'w')
+    writer = csv.writer(file_handle, delimiter=',')
+    
+    write_header = ['agent_type'] + [col for col in header if col not in cols_to_ignore]
+    writer.writerow(write_header)
+    print write_header
+    for agent_type in sums.keys() :
+        row = [agent_type]
+        for col in write_header[1:] :
+            avg = float(sums[agent_type][col]) / num_rows[agent_type]
+            avg = round(avg, 2)
+            row.append(avg)
+        print row
+        writer.writerow(row)
+    
+    file_handle.close()
+
+def compare_task_completion() :
+    results = open(path_to_batch + 'results.csv', 'r')
+    results_reader = csv.reader(results, delimiter=',')
+    results_corrected = open(path_to_batch + 'results_corrected.csv', 'r')
+    corrected_reader = csv.reader(results_corrected, delimiter=',')
+    
+    tc_path = path_to_batch + 'completed/target_commands/'
+    ea_path = path_to_batch + 'completed/executed_actions/'
+    
+    header = results_reader.next()
+    idx = header.index('correct_action')
+    corrected_reader.next()
+
+    user_ids_with_results = dict()
+    filename = path_to_batch + 'mismatch.csv'
+    file_handle = open(filename, 'w')
+    writer = csv.writer(file_handle, delimiter=',')
+    
+    header = ['user_id', 'user_says', 'we_think', 'target_command', 'executed_action']
+    writer.writerow(header)
+    
+    for row in results_reader :
+        user_id = row[0]
+        completed = row[idx]
+        user_ids_with_results[user_id] = completed 
         
-        tc_file = open(tc_path + user_id + '_main.txt', 'r')
-        target_command = tc_file.read()
-        task_successful = True 
-        action = log[2]
-        if isfile(ea_path + user_id + '_main.txt') :
-            ea_file = open(ea_path + user_id + '_main.txt', 'r')
-            executed_action = ea_file.read()
-            if remap_target_command(target_command) != executed_action :
-                task_successful = False
-        else :
-            action = None 
-            task_successful = False
+    for row in corrected_reader :
+        user_id = row[0]
+        completed = row[idx]
+        if completed != user_ids_with_results[user_id] :
+            tc = open(tc_path + user_id + '_main.txt', 'r').read().strip()
+            ea = open(ea_path + user_id + '_main.txt', 'r').read().strip()
+            row_to_write = [user_id, user_ids_with_results[user_id], completed, tc, ea]
+            writer.writerow(row_to_write)
             
-        new_log = (log[0],  conv, action, task_successful, log[4])
-        new_log_file = open(dst_path + user_id + '_main.pkl', 'wb')
-        pickle.dump(new_log, new_log_file, pickle.HIGHEST_PROTOCOL)
-
-if __name__ == '__main__' :
-    check_and_correct_pickle_logs()
+    file_handle.close()
     
+if __name__ == '__main__' :
+    #rejected_user_ids = ['570035b019054', '57004088a360a']
+    #move_to_invalid(rejected_user_ids)
+    #collate_results()
+    #summarize_results_by_agent_type()
+    compare_task_completion()
