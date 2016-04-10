@@ -1,0 +1,2312 @@
+can you bring the chair some beans
+M : bring(a(lambda x:e.(beans(x))),bruce)
+bring(beans,bruce)
+
+go walk to room 3414b
+M : walk(l3_414b)
+walk(l3_414b)
+
+dr niekum wants you to bring them the muffin
+M : bring(muffin,scott)
+bring(muffin,scott)
+
+i want for you to please take a lid to professor ray mooney
+M : bring(a(lambda x:e.(lid(x))),ray)
+bring(lid,ray)
+
+find out and tell me if professor dana ballard is in room 3508
+M : searchroom(dana,l3_508)
+searchroom(dana,l3_508)
+
+i want for you to please give doctor bruce porter a white prism
+M : bring(a(lambda x:e.(and(white(x), prism(x)))),bruce)
+bring(prism,bruce)
+
+dr niekum would like you to bring them a styrofoam, pink cup
+M : bring(a(lambda x:e.(and(styrofoam(x), and(pink(x), cup(x))))),scott)
+bring(cup,scott)
+
+i want for you to deliver a foamy ball to aishwarya
+M : bring(a(lambda x:e.(and(foamy(x), ball(x)))),aishwarya)
+bring(ball,aishwarya)
+
+i would like you to please walk to mr thomason's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, jesse)))))
+walk(l3_414b)
+
+could you walk to room 3414b
+M : walk(l3_414b)
+walk(l3_414b)
+
+go ahead and walk to room 3432
+M : walk(l3_432)
+walk(l3_432)
+
+run over to mr dana ballard's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, dana)))))
+walk(l3_510)
+
+i would like for you to walk to room 3414b
+M : walk(l3_414b)
+walk(l3_414b)
+
+can you tell me if the grad student is in room 3510
+M : searchroom(jesse,l3_510)
+searchroom(jesse,l3_510)
+
+roll over to doctor scott niekum's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, scott)))))
+walk(l3_404)
+
+i want you to please go to room 3432
+M : walk(l3_432)
+walk(l3_432)
+
+look if professor niekum is in room 3512
+M : searchroom(scott,l3_512)
+searchroom(scott,l3_512)
+
+look and tell me if mr porter is in room 3516
+M : searchroom(bruce,l3_516)
+searchroom(bruce,l3_516)
+
+jesse thomason wants a top book
+M : bring(a(lambda x:e.(and(top(x), book(x)))),jesse)
+bring(book,jesse)
+
+hurry and take the hammer to mr thomason
+M : bring(hammer,jesse)
+bring(hammer,jesse)
+
+i would like you to please give doctor mooney the pillow
+M : bring(pillow,ray)
+bring(pillow,ray)
+
+would you please walk to room 3402
+M : walk(l3_402)
+walk(l3_402)
+
+go look if ms miller is in room 3510
+M : searchroom(stacy,l3_510)
+searchroom(stacy,l3_510)
+
+check for dana ballard in room 3516
+M : searchroom(dana,l3_516)
+searchroom(dana,l3_516)
+
+i want for you to please bring a pointy, tiny tin to dr mooney
+M : bring(a(lambda x:e.(and(pointy(x), and(tiny(x), tin(x))))),ray)
+bring(tin,ray)
+
+go to room 3432
+M : walk(l3_432)
+walk(l3_432)
+
+please bring the basket to doctor peter stone
+M : bring(basket,peter)
+bring(basket,peter)
+
+please go and get the phone for jesse thomason
+M : bring(phone,jesse)
+bring(phone,jesse)
+
+give the box to peter
+M : bring(box,peter)
+bring(box,peter)
+
+please walk on over to room 3420
+M : walk(l3_420)
+walk(l3_420)
+
+find out whether mr corona is in room 3402
+M : searchroom(rodolfo,l3_402)
+searchroom(rodolfo,l3_402)
+
+can you tell me whether scott niekum is in room 3420
+M : searchroom(scott,l3_420)
+searchroom(scott,l3_420)
+
+i would like you to please give professor dana ballard the apple
+M : bring(apple,dana)
+bring(apple,dana)
+
+deliver a small, silent rectangle to mr ballard
+M : bring(a(lambda x:e.(and(small(x), and(silent(x), rectangle(x))))),dana)
+bring(rectangle,dana)
+
+i would like for you to walk to room 3510
+M : walk(l3_510)
+walk(l3_510)
+
+go walk to room 3432
+M : walk(l3_432)
+walk(l3_432)
+
+go find mr jesse thomason in room 3414b
+M : searchroom(jesse,l3_414b)
+searchroom(jesse,l3_414b)
+
+please go and get the coffee cup for mr ray mooney
+M : bring(coffee,ray)
+bring(coffee,ray)
+
+go and deliver a styrofoam carton to dr ballard
+M : bring(a(lambda x:e.(and(styrofoam(x), carton(x)))),dana)
+bring(carton,dana)
+
+i want for you to take a medium-sized spray to doctor porter
+M : bring(a(lambda x:e.(and(medium-sized(x), spray(x)))),bruce)
+bring(spray,bruce)
+
+i want you to take a blue lid to the pi
+M : bring(a(lambda x:e.(and(blue(x), lid(x)))),peter)
+bring(lid,peter)
+
+mr mooney would like you to bring them the milk
+M : bring(milk,ray)
+bring(milk,ray)
+
+i want you to bring the notebook to mr dana ballard
+M : bring(notebook,dana)
+bring(notebook,dana)
+
+go and give the bag of chips to doctor porter
+M : bring(chips,bruce)
+bring(chips,bruce)
+
+please walk on over to room 3414b
+M : walk(l3_414b)
+walk(l3_414b)
+
+look if doctor niekum is in room 3420
+M : searchroom(scott,l3_420)
+searchroom(scott,l3_420)
+
+tell me whether aishwarya is in room 3432
+M : searchroom(aishwarya,l3_432)
+searchroom(aishwarya,l3_432)
+
+take the planner to rodolfo
+M : bring(calendar,rodolfo)
+bring(calendar,rodolfo)
+
+the advisor wants the muffin
+M : bring(muffin,ray)
+bring(muffin,ray)
+
+go and find dana in room 3418
+M : searchroom(dana,l3_418)
+searchroom(dana,l3_418)
+
+i would like you to please take a heavy, liquid prism to professor dana ballard
+M : bring(a(lambda x:e.(and(heavy(x), and(liquid(x), prism(x))))),dana)
+bring(prism,dana)
+
+can you please bring a prism to dr dana ballard
+M : bring(a(lambda x:e.(prism(x))),dana)
+bring(prism,dana)
+
+i want you to bring a big, rough carton to professor ballard
+M : bring(a(lambda x:e.(and(big(x), and(rough(x), carton(x))))),dana)
+bring(carton,dana)
+
+deliver the glass of water to mr peter stone
+M : bring(water,peter)
+bring(water,peter)
+
+look if dr porter is in room 3402
+M : searchroom(bruce,l3_402)
+searchroom(bruce,l3_402)
+
+can you please walk to the lab
+M : walk(l3_414b)
+walk(l3_414b)
+
+i would like for you to please walk to room 3402
+M : walk(l3_402)
+walk(l3_402)
+
+roll over to room 3418
+M : walk(l3_418)
+walk(l3_418)
+
+can you bring the soda to doctor mooney
+M : bring(coke,ray)
+bring(coke,ray)
+
+rodolfo corona would like you to bring them a ball
+M : bring(a(lambda x:e.(ball(x))),rodolfo)
+bring(ball,rodolfo)
+
+could you tell me whether dr niekum is in room 3512
+M : searchroom(scott,l3_512)
+searchroom(scott,l3_512)
+
+i want for you to please take the coffee cup to professor dana ballard
+M : bring(coffee,dana)
+bring(coffee,dana)
+
+i want for you to take the phone to mr peter stone
+M : bring(phone,peter)
+bring(phone,peter)
+
+give the burger to mr ray mooney
+M : bring(hamburger,ray)
+bring(hamburger,ray)
+
+i would like for you to deliver the bread to peter
+M : bring(bread,peter)
+bring(bread,peter)
+
+i want for you to bring a plush-toy to dr bruce porter
+M : bring(a(lambda x:e.(plush-toy(x))),bruce)
+bring(plush-toy,bruce)
+
+hurry to ms aishwarya padmakumar's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, aishwarya)))))
+walk(l3_414b)
+
+i would like you to please give mr shiqi a round, pointed beans
+M : bring(a(lambda x:e.(and(round(x), and(pointed(x), beans(x))))),shiqi)
+bring(beans,shiqi)
+
+i would like you to give mr niekum a paper plush-toy
+M : bring(a(lambda x:e.(and(paper(x), plush-toy(x)))),scott)
+bring(plush-toy,scott)
+
+please walk on over to mr dana ballard's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, dana)))))
+walk(l3_510)
+
+run over to ms stacy miller's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, stacy)))))
+walk(l3_502)
+
+i want for you to bring the crisps to ms padmakumar
+M : bring(chips,aishwarya)
+bring(chips,aishwarya)
+
+i would like you to take a thin, empty bucket to professor dana ballard
+M : bring(a(lambda x:e.(and(thin(x), and(empty(x), bucket(x))))),dana)
+bring(bucket,dana)
+
+professor peter stone would like you to bring them a rough, aluminum roll
+M : bring(a(lambda x:e.(and(rough(x), and(aluminum(x), roll(x))))),peter)
+bring(roll,peter)
+
+search for professor scott niekum in room 3516
+M : searchroom(scott,l3_516)
+searchroom(scott,l3_516)
+
+i want you to please bring a tiny, full tub to ray
+M : bring(a(lambda x:e.(and(tiny(x), and(full(x), tub(x))))),ray)
+bring(tub,ray)
+
+i would like you to bring a spraycan to dr ray mooney
+M : bring(a(lambda x:e.(spraycan(x))),ray)
+bring(spraycan,ray)
+
+i want you to walk to doctor stone's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, peter)))))
+walk(l3_508)
+
+see whether ms miller is in room 3516
+M : searchroom(stacy,l3_516)
+searchroom(stacy,l3_516)
+
+can you please walk to room 3418
+M : walk(l3_418)
+walk(l3_418)
+
+i want you to please deliver the letter to mr thomason
+M : bring(letter,jesse)
+bring(letter,jesse)
+
+walk on over to room 3510
+M : walk(l3_510)
+walk(l3_510)
+
+please deliver a tiny jar to ms padmakumar
+M : bring(a(lambda x:e.(and(tiny(x), jar(x)))),aishwarya)
+bring(jar,aishwarya)
+
+i would like for you to please give mr corona a thing
+M : bring(a(lambda x:e.(thing(x))),rodolfo)
+bring(thing,rodolfo)
+
+search the kitchen for dr peter stone
+M : searchroom(peter,kitchen)
+searchroom(peter,kitchen)
+
+hurry and take a rough thing to stacy miller
+M : bring(a(lambda x:e.(and(rough(x), thing(x)))),stacy)
+bring(thing,stacy)
+
+please hurry to dana ballard's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, dana)))))
+walk(l3_510)
+
+go and give a container to stacy
+M : bring(a(lambda x:e.(container(x))),stacy)
+bring(container,stacy)
+
+please go get a skinny, pointy bottle for doctor stone
+M : bring(a(lambda x:e.(and(skinny(x), and(pointy(x), bottle(x))))),peter)
+bring(bottle,peter)
+
+go ahead and bring a tall, purple spraycan to professor bruce porter
+M : bring(a(lambda x:e.(and(tall(x), and(purple(x), spraycan(x))))),bruce)
+bring(spraycan,bruce)
+
+go ahead and take a small cup to ms miller
+M : bring(a(lambda x:e.(and(small(x), cup(x)))),stacy)
+bring(cup,stacy)
+
+can you deliver a sphere to the pi
+M : bring(a(lambda x:e.(sphere(x))),peter)
+bring(sphere,peter)
+
+you should go to room 3510
+M : walk(l3_510)
+walk(l3_510)
+
+is ms padmakumar in room 3418
+M : searchroom(aishwarya,l3_418)
+searchroom(aishwarya,l3_418)
+
+can you please give professor ray mooney a pineapple
+M : bring(a(lambda x:e.(pineapple(x))),ray)
+bring(pineapple,ray)
+
+please go to room 3418
+M : walk(l3_418)
+walk(l3_418)
+
+i would like you to please deliver a shaker to dr bruce porter
+M : bring(a(lambda x:e.(shaker(x))),bruce)
+bring(shaker,bruce)
+
+i want you to take a cylindrical, neon marker to the ta
+M : bring(a(lambda x:e.(and(cylindrical(x), and(neon(x), marker(x))))),aishwarya)
+bring(marker,aishwarya)
+
+go walk to dr scott niekum's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, scott)))))
+walk(l3_404)
+
+roll over to stacy miller's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, stacy)))))
+walk(l3_502)
+
+please go to room 3418
+M : walk(l3_418)
+walk(l3_418)
+
+i would like you to please deliver the dessert to dr porter
+M : bring(dessert,bruce)
+bring(dessert,bruce)
+
+dr peter stone would like a lid
+M : bring(a(lambda x:e.(lid(x))),peter)
+bring(lid,peter)
+
+i want for you to bring the cheeseburger to jesse
+M : bring(hamburger,jesse)
+bring(hamburger,jesse)
+
+i would like for you to please go to scott niekum's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, scott)))))
+walk(l3_404)
+
+i want for you to give doctor porter the apple
+M : bring(apple,bruce)
+bring(apple,bruce)
+
+tell me whether rudy is in room 3420
+M : searchroom(rodolfo,l3_420)
+searchroom(rodolfo,l3_420)
+
+you should take a liquid shaker to mr dana ballard
+M : bring(a(lambda x:e.(and(liquid(x), shaker(x)))),dana)
+bring(shaker,dana)
+
+i would like for you to bring a short, aerosol pineapple to mr niekum
+M : bring(a(lambda x:e.(and(short(x), and(aerosol(x), pineapple(x))))),scott)
+bring(pineapple,scott)
+
+i would like you to go to room 3418
+M : walk(l3_418)
+walk(l3_418)
+
+go bring the letter to ms miller
+M : bring(letter,stacy)
+bring(letter,stacy)
+
+go ahead and deliver the coffee to stacy
+M : bring(coffee,stacy)
+bring(coffee,stacy)
+
+can you search for the director in room 3510
+M : searchroom(ray,l3_510)
+searchroom(ray,l3_510)
+
+i would like you to please take a stuffed-animal to doctor ballard
+M : bring(a(lambda x:e.(stuffed-animal(x))),dana)
+bring(stuffed-animal,dana)
+
+see whether aishwarya is in room 3516
+M : searchroom(aishwarya,l3_516)
+searchroom(aishwarya,l3_516)
+
+walk to ms aishwarya padmakumar's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, aishwarya)))))
+walk(l3_414b)
+
+i would like you to go to mr rodolfo corona's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, rodolfo)))))
+walk(l3_414b)
+
+you should walk to room 3420
+M : walk(l3_420)
+walk(l3_420)
+
+can you deliver a pineapple to bruce porter
+M : bring(a(lambda x:e.(pineapple(x))),bruce)
+bring(pineapple,bruce)
+
+i would like for you to give doctor mooney the pizza
+M : bring(pizza,ray)
+bring(pizza,ray)
+
+doctor peter stone would like a mug
+M : bring(a(lambda x:e.(mug(x))),peter)
+bring(mug,peter)
+
+can you deliver a silver, colored bucket to rodolfo corona
+M : bring(a(lambda x:e.(and(silver(x), and(colored(x), bucket(x))))),rodolfo)
+bring(bucket,rodolfo)
+
+you should bring the book to ray
+M : bring(book,ray)
+bring(book,ray)
+
+go and find out if mr porter is in room 3414b
+M : searchroom(bruce,l3_414b)
+searchroom(bruce,l3_414b)
+
+i would like you to give mr rodolfo corona a teal, closed cup
+M : bring(a(lambda x:e.(and(teal(x), and(closed(x), cup(x))))),rodolfo)
+bring(cup,rodolfo)
+
+go and give the ledger to dr bruce porter
+M : bring(ledger,bruce)
+bring(ledger,bruce)
+
+go ahead and take a soft, metallic plush-toy to mr corona
+M : bring(a(lambda x:e.(and(soft(x), and(metallic(x), plush-toy(x))))),rodolfo)
+bring(plush-toy,rodolfo)
+
+run over to room 3512
+M : walk(l3_512)
+walk(l3_512)
+
+please go to mr niekum's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, scott)))))
+walk(l3_404)
+
+please bring the glass of juice to mr peter stone
+M : bring(juice,peter)
+bring(juice,peter)
+
+can you tell me if doctor stone is in room 3418
+M : searchroom(peter,l3_418)
+searchroom(peter,l3_418)
+
+i want you to please go to room 3510
+M : walk(l3_510)
+walk(l3_510)
+
+i want you to please walk to room 3418
+M : walk(l3_418)
+walk(l3_418)
+
+go ahead and bring a coffee sphere to rudy corona
+M : bring(a(lambda x:e.(and(coffee(x), sphere(x)))),rodolfo)
+bring(sphere,rodolfo)
+
+hurry and bring the letter to dr bruce porter
+M : bring(letter,bruce)
+bring(letter,bruce)
+
+walk on over to jivko's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, jivko)))))
+walk(l3_432)
+
+go bring stacy miller the pizza
+M : bring(pizza,stacy)
+bring(pizza,stacy)
+
+please go to the lab
+M : walk(l3_414b)
+walk(l3_414b)
+
+i want you to take a thing to secretary miller
+M : bring(a(lambda x:e.(thing(x))),stacy)
+bring(thing,stacy)
+
+could you walk to doctor mooney's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, ray)))))
+walk(l3_512)
+
+go and find out if secretary miller is in room 3418
+M : searchroom(stacy,l3_418)
+searchroom(stacy,l3_418)
+
+go and look for mr peter stone in room 3418
+M : searchroom(peter,l3_418)
+searchroom(peter,l3_418)
+
+please bring the pizza to rodolfo corona
+M : bring(pizza,rodolfo)
+bring(pizza,rodolfo)
+
+go ahead and walk to doctor mooney's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, ray)))))
+walk(l3_512)
+
+go and see if doctor mooney is in room 3420
+M : searchroom(ray,l3_420)
+searchroom(ray,l3_420)
+
+look whether the director is in the lab
+M : searchroom(ray,l3_414b)
+searchroom(ray,l3_414b)
+
+i would like for you to bring a circular box to professor porter
+M : bring(a(lambda x:e.(and(circular(x), box(x)))),bruce)
+bring(box,bruce)
+
+please go get some beans for dr dana ballard
+M : bring(a(lambda x:e.(beans(x))),dana)
+bring(beans,dana)
+
+look for ray in room 3512
+M : searchroom(ray,l3_512)
+searchroom(ray,l3_512)
+
+i would like for you to walk to peter's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, peter)))))
+walk(l3_508)
+
+take the basket to secretary miller
+M : bring(basket,stacy)
+bring(basket,stacy)
+
+can you bring the pillow to mr scott niekum
+M : bring(pillow,scott)
+bring(pillow,scott)
+
+go and find out if professor porter is in room 3502
+M : searchroom(bruce,l3_502)
+searchroom(bruce,l3_502)
+
+you are needed in room 3516
+M : walk(l3_516)
+walk(l3_516)
+
+could you please walk to mr thomason's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, jesse)))))
+walk(l3_414b)
+
+doctor peter stone would like a full floaty
+M : bring(a(lambda x:e.(and(full(x), floaty(x)))),peter)
+bring(floaty,peter)
+
+bring a rough stuffed-animal to shiqi
+M : bring(a(lambda x:e.(and(rough(x), stuffed-animal(x)))),shiqi)
+bring(stuffed-animal,shiqi)
+
+go find out if dr porter is in room 3432
+M : searchroom(bruce,l3_432)
+searchroom(bruce,l3_432)
+
+hurry and deliver the laptop to mr ray mooney
+M : bring(laptop,ray)
+bring(laptop,ray)
+
+please go and get a tall, circular container for aishwarya padmakumar
+M : bring(a(lambda x:e.(and(tall(x), and(circular(x), container(x))))),aishwarya)
+bring(container,aishwarya)
+
+can you deliver the coffee cup to professor niekum
+M : bring(coffee,scott)
+bring(coffee,scott)
+
+walk on over to aishwarya padmakumar's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, aishwarya)))))
+walk(l3_414b)
+
+bring a cream-colored beans to dr bruce porter
+M : bring(a(lambda x:e.(and(cream-colored(x), beans(x)))),bruce)
+bring(beans,bruce)
+
+go ahead and deliver the snack to mr ray mooney
+M : bring(snack,ray)
+bring(snack,ray)
+
+i want you to please take a narrow bucket to rodolfo corona
+M : bring(a(lambda x:e.(and(narrow(x), bucket(x)))),rodolfo)
+bring(bucket,rodolfo)
+
+hurry and deliver the cup of coffee to professor bruce porter
+M : bring(coffee,bruce)
+bring(coffee,bruce)
+
+find out if the intern is in room 3508
+M : searchroom(rodolfo,l3_508)
+searchroom(rodolfo,l3_508)
+
+hurry and walk to room 3402
+M : walk(l3_402)
+walk(l3_402)
+
+hurry to jivko's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, jivko)))))
+walk(l3_432)
+
+go look for dr ray mooney in room 3414b
+M : searchroom(ray,l3_414b)
+searchroom(ray,l3_414b)
+
+you are needed in room 3420
+M : walk(l3_420)
+walk(l3_420)
+
+search room 3512 for ms stacy miller
+M : searchroom(stacy,l3_512)
+searchroom(stacy,l3_512)
+
+hurry and deliver the drink to aishwarya padmakumar
+M : bring(juice,aishwarya)
+bring(juice,aishwarya)
+
+go ahead and walk to room 3418
+M : walk(l3_418)
+walk(l3_418)
+
+you are needed at room 3516
+M : walk(l3_516)
+walk(l3_516)
+
+i want for you to please deliver a medium-sized, spherical rectangle to jesse
+M : bring(a(lambda x:e.(and(medium-sized(x), and(spherical(x), rectangle(x))))),jesse)
+bring(rectangle,jesse)
+
+doctor ray mooney wants a big, aluminum notebook
+M : bring(a(lambda x:e.(and(big(x), and(aluminum(x), notebook(x))))),ray)
+bring(notebook,ray)
+
+bring a colored sphere to professor peter stone
+M : bring(a(lambda x:e.(and(colored(x), sphere(x)))),peter)
+bring(sphere,peter)
+
+you are needed at room 3402
+M : walk(l3_402)
+walk(l3_402)
+
+can you search for ms aishwarya padmakumar in room 3512
+M : searchroom(aishwarya,l3_512)
+searchroom(aishwarya,l3_512)
+
+go ahead and bring a bright drink to jesse
+M : bring(a(lambda x:e.(and(bright(x), drink(x)))),jesse)
+bring(drink,jesse)
+
+could you please walk to room 3402
+M : walk(l3_402)
+walk(l3_402)
+
+i want for you to please deliver the watch to mr mooney
+M : bring(watch,ray)
+bring(watch,ray)
+
+can you please walk to professor mooney's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, ray)))))
+walk(l3_512)
+
+i would like for you to please take the planner to dana ballard
+M : bring(calendar,dana)
+bring(calendar,dana)
+
+go and give a red, medium-sized cellphone to mr corona
+M : bring(a(lambda x:e.(and(red(x), and(medium-sized(x), cellphone(x))))),rodolfo)
+bring(cellphone,rodolfo)
+
+go bring the calendar to doctor scott niekum
+M : bring(calendar,scott)
+bring(calendar,scott)
+
+i want for you to bring the cheeseburger to dr niekum
+M : bring(hamburger,scott)
+bring(hamburger,scott)
+
+i would like you to walk to mr scott niekum's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, scott)))))
+walk(l3_404)
+
+roll over to stacy's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, stacy)))))
+walk(l3_502)
+
+i want you to bring the organizer to jivko
+M : bring(organizer,jivko)
+bring(organizer,jivko)
+
+run over to jivko's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, jivko)))))
+walk(l3_432)
+
+i would like you to please bring a metal can to dr ray mooney
+M : bring(a(lambda x:e.(and(metal(x), can(x)))),ray)
+bring(can,ray)
+
+bruce wants a shiny, neon bucket
+M : bring(a(lambda x:e.(and(shiny(x), and(neon(x), bucket(x))))),bruce)
+bring(bucket,bruce)
+
+i would like you to please take a cylinder to dr porter
+M : bring(a(lambda x:e.(cylinder(x))),bruce)
+bring(cylinder,bruce)
+
+can you tell me whether jesse is in room 3414b
+M : searchroom(jesse,l3_414b)
+searchroom(jesse,l3_414b)
+
+take the sandwich to jesse
+M : bring(sandwich,jesse)
+bring(sandwich,jesse)
+
+i want for you to please give doctor niekum a light thing
+M : bring(a(lambda x:e.(and(light(x), thing(x)))),scott)
+bring(thing,scott)
+
+i would like for you to please deliver the drink to shiqi
+M : bring(juice,shiqi)
+bring(juice,shiqi)
+
+can you please walk to room 3512
+M : walk(l3_512)
+walk(l3_512)
+
+i would like for you to please bring a bottle to mr bruce porter
+M : bring(a(lambda x:e.(bottle(x))),bruce)
+bring(bottle,bruce)
+
+please go walk to room 3516
+M : walk(l3_516)
+walk(l3_516)
+
+search room 3402 for the ta
+M : searchroom(aishwarya,l3_402)
+searchroom(aishwarya,l3_402)
+
+please run over to ms miller's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, stacy)))))
+walk(l3_502)
+
+go bring ms padmakumar the apple
+M : bring(apple,aishwarya)
+bring(apple,aishwarya)
+
+go find out whether peter is in room 3432
+M : searchroom(peter,l3_432)
+searchroom(peter,l3_432)
+
+please go walk to the lab
+M : walk(l3_414b)
+walk(l3_414b)
+
+i want you to please take the pillow to mr jivko
+M : bring(pillow,jivko)
+bring(pillow,jivko)
+
+please run over to mr stone's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, peter)))))
+walk(l3_508)
+
+can you find doctor ray mooney in room 3510
+M : searchroom(ray,l3_510)
+searchroom(ray,l3_510)
+
+i would like for you to please take a tiny, large cylinder to professor dana ballard
+M : bring(a(lambda x:e.(and(tiny(x), and(large(x), cylinder(x))))),dana)
+bring(cylinder,dana)
+
+please go and get a soft wipes for mr peter stone
+M : bring(a(lambda x:e.(and(soft(x), wipes(x)))),peter)
+bring(wipes,peter)
+
+i would like you to please take a pencil-shaped tin to dr dana ballard
+M : bring(a(lambda x:e.(and(pencil-shaped(x), tin(x)))),dana)
+bring(tin,dana)
+
+walk to dr ballard's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, dana)))))
+walk(l3_510)
+
+go ahead and bring a neon diary to the secretary
+M : bring(a(lambda x:e.(and(neon(x), diary(x)))),stacy)
+bring(diary,stacy)
+
+go and deliver a foamy diary to professor bruce porter
+M : bring(a(lambda x:e.(and(foamy(x), diary(x)))),bruce)
+bring(diary,bruce)
+
+please run over to stacy's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, stacy)))))
+walk(l3_502)
+
+please take the tea to dana
+M : bring(tea,dana)
+bring(tea,dana)
+
+i would like you to go to dr ray mooney's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, ray)))))
+walk(l3_512)
+
+i want you to please walk to room 3418
+M : walk(l3_418)
+walk(l3_418)
+
+go and look whether the postdoc is in room 3510
+M : searchroom(jivko,l3_510)
+searchroom(jivko,l3_510)
+
+can you please take a full shaker to mr ballard
+M : bring(a(lambda x:e.(and(full(x), shaker(x)))),dana)
+bring(shaker,dana)
+
+go find out if mr ray mooney is in room 3432
+M : searchroom(ray,l3_432)
+searchroom(ray,l3_432)
+
+go ahead and take professor ballard some chips
+M : bring(a(lambda x:e.(chips(x))),dana)
+bring(chips,dana)
+
+i would like for you to please walk to room 3516
+M : walk(l3_516)
+walk(l3_516)
+
+can you search for professor mooney in room 3418
+M : searchroom(ray,l3_418)
+searchroom(ray,l3_418)
+
+go to doctor niekum's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, scott)))))
+walk(l3_404)
+
+i want for you to bring the binder to rudy
+M : bring(binder,rodolfo)
+bring(binder,rodolfo)
+
+look and tell me whether mr ray mooney is in room 3402
+M : searchroom(ray,l3_402)
+searchroom(ray,l3_402)
+
+i would like for you to please go to professor scott niekum's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, scott)))))
+walk(l3_404)
+
+i would like for you to deliver a soft diary to doctor stone
+M : bring(a(lambda x:e.(and(soft(x), diary(x)))),peter)
+bring(diary,peter)
+
+can you bring professor porter the water
+M : bring(water,bruce)
+bring(water,bruce)
+
+i want you to please take a plush-toy to the undergrad
+M : bring(a(lambda x:e.(plush-toy(x))),rodolfo)
+bring(plush-toy,rodolfo)
+
+please walk on over to dr ray mooney's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, ray)))))
+walk(l3_512)
+
+can you take the notebook to the intern
+M : bring(notebook,rodolfo)
+bring(notebook,rodolfo)
+
+i would like you to please take the lays to bruce porter
+M : bring(chips,bruce)
+bring(chips,bruce)
+
+go find mr peter stone in room 3512
+M : searchroom(peter,l3_512)
+searchroom(peter,l3_512)
+
+go and deliver a spiky, aluminum cellphone to professor stone
+M : bring(a(lambda x:e.(and(spiky(x), and(aluminum(x), cellphone(x))))),peter)
+bring(cellphone,peter)
+
+i want for you to please take a laptop to ms stacy miller
+M : bring(a(lambda x:e.(laptop(x))),stacy)
+bring(laptop,stacy)
+
+please give a teal, aluminum wipes to mr ballard
+M : bring(a(lambda x:e.(and(teal(x), and(aluminum(x), wipes(x))))),dana)
+bring(wipes,dana)
+
+please walk on over to scott niekum's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, scott)))))
+walk(l3_404)
+
+can you please deliver a half-full, wide book to jivko
+M : bring(a(lambda x:e.(and(half-full(x), and(wide(x), book(x))))),jivko)
+bring(book,jivko)
+
+i would like for you to please walk to room 3420
+M : walk(l3_420)
+walk(l3_420)
+
+i want you to please give secretary miller a wide pineapple
+M : bring(a(lambda x:e.(and(wide(x), pineapple(x)))),stacy)
+bring(pineapple,stacy)
+
+go bring a wide can to dr mooney
+M : bring(a(lambda x:e.(and(wide(x), can(x)))),ray)
+bring(can,ray)
+
+can you please give dr peter stone some beans
+M : bring(a(lambda x:e.(beans(x))),peter)
+bring(beans,peter)
+
+can you search for doctor porter in room 3510
+M : searchroom(bruce,l3_510)
+searchroom(bruce,l3_510)
+
+search for doctor niekum in room 3418
+M : searchroom(scott,l3_418)
+searchroom(scott,l3_418)
+
+you should deliver a yellow chips to rudy corona
+M : bring(a(lambda x:e.(and(yellow(x), chips(x)))),rodolfo)
+bring(chips,rodolfo)
+
+can you give dr scott niekum a medium-sized wipes
+M : bring(a(lambda x:e.(and(medium-sized(x), wipes(x)))),scott)
+bring(wipes,scott)
+
+can you walk to doctor peter stone's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, peter)))))
+walk(l3_508)
+
+ms aishwarya padmakumar wants a notebook
+M : bring(a(lambda x:e.(notebook(x))),aishwarya)
+bring(notebook,aishwarya)
+
+can you please bring mr rodolfo corona the diary
+M : bring(diary,rodolfo)
+bring(diary,rodolfo)
+
+i want you to go to room 3418
+M : walk(l3_418)
+walk(l3_418)
+
+i would like you to please deliver the cupcake to doctor bruce porter
+M : bring(cupcake,bruce)
+bring(cupcake,bruce)
+
+go find out if doctor bruce porter is in room 3432
+M : searchroom(bruce,l3_432)
+searchroom(bruce,l3_432)
+
+i want you to please bring the ledger to mr thomason
+M : bring(ledger,jesse)
+bring(ledger,jesse)
+
+look if dr dana ballard is in room 3418
+M : searchroom(dana,l3_418)
+searchroom(dana,l3_418)
+
+you should bring a spray to mr mooney
+M : bring(a(lambda x:e.(spray(x))),ray)
+bring(spray,ray)
+
+can you bring dr bruce porter the lays
+M : bring(chips,bruce)
+bring(chips,bruce)
+
+can you please go to room 3516
+M : walk(l3_516)
+walk(l3_516)
+
+go ahead and deliver a colored, foamy laptop to the director
+M : bring(a(lambda x:e.(and(colored(x), and(foamy(x), laptop(x))))),ray)
+bring(laptop,ray)
+
+go bring the book to professor niekum
+M : bring(book,scott)
+bring(book,scott)
+
+i would like you to take a liquid, paper canister to dr ballard
+M : bring(a(lambda x:e.(and(liquid(x), and(paper(x), canister(x))))),dana)
+bring(canister,dana)
+
+go walk to scott niekum's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, scott)))))
+walk(l3_404)
+
+can you please walk to room 3516
+M : walk(l3_516)
+walk(l3_516)
+
+i would like you to please give mr jesse thomason a styrofoam chips
+M : bring(a(lambda x:e.(and(styrofoam(x), chips(x)))),jesse)
+bring(chips,jesse)
+
+i would like you to walk to room 3516
+M : walk(l3_516)
+walk(l3_516)
+
+i would like for you to please give dr scott niekum the hamburger
+M : bring(hamburger,scott)
+bring(hamburger,scott)
+
+bruce porter would like you to bring them the crisps
+M : bring(chips,bruce)
+bring(chips,bruce)
+
+i would like for you to please take a short laptop to professor stone
+M : bring(a(lambda x:e.(and(short(x), laptop(x)))),peter)
+bring(laptop,peter)
+
+go ahead and deliver a cardboard, white canister to doctor dana ballard
+M : bring(a(lambda x:e.(and(cardboard(x), and(white(x), canister(x))))),dana)
+bring(canister,dana)
+
+can you bring mr peter stone a metallic tub
+M : bring(a(lambda x:e.(and(metallic(x), tub(x)))),peter)
+bring(tub,peter)
+
+see if mr scott niekum is in room 3512
+M : searchroom(scott,l3_512)
+searchroom(scott,l3_512)
+
+go bring a paper bucket to dr ray mooney
+M : bring(a(lambda x:e.(and(paper(x), bucket(x)))),ray)
+bring(bucket,ray)
+
+i would like you to bring a round bottle to ray
+M : bring(a(lambda x:e.(and(round(x), bottle(x)))),ray)
+bring(bottle,ray)
+
+search for ray mooney in room 3502
+M : searchroom(ray,l3_502)
+searchroom(ray,l3_502)
+
+i want you to please take a pointy, aluminum book to jivko
+M : bring(a(lambda x:e.(and(pointy(x), and(aluminum(x), book(x))))),jivko)
+bring(book,jivko)
+
+go look if peter is in room 3418
+M : searchroom(peter,l3_418)
+searchroom(peter,l3_418)
+
+roll over to mr scott niekum's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, scott)))))
+walk(l3_404)
+
+i would like for you to bring a spray to doctor dana ballard
+M : bring(a(lambda x:e.(spray(x))),dana)
+bring(spray,dana)
+
+go look for rudy corona in room 3516
+M : searchroom(rodolfo,l3_516)
+searchroom(rodolfo,l3_516)
+
+please go to room 3420
+M : walk(l3_420)
+walk(l3_420)
+
+i would like for you to please take a metal bottle to mr ballard
+M : bring(a(lambda x:e.(and(metal(x), bottle(x)))),dana)
+bring(bottle,dana)
+
+can you please bring a can to dr peter stone
+M : bring(a(lambda x:e.(can(x))),peter)
+bring(can,peter)
+
+can you tell me whether the intern is in room 3510
+M : searchroom(rodolfo,l3_510)
+searchroom(rodolfo,l3_510)
+
+walk to dana's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, dana)))))
+walk(l3_510)
+
+hurry and deliver a stuffed-animal to jesse
+M : bring(a(lambda x:e.(stuffed-animal(x))),jesse)
+bring(stuffed-animal,jesse)
+
+i would like you to bring the cake to the chair
+M : bring(cake,bruce)
+bring(cake,bruce)
+
+go walk to secretary miller's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, stacy)))))
+walk(l3_502)
+
+i want you to take the notebook to professor dana ballard
+M : bring(notebook,dana)
+bring(notebook,dana)
+
+doctor mooney would like you to bring them a pointy bucket
+M : bring(a(lambda x:e.(and(pointy(x), bucket(x)))),ray)
+bring(bucket,ray)
+
+i would like for you to please deliver the laptop to professor ballard
+M : bring(laptop,dana)
+bring(laptop,dana)
+
+please hurry to mr niekum's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, scott)))))
+walk(l3_404)
+
+hurry and walk to room 3402
+M : walk(l3_402)
+walk(l3_402)
+
+can you please give stacy the dustbin
+M : bring(trashcan,stacy)
+bring(trashcan,stacy)
+
+go and give a silver wipes to ms aishwarya padmakumar
+M : bring(a(lambda x:e.(and(silver(x), wipes(x)))),aishwarya)
+bring(wipes,aishwarya)
+
+i want you to go to room 3414b
+M : walk(l3_414b)
+walk(l3_414b)
+
+could you tell me if rudy is in room 3420
+M : searchroom(rodolfo,l3_420)
+searchroom(rodolfo,l3_420)
+
+i want for you to please give dr mooney the planner
+M : bring(calendar,ray)
+bring(calendar,ray)
+
+please hurry to dana's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, dana)))))
+walk(l3_510)
+
+i would like for you to please walk to shiqi's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, shiqi)))))
+walk(l3_420)
+
+i want you to please deliver the ledger to mr porter
+M : bring(ledger,bruce)
+bring(ledger,bruce)
+
+i want you to please deliver the glass of water to dana ballard
+M : bring(water,dana)
+bring(water,dana)
+
+please walk on over to room 3420
+M : walk(l3_420)
+walk(l3_420)
+
+i want you to go to doctor ballard's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, dana)))))
+walk(l3_510)
+
+i want for you to please give scott the laptop
+M : bring(laptop,scott)
+bring(laptop,scott)
+
+i would like for you to please walk to mr jesse thomason's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, jesse)))))
+walk(l3_414b)
+
+i want you to please go to secretary stacy miller's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, stacy)))))
+walk(l3_502)
+
+find dr niekum in room 3414b
+M : searchroom(scott,l3_414b)
+searchroom(scott,l3_414b)
+
+go to mr corona's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, rodolfo)))))
+walk(l3_414b)
+
+go look if mr ballard is in room 3510
+M : searchroom(dana,l3_510)
+searchroom(dana,l3_510)
+
+hurry and take a skinny, soft plush-toy to professor bruce porter
+M : bring(a(lambda x:e.(and(skinny(x), and(soft(x), plush-toy(x))))),bruce)
+bring(plush-toy,bruce)
+
+i want you to please give dana the trashcan
+M : bring(trashcan,dana)
+bring(trashcan,dana)
+
+hurry to peter stone's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, peter)))))
+walk(l3_508)
+
+go ahead and walk to mr stone's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, peter)))))
+walk(l3_508)
+
+i would like for you to bring the diary to the chair
+M : bring(diary,bruce)
+bring(diary,bruce)
+
+you should deliver an aerosol, water laptop to professor niekum
+M : bring(a(lambda x:e.(and(aerosol(x), and(water(x), laptop(x))))),scott)
+bring(laptop,scott)
+
+see if stacy miller is in room 3414b
+M : searchroom(stacy,l3_414b)
+searchroom(stacy,l3_414b)
+
+walk on over to ms aishwarya padmakumar's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, aishwarya)))))
+walk(l3_414b)
+
+i would like you to bring a narrow, liquid plush-toy to the director
+M : bring(a(lambda x:e.(and(narrow(x), and(liquid(x), plush-toy(x))))),ray)
+bring(plush-toy,ray)
+
+go and find out if mr niekum is in room 3510
+M : searchroom(scott,l3_510)
+searchroom(scott,l3_510)
+
+i want you to go to professor niekum's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, scott)))))
+walk(l3_404)
+
+find out and tell me if mr bruce porter is in room 3432
+M : searchroom(bruce,l3_432)
+searchroom(bruce,l3_432)
+
+look and tell me if professor mooney is in room 3402
+M : searchroom(ray,l3_402)
+searchroom(ray,l3_402)
+
+go and give some chips to dr stone
+M : bring(a(lambda x:e.(chips(x))),peter)
+bring(chips,peter)
+
+you should give the hamburger to the chair
+M : bring(hamburger,bruce)
+bring(hamburger,bruce)
+
+walk to room 3510
+M : walk(l3_510)
+walk(l3_510)
+
+i would like you to bring the calendar to doctor ballard
+M : bring(calendar,dana)
+bring(calendar,dana)
+
+mr ray mooney would like you to bring them a paper stuffed-animal
+M : bring(a(lambda x:e.(and(paper(x), stuffed-animal(x)))),ray)
+bring(stuffed-animal,ray)
+
+would you please walk to dr mooney's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, ray)))))
+walk(l3_512)
+
+i want you to walk to room 3418
+M : walk(l3_418)
+walk(l3_418)
+
+i want for you to give the professor a box
+M : bring(a(lambda x:e.(box(x))),ray)
+bring(box,ray)
+
+go and see whether professor stone is in room 3414b
+M : searchroom(peter,l3_414b)
+searchroom(peter,l3_414b)
+
+hurry to room 3516
+M : walk(l3_516)
+walk(l3_516)
+
+bring the cheeseburger to mr shiqi
+M : bring(hamburger,shiqi)
+bring(hamburger,shiqi)
+
+go ahead and take the tea to the ta
+M : bring(tea,aishwarya)
+bring(tea,aishwarya)
+
+can you take a big plush-toy to professor bruce porter
+M : bring(a(lambda x:e.(and(big(x), plush-toy(x)))),bruce)
+bring(plush-toy,bruce)
+
+doctor niekum would like you to bring them the cellphone
+M : bring(cellphone,scott)
+bring(cellphone,scott)
+
+i want you to please take a marker to rudy corona
+M : bring(a(lambda x:e.(marker(x))),rodolfo)
+bring(marker,rodolfo)
+
+the undergrad wants the water
+M : bring(water,rodolfo)
+bring(water,rodolfo)
+
+please give a box to the chair
+M : bring(a(lambda x:e.(box(x))),bruce)
+bring(box,bruce)
+
+i would like for you to bring the calendar to doctor niekum
+M : bring(calendar,scott)
+bring(calendar,scott)
+
+please walk on over to professor dana ballard's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, dana)))))
+walk(l3_510)
+
+can you please walk to room 3516
+M : walk(l3_516)
+walk(l3_516)
+
+i would like you to please take the snack to dana ballard
+M : bring(snack,dana)
+bring(snack,dana)
+
+search room 3512 for doctor ray mooney
+M : searchroom(ray,l3_512)
+searchroom(ray,l3_512)
+
+i would like for you to please go to room 3512
+M : walk(l3_512)
+walk(l3_512)
+
+look whether dana ballard is in the lab
+M : searchroom(dana,l3_414b)
+searchroom(dana,l3_414b)
+
+i would like for you to deliver a tall, white prism to professor scott niekum
+M : bring(a(lambda x:e.(and(tall(x), and(white(x), prism(x))))),scott)
+bring(prism,scott)
+
+can you deliver a plastic, clear flask to ms padmakumar
+M : bring(a(lambda x:e.(and(plastic(x), and(clear(x), flask(x))))),aishwarya)
+bring(flask,aishwarya)
+
+see if mr ray mooney is in room 3432
+M : searchroom(ray,l3_432)
+searchroom(ray,l3_432)
+
+i want you to give mr mooney the organizer
+M : bring(organizer,ray)
+bring(organizer,ray)
+
+i want for you to give ms aishwarya padmakumar the burger
+M : bring(hamburger,aishwarya)
+bring(hamburger,aishwarya)
+
+i want you to bring a curvy crayon to rudy
+M : bring(a(lambda x:e.(and(curvy(x), crayon(x)))),rodolfo)
+bring(crayon,rodolfo)
+
+i would like you to go to room 3512
+M : walk(l3_512)
+walk(l3_512)
+
+i want for you to please deliver a neon beans to professor mooney
+M : bring(a(lambda x:e.(and(neon(x), beans(x)))),ray)
+bring(beans,ray)
+
+go ahead and deliver a brown thing to secretary miller
+M : bring(a(lambda x:e.(and(brown(x), thing(x)))),stacy)
+bring(thing,stacy)
+
+can you please bring professor mooney a bucket
+M : bring(a(lambda x:e.(bucket(x))),ray)
+bring(bucket,ray)
+
+go and see if peter is in room 3402
+M : searchroom(peter,l3_402)
+searchroom(peter,l3_402)
+
+i would like you to go to room 3502
+M : walk(l3_502)
+walk(l3_502)
+
+see if peter stone is in room 3420
+M : searchroom(peter,l3_420)
+searchroom(peter,l3_420)
+
+go and see if professor dana ballard is in room 3516
+M : searchroom(dana,l3_516)
+searchroom(dana,l3_516)
+
+can you walk to the kitchen
+M : walk(kitchen)
+walk(kitchen)
+
+hurry to professor ray mooney's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, ray)))))
+walk(l3_512)
+
+go ahead and deliver an orange-topped, water laptop to professor porter
+M : bring(a(lambda x:e.(and(orange-topped(x), and(water(x), laptop(x))))),bruce)
+bring(laptop,bruce)
+
+i would like for you to bring the crisps to professor dana ballard
+M : bring(chips,dana)
+bring(chips,dana)
+
+you are needed at doctor stone's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, peter)))))
+walk(l3_508)
+
+could you please walk to room 3414b
+M : walk(l3_414b)
+walk(l3_414b)
+
+i want for you to take a ball to secretary stacy miller
+M : bring(a(lambda x:e.(ball(x))),stacy)
+bring(ball,stacy)
+
+go look if the postdoc is in room 3414b
+M : searchroom(jivko,l3_414b)
+searchroom(jivko,l3_414b)
+
+i want you to bring the coffee to go to mr jivko
+M : bring(coffee,jivko)
+bring(coffee,jivko)
+
+deliver the apple to peter
+M : bring(apple,peter)
+bring(apple,peter)
+
+give a jar to doctor scott niekum
+M : bring(a(lambda x:e.(jar(x))),scott)
+bring(jar,scott)
+
+i want you to go to the kitchen
+M : walk(kitchen)
+walk(kitchen)
+
+i would like for you to walk to professor scott niekum's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, scott)))))
+walk(l3_404)
+
+i want for you to please give doctor bruce porter a spiky, tall shaker
+M : bring(a(lambda x:e.(and(spiky(x), and(tall(x), shaker(x))))),bruce)
+bring(shaker,bruce)
+
+please bring a neon, light beans to dr ballard
+M : bring(a(lambda x:e.(and(neon(x), and(light(x), beans(x))))),dana)
+bring(beans,dana)
+
+i would like for you to please deliver a half-full, pencil-shaped stuffed-animal to the intern
+M : bring(a(lambda x:e.(and(half-full(x), and(pencil-shaped(x), stuffed-animal(x))))),rodolfo)
+bring(stuffed-animal,rodolfo)
+
+go ahead and bring a rough, metallic notebook to ms stacy miller
+M : bring(a(lambda x:e.(and(rough(x), and(metallic(x), notebook(x))))),stacy)
+bring(notebook,stacy)
+
+could you search for professor peter stone in room 3414b
+M : searchroom(peter,l3_414b)
+searchroom(peter,l3_414b)
+
+i would like for you to walk to room 3516
+M : walk(l3_516)
+walk(l3_516)
+
+please go and get a teal spraycan for mr rodolfo corona
+M : bring(a(lambda x:e.(and(teal(x), spraycan(x)))),rodolfo)
+bring(spraycan,rodolfo)
+
+i want you to please go to the lab
+M : walk(l3_414b)
+walk(l3_414b)
+
+i would like you to please bring a curvy bottle to doctor bruce porter
+M : bring(a(lambda x:e.(and(curvy(x), bottle(x)))),bruce)
+bring(bottle,bruce)
+
+you should go to rudy's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, rodolfo)))))
+walk(l3_414b)
+
+please walk on over to rudy corona's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, rodolfo)))))
+walk(l3_414b)
+
+could you walk to mr jivko's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, jivko)))))
+walk(l3_432)
+
+go get the potato chips for ms aishwarya padmakumar
+M : bring(chips,aishwarya)
+bring(chips,aishwarya)
+
+go look if doctor stone is in room 3420
+M : searchroom(peter,l3_420)
+searchroom(peter,l3_420)
+
+please go to room 3512
+M : walk(l3_512)
+walk(l3_512)
+
+is the chair in room 3432
+M : searchroom(bruce,l3_432)
+searchroom(bruce,l3_432)
+
+go find out whether rudy corona is in room 3516
+M : searchroom(rodolfo,l3_516)
+searchroom(rodolfo,l3_516)
+
+i would like for you to please bring an orange floaty to aishwarya
+M : bring(a(lambda x:e.(and(orange(x), floaty(x)))),aishwarya)
+bring(floaty,aishwarya)
+
+see whether ms padmakumar is in room 3502
+M : searchroom(aishwarya,l3_502)
+searchroom(aishwarya,l3_502)
+
+go find the pi in room 3420
+M : searchroom(peter,l3_420)
+searchroom(peter,l3_420)
+
+please walk to room 3502
+M : walk(l3_502)
+walk(l3_502)
+
+can you please deliver an aluminum, rough stuffed-animal to mr scott niekum
+M : bring(a(lambda x:e.(and(aluminum(x), and(rough(x), stuffed-animal(x))))),scott)
+bring(stuffed-animal,scott)
+
+would you please walk to room 3414b
+M : walk(l3_414b)
+walk(l3_414b)
+
+go and get a thing for mr niekum
+M : bring(a(lambda x:e.(thing(x))),scott)
+bring(thing,scott)
+
+can you please bring the chair the sandwich
+M : bring(sandwich,bruce)
+bring(sandwich,bruce)
+
+i would like for you to please deliver a round shaker to doctor dana ballard
+M : bring(a(lambda x:e.(and(round(x), shaker(x)))),dana)
+bring(shaker,dana)
+
+please go and get the ledger for professor dana ballard
+M : bring(ledger,dana)
+bring(ledger,dana)
+
+i would like you to please go to room 3418
+M : walk(l3_418)
+walk(l3_418)
+
+please go to stacy's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, stacy)))))
+walk(l3_502)
+
+go ahead and take a bucket to jesse thomason
+M : bring(a(lambda x:e.(bucket(x))),jesse)
+bring(bucket,jesse)
+
+i want you to bring a foam beans to mr porter
+M : bring(a(lambda x:e.(and(foam(x), beans(x)))),bruce)
+bring(beans,bruce)
+
+run over to doctor stone's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, peter)))))
+walk(l3_508)
+
+the undergrad would like you to bring them a pineapple
+M : bring(a(lambda x:e.(pineapple(x))),rodolfo)
+bring(pineapple,rodolfo)
+
+can you please deliver the snack to doctor mooney
+M : bring(snack,ray)
+bring(snack,ray)
+
+i want you to give doctor dana ballard a cylindrical, circular marker
+M : bring(a(lambda x:e.(and(cylindrical(x), and(circular(x), marker(x))))),dana)
+bring(marker,dana)
+
+can you walk to secretary stacy miller's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, stacy)))))
+walk(l3_502)
+
+i would like for you to please go to room 3402
+M : walk(l3_402)
+walk(l3_402)
+
+look and tell me whether mr stone is in room 3418
+M : searchroom(peter,l3_418)
+searchroom(peter,l3_418)
+
+you should deliver a spray to ray mooney
+M : bring(a(lambda x:e.(spray(x))),ray)
+bring(spray,ray)
+
+please go get the soda for scott niekum
+M : bring(coke,scott)
+bring(coke,scott)
+
+i would like you to take a roll to doctor ray mooney
+M : bring(a(lambda x:e.(roll(x))),ray)
+bring(roll,ray)
+
+can you please deliver a shiny shaker to mr thomason
+M : bring(a(lambda x:e.(and(shiny(x), shaker(x)))),jesse)
+bring(shaker,jesse)
+
+i would like you to please bring a wide, metallic thing to dana ballard
+M : bring(a(lambda x:e.(and(wide(x), and(metallic(x), thing(x))))),dana)
+bring(thing,dana)
+
+go and find out if the chair is in room 3414b
+M : searchroom(bruce,l3_414b)
+searchroom(bruce,l3_414b)
+
+hurry and take a tall, water cellphone to dr peter stone
+M : bring(a(lambda x:e.(and(tall(x), and(water(x), cellphone(x))))),peter)
+bring(cellphone,peter)
+
+please go walk to doctor ballard's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, dana)))))
+walk(l3_510)
+
+go and find out if the director is in room 3418
+M : searchroom(ray,l3_418)
+searchroom(ray,l3_418)
+
+check room 3502 for professor peter stone
+M : searchroom(peter,l3_502)
+searchroom(peter,l3_502)
+
+i want you to go to room 3502
+M : walk(l3_502)
+walk(l3_502)
+
+go to room 3432
+M : walk(l3_432)
+walk(l3_432)
+
+please hurry to scott's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, scott)))))
+walk(l3_404)
+
+i would like you to please walk to room 3502
+M : walk(l3_502)
+walk(l3_502)
+
+i would like you to take the cheeseburger to doctor scott niekum
+M : bring(hamburger,scott)
+bring(hamburger,scott)
+
+hurry and deliver a tall, heavy tub to jesse
+M : bring(a(lambda x:e.(and(tall(x), and(heavy(x), tub(x))))),jesse)
+bring(tub,jesse)
+
+mr mooney wants a spiky tin
+M : bring(a(lambda x:e.(and(spiky(x), tin(x)))),ray)
+bring(tin,ray)
+
+i want you to walk to room 3432
+M : walk(l3_432)
+walk(l3_432)
+
+look and tell me if dana is in room 3512
+M : searchroom(dana,l3_512)
+searchroom(dana,l3_512)
+
+go and find out if scott niekum is in room 3418
+M : searchroom(scott,l3_418)
+searchroom(scott,l3_418)
+
+go and find out if ray mooney is in room 3402
+M : searchroom(ray,l3_402)
+searchroom(ray,l3_402)
+
+i would like you to please take some beans to professor niekum
+M : bring(a(lambda x:e.(beans(x))),scott)
+bring(beans,scott)
+
+hurry and bring a black, styrofoam beans to professor niekum
+M : bring(a(lambda x:e.(and(black(x), and(styrofoam(x), beans(x))))),scott)
+bring(beans,scott)
+
+search room 3420 for jivko
+M : searchroom(jivko,l3_420)
+searchroom(jivko,l3_420)
+
+can you please deliver the tea to doctor ray mooney
+M : bring(tea,ray)
+bring(tea,ray)
+
+find ms padmakumar in room 3510
+M : searchroom(aishwarya,l3_510)
+searchroom(aishwarya,l3_510)
+
+professor peter stone would like you to bring them a book
+M : bring(a(lambda x:e.(book(x))),peter)
+bring(book,peter)
+
+would you please walk to doctor ballard's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, dana)))))
+walk(l3_510)
+
+check room 3414b for doctor ray mooney
+M : searchroom(ray,l3_414b)
+searchroom(ray,l3_414b)
+
+i would like for you to bring a rectangle to professor dana ballard
+M : bring(a(lambda x:e.(rectangle(x))),dana)
+bring(rectangle,dana)
+
+i would like you to bring a lid to doctor mooney
+M : bring(a(lambda x:e.(lid(x))),ray)
+bring(lid,ray)
+
+please give the hammer to doctor mooney
+M : bring(hammer,ray)
+bring(hammer,ray)
+
+i would like you to take a blue bucket to dr peter stone
+M : bring(a(lambda x:e.(and(blue(x), bucket(x)))),peter)
+bring(bucket,peter)
+
+i would like you to please give the grad student a sphere
+M : bring(a(lambda x:e.(sphere(x))),jesse)
+bring(sphere,jesse)
+
+you should take a cardboard, metallic tin to mr corona
+M : bring(a(lambda x:e.(and(cardboard(x), and(metallic(x), tin(x))))),rodolfo)
+bring(tin,rodolfo)
+
+can you take a squishy plush-toy to the secretary
+M : bring(a(lambda x:e.(and(squishy(x), plush-toy(x)))),stacy)
+bring(plush-toy,stacy)
+
+i would like you to deliver a cylindrical, cardboard flask to dr porter
+M : bring(a(lambda x:e.(and(cylindrical(x), and(cardboard(x), flask(x))))),bruce)
+bring(flask,bruce)
+
+walk to room 3510
+M : walk(l3_510)
+walk(l3_510)
+
+i want you to walk to professor stone's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, peter)))))
+walk(l3_508)
+
+i would like you to please bring the box to professor peter stone
+M : bring(box,peter)
+bring(box,peter)
+
+please bring the laptop to the postdoc
+M : bring(laptop,jivko)
+bring(laptop,jivko)
+
+i want you to please deliver a thing to professor porter
+M : bring(a(lambda x:e.(thing(x))),bruce)
+bring(thing,bruce)
+
+give a teal rectangle to mr jesse thomason
+M : bring(a(lambda x:e.(and(teal(x), rectangle(x)))),jesse)
+bring(rectangle,jesse)
+
+i would like you to please go to dr mooney's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, ray)))))
+walk(l3_512)
+
+aishwarya padmakumar wants the laptop
+M : bring(laptop,aishwarya)
+bring(laptop,aishwarya)
+
+i would like you to please walk to room 3414b
+M : walk(l3_414b)
+walk(l3_414b)
+
+i want you to bring a neon marker to jesse
+M : bring(a(lambda x:e.(and(neon(x), marker(x)))),jesse)
+bring(marker,jesse)
+
+you should deliver the pizza to dr stone
+M : bring(pizza,peter)
+bring(pizza,peter)
+
+i would like for you to walk to aishwarya padmakumar's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, aishwarya)))))
+walk(l3_414b)
+
+search for professor mooney in room 3516
+M : searchroom(ray,l3_516)
+searchroom(ray,l3_516)
+
+roll over to room 3418
+M : walk(l3_418)
+walk(l3_418)
+
+i would like you to walk to ray mooney's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, ray)))))
+walk(l3_512)
+
+look whether doctor ballard is in room 3432
+M : searchroom(dana,l3_432)
+searchroom(dana,l3_432)
+
+i would like you to please bring a rectangular, open notebook to doctor stone
+M : bring(a(lambda x:e.(and(rectangular(x), and(open(x), notebook(x))))),peter)
+bring(notebook,peter)
+
+i want for you to give rudy a metal, purple lid
+M : bring(a(lambda x:e.(and(metal(x), and(purple(x), lid(x))))),rodolfo)
+bring(lid,rodolfo)
+
+i would like for you to please walk to room 3516
+M : walk(l3_516)
+walk(l3_516)
+
+i would like for you to please walk to room 3414b
+M : walk(l3_414b)
+walk(l3_414b)
+
+i would like for you to please go to room 3510
+M : walk(l3_510)
+walk(l3_510)
+
+i would like for you to please bring a light cylinder to mr peter stone
+M : bring(a(lambda x:e.(and(light(x), cylinder(x)))),peter)
+bring(cylinder,peter)
+
+could you walk to room 3414b
+M : walk(l3_414b)
+walk(l3_414b)
+
+look whether professor ray mooney is in room 3512
+M : searchroom(ray,l3_512)
+searchroom(ray,l3_512)
+
+i want you to take some chips to dana
+M : bring(a(lambda x:e.(chips(x))),dana)
+bring(chips,dana)
+
+please go get the organizer for the ta
+M : bring(organizer,aishwarya)
+bring(organizer,aishwarya)
+
+please walk on over to scott's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, scott)))))
+walk(l3_404)
+
+please deliver a big, styrofoam can to professor mooney
+M : bring(a(lambda x:e.(and(big(x), and(styrofoam(x), can(x))))),ray)
+bring(can,ray)
+
+i would like you to deliver the ledger to peter
+M : bring(ledger,peter)
+bring(ledger,peter)
+
+i would like you to deliver the juice to dr bruce porter
+M : bring(juice,bruce)
+bring(juice,bruce)
+
+look and tell me whether mr scott niekum is in room 3418
+M : searchroom(scott,l3_418)
+searchroom(scott,l3_418)
+
+i would like for you to please deliver a spherical, bright rectangle to ms aishwarya padmakumar
+M : bring(a(lambda x:e.(and(spherical(x), and(bright(x), rectangle(x))))),aishwarya)
+bring(rectangle,aishwarya)
+
+i would like for you to take a wipes to the secretary
+M : bring(a(lambda x:e.(wipes(x))),stacy)
+bring(wipes,stacy)
+
+tell me if doctor peter stone is in room 3432
+M : searchroom(peter,l3_432)
+searchroom(peter,l3_432)
+
+can you please deliver a yellow jar to mr thomason
+M : bring(a(lambda x:e.(and(yellow(x), jar(x)))),jesse)
+bring(jar,jesse)
+
+dr ballard would like a drink
+M : bring(a(lambda x:e.(drink(x))),dana)
+bring(drink,dana)
+
+go and see if doctor dana ballard is in room 3512
+M : searchroom(dana,l3_512)
+searchroom(dana,l3_512)
+
+can you please deliver the container to the advisor
+M : bring(container,ray)
+bring(container,ray)
+
+you should bring a big, colored shaker to professor bruce porter
+M : bring(a(lambda x:e.(and(big(x), and(colored(x), shaker(x))))),bruce)
+bring(shaker,bruce)
+
+give the container to dr ballard
+M : bring(container,dana)
+bring(container,dana)
+
+i would like you to take a bucket to rudy corona
+M : bring(a(lambda x:e.(bucket(x))),rodolfo)
+bring(bucket,rodolfo)
+
+i would like you to please go to secretary miller's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, stacy)))))
+walk(l3_502)
+
+i would like for you to please go to room 3516
+M : walk(l3_516)
+walk(l3_516)
+
+i want for you to give the ta a neon, orange wipes
+M : bring(a(lambda x:e.(and(neon(x), and(orange(x), wipes(x))))),aishwarya)
+bring(wipes,aishwarya)
+
+can you tell me if mr niekum is in room 3502
+M : searchroom(scott,l3_502)
+searchroom(scott,l3_502)
+
+go and give a green, fat floaty to professor mooney
+M : bring(a(lambda x:e.(and(green(x), and(fat(x), floaty(x))))),ray)
+bring(floaty,ray)
+
+go find the secretary in room 3420
+M : searchroom(stacy,l3_420)
+searchroom(stacy,l3_420)
+
+can you please give dr niekum the cellphone
+M : bring(cellphone,scott)
+bring(cellphone,scott)
+
+please run over to room 3502
+M : walk(l3_502)
+walk(l3_502)
+
+can you give ms aishwarya padmakumar the dustbin
+M : bring(trashcan,aishwarya)
+bring(trashcan,aishwarya)
+
+scott niekum wants a crayon
+M : bring(a(lambda x:e.(crayon(x))),scott)
+bring(crayon,scott)
+
+go look for professor niekum in room 3432
+M : searchroom(scott,l3_432)
+searchroom(scott,l3_432)
+
+can you please give stacy miller a flask
+M : bring(a(lambda x:e.(flask(x))),stacy)
+bring(flask,stacy)
+
+i would like you to please take the doritos to dr bruce porter
+M : bring(doritos,bruce)
+bring(doritos,bruce)
+
+bruce would like you to bring them a red cup
+M : bring(a(lambda x:e.(and(red(x), cup(x)))),bruce)
+bring(cup,bruce)
+
+i would like you to go to mr jivko's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, jivko)))))
+walk(l3_432)
+
+walk to aishwarya padmakumar's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, aishwarya)))))
+walk(l3_414b)
+
+find out and tell me whether professor peter stone is in room 3508
+M : searchroom(peter,l3_508)
+searchroom(peter,l3_508)
+
+hurry and walk to room 3516
+M : walk(l3_516)
+walk(l3_516)
+
+find out if dr scott niekum is in room 3512
+M : searchroom(scott,l3_512)
+searchroom(scott,l3_512)
+
+i want for you to please take a pineapple to aishwarya
+M : bring(a(lambda x:e.(pineapple(x))),aishwarya)
+bring(pineapple,aishwarya)
+
+i want you to give mr ballard a thin, blue bucket
+M : bring(a(lambda x:e.(and(thin(x), and(blue(x), bucket(x))))),dana)
+bring(bucket,dana)
+
+can you give dr peter stone the binder
+M : bring(binder,peter)
+bring(binder,peter)
+
+go look whether secretary stacy miller is in the kitchen
+M : searchroom(stacy,kitchen)
+searchroom(stacy,kitchen)
+
+i would like for you to bring a metal pineapple to the professor
+M : bring(a(lambda x:e.(and(metal(x), pineapple(x)))),ray)
+bring(pineapple,ray)
+
+go look if rudy is in room 3414b
+M : searchroom(rodolfo,l3_414b)
+searchroom(rodolfo,l3_414b)
+
+can you search for aishwarya in room 3502
+M : searchroom(aishwarya,l3_502)
+searchroom(aishwarya,l3_502)
+
+go find out whether peter stone is in room 3402
+M : searchroom(peter,l3_402)
+searchroom(peter,l3_402)
+
+look for mr corona in the lab
+M : searchroom(rodolfo,l3_414b)
+searchroom(rodolfo,l3_414b)
+
+i would like for you to please give mr corona the snack
+M : bring(snack,rodolfo)
+bring(snack,rodolfo)
+
+go and find out if doctor dana ballard is in room 3516
+M : searchroom(dana,l3_516)
+searchroom(dana,l3_516)
+
+doctor mooney wants you to bring them the dustbin
+M : bring(trashcan,ray)
+bring(trashcan,ray)
+
+you should deliver the glass to dr porter
+M : bring(glass,bruce)
+bring(glass,bruce)
+
+could you walk to rodolfo corona's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, rodolfo)))))
+walk(l3_414b)
+
+i would like you to please deliver a styrofoam roll to the grad student
+M : bring(a(lambda x:e.(and(styrofoam(x), roll(x)))),jesse)
+bring(roll,jesse)
+
+run over to ray mooney's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, ray)))))
+walk(l3_512)
+
+i would like you to please bring a closed stuffed-animal to secretary miller
+M : bring(a(lambda x:e.(and(closed(x), stuffed-animal(x)))),stacy)
+bring(stuffed-animal,stacy)
+
+could you walk to aishwarya padmakumar's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, aishwarya)))))
+walk(l3_414b)
+
+i would like for you to please give the ta a foamy, teal rectangle
+M : bring(a(lambda x:e.(and(foamy(x), and(teal(x), rectangle(x))))),aishwarya)
+bring(rectangle,aishwarya)
+
+i want you to bring the ledger to the pi
+M : bring(ledger,peter)
+bring(ledger,peter)
+
+i would like you to bring a spiky cylinder to dr porter
+M : bring(a(lambda x:e.(and(spiky(x), cylinder(x)))),bruce)
+bring(cylinder,bruce)
+
+please run over to room 3420
+M : walk(l3_420)
+walk(l3_420)
+
+go see whether professor ray mooney is in room 3516
+M : searchroom(ray,l3_516)
+searchroom(ray,l3_516)
+
+i want you to please bring a rectangle to professor dana ballard
+M : bring(a(lambda x:e.(rectangle(x))),dana)
+bring(rectangle,dana)
+
+please go get the pillow for doctor stone
+M : bring(pillow,peter)
+bring(pillow,peter)
+
+run over to room 3420
+M : walk(l3_420)
+walk(l3_420)
+
+you are needed at scott niekum's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, scott)))))
+walk(l3_404)
+
+you should go to room 3402
+M : walk(l3_402)
+walk(l3_402)
+
+run over to room 3512
+M : walk(l3_512)
+walk(l3_512)
+
+please walk to the kitchen
+M : walk(kitchen)
+walk(kitchen)
+
+i want you to walk to room 3420
+M : walk(l3_420)
+walk(l3_420)
+
+i would like you to please walk to room 3418
+M : walk(l3_418)
+walk(l3_418)
+
+i want for you to please deliver a bright, metal laptop to doctor scott niekum
+M : bring(a(lambda x:e.(and(bright(x), and(metal(x), laptop(x))))),scott)
+bring(laptop,scott)
+
+go find out whether dr bruce porter is in room 3418
+M : searchroom(bruce,l3_418)
+searchroom(bruce,l3_418)
+
+look and tell me whether mr shiqi is in room 3512
+M : searchroom(shiqi,l3_512)
+searchroom(shiqi,l3_512)
+
+i want you to please deliver the muffin to mr scott niekum
+M : bring(muffin,scott)
+bring(muffin,scott)
+
+please walk to mr dana ballard's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, dana)))))
+walk(l3_510)
+
+can you find professor bruce porter in room 3512
+M : searchroom(bruce,l3_512)
+searchroom(bruce,l3_512)
+
+would you please go to the kitchen
+M : walk(kitchen)
+walk(kitchen)
+
+please run over to doctor stone's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, peter)))))
+walk(l3_508)
+
+i would like for you to walk to room 3508
+M : walk(l3_508)
+walk(l3_508)
+
+i want you to bring a drink to professor scott niekum
+M : bring(a(lambda x:e.(drink(x))),scott)
+bring(drink,scott)
+
+i want you to please bring a metallic bottle to mr jivko
+M : bring(a(lambda x:e.(and(metallic(x), bottle(x)))),jivko)
+bring(bottle,jivko)
+
+find out if mr shiqi is in room 3420
+M : searchroom(shiqi,l3_420)
+searchroom(shiqi,l3_420)
+
+please hurry to room 3432
+M : walk(l3_432)
+walk(l3_432)
+
+i want you to go to mr jesse thomason's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, jesse)))))
+walk(l3_414b)
+
+can you please go to room 3508
+M : walk(l3_508)
+walk(l3_508)
+
+please go and get the doritos for dr dana ballard
+M : bring(doritos,dana)
+bring(doritos,dana)
+
+the postdoc would like the organizer
+M : bring(organizer,jivko)
+bring(organizer,jivko)
+
+can you give the director the dustbin
+M : bring(trashcan,ray)
+bring(trashcan,ray)
+
+i want you to give jesse a crayon
+M : bring(a(lambda x:e.(crayon(x))),jesse)
+bring(crayon,jesse)
+
+is secretary stacy miller in room 3432
+M : searchroom(stacy,l3_432)
+searchroom(stacy,l3_432)
+
+i want for you to deliver a laptop to professor ray mooney
+M : bring(a(lambda x:e.(laptop(x))),ray)
+bring(laptop,ray)
+
+i want you to deliver a coffee, paper flask to the intern
+M : bring(a(lambda x:e.(and(coffee(x), and(paper(x), flask(x))))),rodolfo)
+bring(flask,rodolfo)
+
+you should take a cup to doctor ballard
+M : bring(a(lambda x:e.(cup(x))),dana)
+bring(cup,dana)
+
+i want you to please walk to room 3402
+M : walk(l3_402)
+walk(l3_402)
+
+run over to dr ray mooney's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, ray)))))
+walk(l3_512)
+
+go ahead and take a full, heavy can to ray mooney
+M : bring(a(lambda x:e.(and(full(x), and(heavy(x), can(x))))),ray)
+bring(can,ray)
+
+can you please walk to peter stone's office
+M : walk(the(lambda x:e.(and(office(x), possesses(x, peter)))))
+walk(l3_508)
+
+see if doctor ballard is in room 3420
+M : searchroom(dana,l3_420)
+searchroom(dana,l3_420)
+
+i would like you to go to room 3516
+M : walk(l3_516)
+walk(l3_516)
+
+could you tell me whether professor dana ballard is in room 3420
+M : searchroom(dana,l3_420)
+searchroom(dana,l3_420)
+
+go look if bruce is in room 3420
+M : searchroom(bruce,l3_420)
+searchroom(bruce,l3_420)
+
+go find out whether mr scott niekum is in room 3402
+M : searchroom(scott,l3_402)
+searchroom(scott,l3_402)
+
+go look whether the undergrad is in room 3510
+M : searchroom(rodolfo,l3_510)
+searchroom(rodolfo,l3_510)
+
+i want you to please bring a skinny prism to shiqi
+M : bring(a(lambda x:e.(and(skinny(x), prism(x)))),shiqi)
+bring(prism,shiqi)
+
+can you bring mr scott niekum a spherical, circular spray
+M : bring(a(lambda x:e.(and(spherical(x), and(circular(x), spray(x))))),scott)
+bring(spray,scott)
+

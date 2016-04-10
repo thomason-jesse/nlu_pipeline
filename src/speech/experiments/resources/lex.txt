@@ -1,0 +1,97 @@
+#imperative
+search :- M/PP/NP : lambda r:e.(lambda p:e.(searchroom(p,r)))
+search :- M/PP/PP : lambda p:e.(lambda r:e.(searchroom(p,r)))
+bring :- M/NP/NP : lambda y:e.(lambda x:e.(bring(x,y)))
+bring :- M/PP/NP : lambda x:e.(lambda y:e.(bring(x,y)))
+walk :- M/PP : lambda x:e.(at(x))
+
+#prepositional arguments to commands
+for :- PP/NP : lambda x:e.(x)
+of :- PP/NP : lambda x:e.(x)
+in :- PP/NP : lambda x:e.(x)
+about :- PP/NP : lambda x:e.(x)
+to :- PP/NP : lambda x:e.(x)
+
+#confirmations
+yes :- C : yes
+no :- C : no
+none :- C : none
+
+#these are weird now bc there's some implicit knowledge in hasoffice that the second arg is an office
+'s office :- NP\NP : lambda x:e.(the(lambda y:e.(hasoffice(x,y))))
+office of :- N/NP : lambda x:e.(lambda y:e.(hasoffice(x,y)))
+
+#entity descriptor words
+#can be type-raised to N/N : lambda x:e.(pred(x))
+room :- N : room
+person :- N : person
+item :- N : item
+
+#closed category
+the :- NP/(N/N) : lambda P:<e,t>.(the(lambda x:e.(P(x))))
+a :- NP/(N/N) : lambda P:<e,t>.(a(lambda x:e.(P(x))))
+
+#atoms
+3516 :- NP : l3_516
+3508 :- NP : l3_508
+3512 :- NP : l3_512
+3510 :- NP : l3_510
+3402 :- NP : l3_402
+3418 :- NP : l3_418
+3420 :- NP : l3_420
+3432 :- NP : l3_432
+3502 :- NP : l3_502
+3414b :- NP : l3_414b
+
+bruce :- NP : bruce
+stacy :- NP : stacy
+dana :- NP : dana
+jivko :- NP : jivko
+peter :- NP : peter
+ray :- NP : ray
+shiqi :- NP : shiqi
+scott :- NP : scott
+jesse :- NP : jesse
+aishwarya :- NP : aishwarya
+rodolfo :- NP : rodolfo 
+
+apple :- NP : apple
+basket :- NP : basket
+beverage :- NP : beverage
+binder :- NP : binder
+book :- NP : book
+box :- NP : box
+bread :- NP : bread
+cake :- NP : cake
+calendar :- NP : calendar
+cellphone :- NP : cellphone
+chips :- NP : chips
+coffee :- NP : coffee
+coke :- NP : coke
+container :- NP : container
+cupcake :- NP : cupcake
+dessert :- NP : dessert
+diary :- NP : diary
+doritos :- NP : doritos
+glass :- NP : glass
+hamburger :- NP : hamburger
+hammer :- NP : hammer
+juice :- NP : juice
+laptop :- NP : laptop
+ledger :- NP : ledger
+letter :- NP : letter
+milk :- NP : milk
+muffin :- NP : muffin
+notebook :- NP : notebook
+organizer :- NP : organizer
+pencil :- NP : pencil
+phone :- NP : phone
+pillow :- NP : pillow
+pizza :- NP : pizza
+salad :- NP : salad
+sandwich :- NP : sandwich
+snack :- NP : snack
+tea :- NP : tea
+trashcan :- NP : trashcan
+watch :- NP : watch
+water :- NP : water

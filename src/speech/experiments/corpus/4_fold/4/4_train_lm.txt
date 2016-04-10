@@ -1,0 +1,1147 @@
+<s> can you bring the chair some beans </s>
+<s> go walk to room 3414b </s>
+<s> dr niekum wants you to bring them the muffin </s>
+<s> i want for you to please take a lid to professor ray mooney </s>
+<s> find out and tell me if professor dana ballard is in room 3508 </s>
+<s> i want for you to please give doctor bruce porter a white prism </s>
+<s> dr niekum would like you to bring them a styrofoam, pink cup </s>
+<s> i want for you to deliver a foamy ball to aishwarya </s>
+<s> i would like you to please walk to mr thomason's office </s>
+<s> could you walk to room 3414b </s>
+<s> go ahead and walk to room 3432 </s>
+<s> run over to mr dana ballard's office </s>
+<s> i would like for you to walk to room 3414b </s>
+<s> can you tell me if the grad student is in room 3510 </s>
+<s> roll over to doctor scott niekum's office </s>
+<s> i want you to please go to room 3432 </s>
+<s> look if professor niekum is in room 3512 </s>
+<s> look and tell me if mr porter is in room 3516 </s>
+<s> jesse thomason wants a top book </s>
+<s> hurry and take the hammer to mr thomason </s>
+<s> i would like you to please give doctor mooney the pillow </s>
+<s> would you please walk to room 3402 </s>
+<s> go look if ms miller is in room 3510 </s>
+<s> check for dana ballard in room 3516 </s>
+<s> i want for you to please bring a pointy, tiny tin to dr mooney </s>
+<s> go to room 3432 </s>
+<s> please bring the basket to doctor peter stone </s>
+<s> please go and get the phone for jesse thomason </s>
+<s> give the box to peter </s>
+<s> please walk on over to room 3420 </s>
+<s> find out whether mr corona is in room 3402 </s>
+<s> can you tell me whether scott niekum is in room 3420 </s>
+<s> i would like you to please give professor dana ballard the apple </s>
+<s> deliver a small, silent rectangle to mr ballard </s>
+<s> i would like for you to walk to room 3510 </s>
+<s> go walk to room 3432 </s>
+<s> go find mr jesse thomason in room 3414b </s>
+<s> please go and get the coffee cup for mr ray mooney </s>
+<s> go and deliver a styrofoam carton to dr ballard </s>
+<s> i want for you to take a medium-sized spray to doctor porter </s>
+<s> i want you to take a blue lid to the pi </s>
+<s> mr mooney would like you to bring them the milk </s>
+<s> i want you to bring the notebook to mr dana ballard </s>
+<s> go and give the bag of chips to doctor porter </s>
+<s> please walk on over to room 3414b </s>
+<s> look if doctor niekum is in room 3420 </s>
+<s> tell me whether aishwarya is in room 3432 </s>
+<s> take the planner to rodolfo </s>
+<s> the advisor wants the muffin </s>
+<s> go and find dana in room 3418 </s>
+<s> i would like you to please take a heavy, liquid prism to professor dana ballard </s>
+<s> can you please bring a prism to dr dana ballard </s>
+<s> i want you to bring a big, rough carton to professor ballard </s>
+<s> deliver the glass of water to mr peter stone </s>
+<s> look if dr porter is in room 3402 </s>
+<s> can you please walk to the lab </s>
+<s> i would like for you to please walk to room 3402 </s>
+<s> roll over to room 3418 </s>
+<s> can you bring the soda to doctor mooney </s>
+<s> rodolfo corona would like you to bring them a ball </s>
+<s> could you tell me whether dr niekum is in room 3512 </s>
+<s> i want for you to please take the coffee cup to professor dana ballard </s>
+<s> i want for you to take the phone to mr peter stone </s>
+<s> give the burger to mr ray mooney </s>
+<s> i would like for you to deliver the bread to peter </s>
+<s> i want for you to bring a plush-toy to dr bruce porter </s>
+<s> hurry to ms aishwarya padmakumar's office </s>
+<s> i would like you to please give mr shiqi a round, pointed beans </s>
+<s> i would like you to give mr niekum a paper plush-toy </s>
+<s> please walk on over to mr dana ballard's office </s>
+<s> run over to ms stacy miller's office </s>
+<s> i want for you to bring the crisps to ms padmakumar </s>
+<s> i would like you to take a thin, empty bucket to professor dana ballard </s>
+<s> professor peter stone would like you to bring them a rough, aluminum roll </s>
+<s> search for professor scott niekum in room 3516 </s>
+<s> i want you to please bring a tiny, full tub to ray </s>
+<s> i would like you to bring a spraycan to dr ray mooney </s>
+<s> i want you to walk to doctor stone's office </s>
+<s> see whether ms miller is in room 3516 </s>
+<s> can you please walk to room 3418 </s>
+<s> i want you to please deliver the letter to mr thomason </s>
+<s> walk on over to room 3510 </s>
+<s> please deliver a tiny jar to ms padmakumar </s>
+<s> i would like for you to please give mr corona a thing </s>
+<s> search the kitchen for dr peter stone </s>
+<s> hurry and take a rough thing to stacy miller </s>
+<s> please hurry to dana ballard's office </s>
+<s> go and give a container to stacy </s>
+<s> please go get a skinny, pointy bottle for doctor stone </s>
+<s> go ahead and bring a tall, purple spraycan to professor bruce porter </s>
+<s> go ahead and take a small cup to ms miller </s>
+<s> can you deliver a sphere to the pi </s>
+<s> you should go to room 3510 </s>
+<s> is ms padmakumar in room 3418 </s>
+<s> can you please give professor ray mooney a pineapple </s>
+<s> please go to room 3418 </s>
+<s> i would like you to please deliver a shaker to dr bruce porter </s>
+<s> i want you to take a cylindrical, neon marker to the ta </s>
+<s> go walk to dr scott niekum's office </s>
+<s> roll over to stacy miller's office </s>
+<s> please go to room 3418 </s>
+<s> i would like you to please deliver the dessert to dr porter </s>
+<s> dr peter stone would like a lid </s>
+<s> i want for you to bring the cheeseburger to jesse </s>
+<s> i would like for you to please go to scott niekum's office </s>
+<s> i want for you to give doctor porter the apple </s>
+<s> tell me whether rudy is in room 3420 </s>
+<s> you should take a liquid shaker to mr dana ballard </s>
+<s> i would like for you to bring a short, aerosol pineapple to mr niekum </s>
+<s> i would like you to go to room 3418 </s>
+<s> go bring the letter to ms miller </s>
+<s> go ahead and deliver the coffee to stacy </s>
+<s> can you search for the director in room 3510 </s>
+<s> i would like you to please take a stuffed-animal to doctor ballard </s>
+<s> see whether aishwarya is in room 3516 </s>
+<s> walk to ms aishwarya padmakumar's office </s>
+<s> i would like you to go to mr rodolfo corona's office </s>
+<s> you should walk to room 3420 </s>
+<s> can you deliver a pineapple to bruce porter </s>
+<s> i would like for you to give doctor mooney the pizza </s>
+<s> doctor peter stone would like a mug </s>
+<s> can you deliver a silver, colored bucket to rodolfo corona </s>
+<s> you should bring the book to ray </s>
+<s> go and find out if mr porter is in room 3414b </s>
+<s> i would like you to give mr rodolfo corona a teal, closed cup </s>
+<s> go and give the ledger to dr bruce porter </s>
+<s> go ahead and take a soft, metallic plush-toy to mr corona </s>
+<s> run over to room 3512 </s>
+<s> please go to mr niekum's office </s>
+<s> please bring the glass of juice to mr peter stone </s>
+<s> can you tell me if doctor stone is in room 3418 </s>
+<s> i want you to please go to room 3510 </s>
+<s> i want you to please walk to room 3418 </s>
+<s> go ahead and bring a coffee sphere to rudy corona </s>
+<s> hurry and bring the letter to dr bruce porter </s>
+<s> walk on over to jivko's office </s>
+<s> go bring stacy miller the pizza </s>
+<s> please go to the lab </s>
+<s> i want you to take a thing to secretary miller </s>
+<s> could you walk to doctor mooney's office </s>
+<s> go and find out if secretary miller is in room 3418 </s>
+<s> go and look for mr peter stone in room 3418 </s>
+<s> please bring the pizza to rodolfo corona </s>
+<s> go ahead and walk to doctor mooney's office </s>
+<s> go and see if doctor mooney is in room 3420 </s>
+<s> look whether the director is in the lab </s>
+<s> i would like for you to bring a circular box to professor porter </s>
+<s> please go get some beans for dr dana ballard </s>
+<s> look for ray in room 3512 </s>
+<s> i would like for you to walk to peter's office </s>
+<s> take the basket to secretary miller </s>
+<s> can you bring the pillow to mr scott niekum </s>
+<s> go and find out if professor porter is in room 3502 </s>
+<s> you are needed in room 3516 </s>
+<s> could you please walk to mr thomason's office </s>
+<s> doctor peter stone would like a full floaty </s>
+<s> bring a rough stuffed-animal to shiqi </s>
+<s> go find out if dr porter is in room 3432 </s>
+<s> hurry and deliver the laptop to mr ray mooney </s>
+<s> please go and get a tall, circular container for aishwarya padmakumar </s>
+<s> can you deliver the coffee cup to professor niekum </s>
+<s> walk on over to aishwarya padmakumar's office </s>
+<s> bring a cream-colored beans to dr bruce porter </s>
+<s> go ahead and deliver the snack to mr ray mooney </s>
+<s> i want you to please take a narrow bucket to rodolfo corona </s>
+<s> hurry and deliver the cup of coffee to professor bruce porter </s>
+<s> find out if the intern is in room 3508 </s>
+<s> hurry and walk to room 3402 </s>
+<s> hurry to jivko's office </s>
+<s> go look for dr ray mooney in room 3414b </s>
+<s> you are needed in room 3420 </s>
+<s> search room 3512 for ms stacy miller </s>
+<s> hurry and deliver the drink to aishwarya padmakumar </s>
+<s> go ahead and walk to room 3418 </s>
+<s> you are needed at room 3516 </s>
+<s> i want for you to please deliver a medium-sized, spherical rectangle to jesse </s>
+<s> doctor ray mooney wants a big, aluminum notebook </s>
+<s> bring a colored sphere to professor peter stone </s>
+<s> you are needed at room 3402 </s>
+<s> can you search for ms aishwarya padmakumar in room 3512 </s>
+<s> go ahead and bring a bright drink to jesse </s>
+<s> could you please walk to room 3402 </s>
+<s> i want for you to please deliver the watch to mr mooney </s>
+<s> can you please walk to professor mooney's office </s>
+<s> i would like for you to please take the planner to dana ballard </s>
+<s> go and give a red, medium-sized cellphone to mr corona </s>
+<s> go bring the calendar to doctor scott niekum </s>
+<s> i want for you to bring the cheeseburger to dr niekum </s>
+<s> i would like you to walk to mr scott niekum's office </s>
+<s> roll over to stacy's office </s>
+<s> i want you to bring the organizer to jivko </s>
+<s> run over to jivko's office </s>
+<s> i would like you to please bring a metal can to dr ray mooney </s>
+<s> bruce wants a shiny, neon bucket </s>
+<s> i would like you to please take a cylinder to dr porter </s>
+<s> can you tell me whether jesse is in room 3414b </s>
+<s> take the sandwich to jesse </s>
+<s> i want for you to please give doctor niekum a light thing </s>
+<s> i would like for you to please deliver the drink to shiqi </s>
+<s> can you please walk to room 3512 </s>
+<s> i would like for you to please bring a bottle to mr bruce porter </s>
+<s> please go walk to room 3516 </s>
+<s> search room 3402 for the ta </s>
+<s> please run over to ms miller's office </s>
+<s> go bring ms padmakumar the apple </s>
+<s> go find out whether peter is in room 3432 </s>
+<s> please go walk to the lab </s>
+<s> i want you to please take the pillow to mr jivko </s>
+<s> please run over to mr stone's office </s>
+<s> can you find doctor ray mooney in room 3510 </s>
+<s> i would like for you to please take a tiny, large cylinder to professor dana ballard </s>
+<s> please go and get a soft wipes for mr peter stone </s>
+<s> i would like you to please take a pencil-shaped tin to dr dana ballard </s>
+<s> walk to dr ballard's office </s>
+<s> go ahead and bring a neon diary to the secretary </s>
+<s> go and deliver a foamy diary to professor bruce porter </s>
+<s> please run over to stacy's office </s>
+<s> please take the tea to dana </s>
+<s> i would like you to go to dr ray mooney's office </s>
+<s> i want you to please walk to room 3418 </s>
+<s> go and look whether the postdoc is in room 3510 </s>
+<s> can you please take a full shaker to mr ballard </s>
+<s> go find out if mr ray mooney is in room 3432 </s>
+<s> go ahead and take professor ballard some chips </s>
+<s> i would like for you to please walk to room 3516 </s>
+<s> can you search for professor mooney in room 3418 </s>
+<s> go to doctor niekum's office </s>
+<s> i want for you to bring the binder to rudy </s>
+<s> look and tell me whether mr ray mooney is in room 3402 </s>
+<s> i would like for you to please go to professor scott niekum's office </s>
+<s> i would like for you to deliver a soft diary to doctor stone </s>
+<s> can you bring professor porter the water </s>
+<s> i want you to please take a plush-toy to the undergrad </s>
+<s> please walk on over to dr ray mooney's office </s>
+<s> can you take the notebook to the intern </s>
+<s> i would like you to please take the lays to bruce porter </s>
+<s> go find mr peter stone in room 3512 </s>
+<s> go and deliver a spiky, aluminum cellphone to professor stone </s>
+<s> i want for you to please take a laptop to ms stacy miller </s>
+<s> please give a teal, aluminum wipes to mr ballard </s>
+<s> please walk on over to scott niekum's office </s>
+<s> can you please deliver a half-full, wide book to jivko </s>
+<s> i would like for you to please walk to room 3420 </s>
+<s> i want you to please give secretary miller a wide pineapple </s>
+<s> go bring a wide can to dr mooney </s>
+<s> can you please give dr peter stone some beans </s>
+<s> can you search for doctor porter in room 3510 </s>
+<s> search for doctor niekum in room 3418 </s>
+<s> you should deliver a yellow chips to rudy corona </s>
+<s> can you give dr scott niekum a medium-sized wipes </s>
+<s> can you walk to doctor peter stone's office </s>
+<s> ms aishwarya padmakumar wants a notebook </s>
+<s> can you please bring mr rodolfo corona the diary </s>
+<s> i want you to go to room 3418 </s>
+<s> i would like you to please deliver the cupcake to doctor bruce porter </s>
+<s> go find out if doctor bruce porter is in room 3432 </s>
+<s> i want you to please bring the ledger to mr thomason </s>
+<s> look if dr dana ballard is in room 3418 </s>
+<s> you should bring a spray to mr mooney </s>
+<s> can you bring dr bruce porter the lays </s>
+<s> can you please go to room 3516 </s>
+<s> go ahead and deliver a colored, foamy laptop to the director </s>
+<s> go bring the book to professor niekum </s>
+<s> i would like you to take a liquid, paper canister to dr ballard </s>
+<s> go walk to scott niekum's office </s>
+<s> can you please walk to room 3516 </s>
+<s> i would like you to please give mr jesse thomason a styrofoam chips </s>
+<s> i would like you to walk to room 3516 </s>
+<s> i would like for you to please give dr scott niekum the hamburger </s>
+<s> bruce porter would like you to bring them the crisps </s>
+<s> i would like for you to please take a short laptop to professor stone </s>
+<s> go ahead and deliver a cardboard, white canister to doctor dana ballard </s>
+<s> can you bring mr peter stone a metallic tub </s>
+<s> see if mr scott niekum is in room 3512 </s>
+<s> go bring a paper bucket to dr ray mooney </s>
+<s> i would like you to bring a round bottle to ray </s>
+<s> search for ray mooney in room 3502 </s>
+<s> i want you to please take a pointy, aluminum book to jivko </s>
+<s> go look if peter is in room 3418 </s>
+<s> roll over to mr scott niekum's office </s>
+<s> i would like for you to bring a spray to doctor dana ballard </s>
+<s> go look for rudy corona in room 3516 </s>
+<s> please go to room 3420 </s>
+<s> i would like for you to please take a metal bottle to mr ballard </s>
+<s> can you please bring a can to dr peter stone </s>
+<s> can you tell me whether the intern is in room 3510 </s>
+<s> walk to dana's office </s>
+<s> hurry and deliver a stuffed-animal to jesse </s>
+<s> i would like you to bring the cake to the chair </s>
+<s> go walk to secretary miller's office </s>
+<s> i want you to take the notebook to professor dana ballard </s>
+<s> doctor mooney would like you to bring them a pointy bucket </s>
+<s> i would like for you to please deliver the laptop to professor ballard </s>
+<s> please hurry to mr niekum's office </s>
+<s> hurry and walk to room 3402 </s>
+<s> can you please give stacy the dustbin </s>
+<s> go and give a silver wipes to ms aishwarya padmakumar </s>
+<s> i want you to go to room 3414b </s>
+<s> could you tell me if rudy is in room 3420 </s>
+<s> i want for you to please give dr mooney the planner </s>
+<s> please hurry to dana's office </s>
+<s> i would like for you to please walk to shiqi's office </s>
+<s> i want you to please deliver the ledger to mr porter </s>
+<s> i want you to please deliver the glass of water to dana ballard </s>
+<s> please walk on over to room 3420 </s>
+<s> i want you to go to doctor ballard's office </s>
+<s> i want for you to please give scott the laptop </s>
+<s> i would like for you to please walk to mr jesse thomason's office </s>
+<s> i want you to please go to secretary stacy miller's office </s>
+<s> find dr niekum in room 3414b </s>
+<s> go to mr corona's office </s>
+<s> go look if mr ballard is in room 3510 </s>
+<s> hurry and take a skinny, soft plush-toy to professor bruce porter </s>
+<s> i want you to please give dana the trashcan </s>
+<s> hurry to peter stone's office </s>
+<s> go ahead and walk to mr stone's office </s>
+<s> i would like for you to bring the diary to the chair </s>
+<s> you should deliver an aerosol, water laptop to professor niekum </s>
+<s> see if stacy miller is in room 3414b </s>
+<s> walk on over to ms aishwarya padmakumar's office </s>
+<s> i would like you to bring a narrow, liquid plush-toy to the director </s>
+<s> go and find out if mr niekum is in room 3510 </s>
+<s> i want you to go to professor niekum's office </s>
+<s> find out and tell me if mr bruce porter is in room 3432 </s>
+<s> look and tell me if professor mooney is in room 3402 </s>
+<s> go and give some chips to dr stone </s>
+<s> you should give the hamburger to the chair </s>
+<s> walk to room 3510 </s>
+<s> i would like you to bring the calendar to doctor ballard </s>
+<s> mr ray mooney would like you to bring them a paper stuffed-animal </s>
+<s> would you please walk to dr mooney's office </s>
+<s> i want you to walk to room 3418 </s>
+<s> i want for you to give the professor a box </s>
+<s> go and see whether professor stone is in room 3414b </s>
+<s> hurry to room 3516 </s>
+<s> bring the cheeseburger to mr shiqi </s>
+<s> go ahead and take the tea to the ta </s>
+<s> can you take a big plush-toy to professor bruce porter </s>
+<s> doctor niekum would like you to bring them the cellphone </s>
+<s> i want you to please take a marker to rudy corona </s>
+<s> the undergrad wants the water </s>
+<s> please give a box to the chair </s>
+<s> i would like for you to bring the calendar to doctor niekum </s>
+<s> please walk on over to professor dana ballard's office </s>
+<s> can you please walk to room 3516 </s>
+<s> i would like you to please take the snack to dana ballard </s>
+<s> search room 3512 for doctor ray mooney </s>
+<s> i would like for you to please go to room 3512 </s>
+<s> look whether dana ballard is in the lab </s>
+<s> i would like for you to deliver a tall, white prism to professor scott niekum </s>
+<s> can you deliver a plastic, clear flask to ms padmakumar </s>
+<s> see if mr ray mooney is in room 3432 </s>
+<s> i want you to give mr mooney the organizer </s>
+<s> i want for you to give ms aishwarya padmakumar the burger </s>
+<s> i want you to bring a curvy crayon to rudy </s>
+<s> i would like you to go to room 3512 </s>
+<s> i want for you to please deliver a neon beans to professor mooney </s>
+<s> go ahead and deliver a brown thing to secretary miller </s>
+<s> can you please bring professor mooney a bucket </s>
+<s> go and see if peter is in room 3402 </s>
+<s> i would like you to go to room 3502 </s>
+<s> see if peter stone is in room 3420 </s>
+<s> go and see if professor dana ballard is in room 3516 </s>
+<s> can you walk to the kitchen </s>
+<s> hurry to professor ray mooney's office </s>
+<s> go ahead and deliver an orange-topped, water laptop to professor porter </s>
+<s> i would like for you to bring the crisps to professor dana ballard </s>
+<s> you are needed at doctor stone's office </s>
+<s> could you please walk to room 3414b </s>
+<s> i want for you to take a ball to secretary stacy miller </s>
+<s> go look if the postdoc is in room 3414b </s>
+<s> i want you to bring the coffee to go to mr jivko </s>
+<s> deliver the apple to peter </s>
+<s> give a jar to doctor scott niekum </s>
+<s> i want you to go to the kitchen </s>
+<s> i would like for you to walk to professor scott niekum's office </s>
+<s> i want for you to please give doctor bruce porter a spiky, tall shaker </s>
+<s> please bring a neon, light beans to dr ballard </s>
+<s> i would like for you to please deliver a half-full, pencil-shaped stuffed-animal to the intern </s>
+<s> go ahead and bring a rough, metallic notebook to ms stacy miller </s>
+<s> could you search for professor peter stone in room 3414b </s>
+<s> i would like for you to walk to room 3516 </s>
+<s> please go and get a teal spraycan for mr rodolfo corona </s>
+<s> i want you to please go to the lab </s>
+<s> i would like you to please bring a curvy bottle to doctor bruce porter </s>
+<s> you should go to rudy's office </s>
+<s> please walk on over to rudy corona's office </s>
+<s> could you walk to mr jivko's office </s>
+<s> go get the potato chips for ms aishwarya padmakumar </s>
+<s> go look if doctor stone is in room 3420 </s>
+<s> please go to room 3512 </s>
+<s> is the chair in room 3432 </s>
+<s> go find out whether rudy corona is in room 3516 </s>
+<s> i would like for you to please bring an orange floaty to aishwarya </s>
+<s> see whether ms padmakumar is in room 3502 </s>
+<s> go find the pi in room 3420 </s>
+<s> please walk to room 3502 </s>
+<s> can you please deliver an aluminum, rough stuffed-animal to mr scott niekum </s>
+<s> would you please walk to room 3414b </s>
+<s> go and get a thing for mr niekum </s>
+<s> can you please bring the chair the sandwich </s>
+<s> i would like for you to please deliver a round shaker to doctor dana ballard </s>
+<s> please go and get the ledger for professor dana ballard </s>
+<s> i would like you to please go to room 3418 </s>
+<s> please go to stacy's office </s>
+<s> go ahead and take a bucket to jesse thomason </s>
+<s> i want you to bring a foam beans to mr porter </s>
+<s> run over to doctor stone's office </s>
+<s> the undergrad would like you to bring them a pineapple </s>
+<s> can you please deliver the snack to doctor mooney </s>
+<s> i want you to give doctor dana ballard a cylindrical, circular marker </s>
+<s> can you walk to secretary stacy miller's office </s>
+<s> i would like for you to please go to room 3402 </s>
+<s> look and tell me whether mr stone is in room 3418 </s>
+<s> you should deliver a spray to ray mooney </s>
+<s> please go get the soda for scott niekum </s>
+<s> i would like you to take a roll to doctor ray mooney </s>
+<s> can you please deliver a shiny shaker to mr thomason </s>
+<s> i would like you to please bring a wide, metallic thing to dana ballard </s>
+<s> go and find out if the chair is in room 3414b </s>
+<s> hurry and take a tall, water cellphone to dr peter stone </s>
+<s> please go walk to doctor ballard's office </s>
+<s> go and find out if the director is in room 3418 </s>
+<s> check room 3502 for professor peter stone </s>
+<s> i want you to go to room 3502 </s>
+<s> go to room 3432 </s>
+<s> please hurry to scott's office </s>
+<s> i would like you to please walk to room 3502 </s>
+<s> i would like you to take the cheeseburger to doctor scott niekum </s>
+<s> hurry and deliver a tall, heavy tub to jesse </s>
+<s> mr mooney wants a spiky tin </s>
+<s> i want you to walk to room 3432 </s>
+<s> look and tell me if dana is in room 3512 </s>
+<s> go and find out if scott niekum is in room 3418 </s>
+<s> go and find out if ray mooney is in room 3402 </s>
+<s> i would like you to please take some beans to professor niekum </s>
+<s> hurry and bring a black, styrofoam beans to professor niekum </s>
+<s> search room 3420 for jivko </s>
+<s> can you please deliver the tea to doctor ray mooney </s>
+<s> find ms padmakumar in room 3510 </s>
+<s> professor peter stone would like you to bring them a book </s>
+<s> would you please walk to doctor ballard's office </s>
+<s> check room 3414b for doctor ray mooney </s>
+<s> i would like for you to bring a rectangle to professor dana ballard </s>
+<s> i would like you to bring a lid to doctor mooney </s>
+<s> please give the hammer to doctor mooney </s>
+<s> i would like you to take a blue bucket to dr peter stone </s>
+<s> i would like you to please give the grad student a sphere </s>
+<s> you should take a cardboard, metallic tin to mr corona </s>
+<s> can you take a squishy plush-toy to the secretary </s>
+<s> i would like you to deliver a cylindrical, cardboard flask to dr porter </s>
+<s> walk to room 3510 </s>
+<s> i want you to walk to professor stone's office </s>
+<s> i would like you to please bring the box to professor peter stone </s>
+<s> please bring the laptop to the postdoc </s>
+<s> i want you to please deliver a thing to professor porter </s>
+<s> give a teal rectangle to mr jesse thomason </s>
+<s> i would like you to please go to dr mooney's office </s>
+<s> aishwarya padmakumar wants the laptop </s>
+<s> i would like you to please walk to room 3414b </s>
+<s> i want you to bring a neon marker to jesse </s>
+<s> you should deliver the pizza to dr stone </s>
+<s> i would like for you to walk to aishwarya padmakumar's office </s>
+<s> search for professor mooney in room 3516 </s>
+<s> roll over to room 3418 </s>
+<s> i would like you to walk to ray mooney's office </s>
+<s> look whether doctor ballard is in room 3432 </s>
+<s> i would like you to please bring a rectangular, open notebook to doctor stone </s>
+<s> i want for you to give rudy a metal, purple lid </s>
+<s> i would like for you to please walk to room 3516 </s>
+<s> i would like for you to please walk to room 3414b </s>
+<s> i would like for you to please go to room 3510 </s>
+<s> i would like for you to please bring a light cylinder to mr peter stone </s>
+<s> could you walk to room 3414b </s>
+<s> look whether professor ray mooney is in room 3512 </s>
+<s> i want you to take some chips to dana </s>
+<s> please go get the organizer for the ta </s>
+<s> please walk on over to scott's office </s>
+<s> please deliver a big, styrofoam can to professor mooney </s>
+<s> i would like you to deliver the ledger to peter </s>
+<s> i would like you to deliver the juice to dr bruce porter </s>
+<s> look and tell me whether mr scott niekum is in room 3418 </s>
+<s> i would like for you to please deliver a spherical, bright rectangle to ms aishwarya padmakumar </s>
+<s> i would like for you to take a wipes to the secretary </s>
+<s> tell me if doctor peter stone is in room 3432 </s>
+<s> can you please deliver a yellow jar to mr thomason </s>
+<s> dr ballard would like a drink </s>
+<s> go and see if doctor dana ballard is in room 3512 </s>
+<s> can you please deliver the container to the advisor </s>
+<s> you should bring a big, colored shaker to professor bruce porter </s>
+<s> give the container to dr ballard </s>
+<s> i would like you to take a bucket to rudy corona </s>
+<s> i would like you to please go to secretary miller's office </s>
+<s> i would like for you to please go to room 3516 </s>
+<s> i want for you to give the ta a neon, orange wipes </s>
+<s> can you tell me if mr niekum is in room 3502 </s>
+<s> go and give a green, fat floaty to professor mooney </s>
+<s> go find the secretary in room 3420 </s>
+<s> can you please give dr niekum the cellphone </s>
+<s> please run over to room 3502 </s>
+<s> can you give ms aishwarya padmakumar the dustbin </s>
+<s> scott niekum wants a crayon </s>
+<s> go look for professor niekum in room 3432 </s>
+<s> can you please give stacy miller a flask </s>
+<s> i would like you to please take the doritos to dr bruce porter </s>
+<s> bruce would like you to bring them a red cup </s>
+<s> i would like you to go to mr jivko's office </s>
+<s> walk to aishwarya padmakumar's office </s>
+<s> find out and tell me whether professor peter stone is in room 3508 </s>
+<s> hurry and walk to room 3516 </s>
+<s> find out if dr scott niekum is in room 3512 </s>
+<s> i want for you to please take a pineapple to aishwarya </s>
+<s> i want you to give mr ballard a thin, blue bucket </s>
+<s> can you give dr peter stone the binder </s>
+<s> go look whether secretary stacy miller is in the kitchen </s>
+<s> i would like for you to bring a metal pineapple to the professor </s>
+<s> go look if rudy is in room 3414b </s>
+<s> can you search for aishwarya in room 3502 </s>
+<s> go find out whether peter stone is in room 3402 </s>
+<s> look for mr corona in the lab </s>
+<s> i would like for you to please give mr corona the snack </s>
+<s> go and find out if doctor dana ballard is in room 3516 </s>
+<s> doctor mooney wants you to bring them the dustbin </s>
+<s> you should deliver the glass to dr porter </s>
+<s> could you walk to rodolfo corona's office </s>
+<s> i would like you to please deliver a styrofoam roll to the grad student </s>
+<s> run over to ray mooney's office </s>
+<s> i would like you to please bring a closed stuffed-animal to secretary miller </s>
+<s> could you walk to aishwarya padmakumar's office </s>
+<s> i would like for you to please give the ta a foamy, teal rectangle </s>
+<s> i want you to bring the ledger to the pi </s>
+<s> i would like you to bring a spiky cylinder to dr porter </s>
+<s> please run over to room 3420 </s>
+<s> go see whether professor ray mooney is in room 3516 </s>
+<s> i want you to please bring a rectangle to professor dana ballard </s>
+<s> please go get the pillow for doctor stone </s>
+<s> run over to room 3420 </s>
+<s> you are needed at scott niekum's office </s>
+<s> you should go to room 3402 </s>
+<s> run over to room 3512 </s>
+<s> please walk to the kitchen </s>
+<s> i want you to walk to room 3420 </s>
+<s> i would like you to please walk to room 3418 </s>
+<s> i want for you to please deliver a bright, metal laptop to doctor scott niekum </s>
+<s> go find out whether dr bruce porter is in room 3418 </s>
+<s> look and tell me whether mr shiqi is in room 3512 </s>
+<s> i want you to please deliver the muffin to mr scott niekum </s>
+<s> please walk to mr dana ballard's office </s>
+<s> can you find professor bruce porter in room 3512 </s>
+<s> would you please go to the kitchen </s>
+<s> please run over to doctor stone's office </s>
+<s> i would like for you to walk to room 3508 </s>
+<s> i want you to bring a drink to professor scott niekum </s>
+<s> i want you to please bring a metallic bottle to mr jivko </s>
+<s> find out if mr shiqi is in room 3420 </s>
+<s> please hurry to room 3432 </s>
+<s> i want you to go to mr jesse thomason's office </s>
+<s> can you please go to room 3508 </s>
+<s> please go and get the doritos for dr dana ballard </s>
+<s> the postdoc would like the organizer </s>
+<s> can you give the director the dustbin </s>
+<s> i want you to give jesse a crayon </s>
+<s> is secretary stacy miller in room 3432 </s>
+<s> i want for you to deliver a laptop to professor ray mooney </s>
+<s> i want you to deliver a coffee, paper flask to the intern </s>
+<s> you should take a cup to doctor ballard </s>
+<s> i want you to please walk to room 3402 </s>
+<s> run over to dr ray mooney's office </s>
+<s> go ahead and take a full, heavy can to ray mooney </s>
+<s> can you please walk to peter stone's office </s>
+<s> see if doctor ballard is in room 3420 </s>
+<s> i would like you to go to room 3516 </s>
+<s> could you tell me whether professor dana ballard is in room 3420 </s>
+<s> go look if bruce is in room 3420 </s>
+<s> go find out whether mr scott niekum is in room 3402 </s>
+<s> go look whether the undergrad is in room 3510 </s>
+<s> i want you to please bring a skinny prism to shiqi </s>
+<s> can you bring mr scott niekum a spherical, circular spray </s>
+<s> you should bring the pizza to professor stone </s>
+<s> i want for you to please bring a top object to rodolfo </s>
+<s> hurry and deliver a top roll to secretary miller </s>
+<s> go and get a prism for doctor peter stone </s>
+<s> i want for you to please take a thin stuffed-animal to dr bruce porter </s>
+<s> you should take the doritos to secretary miller </s>
+<s> i want you to please give professor bruce porter a container </s>
+<s> i would like you to please take a styrofoam, black can to peter </s>
+<s> you are needed at jivko's office </s>
+<s> go ahead and bring the cupcake to ms stacy miller </s>
+<s> i would like you to please walk to room 3414b </s>
+<s> i want for you to please give peter stone the pillow </s>
+<s> i want you to please go to room 3508 </s>
+<s> hurry and take a medium-sized, silent shaker to dr niekum </s>
+<s> go and look for mr mooney in room 3516 </s>
+<s> check room 3418 for dr bruce porter </s>
+<s> can you search for mr porter in room 3420 </s>
+<s> i want for you to please give mr mooney a big, colored floaty </s>
+<s> i want for you to take the cellphone to ray </s>
+<s> walk to shiqi's office </s>
+<s> please go walk to the kitchen </s>
+<s> could you tell me if mr scott niekum is in room 3512 </s>
+<s> i want you to please give doctor porter a brown, plastic wipes </s>
+<s> please go get a carton for ms aishwarya padmakumar </s>
+<s> please go and get a lid for the pi </s>
+<s> i would like for you to take a squishy, silent spraycan to professor dana ballard </s>
+<s> i would like you to go to room 3510 </s>
+<s> i would like for you to please go to dr scott niekum's office </s>
+<s> you are needed in mr peter stone's office </s>
+<s> could you find doctor ballard in room 3432 </s>
+<s> hurry to room 3418 </s>
+<s> i want for you to bring a skinny shaker to dr niekum </s>
+<s> can you go to stacy's office </s>
+<s> go get the cup of coffee for doctor niekum </s>
+<s> please go walk to dr mooney's office </s>
+<s> look whether mr thomason is in room 3516 </s>
+<s> i would like for you to please walk to room 3432 </s>
+<s> you should go to professor ballard's office </s>
+<s> i would like you to bring a can to dr bruce porter </s>
+<s> go and give a foam book to jesse </s>
+<s> could you tell me if doctor ballard is in room 3414b </s>
+<s> can you tell me whether ms padmakumar is in room 3432 </s>
+<s> roll over to mr rodolfo corona's office </s>
+<s> please hurry to scott niekum's office </s>
+<s> you should give a neon, curvy floaty to dr scott niekum </s>
+<s> please go and get the pizza for doctor porter </s>
+<s> would you please walk to room 3418 </s>
+<s> go ahead and bring the crisps to the ta </s>
+<s> i want for you to deliver a tall cup to dr dana ballard </s>
+<s> please run over to professor peter stone's office </s>
+<s> i want you to give mr ray mooney a skinny jar </s>
+<s> i would like you to take a purple notebook to stacy </s>
+<s> can you please take a brown, bright lid to shiqi </s>
+<s> go and find ms padmakumar in room 3414b </s>
+<s> look whether aishwarya is in room 3432 </s>
+<s> can you please bring a pointed, rough canister to dr bruce porter </s>
+<s> please take a black container to dr ray mooney </s>
+<s> i want you to please walk to room 3510 </s>
+<s> i want for you to please take a bright, spherical mug to secretary stacy miller </s>
+<s> can you please deliver a medium-sized cylinder to the undergrad </s>
+<s> run over to professor niekum's office </s>
+<s> i would like you to please go to professor dana ballard's office </s>
+<s> i would like you to please give the chair a small tin </s>
+<s> go to ms stacy miller's office </s>
+<s> can you please bring a silent, small cylinder to jesse thomason </s>
+<s> i would like you to please take a cream-colored, squishy beans to professor peter stone </s>
+<s> i would like you to please deliver the notebook to jivko </s>
+<s> go ahead and walk to room 3402 </s>
+<s> i want you to go to room 3510 </s>
+<s> walk on over to mr dana ballard's office </s>
+<s> i want you to give dr ray mooney the coffee cup </s>
+<s> go ahead and walk to the lab </s>
+<s> would you please go to doctor niekum's office </s>
+<s> i want you to please walk to room 3510 </s>
+<s> please run over to room 3512 </s>
+<s> look for mr jesse thomason in room 3512 </s>
+<s> walk on over to room 3516 </s>
+<s> i would like for you to bring a squishy book to secretary miller </s>
+<s> i want for you to please take a skinny mug to doctor peter stone </s>
+<s> go walk to room 3420 </s>
+<s> check room 3432 for jesse thomason </s>
+<s> please go to room 3510 </s>
+<s> could you walk to mr mooney's office </s>
+<s> go ahead and walk to mr ray mooney's office </s>
+<s> you are needed at peter stone's office </s>
+<s> i would like for you to take a foamy, bright flask to aishwarya </s>
+<s> i want you to please walk to peter stone's office </s>
+<s> i want for you to please bring a top cylinder to dr scott niekum </s>
+<s> i want you to please walk to ms miller's office </s>
+<s> you should bring the laptop to dr bruce porter </s>
+<s> can you please go to rodolfo corona's office </s>
+<s> i want you to give ray the coffee cup </s>
+<s> i want for you to take the crisps to stacy </s>
+<s> i want you to take a green book to dana </s>
+<s> look and tell me whether the chair is in room 3420 </s>
+<s> go walk to room 3414b </s>
+<s> the intern would like you to bring them a metal spray </s>
+<s> please deliver the diary to professor ballard </s>
+<s> hurry and bring a green, pointed plush-toy to professor porter </s>
+<s> i want you to give doctor ray mooney a shiny, full diary </s>
+<s> i want you to please give the secretary the calendar </s>
+<s> can you find dr niekum in room 3502 </s>
+<s> you should walk to aishwarya's office </s>
+<s> look if mr dana ballard is in room 3508 </s>
+<s> please go and get a prism for ms miller </s>
+<s> can you walk to room 3516 </s>
+<s> can you bring the salad to secretary miller </s>
+<s> i want you to walk to room 3414b </s>
+<s> can you please take the cake to doctor porter </s>
+<s> i would like you to go to peter's office </s>
+<s> find out whether mr bruce porter is in room 3516 </s>
+<s> walk on over to room 3414b </s>
+<s> i want you to go to dana's office </s>
+<s> hurry and deliver the hamburger to jesse thomason </s>
+<s> walk on over to mr peter stone's office </s>
+<s> could you tell me if professor porter is in room 3516 </s>
+<s> could you walk to room 3432 </s>
+<s> i would like for you to walk to mr shiqi's office </s>
+<s> go see whether doctor ray mooney is in room 3512 </s>
+<s> can you deliver a tub to dr ray mooney </s>
+<s> i want for you to please deliver a small, soft jar to the advisor </s>
+<s> i would like you to go to scott niekum's office </s>
+<s> go and find out if mr thomason is in room 3420 </s>
+<s> i would like for you to please bring the doritos to the professor </s>
+<s> can you find mr thomason in room 3508 </s>
+<s> go get the container for professor dana ballard </s>
+<s> i want you to please take a cellphone to mr stone </s>
+<s> i would like for you to give peter a tiny object </s>
+<s> go see whether mr corona is in room 3510 </s>
+<s> can you go to room 3414b </s>
+<s> i want you to please give mr thomason a water, clear cup </s>
+<s> give a mug to ms aishwarya padmakumar </s>
+<s> i want you to walk to professor scott niekum's office </s>
+<s> mr jesse thomason would like you to bring them the hamburger </s>
+<s> can you please deliver an aerosol, plastic pineapple to jesse thomason </s>
+<s> go see whether mr rodolfo corona is in room 3512 </s>
+<s> the secretary would like you to bring them the hamburger </s>
+<s> can you go to professor peter stone's office </s>
+<s> i would like you to please bring a thin, rough spraycan to professor niekum </s>
+<s> hurry and bring a wide cap to dana </s>
+<s> mr jivko would like you to bring them the water </s>
+<s> walk to room 3516 </s>
+<s> you are needed at mr mooney's office </s>
+<s> i would like for you to please go to peter's office </s>
+<s> could you tell me if doctor ballard is in room 3414b </s>
+<s> i want for you to give jivko a bucket </s>
+<s> ms padmakumar would like you to bring them the hammer </s>
+<s> can you please take the glass to peter </s>
+<s> go and find out if professor dana ballard is in room 3420 </s>
+<s> please go to professor ray mooney's office </s>
+<s> i would like for you to please walk to professor ray mooney's office </s>
+<s> can you please bring jesse the milk </s>
+<s> you should walk to dr ray mooney's office </s>
+<s> find mr bruce porter in the kitchen </s>
+<s> hurry to jesse's office </s>
+<s> i would like you to please go to room 3432 </s>
+<s> i want you to walk to room 3510 </s>
+<s> can you please walk to scott niekum's office </s>
+<s> i would like for you to deliver the container to mr jesse thomason </s>
+<s> you are needed in room 3512 </s>
+<s> please walk on over to scott niekum's office </s>
+<s> run over to dr ray mooney's office </s>
+<s> i would like you to please walk to doctor scott niekum's office </s>
+<s> i want for you to deliver a squishy tub to ms miller </s>
+<s> see if dr peter stone is in room 3432 </s>
+<s> find out and tell me if mr thomason is in room 3510 </s>
+<s> look for mr rodolfo corona in room 3420 </s>
+<s> please take a spraycan to mr rodolfo corona </s>
+<s> i would like for you to walk to room 3516 </s>
+<s> i want you to bring the water to professor ray mooney </s>
+<s> i would like for you to bring a metal beans to the secretary </s>
+<s> i would like you to bring a tin to mr jesse thomason </s>
+<s> please hurry to doctor ray mooney's office </s>
+<s> i would like you to go to mr jesse thomason's office </s>
+<s> search for dr peter stone in room 3512 </s>
+<s> can you give the grad student a circular tin </s>
+<s> i want you to bring the pencil to rudy </s>
+<s> can you please give secretary stacy miller a closed jar </s>
+<s> can you take the box to mr jesse thomason </s>
+<s> go find secretary miller in room 3510 </s>
+<s> can you please bring a tiny, metallic flask to the secretary </s>
+<s> find out whether scott is in room 3420 </s>
+<s> go ahead and deliver the diary to bruce </s>
+<s> can you please give doctor scott niekum a rectangular plush-toy </s>
+<s> could you search for professor bruce porter in room 3420 </s>
+<s> i want you to take a small notebook to doctor dana ballard </s>
+<s> i want for you to give mr peter stone a tin </s>
+<s> go look if mr scott niekum is in room 3420 </s>
+<s> go and look for mr thomason in room 3508 </s>
+<s> i would like for you to deliver the salad to mr scott niekum </s>
+<s> i would like you to walk to professor dana ballard's office </s>
+<s> could you find dr niekum in room 3510 </s>
+<s> i want you to go to room 3512 </s>
+<s> please run over to room 3508 </s>
+<s> go find out if stacy is in room 3502 </s>
+<s> can you please take a bucket to peter stone </s>
+<s> you should walk to stacy miller's office </s>
+<s> i would like you to please bring the hammer to rudy corona </s>
+<s> i want you to give dr niekum a can </s>
+<s> walk to mr corona's office </s>
+<s> search room 3508 for professor porter </s>
+<s> i want for you to deliver a cylinder to professor mooney </s>
+<s> i want you to deliver a heavy pineapple to the pi </s>
+<s> i want you to please give professor mooney the crisps </s>
+<s> go ahead and walk to room 3516 </s>
+<s> run over to room 3432 </s>
+<s> peter wants a jar </s>
+<s> run over to doctor scott niekum's office </s>
+<s> you should take a roll to the professor </s>
+<s> i want you to please give mr peter stone the pizza </s>
+<s> i want for you to please bring a cap to peter stone </s>
+<s> i would like you to please walk to dr scott niekum's office </s>
+<s> i would like you to please give doctor bruce porter a shiny, pointy cylinder </s>
+<s> go find out if stacy miller is in room 3508 </s>
+<s> i would like for you to please go to dr ballard's office </s>
+<s> hurry and take a hollow, green drink to mr rodolfo corona </s>
+<s> please run over to room 3414b </s>
+<s> i would like for you to please go to room 3510 </s>
+<s> i want you to please walk to doctor scott niekum's office </s>
+<s> can you give stacy the cellphone </s>
+<s> i want you to please go to room 3508 </s>
+<s> look for dr ray mooney in room 3432 </s>
+<s> find mr corona in room 3516 </s>
+<s> you should go to room 3418 </s>
+<s> could you find dr stone in room 3418 </s>
+<s> is jivko in the lab </s>
+<s> run over to room 3432 </s>
+<s> i want you to go to peter stone's office </s>
+<s> go walk to mr shiqi's office </s>
+<s> would you please go to mr corona's office </s>
+<s> i would like for you to walk to room 3420 </s>
+<s> go ahead and walk to room 3402 </s>
+<s> go and deliver the trashcan to mr niekum </s>
+<s> i would like for you to walk to professor scott niekum's office </s>
+<s> i would like you to take a cardboard ball to scott niekum </s>
+<s> i would like for you to please take a purple cylinder to doctor peter stone </s>
+<s> run over to mr shiqi's office </s>
+<s> i want you to deliver a rectangle to aishwarya </s>
+<s> tell me whether scott niekum is in the kitchen </s>
+<s> hurry to room 3510 </s>
+<s> go to room 3508 </s>
+<s> i would like for you to please go to room 3418 </s>
+<s> please run over to room 3420 </s>
+<s> i would like you to go to room 3502 </s>
+<s> can you walk to ms miller's office </s>
+<s> i would like for you to please give scott niekum a carton </s>
+<s> search room 3516 for mr scott niekum </s>
+<s> please give a cylindrical, aerosol can to the advisor </s>
+<s> i would like you to bring the glass of water to shiqi </s>
+<s> i want you to take an open, narrow tube to doctor porter </s>
+<s> i want you to please bring the cheeseburger to the ta </s>
+<s> i want you to please give jesse thomason a purple laptop </s>
+<s> would you please walk to room 3420 </s>
+<s> deliver a silver plush-toy to the director </s>
+<s> please give the burger to jesse </s>
+<s> could you search for rodolfo corona in room 3414b </s>
+<s> i want you to please give dana the dessert </s>
+<s> you should take the juice to the chair </s>
+<s> you are needed in dr ray mooney's office </s>
+<s> go find doctor dana ballard in room 3502 </s>
+<s> could you please walk to room 3510 </s>
+<s> jesse thomason would like you to bring them a short, closed roll </s>
+<s> i would like for you to give mr corona a flask </s>
+<s> go ahead and bring a neon, big cylinder to doctor ballard </s>
+<s> hurry and deliver a tin to dr ballard </s>
+<s> i want for you to deliver the laptop to mr rodolfo corona </s>
+<s> go see whether mr mooney is in room 3414b </s>
+<s> i would like for you to take a full, tiny drink to professor mooney </s>
+<s> can you bring a silent, transparent bottle to mr thomason </s>
+<s> could you search for bruce porter in room 3402 </s>
+<s> can you please give shiqi the dustbin </s>
+<s> you should deliver a transparent marker to aishwarya </s>
+<s> i want you to please deliver the coffee cup to ray </s>
+<s> go and find out if the director is in room 3512 </s>
+<s> i would like you to please go to mr jesse thomason's office </s>
+<s> i would like for you to walk to mr shiqi's office </s>
+<s> you are needed in room 3510 </s>
+<s> is professor bruce porter in room 3420 </s>
+<s> i want you to please deliver a cylinder to rodolfo corona </s>
+<s> go look if dr porter is in room 3418 </s>
+<s> i would like for you to please walk to dana ballard's office </s>
+<s> go find out whether mr scott niekum is in room 3516 </s>
+<s> is mr stone in room 3508 </s>
+<s> please hurry to ray mooney's office </s>
+<s> could you tell me if professor stone is in room 3432 </s>
+<s> i would like you to please take a green drink to ray mooney </s>
+<s> i would like for you to bring a cap to mr jesse thomason </s>
+<s> find professor stone in room 3508 </s>
+<s> i want for you to please give dr porter a closed laptop </s>
+<s> i would like you to please deliver a half-full, black cellphone to shiqi </s>
+<s> i would like for you to deliver the coke to professor niekum </s>
+<s> can you please take the coffee cup to shiqi </s>
+<s> check room 3432 for the grad student </s>
+<s> go and find out whether bruce porter is in room 3432 </s>
+<s> go and find dr ballard in room 3516 </s>
+<s> please bring a book to rodolfo </s>
+<s> please walk to mr niekum's office </s>
+<s> can you bring doctor ray mooney the snack </s>
+<s> hurry and bring the muffin to dr scott niekum </s>
+<s> please run over to ms padmakumar's office </s>
+<s> please deliver a silent tube to aishwarya </s>
+<s> i would like you to give doctor mooney a pineapple </s>
+<s> i want you to go to peter's office </s>
+<s> please bring a soft notebook to dr porter </s>
+<s> you should bring a brown, water marker to shiqi </s>
+<s> i want you to bring a colored, round spraycan to mr rodolfo corona </s>
+<s> go and find out if mr ballard is in room 3432 </s>
+<s> go and see if secretary stacy miller is in room 3432 </s>
+<s> go and deliver the cheeseburger to mr jesse thomason </s>
+<s> search for mr thomason in room 3512 </s>
+<s> go and give a tin to shiqi </s>
+<s> i would like you to please walk to mr peter stone's office </s>
+<s> go ahead and take the book to dr dana ballard </s>
+<s> i would like you to give jesse a red, wide book </s>
+<s> scott niekum would like you to bring them a can </s>
+<s> i want you to bring a marker to doctor ray mooney </s>
+<s> can you bring a tube to ms miller </s>
+<s> deliver an open, silent wipes to the intern </s>
+<s> you are needed at dr scott niekum's office </s>
+<s> i want for you to take the notebook to doctor scott niekum </s>
+<s> search the kitchen for rodolfo </s>
+<s> go and look if mr jesse thomason is in room 3432 </s>
+<s> go and find out whether dr porter is in room 3502 </s>
+<s> would you please go to mr ballard's office </s>
+<s> can you please give mr corona a full, wide spraycan </s>
+<s> hurry and walk to mr rodolfo corona's office </s>
+<s> you should deliver the coffee to go to doctor stone </s>
+<s> can you please walk to doctor stone's office </s>
+<s> you are needed in room 3512 </s>
+<s> roll over to doctor scott niekum's office </s>
+<s> you should give a cellphone to doctor niekum </s>
+<s> i would like for you to please walk to room 3516 </s>
+<s> i would like for you to please walk to room 3432 </s>
+<s> go get the glass of water for the ta </s>
+<s> please go to room 3508 </s>
+<s> go get an aluminum, green laptop for the director </s>
+<s> go and find out whether doctor ballard is in room 3402 </s>
+<s> could you please walk to dr stone's office </s>
+<s> check room 3420 for jesse </s>
+<s> i want for you to bring a top, paper bottle to ray </s>
+<s> go find mr ray mooney in the kitchen </s>
+<s> i would like for you to please deliver a cylindrical, aluminum container to professor peter stone </s>
+<s> go see whether dr scott niekum is in room 3402 </s>
+<s> could you tell me if jesse is in room 3502 </s>
+<s> please take the soda to professor niekum </s>
+<s> i would like for you to please take the diary to professor stone </s>
+<s> could you please walk to dr peter stone's office </s>
+<s> you are needed at scott's office </s>
+<s> i want for you to please take the drink to ray mooney </s>
+<s> you should deliver the cup of coffee to rodolfo corona </s>
+<s> you are needed at mr dana ballard's office </s>
+<s> go bring mr stone the bag of chips </s>
+<s> go walk to ray mooney's office </s>
+<s> please go walk to mr stone's office </s>
+<s> could you tell me whether bruce porter is in room 3516 </s>
+<s> i would like you to take a water canister to doctor mooney </s>
+<s> deliver a pencil-shaped, empty prism to stacy miller </s>
+<s> i want you to take the letter to professor porter </s>
+<s> i want you to please give doctor porter a circular, pink can </s>
+<s> go and find mr corona in room 3432 </s>
+<s> go and give a drink to peter stone </s>
+<s> could you please walk to room 3414b </s>
+<s> walk to room 3432 </s>
+<s> i would like you to take a purple, pink spray to dr ballard </s>
+<s> could you tell me whether stacy miller is in room 3502 </s>
+<s> i want you to deliver a squishy book to the secretary </s>
+<s> can you bring the laptop to mr ray mooney </s>
+<s> please take the pizza to doctor dana ballard </s>
+<s> go and see if mr thomason is in room 3418 </s>
+<s> can you give ray a teal, water thing </s>
+<s> go bring dr peter stone a metallic rectangle </s>
+<s> hurry and walk to mr rodolfo corona's office </s>
+<s> could you find dr peter stone in room 3512 </s>
+<s> i would like you to walk to room 3516 </s>
+<s> go and look whether mr mooney is in room 3508 </s>
+<s> can you bring the chair a closed shaker </s>
+<s> hurry and walk to room 3402 </s>
+<s> can you bring mr jivko a curvy, pencil-shaped thing </s>
+<s> i would like for you to please bring a circular notebook to mr peter stone </s>
+<s> i would like for you to please bring the coffee to jivko </s>
+<s> give a mug to peter stone </s>
+<s> go to room 3418 </s>
+<s> find out and tell me whether peter is in room 3512 </s>
+<s> please walk to room 3516 </s>
+<s> i would like for you to bring the notebook to the secretary </s>
+<s> hurry and bring an aerosol pineapple to professor mooney </s>
+<s> mr ray mooney would like you to bring them the coffee </s>
+<s> i want for you to give mr dana ballard the diary </s>
+<s> check for the pi in room 3402 </s>
+<s> go find out whether the secretary is in room 3510 </s>
+<s> go and get the bag of chips for rodolfo </s>
+<s> can you please bring bruce a pencil-shaped, white thing </s>
+<s> you should give the juice to the pi </s>
+<s> i want you to please walk to room 3420 </s>
+<s> go bring the ta a tiny diary </s>
+<s> you should bring the hamburger to mr mooney </s>
+<s> go to room 3508 </s>
+<s> please run over to rodolfo corona's office </s>
+<s> can you deliver the binder to the director </s>
+<s> is doctor porter in room 3418 </s>
+<s> go ahead and bring a purple laptop to mr scott niekum </s>
+<s> can you bring a pencil-shaped mug to mr ray mooney </s>
+<s> i would like you to please walk to ms padmakumar's office </s>
+<s> find mr thomason in room 3418 </s>
+<s> tell me if ray is in room 3432 </s>
+<s> go ahead and walk to room 3420 </s>
+<s> i want you to walk to professor scott niekum's office </s>
+<s> i would like you to please give the grad student a rectangle </s>
+<s> go walk to dr peter stone's office </s>
+<s> go get a prism for the undergrad </s>
+<s> can you please walk to the kitchen </s>
+<s> can you deliver an empty, full sphere to doctor bruce porter </s>
+<s> please deliver a styrofoam, large drink to jesse </s>
+<s> i would like you to please bring the box to professor porter </s>
+<s> go look whether mr jivko is in room 3432 </s>
+<s> i would like you to take a squishy can to mr stone </s>
+<s> i want you to deliver a lid to ms miller </s>
+<s> i would like you to walk to room 3418 </s>
+<s> can you bring the cellphone to ms aishwarya padmakumar </s>
+<s> can you please bring professor bruce porter a hollow tin </s>
+<s> i would like you to go to room 3420 </s>
+<s> i would like for you to please walk to the lab </s>
+<s> doctor peter stone would like you to bring them a floaty </s>
+<s> please go walk to professor scott niekum's office </s>
+<s> you are needed in room 3414b </s>
+<s> i would like you to please give professor peter stone the cake </s>
+<s> i want for you to take the burger to ray mooney </s>
+<s> i want for you to give secretary miller the letter </s>
+<s> go and find out whether professor stone is in room 3402 </s>
+<s> i want you to give mr shiqi a plastic, styrofoam plush-toy </s>
+<s> go ahead and deliver a wide, plastic diary to dr scott niekum </s>
+<s> please run over to ms stacy miller's office </s>
+<s> i want for you to deliver the hamburger to ray </s>
+<s> please give an open tin to jesse </s>
+<s> find out and tell me if the postdoc is in room 3414b </s>
+<s> please go walk to professor ray mooney's office </s>
+<s> find out and tell me whether mr porter is in room 3510 </s>
+<s> would you please walk to room 3508 </s>
+<s> you are needed at room 3510 </s>
+<s> can you please walk to room 3420 </s>
+<s> i would like for you to please go to room 3510 </s>
+<s> please run over to ray mooney's office </s>
+<s> please go to peter stone's office </s>
+<s> can you please give dr porter an aerosol beans </s>
+<s> hurry and take an object to ms aishwarya padmakumar </s>
+<s> i would like for you to bring a gray thing to dr dana ballard </s>
+<s> i want for you to please give stacy miller a neon, teal carton </s>
+<s> i want for you to give ray a styrofoam wipes </s>
+<s> could you walk to room 3418 </s>
+<s> search for mr peter stone in room 3516 </s>
+<s> can you go to room 3510 </s>
+<s> go and find out if professor peter stone is in room 3402 </s>
+<s> can you please give dana ballard the crisps </s>
+<s> please go walk to ms miller's office </s>
+<s> is professor stone in room 3516 </s>
+<s> i want you to please bring a pointy cellphone to jivko </s>
+<s> i want for you to please give mr scott niekum a tube </s>
+<s> could you tell me if mr stone is in room 3414b </s>
+<s> hurry and take the cupcake to bruce </s>
+<s> go see whether ray is in the kitchen </s>
+<s> go get a heavy jar for aishwarya padmakumar </s>
+<s> i want for you to bring a foam prism to doctor dana ballard </s>
+<s> could you walk to doctor ballard's office </s>
+<s> could you tell me if doctor ballard is in room 3420 </s>
+<s> can you tell me if professor ray mooney is in room 3432 </s>
+<s> take the chips to mr jivko </s>
+<s> i would like for you to please deliver a large cellphone to jesse </s>
+<s> go find out whether doctor stone is in the lab </s>
+<s> i want for you to bring the trashcan to the director </s>
+<s> i want for you to take some chips to doctor stone </s>
+<s> i want you to walk to room 3516 </s>
+<s> go ahead and deliver a pineapple to professor stone </s>
+<s> i want you to bring a canister to the advisor </s>
+<s> hurry and take a rough, purple cap to mr ray mooney </s>
+<s> hurry and take a carton to peter </s>
+<s> i would like for you to bring a cylindrical, pink stuffed-animal to the grad student </s>
+<s> i would like for you to please go to professor scott niekum's office </s>
+<s> i want you to bring a floaty to the advisor </s>
+<s> can you take a spiky stuffed-animal to doctor ballard </s>
+<s> go walk to room 3502 </s>
+<s> please walk to secretary stacy miller's office </s>
+<s> i want you to walk to room 3516 </s>
+<s> walk to room 3420 </s>
+<s> see whether mr shiqi is in room 3512 </s>
+<s> i want for you to please bring the pencil to professor ray mooney </s>
+<s> find out if doctor ray mooney is in the lab </s>
+<s> go look for the pi in room 3508 </s>
+<s> go to room 3414b </s>
+<s> can you take a fat, squishy floaty to secretary miller </s>
+<s> would you please walk to room 3508 </s>
+<s> walk to room 3432 </s>
+<s> look if mr bruce porter is in the kitchen </s>
+<s> i would like you to bring a silent, short tin to dr ballard </s>
+<s> roll over to doctor ray mooney's office </s>
+<s> you should give a big tub to mr ballard </s>
+<s> you should give a flask to bruce porter </s>
+<s> i would like you to please bring the beverage to mr rodolfo corona </s>
+<s> i want you to bring a foam, red marker to the secretary </s>
+<s> can you please bring the notebook to mr corona </s>
+<s> i want you to please go to room 3414b </s>
+<s> please bring a thing to mr thomason </s>
+<s> i want you to bring a rectangular plush-toy to dr dana ballard </s>
+<s> i want you to please take a mug to the grad student </s>
+<s> i want you to please give mr jivko the glass of water </s>
+<s> look and tell me if stacy miller is in room 3508 </s>
+<s> i would like for you to please bring some chips to rudy corona </s>
+<s> go ahead and bring a carton to ray mooney </s>
+<s> i would like you to take a cap to aishwarya </s>
+<s> i want you to walk to room 3420 </s>
+<s> ms stacy miller would like you to bring them the phone </s>
+<s> i would like you to please give mr ballard the drink </s>
+<s> i want for you to please take the hamburger to dr bruce porter </s>
+<s> walk to the kitchen </s>
+<s> walk to room 3510 </s>
+<s> would you please walk to room 3418 </s>
+<s> please deliver a metal cap to the secretary </s>
+<s> i would like you to please go to room 3414b </s>
+<s> could you find mr scott niekum in room 3414b </s>
+<s> the pi wants you to bring them the bread </s>
+<s> take a tall ball to stacy miller </s>
+<s> go and look whether scott niekum is in room 3420 </s>
+<s> i want for you to please give the pi a ball </s>
+<s> i would like you to please walk to doctor dana ballard's office </s>
+<s> please go get the trashcan for the ta </s>
+<s> walk to mr mooney's office </s>
+<s> you should take a metallic thing to mr peter stone </s>
+<s> hurry to peter stone's office </s>
+<s> can you give secretary stacy miller a water, full prism </s>
+<s> can you tell me whether dana is in room 3414b </s>
+<s> i would like you to please walk to room 3512 </s>
+<s> tell me whether ray mooney is in room 3418 </s>
+<s> i want you to take a round stuffed-animal to mr thomason </s>
+<s> can you please bring doctor ballard the binder </s>
+<s> hurry and bring the ledger to mr niekum </s>
+<s> please go to room 3510 </s>
+<s> can you please take the box to peter stone </s>
+<s> go and find out if the professor is in room 3418 </s>
+<s> please bring the pillow to bruce </s>
+<s> the postdoc would like a crayon </s>
+<s> go bring a paper, spherical lid to doctor scott niekum </s>
+<s> please run over to doctor dana ballard's office </s>
+<s> i would like for you to take the cup of coffee to dr stone </s>
+<s> i would like you to walk to room 3414b </s>
+<s> can you go to room 3516 </s>
+<s> please go to the lab </s>
+<s> walk on over to dana's office </s>
+<s> dr porter wants you to bring them the pizza </s>
+<s> you should go to room 3516 </s>
+<s> i want for you to deliver a cup to ms aishwarya padmakumar </s>
+<s> run over to professor mooney's office </s>
+<s> go and look whether ray is in room 3432 </s>
+<s> please run over to professor ballard's office </s>
+<s> you should bring a hollow, neon cup to professor niekum </s>
+<s> please give the pillow to mr jesse thomason </s>
+<s> look and tell me whether the undergrad is in room 3402 </s>
+<s> i want for you to give secretary stacy miller a tube </s>
+<s> please hurry to mr rodolfo corona's office </s>
+<s> i want for you to please give rodolfo a silver, red laptop </s>
+<s> go to room 3402 </s>
+<s> can you please go to room 3432 </s>
+<s> mr porter would like a wide box </s>
+<s> find out and tell me whether mr shiqi is in room 3414b </s>
+<s> i would like you to go to room 3516 </s>
+<s> stacy miller wants you to bring them a top object </s>
+<s> go ahead and take the organizer to mr peter stone </s>
+<s> could you walk to room 3516 </s>
+<s> you should walk to room 3432 </s>
+<s> hurry and deliver the calendar to professor porter </s>
+<s> i want you to please walk to scott niekum's office </s>
