@@ -13,6 +13,8 @@
 	var user_id_base = null; //supplied from MTurk
 	var user_id = null; //changes based on task
 	var current_task = null;
+    
+    var num_responses = 0;
 	
 	//what little style exists
 	var user_cell_color = 'AliceBlue';
@@ -65,16 +67,8 @@
         serviceType : 'nlu_pipeline/register_user'
     });
     var tryingToRegisterUser = null;
-    var pythonTalkClient = new ROSLIB.Service({
-        ros : ros,
-        name : '/dialogue_python_talk',
-        serviceType : 'nlu_pipeline/dialogue_python_talk'
-    });
-    var jsTalkClient = new ROSLIB.Service({
-        ros : ros,
-        name : '/dialogue_js_talk',
-        serviceType : 'nlu_pipeline/dialogue_js_talk'
-    });
+    var pythonTalkClient = null;
+    var jsTalkClient = null;
 
     function decideTask() {
         var tasks = ['walk', 'deliver', 'search'];
@@ -86,6 +80,11 @@
         } else {
             drawRandomSearchTask();
         }
+    }
+    
+    function begin() {
+        document.getElementById('ask_for_ID').style.display = 'none';
+        document.getElementById('understand_task').style.display = 'block';
     }
    
 	//draw a random walk task and return the description to javascript; write the task goal to file for later comparison against command generated
@@ -192,6 +191,7 @@
 	function startDialog()
 	{
 		//alert('DEBUG: startDialog() called');
+        num_responses = 0;
 		
 		//hide start div and open dialog div
 		document.getElementById('dialog_start_block').style.display = 'none';
@@ -233,6 +233,19 @@
             //alert('User accepted');
             clearInterval(tryingToRegisterUser);
             
+            // Create appropriate clients
+            pythonTalkClient = new ROSLIB.Service({
+                ros : ros,
+                name : '/dialogue_python_talk_' + user_id,
+                serviceType : 'nlu_pipeline/dialogue_python_talk'
+            });
+            jsTalkClient = new ROSLIB.Service({
+                ros : ros,
+                name : '/dialogue_js_talk_' + user_id,
+                serviceType : 'nlu_pipeline/dialogue_js_talk'
+            });
+            
+            //alert('Requesting service');
             var request = new ROSLIB.ServiceRequest({});
             pythonTalkClient.callService(request, invokeDialogAgentOutput);
         } 
@@ -243,7 +256,8 @@
 		//alert('DEBUG: startQuery() called');
 		
 		//change map
-		document.getElementById('task_map').innerHTML = "<b>DIRECTORY</b><p><img src=\"directory.png\" alt=\"Rooms, offices and labs\" style=\"width:60%\"></p>";
+		document.getElementById('task_map').innerHTML = "<b>DIRECTORY</b><p><img src=\"directory.png\" alt=\"Rooms, offices and labs\" style=\"width:40%\"></p>";
+        document.getElementById("stop_prompt").style.display = "none";
 		
 		//hide start div and clear dialog table of past conversation
 		document.getElementById('third_dialog_start_block').style.display = 'none';
@@ -278,7 +292,11 @@
 	//run when the user submits a new response to the system
 	function getDialogResponse(form)
 	{
-        event.preventDefault();
+        //event.preventDefault();
+        num_responses = num_responses + 1;
+        if (current_task == "main" && num_responses > 10) {
+            document.getElementById("stop_prompt").style.display = "block";
+        }
         //alert('In getDialogResponse, current_task =  ' + current_task);
 		//get user input and clear text box
 		var user_input_raw = form.user_input_box.value;
@@ -435,6 +453,41 @@
 		document.getElementById('survey_block').style.display = 'block';
 	}
 	
+    
+    function submitUnderstanding(form) {
+        var walk_selection = -1;
+		for (var i = 0; i < form.walk.length; i++) {
+			if (form.walk[i].checked)
+			{
+				walk_selection = i;
+				break;
+			}
+		}
+		var bring_selection = -1;
+		for (var i = 0; i < form.bring.length; i++) {
+			if (form.bring[i].checked)
+			{
+				bring_selection = i;
+				break;
+			}
+		}
+		var search_selection = -1;
+		for (var i = 0; i < form.search.length; i++) {
+			if (form.search[i].checked)
+			{
+				search_selection = i;
+				break;
+			}
+		}
+        
+        if (!(walk_selection == 0 && bring_selection == 1 && search_selection == 2)) {
+            alert('You do not seem to have understood the prompts correctly. You may proceed with the HIT but please be warned that your HIT will be invalidated if it appears that you have not understood the task to be instructed. ');
+        }
+        
+        document.getElementById('understand_task').style.display = 'none';
+        decideTask();
+    }
+    
 	//invoke php to record likert and produce code for MTurk
 	function submitSurvey(form)
 	{
@@ -594,8 +647,13 @@ width:50%
 </p>
 
 <p>
-<DIV ID="inst" style="display:none">
-	Instruct the robot so that the task specified is completed. The robot can make plans about how to accomplish the goals you give it, so you just need to tell it at a high level what to do.
+<DIV ID="inst" style="display:none;">
+    <font color="1F0975"; size="4">
+        <b>
+	Instruct the robot so that the task specified is completed. Stick to single step high-level instructions. <br/>
+    If the robot does not understand you, vary your choice of words in for the task it has to do and the people and/or items involved. <br/>
+        </b>
+    </font>
 </DIV>
 </p>
 
@@ -610,22 +668,45 @@ width:50%
           <li>Search a room for someone. </li>
         </ul>
         </p>
-        <p> You need to do the following - 
-        <ol>
-          <li>Instruct the robot to accomplish a task, clarifying any questions it has. </li>
-          <li>Name a person on the floor to verify that you are a human. </li>
-          <li>Complete a small survery about your experiences. </li>
-          <li>Receive your code for Mechanical Turk. </li>
-        </ol>
+        <p> Following this, answer a question to verify that you are human and then receive a code to enter in Mechanical Turk to receive payment.
         </p>
         
-        <p> You need to complete all the above steps to complete the HIT. Navigating away from the page or refreshing it during any of the above steps <b>will</b> prevent you from completing the HIT. If the conversation extends too long, you may end it by replying 'stop' but ending the conversation before ten responses from your side without successfully communicating the task <b>will</b> invalidate your HIT.  </p>
+        <p> If the conversation extends too long, you may end it by replying 'stop' but ending the conversation before ten responses from your side without successfully communicating the task <b>will</b> invalidate your HIT.  </p>
         
 		<p><FORM NAME="ask_for_ID_form" ACTION="" METHOD="GET">
 			Click the button below to begin.<br/>
-			<INPUT TYPE="button" NAME="user_id_button" Value="Begin" onClick="decideTask()">
+			<INPUT TYPE="button" NAME="user_id_button" Value="Begin" onClick="begin()">
 		</FORM></p>
 	</DIV>
+
+    <DIV ID="understand_task" style="display:none">
+        This is to verify that you are capable of understanding the objective of the HIT. <br/>
+        As a reminder, the robot can perform three types of tasks -
+        <ul>
+          <li>Walk to a location. </li>
+          <li>Bring an item for someone. </li>
+          <li>Search a room for someone. </li>
+        </ul>
+        For each of the following prompts select the task which you should instruct the robot to perform.  
+    <FORM NAME="understand_task_form" ACTION="" METHOD="GET">
+		<p><b>1)</b> Alice wants the robot. Send it to her office.
+		<TABLE style="width:50%">
+			<tr align="center" bgcolor='GhostWhite'><td style="width:20%">Walk task</td><td style="width:20%">Bring task</td><td style="width:20%">Search task</td></tr>
+			<tr align="center" bgcolor='AliceBlue'><td style="width:20%"><INPUT TYPE="radio" name="walk" value="0"></td><td style="width:20%"><INPUT TYPE="radio" name="walk" value="1"></td><td style="width:20%"><INPUT TYPE="radio" name="walk" value="2"></tr>
+		</TABLE></p>
+		<p><b>2)</b> Alice wants the item in slot 1.
+		<TABLE style="width:50%">
+			<tr align="center" bgcolor='GhostWhite'><td style="width:20%">Walk task</td><td style="width:20%">Bring task</td><td style="width:20%">Search task</td></tr>
+			<tr align="center" bgcolor='AliceBlue'><td style="width:20%"><INPUT TYPE="radio" name="bring" value="0"></td><td style="width:20%"><INPUT TYPE="radio" name="bring" value="1"></td><td style="width:20%"><INPUT TYPE="radio" name="bring" value="2"></tr>
+		</TABLE></p>
+		<p><b>3)</b> Make the robot find out whether Alice is in Bob's office.
+		<TABLE style="width:50%">
+			<tr align="center" bgcolor='GhostWhite'><td style="width:20%">Walk task</td><td style="width:20%">Bring task</td><td style="width:20%">Search task</td></tr>
+			<tr align="center" bgcolor='AliceBlue'><td style="width:20%"><INPUT TYPE="radio" name="search" value="0"></td><td style="width:20%"><INPUT TYPE="radio" name="search" value="1"></td><td style="width:20%"><INPUT TYPE="radio" name="search" value="2"></tr>
+		</TABLE></p>
+		<INPUT TYPE="button" NAME="understand_task_button" Value="Submit" onClick="submitUnderstanding(this.form)">
+	</FORM>
+    </DIV>
 
 	<DIV ID="introduce_task" style="display:none">
 		<b>TASK TO COMPLETE</b><p ID="task_description_text"></p>
@@ -643,8 +724,8 @@ width:50%
 		<TR ID="user_input_table_row">
 			<TD td style="width:15%">YOU</TD>
 			<TD td style="width:85%">
-				<INPUT TYPE="text" NAME="user_input_box" VALUE="" style="width:100%" onkeydown="if (event.keyCode == 13) {document.getElementsByName('user_input_button')[0].click();event.returnValue=false;event.cancel=true;}" onSubmit="function(){return false;}"></INPUT>
-				<BUTTON TYPE="button" NAME="user_input_button" Value="submit" onClick="getDialogResponse(this.form)" onSubmit="getDialogResponse(this.form)" style="display:none"></BUTTON>
+				<INPUT TYPE="text" NAME="user_input_box" VALUE="" style="width:100%" onkeydown="if (event.keyCode == 13) {document.getElementsByName('user_input_button')[0].click();event.returnValue=false;event.cancel=true;}"></INPUT>
+				<INPUT TYPE="button" NAME="user_input_button" Value="submit" onClick="getDialogResponse(this.form)" onSubmit="getDialogResponse(this.form)" style="display:none"></INPUT>
 			</TD>
 		</TR>
 		</FORM>
@@ -668,8 +749,12 @@ width:50%
 
 	<DIV ID="task_map" style="display:none">
 		<b>People and items the robot knows - </b>
-			<p><img src="bring_task_data.png" alt="Rooms, labs and offices" style="width:100%"></p>
+			<p><img src="bring_task_data.png" alt="Rooms, labs and offices" style="width:80%"></p>
 	</DIV>
+    
+    <DIV ID="stop_prompt" style="background-color: #FFF8C6; padding-bottom: 8px; padding-left: 20px; padding-right: 20px; padding-top: 8px; text-align: justify; display:none; width: 80%">
+        <p>You may now enter "stop" to terminate this dialogue. The HIT will still be considered successful provided you complete the remaining steps by clicking "next task" after the dialogue ends. However we would appreciate it if you could try further to convey the command to the robot. </p>
+    </DIV>
 	
 </DIV>
 </DIV>

@@ -17,8 +17,6 @@ class FeatureWrapper :
     def __init__(self, init_arg=None) :
         self.feature_vector = None
         self.num_dialog_turns = 1
-        #print 'init_arg = ', init_arg
-        #print 'type(init_arg) = ', type(init_arg)
         if type(init_arg) == list :
             self.feature_vector = init_arg
         elif isinstance(init_arg, SummaryState) :
@@ -34,11 +32,33 @@ class FeatureWrapper :
 # It extends PomdpDialogAgent for code reuse
 class PomdpTrainer(PomdpDialogAgent) :
 
-    def __init__(self, parser, grounder, policy, parse_depth=10, param_mapping_file=None):
+    def __init__(self, parser, grounder, policy, parse_depth=10, param_mapping_file=None, vocab_mapping_file=None):
         PomdpDialogAgent.__init__(self, parser, grounder, policy, None, None, parse_depth)
         if param_mapping_file is not None :
             # Map params from old IJCAI ontology to current ontology
             self.init_param_mapping(param_mapping_file)   
+        if vocab_mapping_file is not None :
+            self.init_vocab_mapping(vocab_mapping_file)
+
+    def init_vocab_mapping(self, vocab_mapping_file) :
+        f = open(vocab_mapping_file, 'r')
+        reader = csv.reader(f, delimiter='\t')
+        self.vocab_map = dict()
+        for row in reader :
+            if len(row) > 2 and len(row[2]) > 0 :
+                key = row[0]
+                value = row[2]
+                self.vocab_map[key] = value 
+
+    def map_text_to_desired_vocab(self, text) :
+        tokens = self.parser.tokenize(text)[0]
+        mapped_tokens = list()
+        for token in tokens :
+            mapped_token = token
+            if self.vocab_map is not None and token in self.vocab_map :
+                mapped_token = self.vocab_map[token]
+            mapped_tokens.append(mapped_token)
+        return ' '.join(mapped_tokens)
 
     def init_param_mapping(self, param_mapping_file) :
         f = open(param_mapping_file, 'r')
@@ -52,7 +72,7 @@ class PomdpTrainer(PomdpDialogAgent) :
             self.param_map[key] = value 
             
     def get_mapped_value(self, value) :
-        if value in self.param_map :
+        if self.param_map is not None and value in self.param_map :
             return self.param_map[value]
         else :
             return None
@@ -104,7 +124,7 @@ class PomdpTrainer(PomdpDialogAgent) :
                 r += 1
             
             example_list = list(example)
-            #print 'example_list = ', example_list
+            #print 'example_list = ', example_list  # DEBUG
             wrapper = FeatureWrapper(example_list)
             for a in self.knowledge.summary_system_actions :
                 new_feature_vector = self.policy.get_feature_vector(wrapper, a)
@@ -120,21 +140,17 @@ class PomdpTrainer(PomdpDialogAgent) :
                     train_features = np.vstack((train_features, np.matrix(new_feature_vector).T))
                     train_outputs = np.vstack((train_outputs, np.matrix(value).T))
                     sample_weights = np.hstack((sample_weights, sample_weight))
-        print 'train_features.shape = ', train_features.shape
-        print 'train_outputs.shape = ', train_outputs.shape
-        print 't = ', t, ', c = ', c, ', p = ', p, ', r = ', r
+        #print 'train_features.shape = ', train_features.shape  # DEBUG
+        #print 'train_outputs.shape = ', train_outputs.shape    # DEBUG
+        #print 't = ', t, ', c = ', c, ', p = ', p, ', r = ', r # DEBUG
         train_features = np.tile(train_features, (5,1))
         train_outputs = np.tile(train_outputs, (5,1))
-        print 'type(sample_weights) = ', type(sample_weights)
         sample_weights = np.tile(sample_weights, (1, 5))[0,:]
-        print 'sample_weights.shape = ', sample_weights.shape 
-        print 'type(sample_weights) = ', type(sample_weights)
         model = linear_model.Ridge(alpha=0.5, fit_intercept=True)
         model.fit(train_features, train_outputs, sample_weights)
         preds = model.predict(train_features)
-        print 'Train loss = ', sum(np.square(preds - train_outputs)) / train_features.shape[0]
-        #print '\n'.join([str(t) for t in to_print])
-        #print 'Weights = ', model.coef_
+        print 'Train loss = ', sum(np.square(preds - train_outputs)) / train_features.shape[0]      # DEBUG
+        #print 'Weights = ', model.coef_    # DEBUG
         self.policy.theta = model.coef_.T
         save_model(self.policy, 'ktdq_policy_object')
         
@@ -168,8 +184,8 @@ class PomdpTrainer(PomdpDialogAgent) :
                     fail_idx += 1
             save_model(self.policy, 'ktdq_policy_object')
         
-        print 'Number of responses = ', self.num_turns_across_dialogs    
-        print 'Number of responses that could not be parsed = ', self.num_not_parsed
+        print 'Number of responses = ', self.num_turns_across_dialogs   # DEBUG
+        print 'Number of responses that could not be parsed = ', self.num_not_parsed    # DEBUG
             
     # Train the policy using logs from the IJCAI 2015 experiment
     # This makes assumptions on the formatting of the logs
@@ -180,35 +196,34 @@ class PomdpTrainer(PomdpDialogAgent) :
         self.state = HISBeliefState(self.knowledge)
         for line in conv_log :
             parts = line.split('\t')
-            print '---------------------------------------'
-            print 'parts = ', parts
-            print '---------------------------------------'
-            if parts[0] == 'USER' :
+            print '---------------------------------------' # DEBUG
+            print 'parts = ', parts # DEBUG
+            print '---------------------------------------' # DEBUG
+            if parts[0] == 'USER' : 
                 if self.previous_system_action is not None :
                     try :
-                        print 'Start of try'
                         prev_state = SummaryState(self.state)
                         response = parts[1]
-                        print 'Updating state for response :', response
+                        response = self.map_text_to_desired_vocab(response)
+                        print 'Updating state for response :', response # DEBUG
                         self.update_state(response)
                         next_state = SummaryState(self.state)
+                        print '---------------------------------------' # DEBUG
+                        print '---------------------------------------' # DEBUG
+                        print 'prev_state : ', str(prev_state)  # DEBUG
                         print '---------------------------------------'
-                        print '---------------------------------------'
-                        print 'prev_state : ', str(prev_state)
-                        print '---------------------------------------'
-                        print 'action : ', str(self.previous_system_action)
-                        print '---------------------------------------'
-                        print 'next_state : ', str(next_state)
-                        print '---------------------------------------'
+                        print 'action : ', str(self.previous_system_action) # DEBUG
+                        print '---------------------------------------' # DEBUG
+                        print 'next_state : ', str(next_state)  # DEBUG
+                        print '---------------------------------------' # DEBUG
                         self.policy.train(prev_state, self.previous_system_action.action_type, next_state, self.knowledge.per_turn_reward)
                         self.previous_system_action = None
-                        print 'End of try'
                     except :
                         self.num_not_parsed += 1
-                        print "Exception in user code:"
-                        print '-'*60
-                        traceback.print_exc(file=sys.stdout)
-                        print '-'*60 
+                        print "Exception in user code:" # DEBUG
+                        print '-'*60    # DEBUG
+                        traceback.print_exc(file=sys.stdout)    # DEBUG
+                        print '-'*60    # DEBUG
             else :
                 if len(parts) != 6 :
                     continue
@@ -243,9 +258,9 @@ class PomdpTrainer(PomdpDialogAgent) :
                 else :
                     # Not useful dialogue steps. Mostly robot politeness
                     self.previous_system_action = None
-                print '---------------------------------------'
-                print 'action : ', str(self.previous_system_action)
-                print '---------------------------------------'
+                print '---------------------------------------' # DEBUG
+                print 'action : ', str(self.previous_system_action) # DEBUG
+                print '---------------------------------------' # DEBUG
         
         # Need to feed it with terminal reward
         prev_state = SummaryState(self.state)

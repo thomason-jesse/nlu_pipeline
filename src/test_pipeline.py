@@ -11,7 +11,6 @@ import StaticDialogPolicy
 import ActionSender
 from TemplateBasedGenerator import TemplateBasedGenerator
 from StaticDialogAgent import StaticDialogAgent
-from DialogAgent import DialogAgent
 from utils import *
 import pygame
 import os
@@ -57,23 +56,6 @@ class OutputToStdout:
     def say(self, s):
         print "SYSTEM: "+s
 
-# Fixing the random seed for debugging
-numpy.random.seed(10)
-
-class OutputWithSpeech:
-    def __init__(self):
-        pass
- 
-    def say(self, s):
-        
-        #Prints and synthesizes dialogue.
-        print s
-
-        os.system("espeak '" + s + "'")
-
-#Path for argument files. 
-path = './src/nlu_pipeline/src/speech/data/parser/'
-
 print "calling ROSpy init"
 rospy.init_node('test_NLU_pipeline')
 
@@ -93,7 +75,7 @@ print "entries: " + str(lex.entries)
 print "instantiating KBGrounder"
 grounder = KBGrounder.KBGrounder(ont)
 
-#print "instantiating Parser"
+print "instantiating Parser"
 parser = CKYParser.CKYParser(ont, lex, use_language_model=True)
 # Set parser hyperparams to best known values for training
 parser.max_multiword_expression = 2  # max span of a multi-word expression to be considered during tokenization
@@ -105,7 +87,7 @@ converged = parser.train_learner_on_semantic_forms(d, 10, reranker_beam=10)
 if not converged:
     raise AssertionError("Training failed to converge to correct values.")
 save_model(parser, 'parser')
-#parser = load_model('parser')
+# parser = load_model('parser')
 
 # Set parser hyperparams to best known values for test time
 parser.max_multiword_expression = 2  # max span of a multi-word expression to be considered during tokenization
@@ -138,7 +120,6 @@ u_in = InputFromSpeechNode()
 u_out = OutputWithSpeech()
 static_policy = StaticDialogPolicy.StaticDialogPolicy()
 A = StaticDialogAgent(parser, grounder, static_policy, u_in, u_out)
-#A = DialogAgent(parser, grounder, static_policy, u_in, u_out)
 A.dialog_objects_logfile = 'src/nlu_pipeline/src/models/trial_log.pkl'
 
 response_generator = TemplateBasedGenerator()

@@ -3,7 +3,6 @@ __author__ = 'jesse'
 import random
 import math
 import operator
-import sys
 import copy
 import ParseNode
 import SemanticNode
@@ -210,7 +209,7 @@ class Parameters:
             if type(t[t_idx]) is str:
                 t[t_idx] = self.lexicon.surface_forms.index(t[t_idx])
             if t[t_idx] is None:
-                sys.exit("Leaf parse node has None surface form "+str(y))
+                raise RuntimeError("Leaf parse node has None surface form "+str(y))
         b = {}
         t.insert(0, -2)  # beginning of sentence token
         t.append(-3)  # end of sentence token
@@ -411,8 +410,9 @@ class CKYParser:
         self.commutative_idxs = [self.ontology.preds.index('and'), self.ontology.preds.index('or')]
         self.max_multiword_expression = 2  # max span of a multi-word expression to be considered during tokenization
         self.max_new_senses_per_utterance = 2  # max number of new word senses that can be induced on a training example
-        self.max_cky_trees_per_token_sequence_beam = 1000  # for tokenization of an utterance, max cky trees considered
-        self.max_hypothesis_categories_for_unknown_token_beam = 5  # for unknown token, max syntax categories tried
+        self.max_cky_trees_per_token_sequence_beam = 100  # for tokenization of an utterance, max cky trees considered
+        self.max_hypothesis_categories_for_unknown_token_beam = 2  # for unknown token, max syntax categories tried
+        self.max_expansions_per_non_terminal = 10  # decides how many expansions to store per CKY cell
 
         # behavioral parameters
         self.safety = True  # set to False once confident about node combination functions' correctness
@@ -604,7 +604,6 @@ class CKYParser:
     # providing it as an argument to this method allows top-down generation
     # to find new lexical entries for surface forms not yet recognized
     def most_likely_cky_parse(self, s, reranker_beam=1, known_root=None):
-
         if len(s) == 0:
             raise AssertionError("Cannot parse provided string of length zero")
 
@@ -665,9 +664,7 @@ class CKYParser:
 
                 # create generator for current sequence set and get most likely parses
 
-                ccg_parse_tree_generator = self.most_likely_ccg_parse_tree(curr_tk_seqs,
-                                                                           root_is_known=False
-                                                                           if known_root is None else True)
+                ccg_parse_tree_generator = self.most_likely_ccg_parse_tree(curr_tk_seqs)
                 # get next most likely CCG parse tree out of CKY algorithm
                 ccg_tree, tree_score, tks = next(ccg_parse_tree_generator)
                 # ccg_tree indexed by spans (i, j) valued at [CCG category, left span, right span]
@@ -675,8 +672,8 @@ class CKYParser:
 
                     # print "ccg tree: "+str(tree_score)  # DEBUG
                     # for span in ccg_tree:  # DEBUG
-                    #     print str(span) + ": [" + self.lexicon.compose_str_from_category(ccg_tree[span][0]) + \
-                    #         "," + str(ccg_tree[span][1]) + "," + str(ccg_tree[span][2]) + "]"  # DEBUG
+                        # print str(span) + ": [" + self.lexicon.compose_str_from_category(ccg_tree[span][0]) + \
+                            # "," + str(ccg_tree[span][1]) + "," + str(ccg_tree[span][2]) + "]"  # DEBUG
 
                     # get next most likely assignment of semantics to given CCG categories
                     semantic_assignment_generator = self.most_likely_semantic_leaves(tks, ccg_tree,
@@ -756,11 +753,11 @@ class CKYParser:
 
         # print "most_likely_tree_generator: called for ccg_tree: "+str(ccg_tree)  # DEBUG
         parse_roots, parse_leaves_keys = self.form_root_from_leaves(parse_leaves, ccg_tree)
-        # print "parse_leaves: "+str(parse_leaves)  # DEBUG
+        # print "parse_roots: "+str([self.print_parse(p.node) for p in parse_roots])  # DEBUG
 
         # yield parse and total score (leaves+syntax) if structure matches
         # set of new lexical entries required is empty in this case
-        if len(parse_roots) == 1:
+        if len(parse_roots) == 1 and parse_roots[0].node is not None:
             yield parse_roots[0], []  # the ParseNode root of the finished parse tree
 
         # if structure does not match and there are None nodes, perform top-down generation from
@@ -891,36 +888,41 @@ class CKYParser:
         # print "root_key: "+str(root_key)  # DEBUG
         # print "ccg_tree: "+str(ccg_tree)  # DEBUG
 
-        # greedily take children with best score until we get a category match
-        children_generator = self.get_most_likely_children_from_root(parse_root.node)
-        for children, children_score in children_generator:
-            # when we find children with syntax matching ccg tree, save and see whether either should expand
-            if children[0].category == ccg_tree[ccg_tree[root_key][1]][0] and \
-               children[1].category == ccg_tree[ccg_tree[root_key][2]][0]:
-                # print "...category match"  # DEBUG
-                parse_root.children = []
-                for c in range(0, 2):  # save calculated semantic children wrapped in ParseNodes
-                    parse_root.children.append(ParseNode.ParseNode(parse_root, children[c]))
-                if ccg_tree[root_key][1] in known_leaf_keys and ccg_tree[root_key][2] in known_leaf_keys:
-                    # print "...get_most_likely_tree_from_root yielding two known leaf keys"  # DEBUG
-                    yield parse_root, children_score
-                for c in range(0, 2):  # expand children
-                    subtree_generators = [self.get_most_likely_tree_from_root(parse_root.children[c],
-                                                                              ccg_tree[root_key][1+c],
-                                                                              ccg_tree,
-                                                                              known_leaf_keys)
-                                          for c in range(0, 2)]
-                    if ccg_tree[root_key][1+c] not in known_leaf_keys:
-                        for child1, score1 in subtree_generators[c]:
-                            parse_root.children[c] = child1
-                            if ccg_tree[root_key][1+((c+1) % 2)] not in known_leaf_keys:
-                                for child2, score2 in subtree_generators[(c+1) % 2]:
-                                    parse_root.children[(c+1) % 2] = child2
-                                    # print "...get_most_likely_tree_from_root yielding deeper children"  # DEBUG
-                                    yield parse_root, children_score+score1+score2
-                            else:
-                                # print "...get_most_likely_tree_from_root yielding deeper child"  # DEBUG
-                                yield parse_root, children_score+score1
+        # if root key is the only entry in the chart, can only associate it with the known parse root
+        if len(ccg_tree.keys()) == 1:
+            yield parse_root, 0
+        else:
+
+            # greedily take children with best score until we get a category match
+            children_generator = self.get_most_likely_children_from_root(parse_root.node)
+            for children, children_score in children_generator:
+                # when we find children with syntax matching ccg tree, save and see whether either should expand
+                if children[0].category == ccg_tree[ccg_tree[root_key][1]][0] and \
+                   children[1].category == ccg_tree[ccg_tree[root_key][2]][0]:
+                    # print "...category match"  # DEBUG
+                    parse_root.children = []
+                    for c in range(0, 2):  # save calculated semantic children wrapped in ParseNodes
+                        parse_root.children.append(ParseNode.ParseNode(parse_root, children[c]))
+                    if ccg_tree[root_key][1] in known_leaf_keys and ccg_tree[root_key][2] in known_leaf_keys:
+                        # print "...get_most_likely_tree_from_root yielding two known leaf keys"  # DEBUG
+                        yield parse_root, children_score
+                    for c in range(0, 2):  # expand children
+                        subtree_generators = [self.get_most_likely_tree_from_root(parse_root.children[c],
+                                                                                  ccg_tree[root_key][1+c],
+                                                                                  ccg_tree,
+                                                                                  known_leaf_keys)
+                                              for c in range(0, 2)]
+                        if ccg_tree[root_key][1+c] not in known_leaf_keys:
+                            for child1, score1 in subtree_generators[c]:
+                                parse_root.children[c] = child1
+                                if ccg_tree[root_key][1+((c+1) % 2)] not in known_leaf_keys:
+                                    for child2, score2 in subtree_generators[(c+1) % 2]:
+                                        parse_root.children[(c+1) % 2] = child2
+                                        # print "...get_most_likely_tree_from_root yielding deeper children"  # DEBUG
+                                        yield parse_root, children_score+score1+score2
+                                else:
+                                    # print "...get_most_likely_tree_from_root yielding deeper child"  # DEBUG
+                                    yield parse_root, children_score+score1
 
     # yields next most likely pair of children from a given semantic root using production rule parameter scores
     def get_most_likely_children_from_root(self, n):
@@ -1033,9 +1035,8 @@ class CKYParser:
     # yields the next most likely ccg parse tree given a set of possible token sequences
     # finds the best parse tree given each token sequence and returns in-order the one
     # with the highest score
-    def most_likely_ccg_parse_tree(self, tk_seqs, root_is_known=False):
-
-        ccg_parse_tree_generators = [self.most_likely_ccg_parse_tree_given_tokens(tks, root_is_known=root_is_known)
+    def most_likely_ccg_parse_tree(self, tk_seqs):
+        ccg_parse_tree_generators = [self.most_likely_ccg_parse_tree_given_tokens(tks)
                                      for tks in tk_seqs]
         best_per_seq = [next(ccg_parse_tree_generators[idx])
                         for idx in range(0, len(tk_seqs))]
@@ -1064,8 +1065,8 @@ class CKYParser:
                 if len(tk_seqs[idx]) > len(tk_seqs[best_idx]):
                     best_idx = idx
             # print "most_likely_ccg_parse_tree: yielding " + \
-            #       str(best_per_seq[best_idx][0])+" with score "+str(best_score) + \
-            #       " from tokens "+str(tk_seqs[best_idx])  # DEBUG
+                # str(best_per_seq[best_idx][0])+" with score "+str(best_score) + \
+                # " from tokens "+str(tk_seqs[best_idx])  # DEBUG
             yield best_per_seq[best_idx][0], best_score, tk_seqs[best_idx]
             candidate, score = next(ccg_parse_tree_generators[best_idx])
             empty = True
@@ -1076,8 +1077,7 @@ class CKYParser:
                 if leaf_sense_limits[best_idx] < self.max_new_senses_per_utterance:
                     leaf_sense_limits[best_idx] += 1
                     ccg_parse_tree_generators[best_idx] = self.most_likely_ccg_parse_tree_given_tokens(
-                        tk_seqs[best_idx], new_sense_leaf_limit=leaf_sense_limits[best_idx],
-                        root_is_known=root_is_known)
+                        tk_seqs[best_idx], new_sense_leaf_limit=leaf_sense_limits[best_idx])
                     candidate, score = next(ccg_parse_tree_generators[best_idx])
                     if candidate is not None:
                         best_per_seq[best_idx] = [candidate, score]
@@ -1092,10 +1092,11 @@ class CKYParser:
         yield None, neg_inf, None
 
     # yields the next most likely ccg parse tree given a set of tokens
-    def most_likely_ccg_parse_tree_given_tokens(self, tks, new_sense_leaf_limit=0, root_is_known=False):
+    def most_likely_ccg_parse_tree_given_tokens(self, tks, new_sense_leaf_limit=0):
 
         # print "most_likely_ccg_parse_tree_given_tokens initialized with tks="+str(tks) + \
-        #       ", new_sense_leaf_limit="+str(new_sense_leaf_limit)  # DEBUG
+            # ", new_sense_leaf_limit="+str(new_sense_leaf_limit)  # DEBUG
+        # debug_chr = raw_input()
 
         # indexed by position in span (i, j) in parse tree
         # value is list of tuples [CCG category, [left key, left index], [right key, right index], score]
@@ -1121,11 +1122,11 @@ class CKYParser:
                 if exp in self.lexicon.surface_forms:
                     sf_idx = self.lexicon.surface_forms.index(exp)
                     cats = [self.lexicon.semantic_forms[sem_idx].category for sem_idx in self.lexicon.entries[sf_idx]]
-                    for cat in cats:
-                        score = self.theta.CCG_given_token[(cat, sf_idx)] \
-                            if (cat, sf_idx) in self.theta.CCG_given_token \
-                            else self.theta.CCG_given_token[(cat, -1)]
-                        chart[pos].append([cat, None, None, score])
+                    for cat_idx in cats:
+                        score = self.theta.CCG_given_token[(cat_idx, sf_idx)] \
+                            if (cat_idx, sf_idx) in self.theta.CCG_given_token \
+                            else self.theta.CCG_given_token[(cat_idx, -1)]
+                        chart[pos].append([cat_idx, None, None, score])
                     if max_entries[1] is None or max_entries[1] < len(self.lexicon.entries[sf_idx]):
                         max_entries[0] = pos
                         max_entries[1] = len(self.lexicon.entries[sf_idx])
@@ -1152,7 +1153,16 @@ class CKYParser:
         # print "leaf missing: "+str(missing)  # DEBUG
         # _ = raw_input()  # DEBUG
 
-        # populate chart
+        # populate chart for length 1 utterance
+        if len(tks) == 1:
+            # chart entries should be all top-level CCG categories (those that don't take arguments)
+            pos = (0, 1)
+            for cat_idx in range(0, len(self.lexicon.categories)):
+                if type(self.lexicon.categories[cat_idx]) is str:
+                    score = self.theta.CCG_given_token[(cat_idx, -1)]
+                    chart[pos].append([cat_idx, None, None, score])
+
+        # populate chart using CKY
         for width in range(2, len(tks)+1):
             # print "width: "+str(width)  # DEBUG
             for start in range(0, len(tks)-width+1):
@@ -1170,15 +1180,32 @@ class CKYParser:
                     # print "r_key: "+str(r_key)  # DEBUG
                     for l_idx in range(0, len(left)):
                         l = left[l_idx]
-                        # print "l: "+str(l)+", cat="+self.lexicon.compose_str_from_category(l[0])  # DEBUG
+                        # if debug_chr == 'y' : # DEBUG
+                        #     print "l: "+str(l)+", cat="+self.lexicon.compose_str_from_category(l[0])  # DEBUG
                         for r_idx in range(0, len(right)):
                             r = right[r_idx]
-                            # print "r: "+str(r)+", cat="+self.lexicon.compose_str_from_category(r[0])  # DEBUG
+                            # if debug_chr == 'y' : # DEBUG
+                            #     print "r: "+str(r)+", cat="+self.lexicon.compose_str_from_category(r[0])  # DEBUG
                             for prod in self.theta.CCG_production:
-                                # print "prod: "+str([self.lexicon.compose_str_from_category(c) for c in prod])  # DEBUG
+                                # if debug_chr == 'y' : # DEBUG
+                                #     print "prod: "+str([self.lexicon.compose_str_from_category(c)
+                                #  for c in prod])  # DEBUG
                                 if prod[1] == l[0] and prod[2] == r[0]:
                                     new_score = self.theta.CCG_production[prod] + l[3] + r[3]
-                                    chart[key].append([prod[0], [l_key, l_idx], [r_key, r_idx], new_score])
+                                    # Find all expansions of this non-terminal in the cell
+                                    expansions = [expansion for expansion in chart[key] if expansion[0] == prod[0]]
+                                    if len(expansions) < self.max_expansions_per_non_terminal - 1:
+                                        chart[key].append([prod[0], [l_key, l_idx], [r_key, r_idx], new_score])
+                                    else:
+                                        # Sort expansions in order of score
+                                        scores_and_expansions = [(expansion[-1], expansion) for expansion in expansions]
+                                        scores_and_expansions.sort() 
+                                        if new_score > scores_and_expansions[0][0]:
+                                            # Remove the least scoring existing expansion and
+                                            # add the one just found
+                                            chart[key].remove(scores_and_expansions[0][1])
+                                            chart[key].append([prod[0], [l_key, l_idx], [r_key, r_idx], new_score])
+                                            
                                     # print "new chart entry "+str(key)+" : "+str(chart[key][-1])  # DEBUG
                     lr_keys = [l_key, r_key]
                     lr_dirs = [left, right]
@@ -1307,10 +1334,11 @@ class CKYParser:
                 raise TypeError("Non-matching child/parent relationship for one of two nodes " +
                                 self.print_parse(a, True) + " , " + self.print_parse(b, True))
             if a.return_type != b.return_type:
-                sys.exit("performing Merge with '"+self.print_parse(a, True)+"' taking '"+self.print_parse(a, True) +
-                         "' generated mismatched return types" +
-                         self.ontology.compose_str_from_type(a.return_type)+"," +
-                         self.ontology.compose_str_from_type(b.return_type))
+                raise RuntimeError("performing Merge with '"+self.print_parse(a, True) +
+                                   "' taking '"+self.print_parse(a, True) +
+                                   "' generated mismatched return types" +
+                                   self.ontology.compose_str_from_type(a.return_type)+"," +
+                                   self.ontology.compose_str_from_type(b.return_type))
             input_type = [a.return_type, a.return_type]
             if input_type not in self.ontology.types:
                 self.ontology.types.append(input_type)
@@ -1328,8 +1356,8 @@ class CKYParser:
         # print "performed Merge with '"+self.print_parse(a, True)+"' taking '"+self.print_parse(b, True) + \
         #     "' to form '"+self.print_parse(ab, True)+"'"  # DEBUG
         if self.safety and not ab.validate_tree_structure():
-            sys.exit("ERROR: invalidly linked structure generated by FA: " +
-                     self.print_parse(ab, True))
+            raise RuntimeError("ERROR: invalidly linked structure generated by FA: " +
+                               self.print_parse(ab, True))
         return ab
 
     # return true if A,B can be merged
@@ -1362,9 +1390,9 @@ class CKYParser:
     def perform_fa(self, a, b, renumerate=True):
         if self.safety:
             if not a.validate_tree_structure():  # DEBUG
-                sys.exit("WARNING: got invalidly linked node '"+self.print_parse(a)+"'")  # DEBUG
+                raise RuntimeError("WARNING: got invalidly linked node '"+self.print_parse(a)+"'")
             if not b.validate_tree_structure():  # DEBUG
-                sys.exit("WARNING: got invalidly linked node '"+self.print_parse(b)+"'")  # DEBUG
+                raise RuntimeError("WARNING: got invalidly linked node '"+self.print_parse(b)+"'")
         # print "performing FA with '"+self.print_parse(a, True)+"' taking '"+self.print_parse(b, True)+"'"  # DEBUG
 
         # if A is 'and', apply B to children
@@ -1390,8 +1418,8 @@ class CKYParser:
             # print "performed FA(1) with '"+self.print_parse(a, True)+"' taking '"+self.print_parse(b, True) + \
             #     "' to form '"+self.print_parse(a_new, True)+"'"  # DEBUG
             if self.safety and not a_new.validate_tree_structure():
-                sys.exit("ERROR: invalidly linked structure generated by FA: " +
-                         self.print_parse(a_new, True))
+                raise RuntimeError("ERROR: invalidly linked structure generated by FA: " +
+                                   self.print_parse(a_new, True))
             return a_new
 
         # A is lambda headed and so has a single child which will be the root of the composed tree
@@ -1452,7 +1480,7 @@ class CKYParser:
                         # print "...instance heads tree; preserve children taking B"
                         curr.copy_attributes(b, deepest_lambda, preserve_children=True)
                     else:
-                        sys.exit("Error: incompatible parentless, childed node A with childed node B")
+                        raise RuntimeError("Error: incompatible parentless, childed node A with childed node B")
                     entire_replacement = True
                     curr.set_category(self.lexicon.categories[a.category][0])  # take on return type of A
                     curr.set_return_type(self.ontology)
@@ -1467,8 +1495,8 @@ class CKYParser:
                         curr.parent.children[curr_parent_matching_idx].copy_attributes(b, deepest_lambda,
                                                                                        preserve_parent=True)
                         if not curr.parent.children[curr_parent_matching_idx].validate_tree_structure():  # DEBUG
-                            sys.exit("ERROR: copy operation produced invalidly linked tree " +
-                                     self.print_parse(curr.parent.children[curr_parent_matching_idx], True))  # DEBUG
+                            raise RuntimeError("ERROR: copy operation produced invalidly linked tree " +
+                                               self.print_parse(curr.parent.children[curr_parent_matching_idx], True))
                     else:
                         if b.children is None:
                             # print "...instance of B will keep children from A"  # DEBUG
@@ -1478,13 +1506,26 @@ class CKYParser:
                         else:
                             # print "...instance of A and B have matching lambda headers to be merged"  # DEBUG
                             b_without_lambda_headers = b
-                            lambda_arg = 0
+                            lambda_types = {}
                             while (b_without_lambda_headers.is_lambda and
                                     b_without_lambda_headers.is_lambda_instantiation):
-                                lambda_arg = b_without_lambda_headers.is_lambda_instantiation
+                                lambda_types[b_without_lambda_headers.lambda_name] = b_without_lambda_headers.type
                                 b_without_lambda_headers = b_without_lambda_headers.children[0]
+                            a_trace = a
+                            lambda_map = {}
+                            while len(lambda_types.keys()) > 0:
+                                name_found = None
+                                for name in lambda_types:
+                                    if lambda_types[name] == a_trace.type:
+                                        lambda_map[name] = a_trace.lambda_name
+                                        name_found = name
+                                        break
+                                if name_found is not None:
+                                    del lambda_types[name_found]
+                                a_trace = a_trace.children[0]
+                            # print "lambda_map: "+str(lambda_map)  # DEBUG
                             curr.parent.children[curr_parent_matching_idx].copy_attributes(b_without_lambda_headers,
-                                                                                           lambda_arg,
+                                                                                           lambda_map=lambda_map,
                                                                                            preserve_parent=True,
                                                                                            preserve_children=False)
                     curr.parent.children[curr_parent_matching_idx].set_return_type(self.ontology)
@@ -1492,24 +1533,19 @@ class CKYParser:
             if not entire_replacement and curr.children is not None:
                 to_traverse.extend([[c, deepest_lambda] for c in curr.children])
         if renumerate:
-            # print "renumerating "+self.print_parse(ab)  # DEBUG
+            # print "renumerating result '"+self.print_parse(ab)+"'"  # DEBUG
             ab.renumerate_lambdas([])
         try:
             ab.set_return_type(self.ontology)
         except TypeError as e:
-            print e
-            ### ORIG
-            #sys.exit("ERROR in form '"+self.print_parse(ab)+"'")
-            ### AISH
             raise e
-            ###
         ab.set_category(self.lexicon.categories[a.category][0])
         ab.commutative_raise_node(self.commutative_idxs, self.ontology)
         # print "performed FA(2) with '"+self.print_parse(a, True)+"' taking '"+self.print_parse(b, True) + \
         #       "' to form '"+self.print_parse(ab, True)+"'"  # DEBUG
         if self.safety and not ab.validate_tree_structure():
-            sys.exit("ERROR: invalidly linked structure generated by FA: " +
-                     self.print_parse(ab, True))
+            raise RuntimeError("ERROR: invalidly linked structure generated by FA: " +
+                               self.print_parse(ab, True))
         return ab
 
     # return true if A(B) is a valid for functional application
@@ -1524,7 +1560,7 @@ class CKYParser:
             return False  # B is left/right when A expects right/left
         if not a.is_lambda or not a.is_lambda_instantiation or a.type != b.return_type:
             if a.is_lambda_instantiation and a.children is None:  # DEBUG
-                sys.exit("ERROR: found lambda with no children: "+str(self.print_parse(a)))
+                raise RuntimeError("ERROR: found lambda with no children: "+str(self.print_parse(a)))
             # print "A is not lambda instantiation or types are mismatched" + str(self.print_parse(a)) + \  # DEBUG
             #     ", "+ str(self.print_parse(b))  # DEBUG
             return False
@@ -1612,8 +1648,8 @@ class CKYParser:
             for idx in range(0, len(candidate_pairs)):
                 for jdx in range(0, len(candidate_pairs[idx])):
                     if not candidate_pairs[idx][jdx].validate_tree_structure():
-                        sys.exit("ERROR: invalidly linked structure generated by split: " +
-                                 self.print_parse(to_return[-1], True))
+                        raise RuntimeError("ERROR: invalidly linked structure generated by split: " +
+                                           self.print_parse(to_return[-1], True))
         return candidate_pairs
 
     # return true if AB can be split
@@ -1770,13 +1806,15 @@ class CKYParser:
                         #     self.print_parse(a2_with_cat, True)+" in dir "+str(d)+" with params " + \
                         #     ",".join([str(lambda_type), str(preserve_host_children), str(aa)])  # DEBUG
                         if self.safety and not a1_with_cat.validate_tree_structure():
-                            sys.exit("ERROR: invalidly linked structure generated by reverse FA: " +
-                                     self.print_parse(a1_with_cat, True) +
-                                     "with params "+",".join([str(lambda_type), str(preserve_host_children), str(aa)]))
+                            raise RuntimeError("ERROR: invalidly linked structure generated by reverse FA: " +
+                                               self.print_parse(a1_with_cat, True) +
+                                               "with params "+",".join([str(lambda_type), str(preserve_host_children),
+                                                                        str(aa)]))
                         if self.safety and not a2_with_cat.validate_tree_structure():
-                            sys.exit("ERROR: invalidly linked structure generated by reverse FA: " +
-                                     self.print_parse(a2_with_cat, True) +
-                                     "with params "+",".join([str(lambda_type), str(preserve_host_children), str(aa)]))
+                            raise RuntimeError("ERROR: invalidly linked structure generated by reverse FA: " +
+                                               self.print_parse(a2_with_cat, True) +
+                                               "with params "+",".join([str(lambda_type), str(preserve_host_children),
+                                                                        str(aa)]))
 
         return candidate_pairs
 

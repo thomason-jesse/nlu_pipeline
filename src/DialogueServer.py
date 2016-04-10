@@ -4,20 +4,20 @@ __author__ = 'aishwarya'
 import sys
 import Ontology
 import Lexicon
-import FeatureExtractor
-import LinearLearner
 import KBGrounder
-import Parser
-import Generator
+import CKYParser
 import StaticDialogPolicy
 import numpy, re, time, rospy
 import os, stat
 import traceback
 import datetime
+import copy
 
 from TemplateBasedGenerator import TemplateBasedGenerator
+from PomdpKtdqPolicy import PomdpKtdqPolicy
 from PomdpDialogAgent import PomdpDialogAgent
 from StaticDialogAgent import StaticDialogAgent
+from Knowledge import Knowledge
 from utils import *
 from nlu_pipeline.srv import *
 
@@ -30,30 +30,27 @@ MAX_WAITING_USERS = 100
 MAX_OUTSTANDING_MESSAGES = 1000
 MAX_TIMEOUT_TO_ADD_USER = 1 # in seconds
 
-LOGGING_PATH = '../../../../public_html/AMT/log/'
-FINAL_ACTION_PATH = '../../../../public_html/AMT/executed_actions/'
-USER_LOG_FILE = '../../../../public_html/AMT/log_special/user_list.txt'
-ERROR_LOG_FILE = '../../../../public_html/AMT/log_special/errors.txt'
-LEXICAL_ADDITION_LOG = '../../../../public_html/AMT/log_special/lexical_addition.txt'
+MAIN_LOG_PATH = '../../../../public_html/AMT/'
+#MAIN_LOG_PATH = ''
 
-#LOGGING_PATH = '../../../../Trial/AMT/log/'
-#FINAL_ACTION_PATH = '../../../../Trial/AMT/executed_actions/'
-#USER_LOG = '../../../../Trial/AMT/log_special/user_list.txt'
-#ERROR_LOG = '../../../../Trial/AMT/log_special/errors.txt'
-#LEXICAL_ADDITION_LOG = '../../../../Trial/AMT/log_special/lexical_addition.txt'
+LOGGING_PATH = 'log/'
+TEXT_LOG_PATH = 'log_text/'
+FINAL_ACTION_PATH = 'executed_actions/'
+USER_LOG_FILE = 'log_special/users.txt'
+MAIN_ERROR_LOG_FILE = 'log_special/errors.txt'
+DIALOG_ERROR_LOG_PATH = 'error/'
 
 # Fixing the random seed for debugging
-numpy.random.seed(4)
+#numpy.random.seed(4)
 
 class InputFromService:
-    def __init__(self, error_log, logfile=None):
-        self.js_talk_service = rospy.Service('dialogue_js_talk', dialogue_js_talk, self.receive_msg)
+    def __init__(self, user_id,  error_log, logfile=None):
         self.lock = Lock()
+        self.js_talk_service = rospy.Service('dialogue_js_talk_' + user_id, dialogue_js_talk, self.receive_msg)
         self.prev_msg = None
         self.logfile = logfile
         self.error_log = error_log
         self.last_get = ''  
-        self.lock = Lock()
 
     def get(self):
         print 'In get'
@@ -100,7 +97,7 @@ class InputFromService:
             
     def receive_msg(self, req) :
         text = req.js_response[:-1]
-        print 'Received ', text 
+        print 'Received ', text # DEBUG
         while True :
             if self.prev_msg is None :
                 print 'self.prev_msg is None'
@@ -125,17 +122,17 @@ class InputFromService:
                     if success :
                         break
             else :
-                print 'self.prev_msg = ', self.prev_msg
+                print 'self.prev_msg = ', self.prev_msg # DEBUG
         return True
     
 class OutputToService:
-    def __init__(self, input_from_topic, error_log, logfile=None):
-        self.python_talk_service = rospy.Service('dialogue_python_talk', dialogue_python_talk, self.send_msg)
+    def __init__(self, user_id,  input_from_topic, error_log, logfile=None):
+        self.lock = Lock()
+        self.python_talk_service = rospy.Service('dialogue_python_talk_' + user_id, dialogue_python_talk, self.send_msg)
         self.response = None
         self.logfile = logfile  
         self.error_log = error_log  
         self.input_from_topic = input_from_topic
-        self.lock = Lock()
 
     def say(self, response):
         if self.logfile is not None :
@@ -150,7 +147,7 @@ class OutputToService:
         self.lock.acquire()
         try :
             self.response = response
-            print 'Saying: ', response
+            print 'Saying: ', response  # DEBUG
         except KeyboardInterrupt, SystemExit :
             pass
         except :
@@ -188,208 +185,145 @@ class OutputToService:
             msg_poller.sleep()
 
 class DialogueServer :
-    def __init__(self) :
-        rospy.init_node('dialog_agent_aishwarya')
-        self.service = rospy.Service('register_user', register_user, self.on_user_receipt)
-        self.user_log = open(USER_LOG_FILE, 'a')
-        self.error_log = open(ERROR_LOG_FILE, 'a')
-        self.pomdp_agent = None
-        self.static_agent = None
-        self.current_user = None
-        self.lock = Lock()
-        self.u_in = InputFromService(self.error_log)
-        self.u_out = OutputToService(self.u_in, self.error_log)
-
-    def init_static_dialog_agent(self, args) :
-        print "reading in Ontology"
-        ont = Ontology.Ontology(sys.argv[1])
-        print "predicates: " + str(ont.preds)
-        print "types: " + str(ont.types)
-        print "entries: " + str(ont.entries)
-
-        print "reading in Lexicon"
-        lex = Lexicon.Lexicon(ont, sys.argv[2])
-        print "surface forms: " + str(lex.surface_forms)
-        print "categories: " + str(lex.categories)
-        print "semantic forms: " + str(lex.semantic_forms)
-        print "entries: " + str(lex.entries)
-
-        print "instantiating Feature Extractor"
-        f_extractor = FeatureExtractor.FeatureExtractor(ont, lex)
-
-        print "instantiating Linear Learner"
-        learner = LinearLearner.LinearLearner(ont, lex, f_extractor)
-
-        print "instantiating KBGrounder"
-        grounder = KBGrounder.KBGrounder(ont)
-
-        load_parser_from_file = False
-        if len(args) > 4 :
-            if args[4].lower() == 'true' :
-                load_parser_from_file = True
-                
-        if load_parser_from_file :
-            parser = load_model('static_parser')
-            grounder.parser = parser
-            grounder.ontology = parser.ontology
-        else :
-            print "instantiating Parser"
-            parser = Parser.Parser(ont, lex, learner, grounder, beam_width=10, safety=True)
-
-        print "instantiating Generator"
-        generator = Generator.Generator(ont, lex, learner, parser, beam_width=sys.maxint, safety=True)
-
-        print "instantiating DialogAgent"
-        static_policy = StaticDialogPolicy.StaticDialogPolicy()
-        A = StaticDialogAgent(parser, generator, grounder, static_policy, None, None)
-
-        if not load_parser_from_file :
-            print "reading in training data"
-            D = A.read_in_utterance_action_pairs(args[3])
-
-            if len(args) > 4 and args[4] == "both":
-                print "training parser and generator jointly from actions"
-                converged = A.jointly_train_parser_and_generator_from_utterance_action_pairs(
-                    D, epochs=10, parse_beam=30, generator_beam=10)
-            else:
-                print "training parser from actions"
-                converged = A.train_parser_from_utterance_action_pairs(
-                    D, epochs=10, parse_beam=30)
-
-            print "theta: "+str(parser.learner.theta)
-            save_model(parser, 'static_parser')
+    def __init__(self, args) :
+        print 'args = ', args, '\n\n\n\n'
+        if len(args) < 4 :
+            print 'Usage ', args[0], ' ont_file lex_file parser_train_pairs_file [load_models_from_file=true/false]'
         
-        self.static_agent = A
-
-    def init_pomdp_dialog_agent(self, args) :
-        print "Reading in Ontology"
+        rospy.init_node('dialog_agent_aishwarya')
+        
+        self.user_log = open(MAIN_LOG_PATH + USER_LOG_FILE, 'a')
+        self.error_log = open(MAIN_LOG_PATH + MAIN_ERROR_LOG_FILE, 'a')
+        self.started_users = set()
+        
+        print "reading in Ontology"
         ont = Ontology.Ontology(args[1])
         print "predicates: " + str(ont.preds)
         print "types: " + str(ont.types)
         print "entries: " + str(ont.entries)
-
-        print "Reading in Lexicon"
+        self.ont = ont
+        
+        print "reading in Lexicon"
         lex = Lexicon.Lexicon(ont, args[2])
         print "surface forms: " + str(lex.surface_forms)
         print "categories: " + str(lex.categories)
         print "semantic forms: " + str(lex.semantic_forms)
         print "entries: " + str(lex.entries)
-
-        print "Instantiating Feature Extractor"
-        f_extractor = FeatureExtractor.FeatureExtractor(ont, lex)
-
-        print "Instantiating Linear Learner"
-        learner = LinearLearner.LinearLearner(ont, lex, f_extractor)
-
-        print "Instantiating KBGrounder"
-        grounder = KBGrounder.KBGrounder(ont)
-
-        load_models_from_file = False
+        self.lex = lex
+        
+        self.parser_train_file = args[3]
+        
+        self.load_models_from_file = False
         if len(args) > 4 :
             if args[4].lower() == 'true' :
-                load_models_from_file = True
-
-        if load_models_from_file :
-            parser = load_model('pomdp_parser')
-            grounder.parser = parser
-            grounder.ontology = parser.ontology
+                print 'Going to load from file' # DEBUG
+                self.load_models_from_file = True
+        
+        self.lock = Lock()
+        self.service = rospy.Service('register_user', register_user, self.on_user_receipt)
+        
+    def create_static_dialog_agent(self) :
+        ont = copy.deepcopy(self.ont)
+        lex = copy.deepcopy(self.lex)
+        
+        print "instantiating KBGrounder"
+        grounder = KBGrounder.KBGrounder(ont)
+             
+        if self.load_models_from_file :
+            parser = load_model('only_parser_parser')
         else :
-            print "Instantiating Parser"
-            parser = Parser.Parser(ont, lex, learner, grounder, beam_width=10)
+            parser = CKYParser.CKYParser(ont, lex, use_language_model=True)
+            # Set parser hyperparams to best known values for training
+            parser.max_multiword_expression = 2  # max span of a multi-word expression to be considered during tokenization
+            parser.max_new_senses_per_utterance = 3  # max number of new word senses that can be induced on a training example
+            parser.max_cky_trees_per_token_sequence_beam = 100  # for tokenization of an utterance, max cky trees considered
+            parser.max_hypothesis_categories_for_unknown_token_beam = 3  # for unknown token, max syntax categories tried
+            # Train parser
+            d = parser.read_in_paired_utterance_semantics(self.parser_train_file)
+            converged = parser.train_learner_on_semantic_forms(d, 10, reranker_beam=10)
+            save_model(parser, 'only_parser_parser')
+            
+        # Set parser hyperparams to best known values for test time
+        parser.max_multiword_expression = 2  # max span of a multi-word expression to be considered during tokenization
+        parser.max_new_senses_per_utterance = 2  # max number of new word senses that can be induced on a training example
+        parser.max_cky_trees_per_token_sequence_beam = 100  # for tokenization of an utterance, max cky trees considered
+        parser.max_hypothesis_categories_for_unknown_token_beam = 2  # for unknown token, max syntax categories tried
 
+        grounder.parser = parser
+        grounder.ontology = parser.ontology
+  
+        static_policy = StaticDialogPolicy.StaticDialogPolicy()
+        static_agent = StaticDialogAgent(parser, grounder, static_policy, None, None)
+        static_agent.retrain_parser = False
+        return static_agent
+
+    def create_pomdp_dialog_agent(self, parser_file=None) :
+        ont = copy.deepcopy(self.ont)
+        lex = copy.deepcopy(self.lex)
+        
+        print "instantiating KBGrounder"
+        grounder = KBGrounder.KBGrounder(ont)
+        
+        if self.load_models_from_file :
+            parser = load_model(parser_file)
+        else :
+            parser = CKYParser.CKYParser(ont, lex, use_language_model=True)
+            # Set parser hyperparams to best known values for training
+            parser.max_multiword_expression = 2  # max span of a multi-word expression to be considered during tokenization
+            parser.max_new_senses_per_utterance = 3  # max number of new word senses that can be induced on a training example
+            parser.max_cky_trees_per_token_sequence_beam = 100  # for tokenization of an utterance, max cky trees considered
+            parser.max_hypothesis_categories_for_unknown_token_beam = 3  # for unknown token, max syntax categories tried
+            # Train parser
+            d = parser.read_in_paired_utterance_semantics(self.parser_train_file)
+            converged = parser.train_learner_on_semantic_forms(d, 10, reranker_beam=10)
+            save_model(parser, parser_file)
+            
+        # Set parser hyperparams to best known values for test time
+        parser.max_multiword_expression = 2  # max span of a multi-word expression to be considered during tokenization
+        parser.max_new_senses_per_utterance = 2  # max number of new word senses that can be induced on a training example
+        parser.max_cky_trees_per_token_sequence_beam = 1000  # for tokenization of an utterance, max cky trees considered
+        parser.max_hypothesis_categories_for_unknown_token_beam = 2  # for unknown token, max syntax categories tried
+
+        grounder.parser = parser
+        grounder.ontology = parser.ontology
+  
         print "Instantiating DialogAgent"
-        if load_models_from_file :
-            agent = PomdpDialogAgent(parser, grounder, None, None, parse_depth=10, load_policy_from_file=True)
+        if self.load_models_from_file :
+            policy = load_model('ktdq_policy')
+            policy.untrained = False
+            policy.training = False
         else :
-            agent = PomdpDialogAgent(parser, grounder, None, None, parse_depth=10, load_policy_from_file=False)
+            knowledge = Knowledge()
+            policy = PomdpKtdqPolicy(knowledge)
+            policy.untrained = True
+            policy.training = True
+        agent = PomdpDialogAgent(parser, grounder, policy, None, None)
+        agent.retrain_parser = False
+        return agent
 
-        if not load_models_from_file :
-            print "reading in data and training parser from actions"
-            D = agent.read_in_utterance_action_pairs(args[3])
-            converged = agent.train_parser_from_utterance_action_pairs(D, epochs=10, parse_beam=30)
-            print "theta: "+str(parser.learner.theta)
-            save_model(parser, 'pomdp_parser')
-            #print 'Parser ontology : ', parser.ontology.preds
-
-        self.pomdp_agent = agent
-
+    # Receives a request from a new user, creates an appropriate dialog 
+    # agent and starts dialog on a separate thread
+    # Since calls to this function involve writes to come common files
+    # like user_log, it involves locking
     def on_user_receipt(self, req):
-        print 'Received user ', req.user_id
-
+        #print 'Received user ', req.user_id    # DEBUG
+        self.error_log.write('Received user ' + str(req.user_id) + '\n')
+        self.error_log.flush()
+        
         # Try to acquire lock but do not wait
         acquired_lock = self.lock.acquire(False)
 
         if acquired_lock :
-            print 'Acquired lock'
-            # No dialog agent running and no concurrent users being added
-            success = False
-            try :
-                if self.current_user is None :
-                    print 'New user'
-                    # This check is needed because a user may just have 
-                    # gotten accepted but their dialogue may not have 
-                    # started yet
-                    self.current_user = req.user_id
-                    success = True
-                else :
-                    print 'System busy with user ', self.current_user
-            except KeyboardInterrupt, SystemExit :
-                pass
-            except :
-                error = str(sys.exc_info()[0])
-                self.error_log.write(error + '\n')
-                print traceback.format_exc()
-                self.error_log.write(traceback.format_exc() + '\n\n\n')
-                self.error_log.flush()        
-            finally :
-                self.lock.release()
-                return success 
-        else :
-            # The system is currently handling another user
-            print 'Could not acquire lock'
-            return False
-
-    def launch(self) :
-        if self.pomdp_agent is None or self.static_agent is None :
-            raise RuntimeError('Agents must be created before launching server')
-        
-        print 'Dialog agent ready'
-        
-        user_poll_rate = rospy.Rate(100) # If idle, poll for a new user at 100 Hz
-        while not rospy.is_shutdown() :
-            if self.current_user is not None :
-                # We think there is a new user
-                self.lock.acquire()
+            print 'Acquired lock'   # DEBUG
+            if req.user_id not in self.started_users :
+                success = False
                 try :
-                    if self.current_user is not None :
-                        # Ideally this check is unnecessary but just in 
-                        # case assignments are not atomic
-                        logfile = None
-                        final_action_log = None
-                        logfile = LOGGING_PATH + self.current_user + '.txt'
-                        final_action_log = FINAL_ACTION_PATH + self.current_user + '.txt'
-                        self.u_in.logfile = logfile
-                        self.u_in.last_get = ''
-                        self.u_out.logfile = logfile
-                        self.pomdp_agent.lexical_addition_log = LEXICAL_ADDITION_LOG + '_pomdp.txt'
-                        self.static_agent.lexical_addition_log = LEXICAL_ADDITION_LOG + '_static.txt'
-                        
-                        # Randomly choose an agent
-                        r = numpy.random.random_sample()
-                        if r < 0.5 :   
-                            self.user_log.write(self.current_user + ',static\n')
-                            self.error_log.write(self.current_user + ',static\n') 
-                            self.static_agent.input = self.u_in
-                            self.static_agent.output = self.u_out
-                            self.run_static_dialog(final_action_log)
-                        else :
-                            self.user_log.write(self.current_user + ',pomdp\n')
-                            self.error_log.write(self.current_user + ',pomdp\n')
-                            self.pomdp_agent.input = self.u_in
-                            self.pomdp_agent.output = self.u_out
-                            self.run_pomdp_dialog(final_action_log)       
+                    self.handle_user(req.user_id)   
+                    print 'Returned'    # DEBUG
+                    self.started_users.add(req.user_id)     
+                    success = True
                 except KeyboardInterrupt, SystemExit :
-                    pass
+                    raise
                 except :
                     error = str(sys.exc_info()[0])
                     self.error_log.write(error + '\n')
@@ -397,41 +331,136 @@ class DialogueServer :
                     self.error_log.write(traceback.format_exc() + '\n\n\n')
                     self.error_log.flush()        
                 finally :
-                    self.current_user = None 
-                        # Free up for next user regardless of whether 
-                        # the dialogue finished or crashed
-                    self.lock.release()        
-                
-            user_poll_rate.sleep()
+                    self.lock.release()
+                    self.user_log.flush()
+                    self.error_log.flush()
+                    return success 
+            else :
+                self.lock.release()
+                self.user_log.flush()
+                self.error_log.write('Repeated user ID ' + req.user_id + '\n\n')
+                self.error_log.flush()
+                return False
+        else :
+            # The system is currently handling another user
+            print 'Could not acquire lock'  # DEBUG
+            self.user_log.flush()
+            self.error_log.write('Could not acquire lock\n\n')
+            self.error_log.flush()
+            return False
 
-    def run_static_dialog(self, final_action_log=None) :
-        self.u_out.say("How can I help?")
-        s = self.u_in.get()
-        if s == 'stop':
-            self.u_out.say("<END/>")
-            return
-        a = self.static_agent.initiate_dialog_to_get_action(s)
-        if a is not None :
-            response_generator = TemplateBasedGenerator()
-            self.u_out.say(response_generator.get_action_sentence(a, final_action_log) + ' Was this the right action?')
-            r = self.u_in.get()
-        #u_out.say("Happy to help!")
-        self.u_out.say("<END/>")
+    def handle_user(self, user_id) :
+        self.error_log.write('Handling user ' + str(user_id) + '\n')
+        self.error_log.flush()
+        text_log = MAIN_LOG_PATH + TEXT_LOG_PATH + user_id + '.txt'
         
-    def run_pomdp_dialog(self, final_action_log=None) :
-        self.pomdp_agent.final_action_log = final_action_log
-        self.pomdp_agent.first_turn = True
-        success = self.pomdp_agent.run_dialog()
-        #if not success :
-            #u_out.say("I'm sorry I could not help you.")
-        #else :
-            #u_out.say("Happy to help!")
-        self.u_out.say("<END/>")
+        u_in = InputFromService(user_id, self.error_log, text_log)
+        u_out = OutputToService(user_id, u_in, self.error_log, text_log)
+        try :
+            final_action_log = MAIN_LOG_PATH + FINAL_ACTION_PATH + user_id + '.txt'
+            log = MAIN_LOG_PATH + LOGGING_PATH + user_id + '.pkl'
+            error_log = MAIN_LOG_PATH + DIALOG_ERROR_LOG_PATH + user_id + '.txt'
+            
+            # Randomly choose an agent
+            r = numpy.random.random_sample()
+            if r < 1.0 / 3 :   
+                print 'Only parser learning'
+                self.user_log.write(user_id + ',only_parser\n')
+                self.error_log.write(user_id + ',only_parser\n') 
+                static_agent = self.create_static_dialog_agent()
+                static_agent.input = u_in
+                static_agent.output = u_out
+                static_agent.final_action_log = final_action_log
+                static_agent.dialog_objects_logfile = log
+                static_agent.log_header = 'only_parser_learning'
+                static_agent.error_log = open(error_log, 'a')
+                
+                dialog_thread = Thread(target=self.run_static_dialog, args=((static_agent,)))
+                dialog_thread.daemon = True
+                dialog_thread.start()
+            elif r < 2.0 / 3 :
+                print 'Only dialog learning'
+                self.user_log.write(user_id + ',only_dialog\n')
+                self.error_log.write(user_id + ',only_dialog\n')
+                pomdp_agent = self.create_pomdp_dialog_agent('only_dialog_parser')
+                pomdp_agent.input = u_in
+                pomdp_agent.output = u_out
+                pomdp_agent.final_action_log = final_action_log
+                pomdp_agent.dialog_objects_logfile = log
+                pomdp_agent.log_header = 'only_dialog_learning'
+                pomdp_agent.error_log = open(error_log, 'a')
+                
+                dialog_thread = Thread(target=self.run_pomdp_dialog, args=((pomdp_agent,)))
+                dialog_thread.daemon = True
+                dialog_thread.start()
+            else :
+                print 'Dialog and parser learning'
+                self.user_log.write(user_id + ',both\n')
+                self.error_log.write(user_id + ',both\n')
+                pomdp_agent = self.create_pomdp_dialog_agent('both_parser')
+                pomdp_agent.input = u_in
+                pomdp_agent.output = u_out
+                pomdp_agent.final_action_log = final_action_log
+                pomdp_agent.dialog_objects_logfile = log
+                pomdp_agent.log_header = 'both_parser_and_dialog_learning'
+                pomdp_agent.error_log = open(error_log, 'a')
+                
+                dialog_thread = Thread(target=self.run_pomdp_dialog, args=((pomdp_agent,)))
+                dialog_thread.daemon = True
+                dialog_thread.start()
+        except (KeyboardInterrupt, SystemExit) :
+            raise
+        except :
+            # Kill services
+            u_in.shutdown()
+            u_out.shutdown()
+            
+            error = str(sys.exc_info()[0])
+            self.error_log.write(error + '\n')
+            print traceback.format_exc()
+            self.error_log.write(traceback.format_exc() + '\n\n\n')
+            self.error_log.flush()
+
+    def launch(self) :
+        print 'Waiting for users...'
+        rospy.spin()
+
+    def run_static_dialog(self, agent) :
+        print 'Starting static agent...'
+        try :
+            agent.output.say("How can I help?")
+            s = agent.input.get()
+            if s == 'stop':
+               agent.output.say("<END/>")
+               return
+            a = agent.initiate_dialog_to_get_action(s)
+            agent.output.say("<END/>")
+        except KeyboardInterrupt, SystemExit :
+            pass
+        except :
+            error = str(sys.exc_info()[0])
+            self.error_log.write(error + '\n')
+            print traceback.format_exc()
+            self.error_log.write(traceback.format_exc() + '\n\n\n')
+            self.error_log.flush()  
+        
+    def run_pomdp_dialog(self, agent) :
+        print 'Starting POMDP agent ...'
+        try :
+            agent.first_turn = True
+            success = agent.run_dialog()
+            agent.output.say("<END/>")
+        except KeyboardInterrupt, SystemExit :
+            pass
+        except :
+            error = str(sys.exc_info()[0])
+            self.error_log.write(error + '\n')
+            print traceback.format_exc()
+            self.error_log.write(traceback.format_exc() + '\n\n\n')
+            self.error_log.flush()  
         
 def main(args) :        
-    server = DialogueServer()
-    server.init_static_dialog_agent(args)
-    server.init_pomdp_dialog_agent(args)
+    server = DialogueServer(args)
     server.launch()
 
 if __name__ == '__main__' :

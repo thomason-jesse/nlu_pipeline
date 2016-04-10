@@ -10,9 +10,9 @@ class TemplateBasedGenerator :
     def __init__(self) :
         self.init_room_str()
         self.init_person_str()
-        self.rooms = ['l3_516','l3_508','l3_512','l3_510','l3_402','l3_418','l3_420','l3_432','l3_502','l3_414b']
-        self.people = ['stacy', 'ray', 'peter', 'scott', 'dana', 'jivko', 'shiqi', 'jesse', 'aishwarya', 'rodolfo']
-    
+        self.rooms = self.room_str.keys()
+        self.people = self.person_str.keys()
+        
     def init_room_str(self) :
         self.room_str = dict()
         self.room_str['l3_404'] = '3404'

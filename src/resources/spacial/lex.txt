@@ -1,0 +1,47 @@
+#argument predicates
+facing :- I/N\N : lambda x:e.(lambda d:e.(orientation(x, d)))
+beside :- I/N\N : lambda x:e.(lambda y:e.(beside(x, y)))
+'s office :- I\N : lambda p:e.(the(lambda r:e.(and(office(r), knowinside(p, r)))))
+
+#prepositions
+for :- PP/N : lambda x:e.(x)
+of :- PP/N : lambda x:e.(x)
+in :- PP/N : lambda x:e.(x)
+about :- PP/N : lambda x:e.(x)
+
+#entity descriptor words
+#can be type-raised to N/N : lambda x:e.(pred(x))
+person :- DESC : person
+room :- DESC : room
+office :- DESC : office
+conference room :- DESC : conferenceroom
+kitchen :- DESC : kitchen
+restroom :- DESC : restroom
+lab :- DESC : lab
+small :- DESC : small_room
+large :- DESC : large_room
+water fountain :- DESC : water_fountain
+printer :- DESC : printer
+corridor :- DESC : corridor
+long :- DESC : long_corridor
+short :- DESC : short_corridor
+
+#closed category
+and :- I/I\I : lambda x:t.(lambda y:t.(and(x,y)))
+or :- I/I\I : lambda x:t.(lambda y:t.(or(x,y)))
+not :- I/I : lambda x:t.(not(x))
+the :- N/DESC : lambda P:<e,t>.(the(lambda x:e.(P(x))))
+the :- N/N : lambda P:<e,t>.(the(P))
+the :- N/N : lambda x:e.(x)
+a :- N/DESC : lambda P:<e,t>.(a(lambda x:e.(P(x))))
+a :- DESC/DESC : lambda P:<e,t>.(P)
+a :- N/N : lambda x:e.(x)
+
+#atoms
+north :- N : north
+east :- N : east
+south :- N : south
+west :- N : west
+peter :- N : peter
+ray :- N : ray
+dana :- N : dana

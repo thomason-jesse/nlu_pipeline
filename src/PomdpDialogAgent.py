@@ -1,6 +1,6 @@
 __author__ = 'aishwarya'
 
-import sys, random, math, copy, re, numpy, itertools
+import sys, random, math, copy, re, numpy, itertools, traceback
 from HISBeliefState import HISBeliefState
 from SummaryState import SummaryState
 from SystemAction import SystemAction
@@ -46,6 +46,7 @@ class PomdpDialogAgent(DialogAgent) :
         self.dialog_objects_logfile = None 
         self.dialog_objects_log = None
         self.cur_turn_log = None
+        self.log_header = 'pomdp'
         
     # Returns True if the dialog terminates on its own and False if the u
     # user entered stop
@@ -55,7 +56,7 @@ class PomdpDialogAgent(DialogAgent) :
         self.max_prob_user_utterances = list()
         self.dialog_objects_log = list()
         
-        print 'Belief state: ', str(self.state) 
+        print 'Belief state: ', str(self.state)     # DEBUG
         summary_state = SummaryState(self.state)
         (dialog_action, dialog_action_arg) = self.policy.get_initial_action(summary_state)    
         
@@ -66,11 +67,11 @@ class PomdpDialogAgent(DialogAgent) :
                 action = dialog_action_arg
                 output = self.response_generator.get_action_sentence(action, self.final_action_log)
                 self.output.say(output + " Was this the correct action?")
-                response = self.input.get().lower()  
+                response = self.get_user_input().lower()  
                 if response == '<ERROR/>' :
                     # Benefit of doubt - assume the action was correct
                     self.policy.update_final_reward(self.knowledge.correct_action_reward)
-                    complete_log_object = ('pomdp', self.dialog_objects_log, action, True, self.parser_train_data)
+                    complete_log_object = (self.log_header, self.dialog_objects_log, action, True, self.parser_train_data)
                     if self.dialog_objects_logfile is not None :
                         save_obj_general(complete_log_object, self.dialog_objects_logfile)
                     return False  
@@ -78,7 +79,7 @@ class PomdpDialogAgent(DialogAgent) :
                     self.policy.update_final_reward(self.knowledge.correct_action_reward)
                     self.cur_turn_log = ['take_action', None]
                     self.dialog_objects_log.append(self.cur_turn_log)
-                    complete_log_object = ('pomdp', self.dialog_objects_log, action, True, self.parser_train_data)
+                    complete_log_object = (self.log_header, self.dialog_objects_log, action, True, self.parser_train_data)
                     if self.dialog_objects_logfile is not None :
                         save_obj_general(complete_log_object, self.dialog_objects_logfile)
                     if self.retrain_parser :
@@ -86,7 +87,7 @@ class PomdpDialogAgent(DialogAgent) :
                 else :
                     self.cur_turn_log = ['take_action', None]
                     self.dialog_objects_log.append(self.cur_turn_log)
-                    complete_log_object = ('pomdp', self.dialog_objects_log, action, False, self.parser_train_data)
+                    complete_log_object = (self.log_header, self.dialog_objects_log, action, False, self.parser_train_data)
                     if self.dialog_objects_logfile is not None :
                         save_obj_general(complete_log_object, self.dialog_objects_logfile)
                     self.policy.update_final_reward(self.knowledge.wrong_action_reward)
@@ -94,18 +95,18 @@ class PomdpDialogAgent(DialogAgent) :
                 return True
             else :
                 self.previous_system_action = dialog_action_arg
-                print 'System action - '
-                print str(self.previous_system_action)
+                print 'System action - '    # DEBUG
+                print str(self.previous_system_action)  # DEBUG
                 # Take the dialog action
                 response = self.dialog_action_functions[self.dialog_actions.index(dialog_action)]()
                 self.cur_turn_log = [self.previous_system_action, response]
                 if response == '<ERROR/>' :
-                    complete_log_object = ('pomdp', self.dialog_objects_log, None, False, self.parser_train_data)
+                    complete_log_object = (self.log_header, self.dialog_objects_log, None, False, self.parser_train_data)
                     if self.dialog_objects_logfile is not None :
                         save_obj_general(complete_log_object, self.dialog_objects_logfile)
                     return False
                 if response == 'stop' :
-                    complete_log_object = ('pomdp', self.dialog_objects_log, None, False, self.parser_train_data)
+                    complete_log_object = (self.log_header, self.dialog_objects_log, None, False, self.parser_train_data)
                     if self.dialog_objects_logfile is not None :
                         save_obj_general(complete_log_object, self.dialog_objects_logfile)
                     self.policy.update_final_reward(self.knowledge.wrong_action_reward)
@@ -123,15 +124,37 @@ class PomdpDialogAgent(DialogAgent) :
                 #print 'dialog_action = ', dialog_action # DEBUG
                 #print str(dialog_action_arg)            # DEBUG
             self.first_turn = False
+
+    # A wrapper method to call self.input.get() that ensures that logs
+    # get saved if a timeout or stop error is raised
+    def get_user_input(self) :
+        try :
+            response = self.input.get()
+        except KeyboardInterrupt as e :
+            complete_log_object = (self.log_header, self.dialog_objects_log, None, False, self.parser_train_data)
+            if self.dialog_objects_logfile is not None :
+                save_obj_general(complete_log_object, self.dialog_objects_logfile)
+            raise e
+        except SystemExit as e :
+            complete_log_object = (self.log_header, self.dialog_objects_log, None, False, self.parser_train_data)
+            if self.dialog_objects_logfile is not None :
+                save_obj_general(complete_log_object, self.dialog_objects_logfile)
+            raise e
+        except RuntimeError as e :
+            complete_log_object = (self.log_header, self.dialog_objects_log, None, False, self.parser_train_data)
+            if self.dialog_objects_logfile is not None :
+                save_obj_general(complete_log_object, self.dialog_objects_logfile)
+            raise e
+        return response
         
     # Request the user to state/repeat their goal
     def request_user_initiative(self):
         if self.first_turn :
             self.previous_system_action.extra_data = ['first']
         output = self.response_generator.get_sentence(self.previous_system_action)
-        print 'output = ', output
+        print 'output = ', output   # DEBUG
         self.output.say(output)
-        response = self.input.get()
+        response = self.get_user_input()
         if 'full' in self.parser_train_data :
             self.parser_train_data['full'].append(response)
         else :
@@ -142,7 +165,7 @@ class PomdpDialogAgent(DialogAgent) :
     def request_missing_param(self):
         output = self.response_generator.get_sentence(self.previous_system_action)
         self.output.say(output)
-        response = self.input.get()
+        response = self.get_user_input()
         param_name = self.previous_system_action.extra_data[0]
         if param_name in self.parser_train_data :
             self.parser_train_data[param_name].append(response)
@@ -158,14 +181,14 @@ class PomdpDialogAgent(DialogAgent) :
         # Create an n-best list of Utterance objects along with probabiltiies 
         # obtained from their confidences
         self.get_n_best_utterances_from_parses(n_best_parses)
-        #print 'Created utterances'
+        #print 'Created utterances' # DEBUG
         
         if len(self.n_best_utterances) > 0 :
             # Update the belief state
             #print 'Previous system action - ', str(self.previous_system_action) # DEBUG
             #print 'Utterances - ', '\n'.join([str(utterance) for utterance in self.n_best_utterances])
             self.state.update(self.previous_system_action, self.n_best_utterances, self.grounder)
-            print 'Updated'
+            print 'Updated' # DEBUG
 
     # Confirm a (possibly partial) action
     def confirm_action(self):
@@ -173,7 +196,7 @@ class PomdpDialogAgent(DialogAgent) :
         # for now, just use a.name and a.params raw
         output = self.response_generator.get_sentence(self.previous_system_action)
         self.output.say(output)                        
-        response = self.input.get()
+        response = self.get_user_input()
         return response
 
     # Converts an object of type Action to type Utterance assuming it is
@@ -195,74 +218,87 @@ class PomdpDialogAgent(DialogAgent) :
 
     def create_utterances_of_parse(self, parse) :
         parse = parse.node
-        print 'In create_utterances_of_parse with', self.parser.print_parse(parse, show_category=True)
-        print '\n\n'
-        # First check if it is a confirmation or denial
-        if parse.idx == self.parser.ontology.preds.index('yes'):
-            #print 'Is affirm'
-            return [Utterance('affirm')]
-        elif parse.idx == self.parser.ontology.preds.index('no'):
-            #print 'Is deny'
-            return [Utterance('deny')]
-        elif parse.idx == self.parser.ontology.preds.index('none'):
-            #print 'Got a none response'
-            goal = self.previous_system_action.referring_goal
-            if self.previous_system_action.extra_data is not None and len(self.previous_system_action.extra_data) >= 1:
-                param_name = self.previous_system_action.extra_data[0]
+        top_level_category = self.parser.lexicon.categories[parse.category]
+        
+        #print 'In create_utterances_of_parse with', self.parser.print_parse(parse, show_category=True) # DEBUG
+        #print '\n\n'   # DEBUG
+
+        # Confirmation (affirm/deny/none)
+        if top_level_category == 'C' :
+            if parse.idx == self.parser.ontology.preds.index('yes'):
+                #print 'Is affirm'  # DEBUG
+                return [Utterance('affirm')]
+            elif parse.idx == self.parser.ontology.preds.index('no'):
+                #print 'Is deny'    # DEBUG
+                return [Utterance('deny')]
+            elif parse.idx == self.parser.ontology.preds.index('none'):
+                #print 'Got a none response'    # DEBUG
+                goal = self.previous_system_action.referring_goal
+                if self.previous_system_action.extra_data is not None and len(self.previous_system_action.extra_data) >= 1:
+                    param_name = self.previous_system_action.extra_data[0]
+                else :
+                    return []
+                params = dict()
+                params[param_name] = None
+                utterance = Utterance('inform_param', goal, params)      
+                #print '\n' # DEBUG
+                return [utterance]
             else :
                 return []
-            params = dict()
-            params[param_name] = None
-            utterance = Utterance('inform_param', goal, params)      
-            #print '\n'
-            return [utterance]
         
-        #print 'Neither affirm nor deny'
-        
-        # Now check if it a full inform - mentions goal and params
-        try:
-            #print 'Trying to get an action'
-            p_action = self.get_action_from_parse(parse)
-        except SystemError:
-            p_action = None
+        # Complete action with goal and params
+        elif top_level_category == 'M' :
+            try:
+                #print 'Trying to get an action'    # DEBUG
+                p_action = self.get_action_from_parse(parse)
+            except SystemError:
+                p_action = None
 
-        if p_action is not None :
-            #print 'Got an action. Will convert and return'
-            return [self.convert_action_to_utterance(p_action)]
-            
-        # Getting a complete action failed so assume this is a param  
-        if parse.is_lambda and parse.is_lambda_instantiation :
-            # Lambda headed parse - unlikely to give a valid param
-            # value
-            return []
-        #print 'Trying to ground as param value'
-        try :
-            #print "Grounding ", self.parser.print_parse(parse)
-            g = self.grounder.groundSemanticNode(parse, [], [], [])
-            answers = self.grounder.grounding_to_answer_set(g)
-            #print 'answers = ', answers
-            #print '--------------------------------'
-            utterances = []
-            if type(answers) == 'str' :
-                answers = [answers]
-            for answer in answers :
-                goal = self.previous_system_action.referring_goal
-                params = dict()
-                #print 'self.previous_system_action.extra_data = ', self.previous_system_action.extra_data
-                if self.previous_system_action.action_type == 'request_missing_param' and self.previous_system_action.extra_data is not None and len(self.previous_system_action.extra_data) == 1 :
-                    param_name = self.previous_system_action.extra_data[0]
-                    params[param_name] = answer
-                    utterance = Utterance('inform_param', goal, params)      
-                    utterances.append(utterance)
-                else :
-                    for param_name in self.knowledge.goal_params :
-                        params_copy = copy.deepcopy(params)
-                        params_copy[param_name] = answer
-                        utterance = Utterance('inform_param', goal, params_copy)      
+            if p_action is not None :
+                #print 'Got an action. Will convert and return' # DEBUG
+                return [self.convert_action_to_utterance(p_action)]
+            else :
+                return []
+        
+        # To be grounded as param value
+        elif top_level_category == 'NP' :
+            if parse.is_lambda and parse.is_lambda_instantiation :
+                # Lambda headed parse - unlikely to give a valid param
+                # value
+                return []
+            #print 'Trying to ground as param value'    # DEBUG
+            try :
+                #print "Grounding ", self.parser.print_parse(parse) # DEBUG
+                g = self.grounder.groundSemanticNode(parse, [], [], [])
+                answers = self.grounder.grounding_to_answer_set(g)
+                #print 'answers = ', answers    # DEBUG
+                #print '--------------------------------'   # DEBUG
+                utterances = []
+                if type(answers) == 'str' :
+                    answers = [answers]
+                for answer in answers :
+                    goal = self.previous_system_action.referring_goal
+                    params = dict()
+                    #print 'self.previous_system_action.extra_data = ', self.previous_system_action.extra_data  # DEBUG
+                    if self.previous_system_action.action_type == 'request_missing_param' and self.previous_system_action.extra_data is not None and len(self.previous_system_action.extra_data) == 1 :
+                        param_name = self.previous_system_action.extra_data[0]
+                        params[param_name] = answer
+                        utterance = Utterance('inform_param', goal, params)      
                         utterances.append(utterance)
-            return utterances
-        except TypeError as e :
-            print e.message
+                    else :
+                        for param_name in self.knowledge.goal_params :
+                            params_copy = copy.deepcopy(params)
+                            params_copy[param_name] = answer
+                            utterance = Utterance('inform_param', goal, params_copy)      
+                            utterances.append(utterance)
+                return utterances
+            except TypeError as e :
+                error = str(sys.exc_info()[0])
+                if self.error_log is not None :
+                    self.error_log.write(traceback.format_exc() + '\n\n\n')
+                    self.error_log.flush() 
+                print traceback.format_exc()
+                return []
 
     def remove_invalid_utterances(self, utterances, grounder) :
         invalid_utterances = set()
@@ -282,9 +318,9 @@ class PomdpDialogAgent(DialogAgent) :
             while j < len(utterances) :
                 u2 = utterances[j]
                 if u2.is_like(u) :
-                    #print '-------------------------'
-                    #print 'Merging \n', str(u), '\n', str(u2), '\n'
-                    #print '-------------------------'
+                    #print '-------------------------'  # DEBUG
+                    #print 'Merging \n', str(u), '\n', str(u2), '\n'    # DEBUG
+                    #print '-------------------------'  # DEBUG
                     u.parse_prob = add_log_probs(u.parse_prob, u2.parse_prob)
                     utterances.remove(u2)
                 else :
@@ -344,7 +380,7 @@ class PomdpDialogAgent(DialogAgent) :
                                         values[param_name].add(param_value)
                                     if len(values[param_name]) > 1 :
                                         diagreeing_params.add(param_name)
-                        #print 'diagreeing_params = ', diagreeing_params
+                        #print 'diagreeing_params = ', diagreeing_params    # DEBUG
                         if len(diagreeing_params) == 1 :
                             # There is exactly one param on whose value 
                             # these parses differ 
@@ -380,31 +416,36 @@ class PomdpDialogAgent(DialogAgent) :
             if utterances is not None and len(utterances) > 0:
                 for utterance in utterances :
                     utterance.parse = parse
-                    utterance.parse_prob = conf 
+                    utterance.parse_prob = conf - numpy.log(len(utterances))
                     self.n_best_utterances.append(utterance)
         
         # Clean up by removing duplicates and invalid utterances    
-        print 'Created utterances'
-        print '\n'.join([str(utterance) for utterance in self.n_best_utterances])
+        print 'Created utterances'  # DEBUG
+        print '\n'.join([str(utterance) for utterance in self.n_best_utterances])   # DEBUG
         self.n_best_utterances = self.merge_duplicate_utterances(self.n_best_utterances)   
-        print '\n\nMerged duplicates'
-        print '\n'.join([str(utterance) for utterance in self.n_best_utterances])
+        print '\n\nMerged duplicates'   # DEBUG
+        print '\n'.join([str(utterance) for utterance in self.n_best_utterances])   # DEBUG
         self.n_best_utterances = self.cluster_utterances(self.n_best_utterances)
-        print '\n\nClustered to identify unknown params'
-        print '\n'.join([str(utterance) for utterance in self.n_best_utterances])
+        print '\n\nClustered to identify unknown params'    # DEBUG
+        print '\n'.join([str(utterance) for utterance in self.n_best_utterances])   # DEBUG
         self.n_best_utterances = self.remove_invalid_utterances(self.n_best_utterances, self.grounder) 
-        print '\n\nRemoved invalid utterances'
-        print '\n'.join([str(utterance) for utterance in self.n_best_utterances])
+        print '\n\nRemoved invalid utterances'  # DEBUG
+        print '\n'.join([str(utterance) for utterance in self.n_best_utterances])   # DEBUG
         
         sum_log_prob = float('-inf')
         for utterance in self.n_best_utterances :
             sum_log_prob = add_log_probs(sum_log_prob, utterance.parse_prob)
 
         sum_prob = math.exp(sum_log_prob)
-        #print 'sum_prob = ', sum_prob
-        #print 'self.knowledge.min_obs_by_non_n_best_prob = ', self.knowledge.min_obs_by_non_n_best_prob
-        non_n_best_prob = max(self.knowledge.min_obs_by_non_n_best_prob, self.knowledge.max_obs_by_non_n_best_prob - sum_prob)
-        #print 'non_n_best_prob = ', non_n_best_prob
+        non_n_best_prob = 1.0 - sum_prob
+        if non_n_best_prob < self.knowledge.min_obs_by_non_n_best_prob :
+            non_n_best_prob = self.knowledge.min_obs_by_non_n_best_prob
+        elif non_n_best_prob > self.knowledge.max_obs_by_non_n_best_prob :
+            non_n_best_prob = self.knowledge.max_obs_by_non_n_best_prob 
+        print 'non_n_best_prob = ', non_n_best_prob
+        print 'self.knowledge.min_obs_by_non_n_best_prob = ', self.knowledge.min_obs_by_non_n_best_prob
+        print 'self.knowledge.max_obs_by_non_n_best_prob = ', self.knowledge.max_obs_by_non_n_best_prob
+        
         other_utterance = Utterance('-OTHER-', parse_prob=numpy.log(non_n_best_prob))
         self.n_best_utterances.append(other_utterance)
         sum_log_prob = add_log_probs(sum_log_prob, numpy.log(non_n_best_prob))
@@ -428,13 +469,13 @@ class PomdpDialogAgent(DialogAgent) :
             self.max_prob_user_utterances = list()    
         self.max_prob_user_utterances.append(max_prob_utterance)
         
-        #print '\nN best utterances : '
-        #print '\n'.join([str(utterance) for utterance in self.n_best_utterances])
+        #print '\nN best utterances : ' # DEBUG
+        #print '\n'.join([str(utterance) for utterance in self.n_best_utterances])  # DEBUG
 
     # Creates (text, denotation) pairs and retrains parser
     def train_parser_from_dialogue(self, final_action) :
-        print 'Lexicon - ', self.parser.lexicon.surface_forms
-        print 'self.parser_train_data = ', self.parser_train_data
+        #print 'Lexicon - ', self.parser.lexicon.surface_forms   # DEBUG
+        print 'self.parser_train_data = ', self.parser_train_data   # DEBUG
 
         # Learn correct values for each param name
         answers = dict()
@@ -444,7 +485,7 @@ class PomdpDialogAgent(DialogAgent) :
             # param in the final action
             answers[param_name] = final_action.params[idx]
         
-        print 'answers = ', answers
+        print 'answers = ', answers # DEBUG
         
         training_pairs = list()
         for key in self.parser_train_data :
@@ -482,7 +523,7 @@ class PomdpDialogAgent(DialogAgent) :
                 if self.is_parseable(command) :
                     training_pairs.append((command, parse))
                 
-        print 'training_pairs = \n', '\n'.join([command + ' - ' + self.parser.print_parse(parse) for (command, parse) in training_pairs])
+        print 'training_pairs = \n', '\n'.join([command + ' - ' + self.parser.print_parse(parse) for (command, parse) in training_pairs])   # DEBUG
         if len(training_pairs) >= 1 :
             self.parser.train_learner_on_semantic_forms(training_pairs)
         

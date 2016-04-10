@@ -54,12 +54,14 @@ class SemanticNode:
             self.return_type = candidate_type
 
     # copy attributes of the given SemanticNode into this one (essentially, clone the second into this space)
-    def copy_attributes(self, a, lambda_enumeration=0, preserve_parent=False, preserve_children=False):
+    def copy_attributes(self, a, lambda_enumeration=0, lambda_map=None, preserve_parent=False, preserve_children=False):
         self.set_category(a.category)
         self.type = a.type
         self.is_lambda = a.is_lambda
         self.idx = a.idx
         self.lambda_name = None if a.lambda_name is None else a.lambda_name + lambda_enumeration
+        if lambda_map is not None and self.lambda_name in lambda_map:
+            self.lambda_name = lambda_map[a.lambda_name]
         self.is_lambda_instantiation = a.is_lambda_instantiation
         if not preserve_parent:
             self.parent = a.parent
@@ -69,7 +71,8 @@ class SemanticNode:
             else:
                 self.children = [SemanticNode(self, 0, 0, False, 0) for _ in range(0, len(a.children))]
                 for i in range(0, len(a.children)):
-                    self.children[i].copy_attributes(a.children[i], lambda_enumeration, preserve_parent=True)
+                    self.children[i].copy_attributes(a.children[i], lambda_enumeration=lambda_enumeration,
+                                                     lambda_map=lambda_map, preserve_parent=True)
         self.return_type = a.return_type
 
     def print_little(self):

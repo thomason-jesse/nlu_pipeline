@@ -1,0 +1,11 @@
+an office that faces a kitchen
+I : a(lambda x:e.(and(office(x), orientation(x, a(lambda k:e.(kitchen(k)))))))
+
+an office that is beside peter 's office
+I : a(lambda x:e.(and(office(x), beside(x, the(lambda y:e.(and(office(y), knowinside(peter, y))))))))
+
+a conference room that is near a kitchen and ray 's office
+I : a(lambda x:e.(and(conferenceroom(x), and(beside(the(lambda y:e.(and(office(y), knowinside(ray, y)))), x), beside(a(lambda y:e.(kitchen(y))), x)))))
+
+an office at the end of a long corridor beside a lab
+I : a(lambda x:e.(and(office(x), and(beside(a(lambda c:e.(and(corridor(c), long_corridor(c)))), x), beside(a(lambda l:e.(lab(l))), x)))))
