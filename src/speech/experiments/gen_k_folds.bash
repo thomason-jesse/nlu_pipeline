@@ -36,6 +36,7 @@ for i in $( ls $SPEECH_PATH ); do
 
 	#Inserts elemtn into fold using symbolic link.
 	ln -s $CURRENT_DIR/$SPEECH_PATH/$i $CURRENT_DIR/$K_SET_PATH/$FOLD_NUM/
+	rm $CURRENT_DIR/$K_SET_PATH/$FOLD_NUM/$i/$i
 	
 	#Increments NUM_IN_FOLD
 	NUM_IN_FOLD=$(($NUM_IN_FOLD + 1))
