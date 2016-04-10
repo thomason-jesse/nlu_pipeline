@@ -57,6 +57,10 @@
     var conv_publishing = false;
     var seq_no = 0;
     
+    var understanding_walk_selection = -1;
+    var understanding_bring_selection = -1;
+    var understanding_search_selection = -1;
+    
     // Global variables for subscriber
     var subscriber_prev_msg = null;
     
@@ -455,32 +459,32 @@
 	
     
     function submitUnderstanding(form) {
-        var walk_selection = -1;
+        understanding_walk_selection = -1;
 		for (var i = 0; i < form.walk.length; i++) {
 			if (form.walk[i].checked)
 			{
-				walk_selection = i;
+				understanding_walk_selection = i;
 				break;
 			}
 		}
-		var bring_selection = -1;
+		understanding_bring_selection = -1;
 		for (var i = 0; i < form.bring.length; i++) {
 			if (form.bring[i].checked)
 			{
-				bring_selection = i;
+				understanding_bring_selection = i;
 				break;
 			}
 		}
-		var search_selection = -1;
+		understanding_search_selection = -1;
 		for (var i = 0; i < form.search.length; i++) {
 			if (form.search[i].checked)
 			{
-				search_selection = i;
+				understanding_search_selection = i;
 				break;
 			}
 		}
         
-        if (!(walk_selection == 0 && bring_selection == 1 && search_selection == 2)) {
+        if (!(understanding_walk_selection == 0 && understanding_bring_selection == 1 && understanding_search_selection == 2)) {
             alert('You do not seem to have understood the prompts correctly. You may proceed with the HIT but please be warned that your HIT will be invalidated if it appears that you have not understood the task to be instructed. ');
         }
         
@@ -558,7 +562,7 @@
 		//submit php request
 		getRequest(
 		  'submit_survey.php', // URL for the PHP file
-		  'user_id='.concat(user_id).concat('&easy=').concat(easy_selection).concat('&understand=').concat(understand_selection).concat('&delays=').concat(delays_selection).concat('&sensible=').concat(sensible_selection).concat('&conv_long=').concat(conv_long_selection).concat('&comment=').concat(comment_text), // parameters for PHP
+		  'user_id='.concat(user_id).concat('&easy=').concat(easy_selection).concat('&understand=').concat(understand_selection).concat('&delays=').concat(delays_selection).concat('&sensible=').concat(sensible_selection).concat('&conv_long=').concat(conv_long_selection).concat('&understanding_walk=').concat(understanding_walk_selection).concat('&understanding_bring=').concat(understanding_bring_selection).concat('&understanding_search=').concat(understanding_search_selection).concat('&comment=').concat(comment_text), // parameters for PHP
 		   submitSurveyOutput,  // handle successful request
 		   submitSurveyError    // handle error
 		);

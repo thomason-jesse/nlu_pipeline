@@ -1,0 +1,119 @@
+Error when training on file :/u/aish/Documents/Research/AMT_results/Batch2/corrected_pickle_logs/57004dc372f6b_main.pklTraceback (most recent call last):
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 255, in train_parser_from_new_logs
+    per_file_training_pairs = self.create_retraining_pairs(log[2], log[4])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 481, in create_retraining_pairs
+    goal = final_action.name
+AttributeError: 'NoneType' object has no attribute 'name'
+
+
+
+Error when training on file :/u/aish/Documents/Research/AMT_results/Batch2/corrected_pickle_logs/57004dc372f6b_main.pklTraceback (most recent call last):
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 255, in train_parser_from_new_logs
+    per_file_training_pairs = self.create_retraining_pairs(log[2], log[4])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 481, in create_retraining_pairs
+    goal = final_action.name
+AttributeError: 'NoneType' object has no attribute 'name'
+
+
+
+Error when training on file :/u/aish/Documents/Research/AMT_results/Batch2/corrected_pickle_logs/57004dc372f6b_main.pklTraceback (most recent call last):
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 255, in train_parser_from_new_logs
+    per_file_training_pairs = self.create_retraining_pairs(log[2], log[4])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 481, in create_retraining_pairs
+    goal = final_action.name
+AttributeError: 'NoneType' object has no attribute 'name'
+
+
+
+Error when training on file :/u/aish/Documents/Research/AMT_results/Batch2/corrected_pickle_logs/57007380aaf3f_main.pklTraceback (most recent call last):
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 255, in train_parser_from_new_logs
+    per_file_training_pairs = self.create_retraining_pairs(log[2], log[4])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 481, in create_retraining_pairs
+    goal = final_action.name
+AttributeError: 'NoneType' object has no attribute 'name'
+
+
+
+Error when training on file :/u/aish/Documents/Research/AMT_results/Batch2/corrected_pickle_logs/5700364b9b525_main.pklTraceback (most recent call last):
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 255, in train_parser_from_new_logs
+    per_file_training_pairs = self.create_retraining_pairs(log[2], log[4])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 481, in create_retraining_pairs
+    goal = final_action.name
+AttributeError: 'NoneType' object has no attribute 'name'
+
+
+
+Error when training on file :/u/aish/Documents/Research/AMT_results/Batch2/corrected_pickle_logs/570037c8d01bf_main.pklTraceback (most recent call last):
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 255, in train_parser_from_new_logs
+    per_file_training_pairs = self.create_retraining_pairs(log[2], log[4])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 507, in create_retraining_pairs
+    action = self.get_action_from_parse(parse.node)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/DialogAgent.py", line 345, in get_action_from_parse
+    g = self.grounder.groundSemanticNode(arg, [], [], [])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 87, in groundSemanticNode
+    child_grounds.append(self.groundSemanticNode(c, lambda_names, lambda_types, lambda_assignments))
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 56, in groundSemanticNode
+    grounding_results = self.groundSemanticNode(root.children[0], new_names, new_types, new_assignments)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 108, in groundSemanticNode
+    satisfied = self.grounding_to_answer_set(child_grounds[0][child_ground_idx[0]])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 36, in grounding_to_answer_set
+    return [gr[1] for gr in g]
+IndexError: list index out of range
+
+
+
+Error when training on file :/u/aish/Documents/Research/AMT_results/Batch2/corrected_pickle_logs/57004dc372f6b_main.pklTraceback (most recent call last):
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 255, in train_parser_from_new_logs
+    per_file_training_pairs = self.create_retraining_pairs(log[2], log[4])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 481, in create_retraining_pairs
+    goal = final_action.name
+AttributeError: 'NoneType' object has no attribute 'name'
+
+
+
+Error when training on file :/u/aish/Documents/Research/AMT_results/Batch2/corrected_pickle_logs/57007380aaf3f_main.pklTraceback (most recent call last):
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 255, in train_parser_from_new_logs
+    per_file_training_pairs = self.create_retraining_pairs(log[2], log[4])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 481, in create_retraining_pairs
+    goal = final_action.name
+AttributeError: 'NoneType' object has no attribute 'name'
+
+
+
+Error when training on file :/u/aish/Documents/Research/AMT_results/Batch2/corrected_pickle_logs/5700364b9b525_main.pklTraceback (most recent call last):
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 255, in train_parser_from_new_logs
+    per_file_training_pairs = self.create_retraining_pairs(log[2], log[4])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 481, in create_retraining_pairs
+    goal = final_action.name
+AttributeError: 'NoneType' object has no attribute 'name'
+
+
+
+Error when training on file :/u/aish/Documents/Research/AMT_results/Batch2/corrected_pickle_logs/570037c8d01bf_main.pklTraceback (most recent call last):
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 255, in train_parser_from_new_logs
+    per_file_training_pairs = self.create_retraining_pairs(log[2], log[4])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 507, in create_retraining_pairs
+    action = self.get_action_from_parse(parse.node)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/DialogAgent.py", line 345, in get_action_from_parse
+    g = self.grounder.groundSemanticNode(arg, [], [], [])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 87, in groundSemanticNode
+    child_grounds.append(self.groundSemanticNode(c, lambda_names, lambda_types, lambda_assignments))
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 56, in groundSemanticNode
+    grounding_results = self.groundSemanticNode(root.children[0], new_names, new_types, new_assignments)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 108, in groundSemanticNode
+    satisfied = self.grounding_to_answer_set(child_grounds[0][child_ground_idx[0]])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 36, in grounding_to_answer_set
+    return [gr[1] for gr in g]
+IndexError: list index out of range
+
+
+
+Error when training on file :/u/aish/Documents/Research/AMT_results/Batch2/corrected_pickle_logs/57004dc372f6b_main.pklTraceback (most recent call last):
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 255, in train_parser_from_new_logs
+    per_file_training_pairs = self.create_retraining_pairs(log[2], log[4])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 481, in create_retraining_pairs
+    goal = final_action.name
+AttributeError: 'NoneType' object has no attribute 'name'
+
+
+

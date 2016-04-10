@@ -33,6 +33,24 @@ if (!isset($_POST['comment']))
 	die("FAILED\nno comment survey response posted");
 }
 
+$understanding_walk = -1;
+if (isset($_POST['understanding_walk']))
+{
+	$understanding_walk = $_POST['understanding_walk'];
+}
+
+$understanding_bring = -1;
+if (isset($_POST['understanding_bring']))
+{
+	$understanding_bring = $_POST['understanding_bring'];
+}
+
+$understanding_search = -1;
+if (isset($_POST['understanding_search']))
+{
+	$understanding_search = $_POST['understanding_search'];
+}
+
 //$path_to_log = '../../Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/log/';
 //$path_to_log_special = '../../Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/log_special/';
 //$path_to_executed_action = '../../Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/executed_action/';
@@ -182,7 +200,7 @@ $mturk_code = $user_id."_".substr(sha1("rlg_salted_hash".$user_id),0,13).chr($or
 
 // Write Mturk code to file
 $input_file = fopen('codes/'.$user_id.'.txt', 'w');
-$file_output = $user_id.','.(int)$task_success.','.$failure_reason.','.$mturk_code;
+$file_output = $user_id.','.(int)$task_success.','.$failure_reason.','.$mturk_code.','.$understanding_walk.','.$understanding_bring.','.$understanding_search;
 fwrite($input_file, $file_output);
 fclose($input_file);
 
@@ -190,6 +208,9 @@ fclose($input_file);
 //$output = $output."<p>task_success = ".(int)$task_success."</p>";
 //$output = $output."<p>failure reason = ".$failure_reason."</p>";
 $output = $output."</p>"."<p>Thank you for your participation!</p><p>Copy the code below, return to Mechanical Turk, and enter it to receive payment:<br/>".$mturk_code."</p>";
+//$output = $output.'understanding_walk = '.$understanding_walk.'<br/>';
+//$output = $output.'understanding_bring = '.$understanding_bring.'<br/>';
+//$output = $output.'understanding_search = '.$understanding_search.'<br/>';
 //$output = "<p>Thank you for your participation!</p>";
 echo $output
 ?>

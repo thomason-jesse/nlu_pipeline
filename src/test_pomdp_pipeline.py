@@ -63,7 +63,7 @@ grounder = KBGrounder.KBGrounder(ont)
 #if not converged:
     #raise AssertionError("Training failed to converge to correct values.")
 #save_model(parser, 'parser')
-parser = load_model('parsers/parser_1500')
+parser = load_model('both_parser')
 
 # Set parser hyperparams to best known values for test time
 parser.max_multiword_expression = 2  # max span of a multi-word expression to be considered during tokenization
@@ -81,7 +81,7 @@ u_out = OutputToStdout()
 
 knowledge = Knowledge()
 #policy = PomdpKtdqPolicy(knowledge, False)
-policy = load_model('ktdq_policy')
+policy = load_model('both_policy')
 policy.untrained = False
 policy.training = False
 A = PomdpDialogAgent(parser, grounder, policy, u_in, u_out)

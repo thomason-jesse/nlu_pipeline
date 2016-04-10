@@ -34,7 +34,7 @@ def load_obj_general(name):
 def load_model(name, path=models_path):
     try:
         print os.path.join(path, str(name) + '.pkl')  # DEBUG
-        with open(os.path.join(path, str(name) + '.pkl'), 'r') as f:
+        with open(os.path.join(path, str(name) + '.pkl'), 'rb') as f:
             return pickle.load(f)
     except IOError:
         return None

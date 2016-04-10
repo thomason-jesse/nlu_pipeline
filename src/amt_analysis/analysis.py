@@ -3,11 +3,11 @@ from os import listdir
 from os.path import isfile, join, isdir
 sys.path.append('../')
 
-path_to_batch = '/u/aish/Documents/Research/AMT_results/Batch2/'
+path_to_batch = '/u/aish/Documents/Research/AMT_results/Batch3/'
 
 def move_to_invalid(rejected_user_ids) :
     src_path = path_to_batch + 'completed/'
-    dst_path = path_to_batch + 'invalid/'
+    dst_path = path_to_batch + 'rejected/'
     for user_id in rejected_user_ids :
         if isfile(src_path + 'codes/' + user_id + '.txt') :
             shutil.move(src_path + 'codes/' + user_id + '.txt', dst_path + 'codes/' + user_id + '.txt')
@@ -46,6 +46,7 @@ def get_ids_with_codes() :
 def collate_results() :
     ids_with_codes = get_ids_with_codes()
     log_path = path_to_batch + 'completed/log/'
+    log_text_path = path_to_batch + 'completed/log_text/'
     #log_path = path_to_batch + 'corrected_pickle_logs/'
     survey_path = path_to_batch + 'completed/surveys/'
     
@@ -54,7 +55,7 @@ def collate_results() :
     file_handle = open(filename, 'w')
     writer = csv.writer(file_handle, delimiter=',')
     
-    header = ["user_id", "code", "agent_type", "performed_action", "correct_action", "task_easy", "robot_understood", "robot_delayed", "asked_sensible_questions", "conversation_too_long", "comment"]
+    header = ["user_id", "code", "agent_type", "performed_action", "correct_action", "task_easy", "robot_understood", "robot_delayed", "asked_sensible_questions", "conversation_too_long", "dialog_length", "comment"]
     writer.writerow(header)
     
     for (user_id, code) in ids_with_codes.items() :
@@ -73,11 +74,59 @@ def collate_results() :
             else :
                 comment = comment + line 
             lineno += 1
+        
+        log_text_handle = open(log_text_path + user_id + '_main.txt', 'r')
+        log_text = log_text_handle.read()
+        length = len(log_text.split('\n'))
+        row = row + [length] 
+        
         comment = re.sub('\n', ' ', comment)
         row = row + [comment] 
         writer.writerow(row)
         
     file_handle.close()
+
+def collate_results_corrected() :
+    ids_with_codes = get_ids_with_codes()
+    log_text_path = path_to_batch + 'completed/log_text/'
+    log_path = path_to_batch + 'corrected_pickle_logs/'
+    survey_path = path_to_batch + 'completed/surveys/'
+    
+    filename = path_to_batch + 'results_corrected.csv'
+    file_handle = open(filename, 'w')
+    writer = csv.writer(file_handle, delimiter=',')
+    
+    header = ["user_id", "code", "agent_type", "performed_action", "correct_action", "task_easy", "robot_understood", "robot_delayed", "asked_sensible_questions", "conversation_too_long", "dialog_length", "comment"]
+    writer.writerow(header)
+    
+    for (user_id, code) in ids_with_codes.items() :
+        log_file_handle = open(log_path + user_id + '_main.pkl', 'rb')
+        log = pickle.load(log_file_handle)
+        row = [user_id, code, log[0], int(log[2] != None), int(log[3])]
+        survey_file_handle = open(survey_path + user_id + '.txt', 'r')
+        lineno = 0
+        comment = ''
+        for line in survey_file_handle :
+            line = line.strip()
+            if lineno == 0 :
+                row = row + line.strip().split(',')
+            elif lineno == 1 :
+                comment = line 
+            else :
+                comment = comment + line 
+            lineno += 1
+        
+        log_text_handle = open(log_text_path + user_id + '_main.txt', 'r')
+        log_text = log_text_handle.read()
+        length = len(log_text.split('\n'))
+        row = row + [length] 
+        
+        comment = re.sub('\n', ' ', comment)
+        row = row + [comment] 
+        writer.writerow(row)
+        
+    file_handle.close()
+
     
 def summarize_results_by_agent_type() :
     results_file = open(path_to_batch + 'results.csv', 'r')
@@ -119,6 +168,46 @@ def summarize_results_by_agent_type() :
     
     file_handle.close()
 
+def summarize_results_by_agent_type_corrected() :
+    results_file = open(path_to_batch + 'results_corrected.csv', 'r')
+    reader = csv.reader(results_file, delimiter=',')
+    sums = dict()
+    num_rows = dict()
+    cols_to_ignore = header = ["user_id", "code", "agent_type", "comment"]
+    header = reader.next()
+    type_idx = header.index("agent_type")
+    for row in reader :
+        agent_type = row[type_idx]
+        if agent_type not in sums :
+            sums[agent_type] = dict()
+        if agent_type not in num_rows :
+            num_rows[agent_type] = 0
+        num_rows[agent_type] = num_rows[agent_type] + 1
+        for (idx, col) in enumerate(header) :
+            if col not in cols_to_ignore :
+                if col not in sums[agent_type] :
+                    sums[agent_type][col] = 0
+                sums[agent_type][col] = sums[agent_type][col] + int(row[idx])
+    
+    filename = path_to_batch + 'summary_corrected.csv'
+    file_handle = open(filename, 'w')
+    writer = csv.writer(file_handle, delimiter=',')
+    
+    write_header = ['agent_type'] + [col for col in header if col not in cols_to_ignore]
+    writer.writerow(write_header)
+    print write_header
+    for agent_type in sums.keys() :
+        row = [agent_type]
+        for col in write_header[1:] :
+            avg = float(sums[agent_type][col]) / num_rows[agent_type]
+            avg = round(avg, 2)
+            row.append(avg)
+        print row
+        writer.writerow(row)
+    
+    file_handle.close()
+
+
 def compare_task_completion() :
     results = open(path_to_batch + 'results.csv', 'r')
     results_reader = csv.reader(results, delimiter=',')
@@ -157,8 +246,10 @@ def compare_task_completion() :
     file_handle.close()
     
 if __name__ == '__main__' :
-    #rejected_user_ids = ['570035b019054', '57004088a360a']
-    #move_to_invalid(rejected_user_ids)
-    #collate_results()
-    #summarize_results_by_agent_type()
-    compare_task_completion()
+    rejected_user_ids = ['57053c209db61', '57053619b608', '5705fd9cb9fcb', '5705f87f0b3ab', '5706076b544b5', '5705343360d6a', '570538488b7f5']
+    move_to_invalid(rejected_user_ids)
+    collate_results()
+    summarize_results_by_agent_type()
+    collate_results_corrected()
+    summarize_results_by_agent_type_corrected()
+    #compare_task_completion()

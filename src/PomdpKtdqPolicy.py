@@ -246,6 +246,7 @@ class PomdpKtdqPolicy(AbstractPolicy) :
     
     # Train on a single example (b, a, b', r)
     def train(self, b, a, b_prime, r) :
+        #print 'In train'
         #print 'theta = ', self.theta
         #print 'P = ', self.P
         #raw_input()
@@ -273,16 +274,16 @@ class PomdpKtdqPolicy(AbstractPolicy) :
                     if q > max_q :
                         max_q = q
                 f = self.get_feature_vector(b, a)        
-                r_j -= self.gamma * max_q
+                r_j = r_j - self.gamma * max_q
             
-            r_hat += r_j * w[j]
+            r_hat = r_hat + r_j * w[j]
 
             if j == 0 :
-                P_r += (w[j] + 1 - (self.alpha ** 2) + self.beta) * (r_j - r_hat) * (r_j - r_hat)
-                P_theta_r += ((w[j] + 1 - (self.alpha ** 2) + self.beta) * (r_j - r_hat)) * (theta[j] - self.theta)
+                P_r = P_r + (w[j] + 1 - (self.alpha ** 2) + self.beta) * (r_j - r_hat) * (r_j - r_hat)
+                P_theta_r = P_theta_r + ((w[j] + 1 - (self.alpha ** 2) + self.beta) * (r_j - r_hat)) * (theta[j] - self.theta)
             else :
-                P_r += w[j] * (r_j - r_hat) * (r_j - r_hat)
-                P_theta_r += (w[j] * (r_j - r_hat)) * (theta[j] - self.theta)
+                P_r = P_r + w[j] * (r_j - r_hat) * (r_j - r_hat)
+                P_theta_r = P_theta_r + (w[j] * (r_j - r_hat)) * (theta[j] - self.theta)
         
         #print 'P_r = ', P_r
         #raw_input()
@@ -292,9 +293,11 @@ class PomdpKtdqPolicy(AbstractPolicy) :
         K = (1.0 / P_r) * P_theta_r
         #print 'K = ', K
         #raw_input()
-        self.theta += K * (r - r_hat)
-        self.P -= P_r * (K * K.T)
-        #print 'theta = ', self.theta
+        old_theta = self.theta
+        self.theta = self.theta + K * (r - r_hat)
+        self.P = self.P - P_r * (K * K.T)
+        #print 'theta_diff = ', numpy.sum(numpy.absolute(K * (r - r_hat)))
+        #print 'theta_diff = ', numpy.sum(numpy.absolute(old_theta - self.theta))
         #raw_input()
         #print 'P = ', self.P
         #raw_input()

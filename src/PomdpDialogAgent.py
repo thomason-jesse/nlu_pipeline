@@ -65,6 +65,14 @@ class PomdpDialogAgent(DialogAgent) :
             if dialog_action == 'take_action' :
                 # Submit the action given by the policy
                 action = dialog_action_arg
+                if action is None :
+                    self.cur_turn_log = ['take_action', None]
+                    self.dialog_objects_log.append(self.cur_turn_log)
+                    complete_log_object = (self.log_header, self.dialog_objects_log, action, False, self.parser_train_data)
+                    if self.dialog_objects_logfile is not None :
+                        save_obj_general(complete_log_object, self.dialog_objects_logfile)
+                    self.policy.update_final_reward(self.knowledge.wrong_action_reward)
+                    return False
                 output = self.response_generator.get_action_sentence(action, self.final_action_log)
                 self.output.say(output + " Was this the correct action?")
                 response = self.get_user_input().lower()  
@@ -472,10 +480,9 @@ class PomdpDialogAgent(DialogAgent) :
         #print '\nN best utterances : ' # DEBUG
         #print '\n'.join([str(utterance) for utterance in self.n_best_utterances])  # DEBUG
 
-    # Creates (text, denotation) pairs and retrains parser
-    def train_parser_from_dialogue(self, final_action) :
+    def create_retraining_pairs(self, final_action, parser_train_data) :
         #print 'Lexicon - ', self.parser.lexicon.surface_forms   # DEBUG
-        print 'self.parser_train_data = ', self.parser_train_data   # DEBUG
+        print 'parser_train_data = ', parser_train_data   # DEBUG
 
         # Learn correct values for each param name
         answers = dict()
@@ -488,13 +495,13 @@ class PomdpDialogAgent(DialogAgent) :
         print 'answers = ', answers # DEBUG
         
         training_pairs = list()
-        for key in self.parser_train_data :
+        for key in parser_train_data :
             if key in answers :
                 ccg = self.parser.lexicon.read_category_from_str('NP')
                 form = self.parser.lexicon.read_semantic_form_from_str(answers[key], None, None, [],
                                                                 allow_expanding_ont=False)
                 form.category = ccg
-                for item in self.parser_train_data[key] :
+                for item in parser_train_data[key] :
                     training_pairs.append((item, form))
 
         # Retrain parser
@@ -502,7 +509,7 @@ class PomdpDialogAgent(DialogAgent) :
         # parses. Try to ground each one as an action and see if it 
         # matches the desired action. If so, retrain with that parse.
         valid_semantic_forms = list()
-        for command in self.parser_train_data['full'] :
+        for command in parser_train_data['full'] :
             parses = self.get_n_best_parses(command, self.max_parses_examined_in_retraining) 
             for (parse, conf) in parses :
                 action = self.get_action_from_parse(parse.node)
@@ -511,17 +518,23 @@ class PomdpDialogAgent(DialogAgent) :
         
         # Heuristic - Convert the action str into a semantic node if
         # no parse was successful
-        if len(self.parser_train_data['full']) > 0 and len(valid_semantic_forms) == 0 :
+        if len(parser_train_data['full']) > 0 and len(valid_semantic_forms) == 0 :
             ccg = self.parser.lexicon.read_category_from_str('M')
             form = self.parser.lexicon.read_semantic_form_from_str(str(final_action), None, None, [],
                                                             allow_expanding_ont=False)
             form.category = ccg
             valid_semantic_forms.append(form)
                     
-        for command in self.parser_train_data['full'] :
+        for command in parser_train_data['full'] :
             for parse in valid_semantic_forms :
                 if self.is_parseable(command) :
                     training_pairs.append((command, parse))
+        
+        return training_pairs
+
+    # Creates (text, denotation) pairs and retrains parser
+    def train_parser_from_dialogue(self, final_action) :
+        training_pairs = self.create_training_pairs(final_action, self.parser_train_data)
                 
         print 'training_pairs = \n', '\n'.join([command + ' - ' + self.parser.print_parse(parse) for (command, parse) in training_pairs])   # DEBUG
         if len(training_pairs) >= 1 :

@@ -7,6 +7,7 @@ import Lexicon
 import KBGrounder
 import CKYParser
 import numpy, re
+from threading import Thread 
 
 from Knowledge import Knowledge
 from PomdpKtdqPolicy import PomdpKtdqPolicy
@@ -30,76 +31,53 @@ def create_trainer(parser_file, policy_file) :
 
     knowledge = Knowledge()
     policy = load_model(policy_file)
-    trainer = PomdpTrainer(parser, grounder, policy, param_mapping_file, vocab_mapping_file)
+    trainer = PomdpTrainer(parser, grounder, policy)
     return trainer
 
-def train_only_parser(trainer, max_iterations=10, convergence_threshold=0.1)
-    logs_dir = '/u/aish/Documents/Research/AMT_results/Batch2/corrected_pickle_logs/'
+def train_policy(trainer, relevant_log_type, policy_save_file, max_iterations=10, convergence_threshold=numpy.exp(-21.0)) :
+    print 'In train_policy : ', relevant_log_type
+    logs_dir = '/u/aish/Documents/Research/AMT_results/Batch1/corrected_pickle_logs/'
     theta = trainer.policy.theta
     P = trainer.policy.P
     
     for i in range(0, max_iterations) :
-        train_from_new_logs(logs_dir, True, False, 'retraining/only_parser_policy', 'retraining/only_parser_parser') 
-        save_model(trainer.parser, 'retraining/batch' + i + '_only_parser_parser')
-        save_model(trainer.policy, 'retraining/batch' + i + '_only_parser_policy')
+        trainer.train_policy_from_new_logs(logs_dir, relevant_log_type, policy_save_file)
+        save_model(trainer.policy, 'retraining/batch' + str(i) + '_' + relevant_log_type)
         new_theta = trainer.policy.theta
         new_P = trainer.policy.P
         theta_diff = numpy.sum(numpy.absolute(new_theta - theta))
         P_diff = numpy.sum(numpy.absolute(new_P - P))
-        if theta_diff < convergence_threshold and P_diff < convergence_threshold :
-            break
-            
-def train_only_dialog(trainer, max_iterations=10, convergence_threshold=0.1)
-    logs_dir = '/u/aish/Documents/Research/AMT_results/Batch2/corrected_pickle_logs/'
-    theta = trainer.policy.theta
-    P = trainer.policy.P
-    
-    for i in range(0, max_iterations) :
-        train_from_new_logs(logs_dir, False, True, 'retraining/only_dialog_policy', 'retraining/only_dialog_parser') 
-        save_model(trainer.parser, 'retraining/batch' + i + '_only_dialog_parser')
-        save_model(trainer.policy, 'retraining/batch' + i + '_only_dialog_policy')
-        new_theta = trainer.policy.theta
-        new_P = trainer.policy.P
-        theta_diff = numpy.sum(numpy.absolute(new_theta - theta))
-        P_diff = numpy.sum(numpy.absolute(new_P - P))
-        if theta_diff < convergence_threshold and P_diff < convergence_threshold :
-            break
-            
-def train_both(trainer, max_iterations=10, convergence_threshold=0.1)
-    logs_dir = '/u/aish/Documents/Research/AMT_results/Batch2/corrected_pickle_logs/'
-    theta = trainer.policy.theta
-    P = trainer.policy.P
-    
-    for i in range(0, max_iterations) :
-        train_from_new_logs(logs_dir, True, True, 'retraining/both_policy', 'retraining/both_parser') 
-        save_model(trainer.parser, 'retraining/batch' + i + '_both_parser')
-        save_model(trainer.policy, 'retraining/batch' + i + '_both_policy')
-        new_theta = trainer.policy.theta
-        new_P = trainer.policy.P
-        theta_diff = numpy.sum(numpy.absolute(new_theta - theta))
-        P_diff = numpy.sum(numpy.absolute(new_P - P))
+        print relevant_log_type, ' : theta_diff = ', theta_diff, 'P_diff = ', P_diff
         if theta_diff < convergence_threshold and P_diff < convergence_threshold :
             break
 
+    print "Terminated in iteration ", i
+
+
 def main() :
+    logs_dir = '/u/aish/Documents/Research/AMT_results/Batch1/corrected_pickle_logs/'
     only_parser_trainer = create_trainer('only_parser_parser', 'only_parser_policy')
-    only_parser_thread = Thread(target=train_only_parser, args=(only_parser_trainer,))
-    only_parser_thread.daemon = True
-    only_parser_thread.start()
+    only_parser_parser_thread = Thread(target=only_parser_trainer.train_parser_from_new_logs, args=(logs_dir, 'only_parser_learning', 'retraining/final_parser-only_parser'))
+    only_parser_parser_thread.daemon = True
+    only_parser_parser_thread.start()
     
     only_dialog_trainer = create_trainer('only_dialog_parser', 'only_dialog_policy')
-    only_dialog_thread = Thread(target=train_only_dialog, args=(only_dialog_trainer,))
-    only_dialog_thread.daemon = True
-    only_dialog_thread.start()
+    only_dialog_policy_thread = Thread(target=train_policy, args=(only_dialog_trainer, 'only_dialog_learning', 'retraining/final_policy-only_dialog'))
+    only_dialog_policy_thread.daemon = True
+    only_dialog_policy_thread.start()
     
     both_trainer = create_trainer('both_parser', 'both_policy')
-    both_thread = Thread(target=train_both, args=(both_trainer,))
-    both_thread.daemon = True
-    both_thread.start()
+    both_policy_thread = Thread(target=train_policy, args=(both_trainer, 'both_parser_and_dialog_learning', 'retraining/final_policy-both'))
+    both_policy_thread.daemon = True
+    both_policy_thread.start()
+    both_parser_thread = Thread(target=both_trainer.train_parser_from_new_logs, args=(logs_dir, 'both_parser_and_dialog_learning', 'retraining/final_parser-both'))
+    both_parser_thread.daemon = True
+    both_parser_thread.start()
     
-    only_parser_thread.join()
-    only_dialog_thread.join()
-    both_thread.join()
+    only_parser_parser_thread.join()
+    only_dialog_policy_thread.join()
+    both_parser_thread.join()
+    both_policy_thread.join()
             
 if __name__ == '__main__' :
     main()            

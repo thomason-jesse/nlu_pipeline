@@ -54,7 +54,7 @@ class InputFromService:
 
     def get(self):
         print 'In get'
-        timeout_min = 2
+        timeout_min = 10
         timeout = time.time() + 60*timeout_min 
         sleeper = rospy.Rate(100)
         while True :
@@ -213,23 +213,24 @@ class DialogueServer :
         
         self.parser_train_file = args[3]
         
-        self.load_models_from_file = False
-        if len(args) > 4 :
-            if args[4].lower() == 'true' :
-                print 'Going to load from file' # DEBUG
-                self.load_models_from_file = True
+        #self.load_models_from_file = False
+        #if len(args) > 4 :
+            #if args[4].lower() == 'true' :
+                #print 'Going to load from file' # DEBUG
+                #self.load_models_from_file = True
+        self.load_models_from_file = True
         
         self.lock = Lock()
         self.service = rospy.Service('register_user', register_user, self.on_user_receipt)
         
-    def create_pomdp_dialog_agent(self, parser_file=None) :
+    def create_pomdp_dialog_agent(self, parser_file=None, policy_file=None) :
         ont = copy.deepcopy(self.ont)
         lex = copy.deepcopy(self.lex)
         
         print "instantiating KBGrounder"
         grounder = KBGrounder.KBGrounder(ont)
         
-        if self.load_models_from_file :
+        if parser_file is not None :
             parser = load_model(parser_file)
         else :
             parser = CKYParser.CKYParser(ont, lex, use_language_model=True)
@@ -253,8 +254,8 @@ class DialogueServer :
         grounder.ontology = parser.ontology
   
         print "Instantiating DialogAgent"
-        if self.load_models_from_file :
-            policy = load_model('ktdq_policy')
+        if policy_file is not None :
+            policy = load_model(policy_file)
             policy.untrained = False
             policy.training = False
         else :
@@ -336,14 +337,14 @@ class DialogueServer :
                 print 'Only parser learning'
                 self.user_log.write(user_id + ',only_parser\n')
                 self.error_log.write(user_id + ',only_parser\n') 
-                pomdp_agent = self.create_pomdp_dialog_agent('only_parser_parser')
+                pomdp_agent = self.create_pomdp_dialog_agent('only_parser_parser', 'only_parser_policy')
                 pomdp_agent.input = u_in
                 pomdp_agent.output = u_out
                 pomdp_agent.final_action_log = final_action_log
                 pomdp_agent.dialog_objects_logfile = log
                 pomdp_agent.log_header = 'only_parser_learning'
                 pomdp_agent.policy.training = False
-                pomdp_agent.policy.untrained = True
+                pomdp_agent.policy.untrained = True # So that it uses hand coded policy
                 pomdp_agent.error_log = open(error_log, 'a')
                 
                 dialog_thread = Thread(target=self.run_pomdp_dialog, args=((pomdp_agent,)))
@@ -353,7 +354,7 @@ class DialogueServer :
                 print 'Only dialog learning'
                 self.user_log.write(user_id + ',only_dialog\n')
                 self.error_log.write(user_id + ',only_dialog\n')
-                pomdp_agent = self.create_pomdp_dialog_agent('only_dialog_parser')
+                pomdp_agent = self.create_pomdp_dialog_agent('only_dialog_parser', 'only_dialog_policy')
                 pomdp_agent.input = u_in
                 pomdp_agent.output = u_out
                 pomdp_agent.final_action_log = final_action_log
@@ -368,7 +369,7 @@ class DialogueServer :
                 print 'Dialog and parser learning'
                 self.user_log.write(user_id + ',both\n')
                 self.error_log.write(user_id + ',both\n')
-                pomdp_agent = self.create_pomdp_dialog_agent('both_parser')
+                pomdp_agent = self.create_pomdp_dialog_agent('both_parser', 'both_policy')
                 pomdp_agent.input = u_in
                 pomdp_agent.output = u_out
                 pomdp_agent.final_action_log = final_action_log

@@ -3,7 +3,7 @@ from os import listdir
 from os.path import isfile, join, isdir
 sys.path.append('../')
 
-path_to_batch = '/u/aish/Documents/Research/AMT_results/Batch2/'
+path_to_batch = '/u/aish/Documents/Research/AMT_results/Batch3/'
 
 people_map = {'alice' : 'stacy', 'bob' : 'jesse', 'carol' : 'shiqi', \
     'dave' : 'jivko', 'eve' : 'aishwarya', 'frannie' : 'scott', \
@@ -144,7 +144,27 @@ def check_and_correct_pickle_logs() :
         new_log_file = open(dst_path + user_id + '_main.pkl', 'wb')
         pickle.dump(new_log, new_log_file, pickle.HIGHEST_PROTOCOL)
 
+def organize_text_logs() :
+    results_file = open(path_to_batch + 'results_corrected.csv', 'r')
+    results_reader = csv.reader(results_file, delimiter=',')
+    results_reader.next()
+    src_path = path_to_batch + 'completed/log_text/'
+    for row in results_reader :
+        user_id = row[0]
+        agent_type = row[2]
+        success = bool(int(row[4]))
+        dst_path = path_to_batch + 'categorized_text_logs/'
+        if success :
+            dst_path = dst_path + 'success/'
+        else :
+            dst_path = dst_path + 'failure/'
+        dst_path = dst_path + agent_type + '/'
+        shutil.copy(src_path + user_id + '_main.txt', dst_path + user_id + '.txt')    
+        
+        
+
 if __name__ == '__main__' :
     #move_logs_with_codes()
     #collate_files_for_reconstructing_pickle_logs()    
-    check_and_correct_pickle_logs()
+    #check_and_correct_pickle_logs()
+    organize_text_logs()
