@@ -75,8 +75,12 @@
     var jsTalkClient = null;
 
     function decideTask() {
+        document.getElementById('example').style.display = 'none';
+        document.getElementById('proceed_button').style.display = 'none';
+        
         var tasks = ['walk', 'deliver', 'search'];
         var task = tasks[Math.floor(Math.random()*tasks.length)];
+        //alert('task = ' + task);
         if (task == 'walk') {
             drawRandomWalkTask();
         } else if (task == 'deliver') {
@@ -179,7 +183,7 @@
 	// handles the response, adds the html
 	function invokeRandomTaskOutput(response_text) {
 	
-		//alert('DEBUG: output from php:\n'.concat(response_text));
+		alert('DEBUG: output from php:\n'.concat(response_text));
 	
 		var task_description_text = document.getElementById('task_description_text');
 		task_description_text.innerHTML = response_text;
@@ -485,11 +489,110 @@
 		}
         
         if (!(understanding_walk_selection == 0 && understanding_bring_selection == 1 && understanding_search_selection == 2)) {
-            alert('You do not seem to have understood the prompts correctly. You may proceed with the HIT but please be warned that your HIT will be invalidated if it appears that you have not understood the task to be instructed. ');
+            alert('You do not seem to have understood the prompts correctly. We would prefer it if you do not proceed with this HIT. You may start over but you must pass the system verifications before you can complete the HIT. ');
+            document.getElementById('understand_task_button').disabled = true;
+        } else {
+            document.getElementById('understand_task').style.display = 'none';
+            openFluency();
+            //decideTask();    
+        }
+    }
+    
+    var fluencyVerificationCount = 0;
+    var options = [
+            [{text: "Dust the table lamp in Oscar Osborne\'s house", idx: "0"},
+             {text: "Dust lamp Oscar Osborne", idx: "1"},
+             {text: "Dust lamp 211", idx: "2"},
+             {text: "Dust 3 211", idx: "3"}
+            ],
+            [{text: "Dust the lamp in Oscar's house", idx: "0"},
+             {text: "Dust the table lamp in Oscar Osborne\'s house", idx: "1"},
+             {text: "Dust 3 211", idx: "2"},
+             {text: "Dust task", idx: "3"}
+            ],
+            [{text: "Clean the lamp in Oscar's house", idx: "0"},
+             {text: "Clean 3 211", idx: "1"},
+             {text: "Clean lamp Oscar", idx: "2"},
+             {text: "Clean task", idx: "3"}
+            ],
+            [{text: "the lamp", idx: "0"},
+             {text: "3", idx: "1"},
+             {text: "Clean the lamp in Oscar's house", idx: "2"},
+             {text: "clean", idx: "3"}
+            ],
+        ];
+    
+    function shuffleArray(array) {
+        for (var i = array.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var temp = array[i];
+            array[i] = array[j];
+            array[j] = temp;
+        }
+        return array;
+    } 
+    
+    function openFluency() {
+        document.getElementById('example').style.display = 'block';
+    }
+        
+    function fluencyVerification() {
+        //alert('fluencyVerificationCount = ' + fluencyVerificationCount);
+        
+        document.getElementById('example_instructions').style.display = 'none';
+        document.getElementById('example_introduce_task').style.display = 'block';
+        document.getElementById('example_dialog_history_block').style.display = 'block';
+        
+        var row_num = fluencyVerificationCount;
+        
+        if (fluencyVerificationCount > 0) {
+            // Verify previous step
+            var selection = "";
+            var name = 'tr' + (row_num - 1);
+            var radio = document.getElementsByName(name);
+            for (var i = 0; i < radio.length; i++) {
+                if (radio[i].checked) {
+                    selection = radio[i].value;
+                    break;
+                }
+            }
+            
+            if (selection != "0") {
+                alert('You do not seem to have understood the prompts correctly. We would prefer it if you do not proceed with this HIT. You may start over but you must pass the system verifications before you can complete the HIT. ');
+                document.getElementById('fluency_button').disabled = true;
+                return;
+            } else {
+                var id = 'tr' + (row_num - 1) + '_options'; 
+                document.getElementById(id).style.display = 'none';
+                //document.getElementById(id).style.visiblity = 'collapse';
+                var id = 'tr' + (row_num - 1) + '_user'; 
+                document.getElementById(id).style.display = 'block';   
+            }
         }
         
-        document.getElementById('understand_task').style.display = 'none';
-        decideTask();
+        if (fluencyVerificationCount == 4) {
+            var id = 'tr' + row_num + '_robot';
+            document.getElementById(id).style.display = 'block';
+            var id = 'tr' + row_num + '_user';
+            document.getElementById(id).style.display = 'block';
+            document.getElementById('fluency_button').style.display = 'none';
+            document.getElementById('proceed_button').style.display = 'block';
+        } else {
+            var id = 'tr' + row_num + '_robot';
+            document.getElementById(id).style.display = 'block';
+            id = 'tr' + row_num + '_options';
+            document.getElementById(id).style.display = 'block';
+            
+            var row_options = shuffleArray(options[row_num]);
+            for (var i=0; i<4; i++) {
+                id = 'tr' + row_num + '_' + i;
+                document.getElementById(id).value = row_options[i].idx;
+                id = 'tr' + row_num + '_' + i + '_text';
+                document.getElementById(id).innerHTML = row_options[i].text;
+            }
+            
+            fluencyVerificationCount = fluencyVerificationCount + 1;        
+        }
     }
     
 	//invoke php to record likert and produce code for MTurk
@@ -708,9 +811,172 @@ width:50%
 			<tr align="center" bgcolor='GhostWhite'><td style="width:20%">Walk task</td><td style="width:20%">Bring task</td><td style="width:20%">Search task</td></tr>
 			<tr align="center" bgcolor='AliceBlue'><td style="width:20%"><INPUT TYPE="radio" name="search" value="0"></td><td style="width:20%"><INPUT TYPE="radio" name="search" value="1"></td><td style="width:20%"><INPUT TYPE="radio" name="search" value="2"></tr>
 		</TABLE></p>
-		<INPUT TYPE="button" NAME="understand_task_button" Value="Submit" onClick="submitUnderstanding(this.form)">
+		<INPUT TYPE="button"  id="understand_task_button"  NAME="understand_task_button" Value="Submit" onClick="submitUnderstanding(this.form)">
 	</FORM>
     </DIV>
+    
+    <div id="example" style="display: none;">
+        <div id="example_instructions">
+            The objective of this HIT is to command a robot. The robot assumes commands to be
+            <ul>
+              <li>In a single sentence</li>
+              <li>Fairly short</li>
+              <li>Grammatical</li>
+            </ul>
+            
+            <p>
+                You should talk to the robot as if it were a person. 
+                You will now walk through an example conversation with a similar robot that knows how to clean objects in a house. 
+            </p>
+            <p>
+                Select what you feel is the most appropriate response at each step of the conversation to demonstrate that you have understood the task. 
+            </p>
+            
+            <INPUT TYPE="button" NAME="fluency_button" Value="Continue" onClick="fluencyVerification()" onSubmit="fluencyVerification()"></INPUT>
+        </div>
+
+        
+        
+        <div id="example_introduce_task" style='display:none'>
+            <br/>
+        <b>TASK TO COMPLETE</b><p >Oscar Osborne wants the item in slot 3 to be dusted.</p>
+        </div>
+        
+        <div id="example_dialog_history_block" style='display:none'>
+            <table name="example_history" style="width:100%; border-collapse:collapse; table-layout:fixed">
+            <form name="example_user_input_form" type="text" onsubmit="return false;"></form>
+            <tbody>
+                <tr id="tr0_robot" style='display:none; width:100%'>
+                    <td style="background-color: ghostwhite; width:20%">ROBOT</td>
+                    <td style="background-color: ghostwhite; width:80%">How can I help?</td>
+                </tr>
+                <tr id="tr0_options" style='display:none; width:100%'>
+                    <td style='width:15%'></td>
+                    <td style='width:85%'><table>
+                        <tr bgcolor='AliceBlue'>
+                            <td><INPUT TYPE="radio" id="tr0_0" name="tr0" value="-2"></td>
+                            <td id="tr0_0_text">a</td>      
+                        </tr>
+                        <tr bgcolor='GhostWhite'>
+                            <td><INPUT TYPE="radio" id="tr0_1" name="tr0" value="-2"></td>     
+                            <td id="tr0_1_text">b</td>
+                        </tr>
+                        <tr bgcolor='AliceBlue'>
+                            <td><INPUT TYPE="radio" id="tr0_2" name="tr0" value="-2"></td>      
+                            <td id="tr0_2_text">c</td>
+                        </tr>
+                        <tr bgcolor='GhostWhite'>
+                            <td><INPUT TYPE="radio" id="tr0_3" name="tr0" value="-2"></td>     
+                            <td id="tr0_3_text">d</td>
+                        </tr>
+                    </table></td>
+                </tr>
+                <tr id="tr0_user" style='display:none; width:100%'>
+                    <td style="background-color: aliceblue; width:20%">YOU</td>
+                    <td style="background-color: aliceblue; width:80%">Dust the table lamp in Oscar Osborne's house</td>
+                </tr>
+                <tr id="tr1_robot" style='display:none; width:100%'> 
+                    <td style="background-color: ghostwhite; width:20%">ROBOT</td>
+                    <td style="background-color: ghostwhite; width:80%">Sorry I couldn't understand that. Could you reword your original request?</td>
+                </tr>
+                <tr id="tr1_options" style='display:none; width:100%'>
+                    <td style='width:15%'></td>
+                    <td style='width:85%'><table>
+                        <tr bgcolor='AliceBlue'>
+                            <td><INPUT TYPE="radio" id="tr1_0" name="tr1" value="-2"></td>
+                            <td id="tr1_0_text">a</td>      
+                        </tr>
+                        <tr bgcolor='GhostWhite'>
+                            <td><INPUT TYPE="radio" id="tr1_1" name="tr1" value="-2"></td>     
+                            <td id="tr1_1_text">b</td>
+                        </tr>
+                        <tr bgcolor='AliceBlue'>
+                            <td><INPUT TYPE="radio" id="tr1_2" name="tr1" value="-2"></td>      
+                            <td id="tr1_2_text">c</td>
+                        </tr>
+                        <tr bgcolor='GhostWhite'>
+                            <td><INPUT TYPE="radio" id="tr1_3" name="tr1" value="-2"></td>     
+                            <td id="tr1_3_text">d</td>
+                        </tr>
+                    </table></td>
+                </tr>
+                <tr id="tr1_user" style='display:none; width:100%'>
+                    <td style="background-color: aliceblue; width:20%">YOU</td>
+                    <td style="background-color: aliceblue; width:80%">Dust the lamp in Oscar's house</td>
+                </tr>
+                <tr id="tr2_robot" style='display:none; width:100%'>
+                    <td style="background-color: ghostwhite; width:20%">ROBOT</td>
+                    <td style="background-color: ghostwhite; width:80%">Sorry I couldn't understand that. Could you reword your original request?</td>
+                </tr>
+                <tr id="tr2_options" style='display:none; width:100%'>
+                    <td style='width:15%'></td>
+                    <td style='width:85%'><table>
+                        <tr bgcolor='AliceBlue'>
+                            <td><INPUT TYPE="radio" id="tr2_0" name="tr2" value="-2"></td>
+                            <td id="tr2_0_text">a</td>      
+                        </tr>
+                        <tr bgcolor='GhostWhite'>
+                            <td><INPUT TYPE="radio" id="tr2_1" name="tr2" value="-2"></td>     
+                            <td id="tr2_1_text">b</td>
+                        </tr>
+                        <tr bgcolor='AliceBlue'>
+                            <td><INPUT TYPE="radio" id="tr2_2" name="tr2" value="-2"></td>      
+                            <td id="tr2_2_text">c</td>
+                        </tr>
+                        <tr bgcolor='GhostWhite'>
+                            <td><INPUT TYPE="radio" id="tr2_3" name="tr2" value="-2"></td>     
+                            <td id="tr2_3_text">d</td>
+                        </tr>
+                    </table></td>
+                </tr>
+                <tr id="tr2_user" style='display:none; width:100%'>
+                    <td style="background-color: aliceblue; width:20%">YOU</td>
+                    <td style="background-color: aliceblue; width:80%">Clean the lamp in Oscar's house</td>
+                </tr>
+                <tr id="tr3_robot" style='display:none; width:100%'>
+                    <td style="background-color: ghostwhite; width:20%">ROBOT</td>
+                    <td style="background-color: ghostwhite; width:80%">What should I clean in 211?</td>
+                </tr>
+                <tr id="tr3_options" style='display:none; width:100%'>
+                    <td style='width:15%'></td>
+                    <td style='width:85%'><table>
+                        <tr bgcolor='AliceBlue'>
+                            <td><INPUT TYPE="radio" id="tr3_0" name="tr3" value="-2"></td>
+                            <td id="tr3_0_text">a</td>      
+                        </tr>
+                        <tr bgcolor='GhostWhite'>
+                            <td><INPUT TYPE="radio" id="tr3_1" name="tr3" value="-2"></td>     
+                            <td id="tr3_1_text">b</td>
+                        </tr>
+                        <tr bgcolor='AliceBlue'>
+                            <td><INPUT TYPE="radio" id="tr3_2" name="tr3" value="-2"></td>      
+                            <td id="tr3_2_text">c</td>
+                        </tr>
+                        <tr bgcolor='GhostWhite'>
+                            <td><INPUT TYPE="radio" id="tr3_3" name="tr3" value="-2"></td>     
+                            <td id="tr3_3_text">d</td>
+                        </tr>
+                    </table></td>
+                </tr>
+                <tr id="tr3_user" style='display:none; width:100%'>
+                    <td style="background-color: aliceblue; width:20%">YOU</td>
+                    <td style="background-color: aliceblue; width:80%">the lamp</td>
+                </tr>
+                <tr id="tr4_robot" style='display:none; width:100%'>
+                    <td style="background-color: ghostwhite; width:20%">ROBOT</td>
+                    <td style="background-color: ghostwhite; width:80%">I cleaned the lamp in 211. Was this the right action?</td>
+                </tr>
+                </tr>
+                <tr id="tr4_user" style='display:none; width:100%'>
+                    <td style="background-color: aliceblue; width:20%">YOU</td>
+                    <td style="background-color: aliceblue; width:80%">yes</td>
+                </tr>
+            </tbody></table>
+            
+            <INPUT TYPE="button" id="fluency_button" NAME="fluency_button" Value="Continue" onClick="fluencyVerification()" onSubmit="fluencyVerification()"></INPUT>
+        </div>
+    </div>
+    <INPUT TYPE="button" id="proceed_button" NAME="proceed_button" Value="Proceed to HIT" onClick="decideTask()" onSubmit="decideTask()" style='display:none'></INPUT>
 
 	<DIV ID="introduce_task" style="display:none">
 		<b>TASK TO COMPLETE</b><p ID="task_description_text"></p>
