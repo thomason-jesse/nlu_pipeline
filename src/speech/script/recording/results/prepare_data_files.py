@@ -32,6 +32,10 @@ def process_phrase(phrase, pass_num):
     if not whole_num == None:
         return_phrase += whole_num
 
+    #For speech. 
+    if pass_num == 3:
+        return_phrase = '<s> ' + return_phrase.strip() + ' </s>'
+
     return return_phrase.strip() + "\n"
 
 #Dictionary to post-process numbers. 
@@ -66,7 +70,13 @@ for user in os.listdir('headset'):
         denotation.close()
 
         semantic_form = open(path + 'semantic_forms/' + user + '_semantic_' + str(i), 'r')
-        semantic_forms_file.write(semantic_form.read() + '\n')
+        semantic_form_text = semantic_form.read()
+
+        if semantic_form_text.startswith("walk(the"):
+            #Parentheses added to fix bug. They were miscounted during corpus generation :(
+            semantic_form_text += "))"
+
+        semantic_forms_file.write('M : ' + semantic_form_text + '\n')
         semantic_form.close()
 
     phrase_file.close()
@@ -74,17 +84,24 @@ for user in os.listdir('headset'):
     semantic_forms_file.close()
 
     #Prepares parser training file for user. 
-    training_file = open(path + user + '_train.txt', 'w')
+    parser_training_file = open(path + user + '_train_parser.txt', 'w')
+    lm_training_file = open(path + user + '_train_lm.txt', 'w')
+
     phrase_file = open(path + user + '_phrases.txt', 'r')
     denotation_file = open(path + user + '_denotations.txt', 'r')
     semantic_forms_file = open(path + user + '_semantic_forms.txt', 'r')
 
     for i in range(1, num_files + 1):
-       training_file.write(process_phrase(phrase_file.readline(), 2))
-       training_file.write(semantic_forms_file.readline())
-       training_file.write(denotation_file.readline() + '\n')
+        phrase = phrase_file.readline()    
+        
+        lm_training_file.write(process_phrase(phrase, 3))
 
-    training_file.close()
+        parser_training_file.write(process_phrase(phrase, 2))
+        parser_training_file.write(semantic_forms_file.readline())
+        parser_training_file.write(denotation_file.readline() + '\n')
+
+    lm_training_file.close()
+    parser_training_file.close()
     phrase_file.close()
     denotation_file.close()
     semantic_forms_file.close()
