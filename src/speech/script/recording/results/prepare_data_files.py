@@ -38,6 +38,13 @@ def process_phrase(phrase, pass_num):
 
     return return_phrase.strip() + "\n"
 
+def validSemanticForm(semantic_form):
+    for word in duplicates:
+        if semantic_form.startswith("bring(" + word):
+            return False
+
+    return True
+
 #Dictionary to post-process numbers. 
 numbers = {"zero": "0", "one": "1", "two": "2", "three": "3",
            "four": "4", "five": "5", "six": "6",
@@ -50,6 +57,10 @@ numbers = {"zero": "0", "one": "1", "two": "2", "three": "3",
 
 abbreviations = {"P.I.": "pi", "T.A.": "ta"}
 
+duplicates = ["book", "box", "cellphone", "chips",
+              "coffee", "container", "diary", 
+              "notebook", "water"]
+
 for user in os.listdir('headset'):
     path = 'headset/' + user + '/'
         
@@ -58,26 +69,35 @@ for user in os.listdir('headset'):
     denotation_file = open(path + user + '_denotations.txt', 'w')
     semantic_forms_file = open(path + user + '_semantic_forms.txt', 'w')
 
-    num_files = len(os.listdir(path + 'recordings/'))
+    num_files = len(os.listdir(path + 'phrases/'))
 
     for i in range(1, num_files + 1):
-        phrase = open(path + 'phrases/' + user + '_phrase_' + str(i), 'r')
-        phrase_file.write(process_phrase(phrase.read(), 1))
-        phrase.close()
+        phrase_buff = open(path + 'phrases/' + user + '_phrase_' + str(i), 'r')
+        phrase = process_phrase(phrase_buff.read(), 1)
+        phrase_buff.close()
 
-        denotation = open(path + 'denotations/' + user + '_denotation_' + str(i), 'r')
-        denotation_file.write(denotation.read() + '\n')
-        denotation.close()
 
-        semantic_form = open(path + 'semantic_forms/' + user + '_semantic_' + str(i), 'r')
-        semantic_form_text = semantic_form.read()
+        denotation_buff = open(path + 'denotations/' + user + '_denotation_' + str(i), 'r')
+        denotation = denotation_buff.read()
+        denotation_buff.close()
 
-        if semantic_form_text.startswith("walk(the"):
+
+        semantic_form_buff = open(path + 'semantic_forms/' + user + '_semantic_' + str(i), 'r')
+        semantic_form = semantic_form_buff.read()
+        semantic_form_buff.close()
+
+        #Fixes format bug. 
+        if semantic_form.startswith("walk(the"):
             #Parentheses added to fix bug. They were miscounted during corpus generation :(
-            semantic_form_text += "))"
-
-        semantic_forms_file.write('M : ' + semantic_form_text + '\n')
-        semantic_form.close()
+            semantic_form += "))"
+        
+        #Writes data if semantic form is valid (i.e. because of duplicate items in ontology error.)
+        if validSemanticForm(semantic_form):   
+            #TODO write record file path. 
+            phrase_file.write(phrase)
+            denotation_file.write(denotation + '\n')
+            semantic_forms_file.write('M : ' + semantic_form + '\n')
+        
 
     phrase_file.close()
     denotation_file.close()
@@ -97,8 +117,8 @@ for user in os.listdir('headset'):
         lm_training_file.write(process_phrase(phrase, 3))
 
         parser_training_file.write(process_phrase(phrase, 2))
-        parser_training_file.write(semantic_forms_file.readline())
-        parser_training_file.write(denotation_file.readline() + '\n')
+        parser_training_file.write(semantic_forms_file.readline() + '\n')
+        #parser_training_file.write(denotation_file.readline() + '\n')
 
     lm_training_file.close()
     parser_training_file.close()
