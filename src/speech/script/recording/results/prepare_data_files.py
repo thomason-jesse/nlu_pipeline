@@ -11,7 +11,7 @@ def process_phrase(phrase, pass_num):
     return_phrase = ""
 
     for word in words:
-        if (not word in numbers) or pass_num == 1:
+        if (not word in numbers) or pass_num == 1 or pass_num == 3:
             #If previous words made up number, then write it to file. 
             if not whole_num == None:
                 return_phrase += whole_num + " "
@@ -110,18 +110,24 @@ for user in os.listdir('headset'):
     semantic_forms_file.close()
     recordings_file.close()
 
-    #Prepares parser training file for user. 
+    #Prepares transcripts as well as parser and lm training files for user. 
     parser_training_file = open(path + user + '_train_parser.txt', 'w')
     lm_training_file = open(path + user + '_train_lm.txt', 'w')
+    transcript_file = open(path + user + '_transcript.txt', 'w')
 
     phrase_file = open(path + user + '_phrases.txt', 'r')
     denotation_file = open(path + user + '_denotations.txt', 'r')
     semantic_forms_file = open(path + user + '_semantic_forms.txt', 'r')
+    recordings_file = open(path + user + '_recording_files.txt', 'r')
 
-    for i in range(1, num_files + 1):
+    for i in range(0, 95):
         phrase = phrase_file.readline()    
-        
-        lm_training_file.write(process_phrase(phrase, 3))
+
+        processed_phrase = process_phrase(phrase, 3)
+        lm_training_file.write(processed_phrase)
+       
+        recording_file_name = '(' + recordings_file.readline().split('.')[0] + ')'
+        transcript_file.write(processed_phrase.strip() + ' ' + recording_file_name + '\n')
 
         parser_training_file.write(process_phrase(phrase, 2))
         parser_training_file.write(semantic_forms_file.readline() + '\n')
@@ -132,3 +138,4 @@ for user in os.listdir('headset'):
     phrase_file.close()
     denotation_file.close()
     semantic_forms_file.close()
+    transcript_file.close()
