@@ -49,13 +49,13 @@ def validSemanticForm(semantic_form):
 numbers = {"zero": "0", "one": "1", "two": "2", "three": "3",
            "four": "4", "five": "5", "six": "6",
            "seven": "7", "eight": "8", "nine": "9",
-           "thirty-four": "34", "B": "b", 
+           "thirty-four": "34", "b": "b",
            "fourteen": "14", "eighteen": "18",
            "twenty": "20", "thirty-two": "32",
            "thirty-five": "35", "ten": "10",
            "twelve": "12", "sixteen": "16"}
 
-abbreviations = {"P.I.": "pi", "T.A.": "ta"}
+abbreviations = {"P.I.": "pi", "T.A.": "ta", "B": "b"}
 
 duplicates = ["book", "box", "cellphone", "chips",
               "coffee", "container", "diary", 
@@ -123,10 +123,14 @@ for user in os.listdir('headset'):
     for i in range(0, 95):
         phrase = phrase_file.readline()    
 
-        processed_phrase = process_phrase(phrase, 3)
+        #Phrase processing removes commas. 
+        processed_phrase = process_phrase(phrase, 3).replace(',', '')
         lm_training_file.write(processed_phrase)
-       
-        recording_file_name = '(' + recordings_file.readline().split('.')[0] + ')'
+      
+        recording_file_name = recordings_file.readline().split('.')[0]
+        recording_file_name = recording_file_name.split('/')
+        recording_file_name = recording_file_name[len(recording_file_name) - 1]
+        recording_file_name = '(' + recording_file_name + ')'
         transcript_file.write(processed_phrase.strip() + ' ' + recording_file_name + '\n')
 
         parser_training_file.write(process_phrase(phrase, 2))
