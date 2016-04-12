@@ -4,10 +4,10 @@
 #from the speech corpus. 
 #Usage: $./gen_k_folds.bash [k] [speech corpus path] [k-fold sets path]
 
-K=$1
-SPEECH_PATH=$2
-K_SET_PATH=$3
-K_FOLD_PATH=$4
+K=$1			#The K in k-folds
+SPEECH_PATH=$2	#The path to the actual speech corpus.  
+K_SET_PATH=$3	#The path in which to create the symbolic links. 
+K_FOLD_PATH=$4	#The path where all the actual data used for experiments will be kept. 
 
 #Used to create symbolic links. 
 CURRENT_DIR=$( pwd )
@@ -26,6 +26,8 @@ FOLD_NUM=1
 for i in $( seq $K ); do
 	mkdir $K_SET_PATH/$i
 	mkdir $K_FOLD_PATH/$i
+	mkdir -p $K_FOLD_PATH/$i/recordings/train
+	mkdir -p $K_FOLD_PATH/$i/recordings/test
 done
 
 #Goes through all users in folder to create folds. 
