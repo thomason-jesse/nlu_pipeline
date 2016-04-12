@@ -1,9 +1,8 @@
+requirements = InMastodon
 universe = vanilla
-environment = /u/rcorona/nlu_pipeline/src/speech/experiments
+environment = /scratch/cluster/rcorona/nlu_pipeline/src/speech/experiments
 
-STANFORD_PATH=/u/rcorona/388/HW3/stanford-parser
-
-Initialdir = /u/rcorona/nlu_pipeline/src/speech/experiments
+Initialdir = /scratch/cluster/rcorona/nlu_pipeline/src/speech/experiments/condor/logs/lms
 Executable = $(SRILM_DIR)/ngram
 
 +Group = "UNDER"
