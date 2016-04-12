@@ -68,10 +68,14 @@ for user in os.listdir('headset'):
     phrase_file = open(path + user + '_phrases.txt', 'w')
     denotation_file = open(path + user + '_denotations.txt', 'w')
     semantic_forms_file = open(path + user + '_semantic_forms.txt', 'w')
+    recordings_file = open(path + user + '_recording_files.txt', 'w')
 
     num_files = len(os.listdir(path + 'phrases/'))
 
-    for i in range(1, num_files + 1):
+    #Only gets 100 data points per user.
+    i = 1
+    num_written = 0
+    while num_written < 95:
         phrase_buff = open(path + 'phrases/' + user + '_phrase_' + str(i), 'r')
         phrase = process_phrase(phrase_buff.read(), 1)
         phrase_buff.close()
@@ -92,16 +96,19 @@ for user in os.listdir('headset'):
             semantic_form += "))"
         
         #Writes data if semantic form is valid (i.e. because of duplicate items in ontology error.)
-        if validSemanticForm(semantic_form):   
-            #TODO write record file path. 
+        if validSemanticForm(semantic_form):
+            num_written += 1
+            recordings_file.write(path + 'recordings/' + user + '_recording_' + str(i) + '.raw\n') 
             phrase_file.write(phrase)
             denotation_file.write(denotation + '\n')
             semantic_forms_file.write('M : ' + semantic_form + '\n')
-        
+
+        i += 1
 
     phrase_file.close()
     denotation_file.close()
     semantic_forms_file.close()
+    recordings_file.close()
 
     #Prepares parser training file for user. 
     parser_training_file = open(path + user + '_train_parser.txt', 'w')
