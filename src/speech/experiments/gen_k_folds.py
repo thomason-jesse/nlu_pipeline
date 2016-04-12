@@ -20,6 +20,7 @@ def copyRecordings(src_dir, dest_dir):
 #Generates files for all k's. 
 for k_fold_folder in os.listdir('corpus'):
     k = int(k_fold_folder.split('_')[0])
+    print "Generating sets for k=" + str(k)
 
     #Reads in data files for each fold. 
     file_list = {}
@@ -36,6 +37,8 @@ for k_fold_folder in os.listdir('corpus'):
 
     #Creates training and test files for each fold.
     for i in range(1, k + 1):
+        print "Generating sets for k=" + str(k) + ", fold " + str(i)
+        
         path = 'k-folds/' + str(k) + '_fold/' + str(i) 
         parser_train_file = open(path + '/parser_train.txt', 'w')
         lm_train_file = open(path + '/lm_train.txt', 'w')

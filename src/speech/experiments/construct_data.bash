@@ -3,6 +3,7 @@
 #TODO add options to run only certain experiments. 
 
 #Generates corpus directory structure. 
+echo "Building directories..."
 mkdir corpus
 mkdir corpus/4_fold
 #mkdir corpus/8_fold
@@ -11,6 +12,16 @@ mkdir corpus/4_fold
 mkdir k-folds
 mkdir k-folds/4_fold
 #mkdir k-folds/8_fold
+
+#Generates condor log directories. 
+mkdir -p condor/logs/lms
+
+#Prepares data for building data set. 
+echo "Preprocessing data..."
+CURRENT_DIR=$( pwd )
+cd ../script/recording/results/
+python prepare_data_files.py
+cd $CURRENT_DIR
 
 echo "Generating folds..."
 ./gen_corpus_folds.bash 4 ../script/recording/results/headset corpus/4_fold k-folds/4_fold
@@ -25,9 +36,4 @@ echo "Generating train and test sets for each fold..."
 python gen_k_folds.py
 
 echo "Generating id files for recordings"
-python gen_id_files
-
-#Creates in-domain language models for each.
-echo "Generating language models for each fold..."
-#./gen_lms.bash ./SRILM/bin/i686-m64/
-
+python gen_id_files.py

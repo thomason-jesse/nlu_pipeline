@@ -14,7 +14,7 @@ for i in $( ls k-folds ); do
 
 		#Creates interpolated language models using the sphinx en-us model. 
 		for w in $( echo 0.25 0.5 0.75 ); do
-			condor_submit -a "SRILM_DIR = $SRILM_PATH" -a "NAME = $i-$j-$w" -a "IN_LM = $IN_LM" -a "GEN_LM = $CURRENT_DIR/resources/en-us.lm" -a "w = $w" "INT_LM = $CURRENT_DIR/k-folds/$i/$j/$w.lm" 
+			condor_submit -a "SRILM_DIR = $SRILM_PATH" -a "NAME = $i-$j-$w" -a "IN_LM = $IN_LM" -a "GEN_LM = $CURRENT_DIR/resources/en-us.lm" -a "w = $w" -a "INT_LM = $CURRENT_DIR/k-folds/$i/$j/$w.lm" $CURRENT_DIR/condor/interpolate_lms.bash 
 #ngram -lm $IN_LM -mix-lm resources/en-us.lm -lambda $w -write-lm $CURRENT_DIR/k-folds/$i/$j/"$w".lm
 			echo "Created interpolated lm for " $i/$j/ "with weight" $w
 		done
