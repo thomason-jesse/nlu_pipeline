@@ -59,7 +59,7 @@ abbreviations = {"P.I.": "pi", "T.A.": "ta", "B": "b"}
 
 duplicates = ["book", "box", "cellphone", "chips",
               "coffee", "container", "diary", 
-              "notebook", "water"]
+              "notebook", "water", "laptop"]
 
 for user in os.listdir('headset'):
     path = 'headset/' + user + '/'
@@ -75,7 +75,7 @@ for user in os.listdir('headset'):
     #Only gets 100 data points per user.
     i = 1
     num_written = 0
-    while num_written < 95:
+    while num_written < 90:
         phrase_buff = open(path + 'phrases/' + user + '_phrase_' + str(i), 'r')
         phrase = process_phrase(phrase_buff.read(), 1)
         phrase_buff.close()
