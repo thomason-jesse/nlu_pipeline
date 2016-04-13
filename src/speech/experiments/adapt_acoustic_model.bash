@@ -11,7 +11,7 @@ ADAPT_MODEL=$7		#Directory where adapted acoustic model will be kept.
 BIN=$8				#Path for binary executables used by adaptation process.
 
 CURRENT_DIR=$( pwd )
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CURRENT_DIR/lib
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CURRENT_DIR/sphinxbase_install/lib/
 
 #Creates feature files for each recording. 
 $CURRENT_DIR/bin/sphinx_fe -argfile $AC_MODEL/feat.params -samprate 16000 -c $IDS_FILE -di $RECORDINGS_DIR -do $OUT_DIR -ei raw -eo mfc -raw yes
