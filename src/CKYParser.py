@@ -515,6 +515,7 @@ class CKYParser:
             ccg = self.lexicon.read_category_from_str(ccg_str)
             form = self.lexicon.read_semantic_form_from_str(form_str, None, None, [],
                                                             allow_expanding_ont=allow_expanding_ont)
+
             form.category = ccg
             d.append([input_str, form])
             i += 3
@@ -539,13 +540,14 @@ class CKYParser:
     # training pairs in t are of form (x, y_chosen, y_correct, chosen_lex_entries, correct_lex_entries)
     # k determines how many parses to get for re-ranking
     # beam determines how many cky_trees to look through before giving up on a given input
-    def get_training_pairs(self, d, reranker_beam=1):
+    def get_training_pairs(self, d, reranker_beam=1): 
         t = []
         num_trainable = 0
         num_matches = 0
         num_fails = 0
         num_genlex_only = 0
         for [x, y] in d:
+            print "Training on: [" + str(x) + "," + str(y) + "]" 
             correct_parse = None
             correct_new_lexicon_entries = []
             cky_parse_generator = self.most_likely_cky_parse(x, reranker_beam=reranker_beam, known_root=y)

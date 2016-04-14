@@ -19,7 +19,6 @@ glass:e
 hamburger:e
 hammer:e
 juice:e
-laptop:e
 ledger:e
 letter:e
 milk:e

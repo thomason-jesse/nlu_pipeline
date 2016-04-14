@@ -263,15 +263,14 @@ if __name__ == '__main__' :
     ont = Ontology.Ontology(sys.argv[1])
     lex = Lexicon.Lexicon(ont, sys.argv[2])
     
-    parser_trainer = ParserTrainer()
-    parser = CKYParser.CKYParser(ont, lex, use_language_model=True)
+    parser = CKYParser.CKYParser(ont, lex, use_language_model=False)
     
     ## Set parser hyperparams to best known values for training
     parser.max_multiword_expression = 2  # max span of a multi-word expression to be considered during tokenization
     parser.max_new_senses_per_utterance = 2  # max number of new word senses that can be induced on a training example
-    parser.max_cky_trees_per_token_sequence_beam = 1000  # for tokenization of an utterance, max cky trees considered
-    parser.max_hypothesis_categories_for_unknown_token_beam = 5  # for unknown token, max syntax categories tried
-    parser.max_expansions_per_non_terminal = 5
+    parser.max_cky_trees_per_token_sequence_beam = 10  # for tokenization of an utterance, max cky trees considered
+    parser.max_hypothesis_categories_for_unknown_token_beam = 2  # for unknown token, max syntax categories tried
+    parser.max_expansions_per_non_terminal = 2
 
     # Create train set
     D = parser.read_in_paired_utterance_semantics(sys.argv[3])
@@ -288,7 +287,7 @@ if __name__ == '__main__' :
         #form.category = ccg
 
         #D.append((command, form))
-    converged = parser.train_learner_on_semantic_forms(D, 10, reranker_beam=10)
+    converged = parser.train_learner_on_semantic_forms(D, 10, reranker_beam=1)
     print 'converged = ', converged
     if len(sys.argv) > 4 :
         filename = str(sys.argv[4])
