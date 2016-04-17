@@ -33,16 +33,14 @@ if __name__ == '__main__' :
     parser.max_hypothesis_categories_for_unknown_token_beam = 5  # for unknown token, max syntax categories tried
     parser.max_expansions_per_non_terminal = 5
 
-    file_path = '../models/parser_training_full/'
-
     # Read in easy train data 
     easy_data = parser.read_in_paired_utterance_semantics(sys.argv[3])
     converged = parser.train_learner_on_semantic_forms(easy_data, 10, reranker_beam=10)
     print '\n\n\nHand designed examples: converged = ', converged
 
-    file_name = file_path + 'basic.pkl'
-    save_obj_general(parser, file_name)
+    save_obj_general(parser, sys.argv[4])
     
+    """
     hard_data = parser.read_in_paired_utterance_semantics(sys.argv[4])
     usable_data = list()
     for (utterance, semantic_form) in hard_data :
@@ -55,3 +53,4 @@ if __name__ == '__main__' :
     
     file_name = '../models/parser_1000.pkl'
     save_obj_general(parser, file_name)
+    """

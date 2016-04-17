@@ -32,12 +32,13 @@ def process_phrase(phrase, pass_num):
     if not whole_num == None:
         return_phrase += whole_num
 
-    #Makes 's tokens. 
+    #Prepares phrases for parser training file. 
     if pass_num == 2:
         word_list = return_phrase.split()
         return_phrase = ""
 
         for word in word_list:
+            word = word.strip(',')
             split_list = word.split('\'') 
             
             #Token had apostrophe. 
@@ -128,13 +129,14 @@ for user in os.listdir('headset'):
     parser_training_file = open(path + user + '_train_parser.txt', 'w')
     lm_training_file = open(path + user + '_train_lm.txt', 'w')
     transcript_file = open(path + user + '_transcript.txt', 'w')
+    parser_training_short_file = open(path + user + '_train_parser_short.txt' , 'w')
 
     phrase_file = open(path + user + '_phrases.txt', 'r')
     denotation_file = open(path + user + '_denotations.txt', 'r')
     semantic_forms_file = open(path + user + '_semantic_forms.txt', 'r')
     recordings_file = open(path + user + '_recording_files.txt', 'r')
 
-    for i in range(0, 95):
+    for i in range(0, 90):
         phrase = phrase_file.readline()    
 
         #Phrase processing removes commas. 
@@ -147,12 +149,20 @@ for user in os.listdir('headset'):
         recording_file_name = '(' + recording_file_name + ')'
         transcript_file.write(processed_phrase.strip() + ' ' + recording_file_name + '\n')
 
-        parser_training_file.write(process_phrase(phrase, 2))
-        parser_training_file.write(semantic_forms_file.readline())
-        parser_training_file.write(denotation_file.readline() + '\n')
+        #Writes phrase to regular parser training file. 
+        processed_phrase = process_phrase(phrase, 2)
+        semantic_form = semantic_forms_file.readline()
+        parser_training_file.write(processed_phrase)
+        parser_training_file.write(semantic_form + '\n')
+
+        #Writes phrase to short training file if sentence length does not exceed 10.
+        if len(processed_phrase.split()) <= 10:
+            parser_training_short_file.write(processed_phrase)
+            parser_training_short_file.write(semantic_form + '\n')
 
     lm_training_file.close()
     parser_training_file.close()
+    parser_training_short_file.close()
     phrase_file.close()
     denotation_file.close()
     semantic_forms_file.close()
