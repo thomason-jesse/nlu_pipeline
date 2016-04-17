@@ -32,8 +32,22 @@ def process_phrase(phrase, pass_num):
     if not whole_num == None:
         return_phrase += whole_num
 
+    #Makes 's tokens. 
+    if pass_num == 2:
+        word_list = return_phrase.split()
+        return_phrase = ""
+
+        for word in word_list:
+            split_list = word.split('\'') 
+            
+            #Token had apostrophe. 
+            if len(split_list) == 2:
+                return_phrase += split_list[0] + ' '
+                return_phrase += '\'' + split_list[1] + ' '
+            else:
+                return_phrase += word + ' '
     #For speech. 
-    if pass_num == 3:
+    elif pass_num == 3:
         return_phrase = '<s> ' + return_phrase.strip() + ' </s>'
 
     return return_phrase.strip() + "\n"
@@ -134,8 +148,8 @@ for user in os.listdir('headset'):
         transcript_file.write(processed_phrase.strip() + ' ' + recording_file_name + '\n')
 
         parser_training_file.write(process_phrase(phrase, 2))
-        parser_training_file.write(semantic_forms_file.readline() + '\n')
-        #parser_training_file.write(denotation_file.readline() + '\n')
+        parser_training_file.write(semantic_forms_file.readline())
+        parser_training_file.write(denotation_file.readline() + '\n')
 
     lm_training_file.close()
     parser_training_file.close()
