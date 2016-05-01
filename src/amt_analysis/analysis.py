@@ -278,7 +278,7 @@ def get_statistical_significance() :
     filename = path_to_batch + 'statistical_significance.csv'
     file_handle = open(filename, 'w')
     writer = csv.writer(file_handle, delimiter=',')
-    write_header = ['agent1', 'agent2', 'metric', 'mean1', 'mean2', 'significance']
+    write_header = ['agent1', 'agent2', 'metric', 'mean1', 'mean2', 'significance', 'winner']
         
     for (agent1, agent2) in agent_pairs :
         for col_name in cols_to_evaluate :
@@ -293,11 +293,17 @@ def get_statistical_significance() :
             v = int(round(v))
             t_stat = stats.t.ppf(1-0.025, v)
             if abs(t) > t_stat :
-                row = [agent1, agent2, col_name, y1, y2, 'significant']
+                if y1 > y2 :
+                    row = [agent1, agent2, col_name, y1, y2, 'significant', agent1]
+                else :
+                    row = [agent1, agent2, col_name, y1, y2, 'significant', agent2]
             else :
                 trending_t_stat = stats.t.ppf(1-0.05, v)
                 if abs(t) > trending_t_stat :
-                    row = [agent1, agent2, col_name, y1, y2, 'trending']
+                    if y1 > y2 :
+                        row = [agent1, agent2, col_name, y1, y2, 'trending', agent1]
+                    else :
+                        row = [agent1, agent2, col_name, y1, y2, 'trending', agent2]
                 else :
                     row = [agent1, agent2, col_name, y1, y2, 'not significant']
             writer.writerow(row)
@@ -360,7 +366,7 @@ def get_statistical_significance_corrected() :
     filename = path_to_batch + 'statistical_significance_corrected.csv'
     file_handle = open(filename, 'w')
     writer = csv.writer(file_handle, delimiter=',')
-    write_header = ['agent1', 'agent2', 'metric', 'mean1', 'mean2', 'significance']
+    write_header = ['agent1', 'agent2', 'metric', 'mean1', 'mean2', 'significance', 'winner']
         
     for (agent1, agent2) in agent_pairs :
         for col_name in cols_to_evaluate :
@@ -375,11 +381,17 @@ def get_statistical_significance_corrected() :
             v = int(round(v))
             t_stat = stats.t.ppf(1-0.025, v)
             if abs(t) > t_stat :
-                row = [agent1, agent2, col_name, y1, y2, 'significant']
+                if y1 > y2 :
+                    row = [agent1, agent2, col_name, y1, y2, 'significant', agent1]
+                else :
+                    row = [agent1, agent2, col_name, y1, y2, 'significant', agent2]
             else :
                 trending_t_stat = stats.t.ppf(1-0.05, v)
                 if abs(t) > trending_t_stat :
-                    row = [agent1, agent2, col_name, y1, y2, 'trending']
+                    if y1 > y2 :
+                        row = [agent1, agent2, col_name, y1, y2, 'trending', agent1]
+                    else :
+                        row = [agent1, agent2, col_name, y1, y2, 'trending', agent2]
                 else :
                     row = [agent1, agent2, col_name, y1, y2, 'not significant']
             writer.writerow(row)
