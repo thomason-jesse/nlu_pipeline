@@ -304,20 +304,23 @@ def get_statistical_significance() :
             
     file_handle.close()
 
-def get_statistical_significance_corrected() :
+def get_statistical_significance() :
     results_file = open(path_to_batch + 'results_corrected.csv', 'r')
     results_reader = csv.reader(results_file, delimiter=',')
     results_header = results_reader.next()
+    agent_type_idx = results_header.index('agent_type')
     
     summary_file = open(path_to_batch + 'summary_corrected.csv', 'r')
     summary_reader = csv.reader(summary_file, delimiter=',')
     summary_header = summary_reader.next()
+    print 'summary_header = ', summary_header
     
-    cols_to_evaluate = summary_header
+    cols_to_evaluate = copy.deepcopy(summary_header)
     cols_to_evaluate.remove('agent_type')
     cols_to_evaluate.remove('performed_action')
     cols_to_evaluate.remove('Number of dialogues')
-    
+    print 'cols_to_evaluate = ', cols_to_evaluate
+     
     means = dict()
     num_rows = dict()
     variances = dict()
@@ -333,24 +336,27 @@ def get_statistical_significance_corrected() :
                 num_rows[agent_type] = int(col_val)
     
     for row in results_reader :
-        agent_type = row[0]
+        agent_type = row[agent_type_idx]
         variances[agent_type] = dict()
         for (col_num, col_val) in enumerate(row) :
             col_name = results_header[col_num]
+            print 'col_name = ', col_name
             if col_name in cols_to_evaluate :
                 if col_name not in variances[agent_type] :
                     variances[agent_type][col_name] = 0.0
                 variances[agent_type][col_name] = variances[agent_type][col_name] + (float(col_val) - means[agent_type][col_name]) ** 2
     
     for agent_type in variances :
-        for col_name in variances[agent] :
+        for col_name in variances[agent_type] :
+            print 'agent_type = ', agent_type, ', col_name = ', col_name
             variances[agent_type][col_name] = variances[agent_type][col_name] / num_rows[agent_type]
     
     agent_types = means.keys()            
     agent_pairs = list()
     for i in range(0, len(agent_types)-1) :
-        agent_pairs = agent_pairs + list(itertools.product(agent_types[i], agent_types[i+1:]))        
-    
+        agent_pairs = agent_pairs + list(itertools.product([agent_types[i]], agent_types[i+1:]))        
+    print 'agent_pairs = ', agent_pairs
+ 
     filename = path_to_batch + 'statistical_significance_corrected.csv'
     file_handle = open(filename, 'w')
     writer = csv.writer(file_handle, delimiter=',')
