@@ -30,8 +30,8 @@ MAX_WAITING_USERS = 100
 MAX_OUTSTANDING_MESSAGES = 1000
 MAX_TIMEOUT_TO_ADD_USER = 1 # in seconds
 
-#MAIN_LOG_PATH = '../../../../public_html/AMT/'
-MAIN_LOG_PATH = '/home/aishwarya/Documents/Trial/AMT/'
+MAIN_LOG_PATH = '../../../../public_html/AMT/'
+#MAIN_LOG_PATH = '/home/aishwarya/Documents/Trial/AMT/'
 
 LOGGING_PATH = 'log/'
 TEXT_LOG_PATH = 'log_text/'

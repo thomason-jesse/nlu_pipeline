@@ -63,7 +63,7 @@ if (strcmp($task_type,"deliver") == 0) {
             $food = $foods[rand(0,count($foods)-1)];
         }
     } else {
-        $food = $deliver_test[$food];
+        $food = $deliver_test[$person];
     }
     
 	$target_command = "bring(".$food.",".$person.")";

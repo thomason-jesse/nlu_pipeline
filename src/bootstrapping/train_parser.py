@@ -31,7 +31,7 @@ if __name__ == '__main__' :
     parser.max_new_senses_per_utterance = 2  # max number of new word senses that can be induced on a training example
     parser.max_cky_trees_per_token_sequence_beam = 1000  # for tokenization of an utterance, max cky trees considered
     parser.max_hypothesis_categories_for_unknown_token_beam = 5  # for unknown token, max syntax categories tried
-    parser.max_expansions_per_non_terminal = 5
+    parser.max_expansions_per_non_terminal = 5 # no of backpointers to store
 
     file_path = '../models/parser_training_full/'
 

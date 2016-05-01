@@ -36,7 +36,7 @@ def create_trainer(parser_file, policy_file) :
 
 def train_policy(trainer, relevant_log_type, policy_save_file, max_iterations=10, convergence_threshold=numpy.exp(-21.0)) :
     print 'In train_policy : ', relevant_log_type
-    logs_dir = '/u/aish/Documents/Research/AMT_results/Batch1/corrected_pickle_logs/'
+    logs_dir = '/u/aish/Documents/Research/AMT_results/after_fluency/combined/'
     theta = trainer.policy.theta
     P = trainer.policy.P
     
@@ -48,14 +48,14 @@ def train_policy(trainer, relevant_log_type, policy_save_file, max_iterations=10
         theta_diff = numpy.sum(numpy.absolute(new_theta - theta))
         P_diff = numpy.sum(numpy.absolute(new_P - P))
         print relevant_log_type, ' : theta_diff = ', theta_diff, 'P_diff = ', P_diff
-        if theta_diff < convergence_threshold and P_diff < convergence_threshold :
-            break
-
+        #if theta_diff < convergence_threshold and P_diff < convergence_threshold :
+            #break
+    
     print "Terminated in iteration ", i
 
 
 def main() :
-    logs_dir = '/u/aish/Documents/Research/AMT_results/Batch1/corrected_pickle_logs/'
+    logs_dir = '/u/aish/Documents/Research/AMT_results/after_fluency/combined/'
     only_parser_trainer = create_trainer('only_parser_parser', 'only_parser_policy')
     only_parser_parser_thread = Thread(target=only_parser_trainer.train_parser_from_new_logs, args=(logs_dir, 'only_parser_learning', 'retraining/final_parser-only_parser'))
     only_parser_parser_thread.daemon = True

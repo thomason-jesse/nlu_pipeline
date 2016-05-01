@@ -3,7 +3,7 @@ from os import listdir
 from os.path import isfile, join, isdir
 sys.path.append('../')
 
-path_to_batch = '/u/aish/Documents/Research/AMT_results/Batch3/'
+path_to_batch = '/u/aish/Documents/Research/AMT_results/after_fluency/Batch3/'
 
 people_map = {'alice' : 'stacy', 'bob' : 'jesse', 'carol' : 'shiqi', \
     'dave' : 'jivko', 'eve' : 'aishwarya', 'frannie' : 'scott', \
@@ -164,7 +164,7 @@ def organize_text_logs() :
         
 
 if __name__ == '__main__' :
-    #move_logs_with_codes()
+    move_logs_with_codes()
     #collate_files_for_reconstructing_pickle_logs()    
-    #check_and_correct_pickle_logs()
-    organize_text_logs()
+    check_and_correct_pickle_logs()
+    #organize_text_logs()

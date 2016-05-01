@@ -3,7 +3,7 @@ from os import listdir
 from os.path import isfile, join, isdir
 sys.path.append('../')
 
-path_to_batch = '/u/aish/Documents/Research/AMT_results/Batch3/'
+path_to_batch = '/u/aish/Documents/Research/AMT_results/after_fluency/Batch3/'
 
 def move_to_invalid(rejected_user_ids) :
     src_path = path_to_batch + 'completed/'
@@ -55,13 +55,18 @@ def collate_results() :
     file_handle = open(filename, 'w')
     writer = csv.writer(file_handle, delimiter=',')
     
-    header = ["user_id", "code", "agent_type", "performed_action", "correct_action", "task_easy", "robot_understood", "robot_delayed", "asked_sensible_questions", "conversation_too_long", "dialog_length", "comment"]
+    header = ["user_id", "code", "agent_type", "target_task", "performed_action", "correct_action", "task_easy", "robot_understood", "robot_delayed", "asked_sensible_questions", "conversation_too_long", "dialog_length", "comment"]
     writer.writerow(header)
     
     for (user_id, code) in ids_with_codes.items() :
         log_file_handle = open(log_path + user_id + '_main.pkl', 'rb')
         log = pickle.load(log_file_handle)
-        row = [user_id, code, log[0], int(log[2] != None), int(log[3])]
+        
+        tc_path = path_to_batch + 'completed/target_commands/'
+        tc_file = open(tc_path + user_id + '_main.txt', 'r')
+        target_command = tc_file.read().strip().split('(')[0]
+        
+        row = [user_id, code, log[0], target_command, int(log[2] != None), int(log[3])]
         survey_file_handle = open(survey_path + user_id + '.txt', 'r')
         lineno = 0
         comment = ''
@@ -96,13 +101,18 @@ def collate_results_corrected() :
     file_handle = open(filename, 'w')
     writer = csv.writer(file_handle, delimiter=',')
     
-    header = ["user_id", "code", "agent_type", "performed_action", "correct_action", "task_easy", "robot_understood", "robot_delayed", "asked_sensible_questions", "conversation_too_long", "dialog_length", "comment"]
+    header = ["user_id", "code", "agent_type", "target_task", "performed_action", "correct_action", "task_easy", "robot_understood", "robot_delayed", "asked_sensible_questions", "conversation_too_long", "dialog_length", "comment"]
     writer.writerow(header)
     
     for (user_id, code) in ids_with_codes.items() :
         log_file_handle = open(log_path + user_id + '_main.pkl', 'rb')
         log = pickle.load(log_file_handle)
-        row = [user_id, code, log[0], int(log[2] != None), int(log[3])]
+        
+        tc_path = path_to_batch + 'completed/target_commands/'
+        tc_file = open(tc_path + user_id + '_main.txt', 'r')
+        target_command = tc_file.read().strip().split('(')[0]
+        
+        row = [user_id, code, log[0], target_command, int(log[2] != None), int(log[3])]
         survey_file_handle = open(survey_path + user_id + '.txt', 'r')
         lineno = 0
         comment = ''
@@ -128,17 +138,101 @@ def collate_results_corrected() :
     file_handle.close()
 
     
+def summarize_results_by_agent_type_and_goal() :
+    results_file = open(path_to_batch + 'results.csv', 'r')
+    #results_file = open(path_to_batch + 'results_corrected.csv', 'r')
+    reader = csv.reader(results_file, delimiter=',')
+    sums = dict()
+    num_rows = dict()
+    cols_to_ignore = header = ["user_id", "code", "agent_type", "target_task", "comment"]
+    header = reader.next()
+    agent_idx = header.index("agent_type")
+    target_idx = header.index("target_task")
+    for row in reader :
+        agent_type = row[agent_idx] + ':' + row[target_idx]
+        if agent_type not in sums :
+            sums[agent_type] = dict()
+        if agent_type not in num_rows :
+            num_rows[agent_type] = 0
+        num_rows[agent_type] = num_rows[agent_type] + 1
+        for (idx, col) in enumerate(header) :
+            if col not in cols_to_ignore :
+                if col not in sums[agent_type] :
+                    sums[agent_type][col] = 0
+                sums[agent_type][col] = sums[agent_type][col] + int(row[idx])
+    
+    filename = path_to_batch + 'summary_goal.csv'
+    file_handle = open(filename, 'w')
+    writer = csv.writer(file_handle, delimiter=',')
+    
+    write_header = ['agent_type'] + [col for col in header if col not in cols_to_ignore] + ['Number of dialogues']
+    writer.writerow(write_header)
+    print write_header
+    for agent_type in sums.keys() :
+        row = [agent_type]
+        for col in write_header[1:len(write_header)-1] :
+            avg = float(sums[agent_type][col]) / num_rows[agent_type]
+            avg = round(avg, 2)
+            row.append(avg)
+        row.append(num_rows[agent_type])
+        print row
+        writer.writerow(row)
+    
+    file_handle.close()
+
+def summarize_results_by_agent_type_and_goal_corrected() :
+    results_file = open(path_to_batch + 'results_corrected.csv', 'r')
+    reader = csv.reader(results_file, delimiter=',')
+    sums = dict()
+    num_rows = dict()
+    cols_to_ignore = header = ["user_id", "code", "agent_type", "target_task", "comment"]
+    header = reader.next()
+    agent_idx = header.index("agent_type")
+    target_idx = header.index("target_task")
+    for row in reader :
+        agent_type = row[agent_idx] + ':' + row[target_idx]
+        if agent_type not in sums :
+            sums[agent_type] = dict()
+        if agent_type not in num_rows :
+            num_rows[agent_type] = 0
+        num_rows[agent_type] = num_rows[agent_type] + 1
+        for (idx, col) in enumerate(header) :
+            if col not in cols_to_ignore :
+                if col not in sums[agent_type] :
+                    sums[agent_type][col] = 0
+                sums[agent_type][col] = sums[agent_type][col] + int(row[idx])
+    
+    filename = path_to_batch + 'summary_goal_corrected.csv'
+    file_handle = open(filename, 'w')
+    writer = csv.writer(file_handle, delimiter=',')
+    
+    write_header = ['agent_type'] + [col for col in header if col not in cols_to_ignore] + ['Number of dialogues']
+    writer.writerow(write_header)
+    print write_header
+    for agent_type in sums.keys() :
+        row = [agent_type]
+        for col in write_header[1:len(write_header)-1] :
+            avg = float(sums[agent_type][col]) / num_rows[agent_type]
+            avg = round(avg, 2)
+            row.append(avg)
+        row.append(num_rows[agent_type])
+        print row
+        writer.writerow(row)
+    
+    file_handle.close()
+
 def summarize_results_by_agent_type() :
     results_file = open(path_to_batch + 'results.csv', 'r')
     #results_file = open(path_to_batch + 'results_corrected.csv', 'r')
     reader = csv.reader(results_file, delimiter=',')
     sums = dict()
     num_rows = dict()
-    cols_to_ignore = header = ["user_id", "code", "agent_type", "comment"]
+    cols_to_ignore = header = ["user_id", "code", "agent_type", "target_task", "comment"]
     header = reader.next()
-    type_idx = header.index("agent_type")
+    agent_idx = header.index("agent_type")
+    target_idx = header.index("target_task")
     for row in reader :
-        agent_type = row[type_idx]
+        agent_type = row[agent_idx]
         if agent_type not in sums :
             sums[agent_type] = dict()
         if agent_type not in num_rows :
@@ -154,15 +248,16 @@ def summarize_results_by_agent_type() :
     file_handle = open(filename, 'w')
     writer = csv.writer(file_handle, delimiter=',')
     
-    write_header = ['agent_type'] + [col for col in header if col not in cols_to_ignore]
+    write_header = ['agent_type'] + [col for col in header if col not in cols_to_ignore] + ['Number of dialogues']
     writer.writerow(write_header)
     print write_header
     for agent_type in sums.keys() :
         row = [agent_type]
-        for col in write_header[1:] :
+        for col in write_header[1:len(write_header)-1] :
             avg = float(sums[agent_type][col]) / num_rows[agent_type]
             avg = round(avg, 2)
             row.append(avg)
+        row.append(num_rows[agent_type])
         print row
         writer.writerow(row)
     
@@ -173,11 +268,12 @@ def summarize_results_by_agent_type_corrected() :
     reader = csv.reader(results_file, delimiter=',')
     sums = dict()
     num_rows = dict()
-    cols_to_ignore = header = ["user_id", "code", "agent_type", "comment"]
+    cols_to_ignore = header = ["user_id", "code", "agent_type", "target_task", "comment"]
     header = reader.next()
-    type_idx = header.index("agent_type")
+    agent_idx = header.index("agent_type")
+    target_idx = header.index("target_task")
     for row in reader :
-        agent_type = row[type_idx]
+        agent_type = row[agent_idx]
         if agent_type not in sums :
             sums[agent_type] = dict()
         if agent_type not in num_rows :
@@ -193,20 +289,20 @@ def summarize_results_by_agent_type_corrected() :
     file_handle = open(filename, 'w')
     writer = csv.writer(file_handle, delimiter=',')
     
-    write_header = ['agent_type'] + [col for col in header if col not in cols_to_ignore]
+    write_header = ['agent_type'] + [col for col in header if col not in cols_to_ignore] + ['Number of dialogues']
     writer.writerow(write_header)
     print write_header
     for agent_type in sums.keys() :
         row = [agent_type]
-        for col in write_header[1:] :
+        for col in write_header[1:len(write_header)-1] :
             avg = float(sums[agent_type][col]) / num_rows[agent_type]
             avg = round(avg, 2)
             row.append(avg)
+        row.append(num_rows[agent_type])
         print row
         writer.writerow(row)
     
     file_handle.close()
-
 
 def compare_task_completion() :
     results = open(path_to_batch + 'results.csv', 'r')
@@ -246,10 +342,12 @@ def compare_task_completion() :
     file_handle.close()
     
 if __name__ == '__main__' :
-    rejected_user_ids = ['57053c209db61', '57053619b608', '5705fd9cb9fcb', '5705f87f0b3ab', '5706076b544b5', '5705343360d6a', '570538488b7f5']
-    move_to_invalid(rejected_user_ids)
+    #rejected_user_ids = ['57053c209db61', '57053619b608', '5705fd9cb9fcb', '5705f87f0b3ab', '5706076b544b5', '5705343360d6a', '570538488b7f5']
+    #move_to_invalid(rejected_user_ids)
     collate_results()
     summarize_results_by_agent_type()
+    summarize_results_by_agent_type_and_goal()
     collate_results_corrected()
     summarize_results_by_agent_type_corrected()
+    summarize_results_by_agent_type_and_goal_corrected()
     #compare_task_completion()

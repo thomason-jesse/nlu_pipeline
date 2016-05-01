@@ -85,8 +85,11 @@ class PomdpTrainer(PomdpDialogAgent) :
         w = FeatureWrapper(b)
         f = self.policy.get_feature_vector(w, 'confirm_action')
             
-    def init_weights_from_hand_coded_policy(self) :
-        probs = [np.log(p) for p in [0, 0.00001, 0.2, 0.4, 0.6, 0.8, 1.0]]
+    def init_weights_from_hand_coded_policy(self, rare_cases_weight=3) :
+        probs = [np.log(p) for p in [0, 0.00001, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.98, 0.991, 1.0]]
+        #probs = [np.log(p) for p in [0, 0.00001, 0.2, 0.4, 0.6, 0.8, 1.0]]
+        #probs = [0.05 * x for x in range(0, 21)]
+        #probs = [np.log(p) for p in probs]
         num_goals = [1 ,2 ,3]
         num_uncertain_params = [0, 1, 2, 3]
         last_utterance_type = ['inform_full', 'inform_param', 'affirm', 'deny']
@@ -102,16 +105,23 @@ class PomdpTrainer(PomdpDialogAgent) :
         train_outputs = None
         sample_weights = None
         to_print = []
+        num_hard = 0
         for example in training_examples :
             i += 1
             sample_weight = 1
             example_list = list(example)
             wrapper = FeatureWrapper(example_list)
             action = self.policy.get_action_from_hand_coded_policy(wrapper)
-            if action == 'confirm_action' or action == 'take_action' :
+            if action == 'confirm_action' :
                 # These actions are rarer and need high sample weight to 
                 # be learned
-                sample_weight = 100
+                num_hard += 1
+                sample_weight = rare_cases_weight
+            elif action == 'take_action' :
+                # These actions are rarer and need high sample weight to 
+                # be learned
+                num_hard += 1
+                sample_weight = rare_cases_weight * 1.7
             
             for a in self.knowledge.summary_system_actions :
                 new_feature_vector = self.policy.get_feature_vector(wrapper, a)
@@ -127,13 +137,51 @@ class PomdpTrainer(PomdpDialogAgent) :
                     train_features = np.vstack((train_features, np.matrix(new_feature_vector).T))
                     train_outputs = np.vstack((train_outputs, np.matrix(value).T))
                     sample_weights = np.hstack((sample_weights, sample_weight))
+        #train_features = np.vstack((train_features, train_features))
+        #train_outputs = np.vstack((train_outputs, train_outputs))
+        #sample_weights = np.hstack((sample_weights, sample_weights))
         train_features = np.tile(train_features, (5,1))
         train_outputs = np.tile(train_outputs, (5,1))
         sample_weights = np.tile(sample_weights, (1, 5))[0,:]
-        model = linear_model.Ridge(alpha=0.5, fit_intercept=True)
+        model = linear_model.Ridge(alpha=0, fit_intercept=True)
         model.fit(train_features, train_outputs, sample_weights)
         preds = model.predict(train_features)
         print 'Train loss = ', sum(np.square(preds - train_outputs)) / train_features.shape[0]      # DEBUG
+        
+        num_correct = 0
+        hard_correct = 0
+        for example in training_examples :
+            example_list = list(example)
+            wrapper = FeatureWrapper(example_list)
+            action = self.policy.get_action_from_hand_coded_policy(wrapper)
+            max_val = -sys.maxint
+            pred_action = None
+            for a in self.knowledge.summary_system_actions :
+                new_feature_vector = self.policy.get_feature_vector(wrapper, a)
+                train_features = np.matrix(new_feature_vector).T
+                pred = model.predict(train_features)
+                if pred > max_val :
+                    pred_action = a
+                    max_val = pred 
+            if action == pred_action :
+                num_correct += 1
+                if action == 'confirm_action' or action == 'take_action' :
+                    hard_correct += 1
+            else :
+                disp_example = list(example)
+                disp_example[0] = numpy.exp(disp_example[0])
+                print 'example = ', disp_example
+                print 'action = ', action, 'pred_action = ', pred_action
+                print 
+                
+        print 'num_correct = ', num_correct
+        print 'num_examples = ', len(training_examples)
+        print 'accuracy = ', float(num_correct) * 100 / len(training_examples)
+        
+        print 'num_hard = ', num_hard
+        print 'hard_correct = ', hard_correct
+        print 'hard accuracy = ', float(hard_correct) * 100 / num_hard
+        
         self.policy.theta = model.coef_.T
         save_model(self.policy, 'ktdq_policy_object')
         
@@ -280,13 +328,14 @@ class PomdpTrainer(PomdpDialogAgent) :
         save_model(self.parser, parser_save_name)
         
     # Train the policy using pickle logs from new experiment
-    def train_policy_from_new_logs(self, log_dir, relevant_log_type, policy_save_name='ktdq_policy_object') :
+    def train_policy_from_new_logs(self, log_dir, relevant_log_type=None, policy_save_name='ktdq_policy_object') :
         print 'log_dir = ', log_dir, 'relevant_log_type = ', relevant_log_type
         self.num_turns_across_dialogs = 0
         self.num_not_parsed = 0
         
         files = [f for f in listdir(log_dir) if isfile(join(log_dir, f))]
         random.shuffle(files)
+        print 'No of files = ', len(files)
         idx = 0
 
         err_log = open('src/nlu_pipeline/src/log/Policy_training_errors.txt', 'a')
@@ -327,32 +376,32 @@ class PomdpTrainer(PomdpDialogAgent) :
         # KTDQ is an off policy algorithm so it can be trained on data 
         # from both pomdp and static agents. However, since the experiment
         # compares the agents, we want to train it only from pomdp instances
-        if log[0] == relevant_log_type :
+        if relevant_log_type is None or log[0] == relevant_log_type :
             self.files_used_for_policy_training += 1
-            #self.state = HISBeliefState(self.knowledge)
+            self.state = HISBeliefState(self.knowledge)
             
-            ## For each system_action, response pair, update state and
-            ## train policy with standard per turn reward
-            #for [system_action, response] in log[1] :
-                #prev_state = SummaryState(self.state)
-                #next_state = None
-                #action_type = system_action
-                #if isinstance(system_action, SystemAction) :
-                    #self.previous_system_action = system_action
-                    #self.update_state(response)
-                    #next_state = SummaryState(self.state)
-                    #action_type = system_action.action_type
-                #elif type(system_action) == 'str' and system_action == 'repeat_goal' :
-                    #self.previous_system_action = SystemAction('repeat_goal')
-                    #self.update_state(response)
-                    #next_state = SummaryState(self.state)
-                    #action_type = system_action.action_type
-                #self.policy.train(prev_state, action_type, next_state, self.knowledge.per_turn_reward)
+            # For each system_action, response pair, update state and
+            # train policy with standard per turn reward
+            for [system_action, response] in log[1] :
+                prev_state = SummaryState(self.state)
+                next_state = None
+                action_type = system_action
+                if isinstance(system_action, SystemAction) :
+                    self.previous_system_action = system_action
+                    self.update_state(response)
+                    next_state = SummaryState(self.state)
+                    action_type = system_action.action_type
+                elif type(system_action) == 'str' and system_action == 'repeat_goal' :
+                    self.previous_system_action = SystemAction('repeat_goal')
+                    self.update_state(response)
+                    next_state = SummaryState(self.state)
+                    action_type = system_action.action_type
+                self.policy.train(prev_state, action_type, next_state, self.knowledge.per_turn_reward)
                 
-            #if log[3] : # Dialogue was successful
-                #self.policy.train(prev_state, 'take_action', None, self.knowledge.correct_action_reward)
-            #else :
-                #self.policy.train(prev_state, 'take_action', None, self.knowledge.wrong_action_reward)
+            if log[3] : # Dialogue was successful
+                self.policy.train(prev_state, 'take_action', None, self.knowledge.correct_action_reward)
+            else :
+                self.policy.train(prev_state, 'take_action', None, self.knowledge.wrong_action_reward)
             
                 
                     

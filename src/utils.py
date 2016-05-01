@@ -8,7 +8,7 @@ import numpy
 from SemanticNode import SemanticNode
 
 
-models_path = 'src/nlu_pipeline/src/models/'
+models_path = '/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/models/'
 
 
 def save_model(obj, name):

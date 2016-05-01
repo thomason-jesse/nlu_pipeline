@@ -58,62 +58,17 @@ grounder.parser = parser
 grounder.ontology = parser.ontology
 
 knowledge = Knowledge()
-policy = PomdpKtdqPolicy(knowledge)
+#policy = PomdpKtdqPolicy(knowledge)
+policy = load_model('policy_training/old_batch_iteration4')
 print "instantiating Trainer"
 param_mapping_file = 'src/nlu_pipeline/src/resources/old_ijcai_domain/ontology_mapping.csv'
 vocab_mapping_file = 'src/nlu_pipeline/src/bootstrapping/Vocabulary.txt'
 trainer = PomdpTrainer(parser, grounder, policy, param_mapping_file = param_mapping_file, vocab_mapping_file = vocab_mapping_file)
 
-file_path = 'src/nlu_pipeline/src/models/policy_training/'
-success_dir = '/u/aish/Documents/Research/rlg/logs_only/second/valid'
-fail_dir = '/u/aish/Documents/Research/rlg/logs_only/second/invalid'
-
 # Initialize using hand-coded policy
 trainer.init_weights_from_hand_coded_policy()
-file_name = file_path + 'hand_coded' + '.pkl'
-save_obj_general(trainer.policy, file_name)
+#file_name = file_path + 'hand_coded' + '.pkl'
+#save_obj_general(trainer.policy, file_name)
 
-param_diff_file = 'src/nlu_pipeline/src/bootstrapping/param_diffs.csv'
-param_diff_file_handle = open(param_diff_file, 'a')
-param_diff_file_writer = csv.writer(param_diff_file_handle, delimiter=',')
-param_diff_file_writer.writerow(['name', 'theta_diff', 'P_diff'])
 
-theta = trainer.policy.theta
-P = trainer.policy.P
-
-# Train using old logs
-for i in range(0, 5) :
-    trainer.train_from_old_logs(success_dir, fail_dir)
-    file_name = file_path + 'old_batch_iteration' + str(i) + '.pkl'
-    save_obj_general(trainer.policy, file_name)
-    
-    new_theta = trainer.policy.theta
-    new_P = trainer.policy.P
-    theta_diff = numpy.sum(numpy.absolute(new_theta - theta))
-    P_diff = numpy.sum(numpy.absolute(new_P - P))
-    param_diff_file_writer.writerow(['old_batch_iteration' + str(i), theta_diff, P_diff])
-    theta = new_theta
-    P = new_P
-
-# Train using new logs
-new_logs_dirs = ['/u/aish/Documents/Research/AMT_results/before_fluency_verification/Batch0/all_corrected_pickle_logs/', \
-    '/u/aish/Documents/Research/AMT_results/before_fluency_verification/Batch1/corrected_pickle_logs/', \
-    '/u/aish/Documents/Research/AMT_results/before_fluency_verification/Batch2/corrected_pickle_logs/', \
-    '/u/aish/Documents/Research/AMT_results/testing_fluency/corrected_pickle_logs/', \
-    '/u/aish/Documents/Research/AMT_results/after_fluency/Batch0/corrected_pickle_logs/']
-    
-for i in range(0, 5) :
-    for (j, log_dir) in enumerate(new_logs_dirs) :
-        trainer.train_policy_from_new_logs(log_dir)
-        file_name = file_path + 'new_batch' + str(j) + '_iteration' + str(i) + '.pkl'
-        save_obj_general(trainer.policy, file_name)
-        
-        new_theta = trainer.policy.theta
-        new_P = trainer.policy.P
-        theta_diff = numpy.sum(numpy.absolute(new_theta - theta))
-        P_diff = numpy.sum(numpy.absolute(new_P - P))
-        param_diff_file_writer.writerow(['new_batch' + str(j) + '_iteration' + str(i), theta_diff, P_diff])
-        theta = new_theta
-        P = new_P
-    
 

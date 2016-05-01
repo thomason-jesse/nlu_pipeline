@@ -9,16 +9,17 @@
 
 <SCRIPT LANGUAGE="JavaScript" >
 
-	var train_or_test = "train";
-	var user_id_base = null; //supplied from MTurk
-	var user_id = null; //changes based on task
-	var current_task = null;
+    //var train_or_test = "train";
+    var train_or_test = "test";
+    var user_id_base = null; //supplied from MTurk
+    var user_id = null; //changes based on task
+    var current_task = null;
     
     var num_responses = 0;
-	
-	//what little style exists
-	var user_cell_color = 'AliceBlue';
-	var system_cell_color = 'GhostWhite';
+    
+    //what little style exists
+    var user_cell_color = 'AliceBlue';
+    var system_cell_color = 'GhostWhite';
 
     // Set up rosbridge connecton
     var ros = new ROSLIB.Ros({
@@ -78,6 +79,7 @@
         document.getElementById('example').style.display = 'none';
         document.getElementById('proceed_button').style.display = 'none';
         
+        
         var tasks = ['walk', 'deliver', 'search'];
         var task = tasks[Math.floor(Math.random()*tasks.length)];
         //alert('task = ' + task);
@@ -93,138 +95,142 @@
     function begin() {
         document.getElementById('ask_for_ID').style.display = 'none';
         document.getElementById('understand_task').style.display = 'block';
+        document.getElementById('task_map').style.display = 'block';
     }
    
-	//draw a random walk task and return the description to javascript; write the task goal to file for later comparison against command generated
-	function drawRandomWalkTask()
-	{
-		//get user id
-		user_id_base = <?php echo "'".uniqid()."'";?>;
-		user_id = user_id_base.concat('_main');
-		current_task = "main";
-	
-		//hide ask id div and open task show div
-		document.getElementById('ask_for_ID').style.display = 'none';
-		document.getElementById('inst').style.display = 'block';
-		document.getElementById('introduce_task').style.display = 'block';
-		document.getElementById('task_map').style.display = 'block';
-		document.getElementById('dialog_start_block').style.display = 'block';
-	
-		getRequest(
-			  'draw_random_task.php', // URL for the PHP file
-			  'task=at&user_id='.concat(user_id).concat('&train_or_test=').concat(train_or_test), // parameters for PHP
-			   invokeRandomTaskOutput,  // handle successful request
-			   invokeRandomTaskError    // handle error
-		  );
-	}
-	
-	//draw a random deliver task and return the description to javascript; write the task goal to file for later comparison against command generated
-	function drawRandomDeliverTask()
-	{
-		//update user id for new task
-		//get user id
-		user_id_base = <?php echo "'".uniqid()."'";?>;
-		user_id = user_id_base.concat('_main');
-		current_task = "main";
-	
-		//hide ask id div and open task show div
-		document.getElementById('ask_for_ID').style.display = 'none';
-		document.getElementById('inst').style.display = 'block';
-		document.getElementById('introduce_task').style.display = 'block';
-		document.getElementById('task_map').style.display = 'block';
-		document.getElementById('dialog_start_block').style.display = 'block';
-	
-		getRequest(
-			  'draw_random_task.php', // URL for the PHP file
-			  'task=deliver&user_id='.concat(user_id).concat('&train_or_test=').concat(train_or_test), // parameters for PHP
-			   invokeRandomTaskOutput,  // handle successful request
-			   invokeRandomTaskError    // handle error
-		  );
-	}
+    //draw a random walk task and return the description to javascript; write the task goal to file for later comparison against command generated
+    function drawRandomWalkTask()
+    {
+        //get user id
+        user_id_base = <?php echo "'".uniqid()."'";?>;
+        user_id = user_id_base.concat('_main');
+        current_task = "main";
+    
+        //hide ask id div and open task show div
+        document.getElementById('ask_for_ID').style.display = 'none';
+        document.getElementById('inst').style.display = 'block';
+        document.getElementById('introduce_task').style.display = 'block';
+        document.getElementById('task_map').style.display = 'block';
+        document.getElementById('prompt').style.display = 'block';
+        document.getElementById('dialog_start_block').style.display = 'block';
+    
+        getRequest(
+              'draw_random_task.php', // URL for the PHP file
+              'task=at&user_id='.concat(user_id).concat('&train_or_test=').concat(train_or_test), // parameters for PHP
+               invokeRandomTaskOutput,  // handle successful request
+               invokeRandomTaskError    // handle error
+          );
+    }
+    
+    //draw a random deliver task and return the description to javascript; write the task goal to file for later comparison against command generated
+    function drawRandomDeliverTask()
+    {
+        //update user id for new task
+        //get user id
+        user_id_base = <?php echo "'".uniqid()."'";?>;
+        user_id = user_id_base.concat('_main');
+        current_task = "main";
+    
+        //hide ask id div and open task show div
+        document.getElementById('ask_for_ID').style.display = 'none';
+        document.getElementById('inst').style.display = 'block';
+        document.getElementById('introduce_task').style.display = 'block';
+        document.getElementById('task_map').style.display = 'block';
+        document.getElementById('prompt').style.display = 'block';
+        document.getElementById('dialog_start_block').style.display = 'block';
+    
+        getRequest(
+              'draw_random_task.php', // URL for the PHP file
+              'task=deliver&user_id='.concat(user_id).concat('&train_or_test=').concat(train_or_test), // parameters for PHP
+               invokeRandomTaskOutput,  // handle successful request
+               invokeRandomTaskError    // handle error
+          );
+    }
     
     //draw a random search task and return the description to javascript; write the task goal to file for later comparison against command generated
-	function drawRandomSearchTask()
-	{
+    function drawRandomSearchTask()
+    {
         //get user id
-		user_id_base = <?php echo "'".uniqid()."'";?>;
-		user_id = user_id_base.concat('_main');
-		current_task = "main";
-	
-		//hide ask id div and open task show div
-		document.getElementById('ask_for_ID').style.display = 'none';
-		document.getElementById('inst').style.display = 'block';
-		document.getElementById('introduce_task').style.display = 'block';
-		document.getElementById('task_map').style.display = 'block';
-		document.getElementById('dialog_start_block').style.display = 'block';
-	
+        user_id_base = <?php echo "'".uniqid()."'";?>;
+        user_id = user_id_base.concat('_main');
+        current_task = "main";
+    
+        //hide ask id div and open task show div
+        document.getElementById('ask_for_ID').style.display = 'none';
+        document.getElementById('inst').style.display = 'block';
+        document.getElementById('introduce_task').style.display = 'block';
+        document.getElementById('task_map').style.display = 'block';
+        document.getElementById('dialog_start_block').style.display = 'block';
+        document.getElementById('prompt').style.display = 'block';
+    
         getRequest(
-			  'draw_random_task.php', // URL for the PHP file
-			  'task=search&user_id='.concat(user_id).concat('&train_or_test=').concat(train_or_test), // parameters for PHP
-			   invokeRandomTaskOutput,  // handle successful request
-			   invokeRandomTaskError    // handle error
-		  );
-	}
-	
-	//draw a random query task and return the description to javascript; write the task goal to file for later comparison against command generated; this is the validation task to detect spammers
-	function drawRandomQueryTask()
-	{
-		//update user id for new task
-		user_id = user_id_base.concat('_query');
-		current_task = "query";
-	
-		getRequest(
-			  'draw_random_task.php', // URL for the PHP file
-			  'task=query&user_id='.concat(user_id).concat('&train_or_test=').concat(train_or_test), // parameters for PHP
-			   invokeRandomTaskOutput,  // handle successful request
-			   invokeRandomTaskError    // handle error
-		  );
-	}
-	
-	// handles the response, adds the html
-	function invokeRandomTaskOutput(response_text) {
-	
-		alert('DEBUG: output from php:\n'.concat(response_text));
-	
-		var task_description_text = document.getElementById('task_description_text');
-		task_description_text.innerHTML = response_text;
+              'draw_random_task.php', // URL for the PHP file
+              'task=search&user_id='.concat(user_id).concat('&train_or_test=').concat(train_or_test), // parameters for PHP
+               invokeRandomTaskOutput,  // handle successful request
+               invokeRandomTaskError    // handle error
+          );
+    }
+    
+    //draw a random query task and return the description to javascript; write the task goal to file for later comparison against command generated; this is the validation task to detect spammers
+    function drawRandomQueryTask()
+    {
+        //update user id for new task
+        user_id = user_id_base.concat('_query');
+        current_task = "query";
+    
+        getRequest(
+              'draw_random_task.php', // URL for the PHP file
+              'task=query&user_id='.concat(user_id).concat('&train_or_test=').concat(train_or_test), // parameters for PHP
+               invokeRandomTaskOutput,  // handle successful request
+               invokeRandomTaskError    // handle error
+          );
+    }
+    
+    // handles the response, adds the html
+    function invokeRandomTaskOutput(response_text) {
+    
+        //alert('DEBUG: output from php:\n'.concat(response_text));
+    
+        var task_description_text = document.getElementById('task_description_text');
+        task_description_text.innerHTML = response_text;
 
-	}
-	
-	// handles drawing an error message
-	function invokeRandomTaskError () {
-		alert('DEBUG: there was an error calling draw_random_task.php');
-	}
+    }
+    
+    // handles drawing an error message
+    function invokeRandomTaskError () {
+        alert('DEBUG: there was an error calling draw_random_task.php');
+    }
     
     //run to start a dialog with the system for a new user
-	function startDialog()
-	{
-		//alert('DEBUG: startDialog() called');
+    function startDialog()
+    {
+        //alert('DEBUG: startDialog() called');
         num_responses = 0;
-		
-		//hide start div and open dialog div
-		document.getElementById('dialog_start_block').style.display = 'none';
-		document.getElementById('dialog_history_block').style.display = 'block';
-		
-		//gray out text area to prevent overloading system while it's starting up
-		document.getElementsByName("user_input_box")[0].disabled = true;
-		
-		//add robot initial [thinking...] cell
-		var table = document.getElementsByName('history')[0];
-		var system_row = table.insertRow(table.rows.length-1);
-		var system_response_cell = system_row.insertCell(0);
-		system_response_cell.innerHTML = "<i>typing...</i>";
-		system_response_cell.style.backgroundColor = system_cell_color;
-		var system_name_cell = system_row.insertCell(0);
-		system_name_cell.innerHTML = "ROBOT";
-		system_name_cell.style.backgroundColor = system_cell_color;
+        
+        //hide start div and open dialog div
+        document.getElementById('dialog_start_block').style.display = 'none';
+        document.getElementById('dialog_history_block').style.display = 'block';
+        
+        //gray out text area to prevent overloading system while it's starting up
+        document.getElementsByName("user_input_box")[0].disabled = true;
+        
+        //add robot initial [thinking...] cell
+        var table = document.getElementsByName('history')[0];
+        var system_row = table.insertRow(table.rows.length-1);
+        var system_response_cell = system_row.insertCell(0);
+        system_response_cell.innerHTML = "<i>typing...</i>";
+        system_response_cell.style.backgroundColor = system_cell_color;
+        var system_name_cell = system_row.insertCell(0);
+        system_name_cell.innerHTML = "ROBOT";
+        system_name_cell.style.backgroundColor = system_cell_color;
         
         //alert('ros = ' + ros + ' user_id = ' + user_id);
 
         // Retries registering the user once every 100 ms
         tryingToRegisterUser = setInterval(registerUser, 100);
         
-		return false;
-	}
+        return false;
+    }
     
     function registerUser() {
         //alert('Trying to register user');
@@ -259,84 +265,85 @@
         } 
     }
     
-	function startQuery()
-	{
-		//alert('DEBUG: startQuery() called');
-		
-		//change map
-		document.getElementById('task_map').innerHTML = "<b>DIRECTORY</b><p><img src=\"directory.png\" alt=\"Rooms, offices and labs\" style=\"width:40%\"></p>";
+    function startQuery()
+    {
+        //alert('DEBUG: startQuery() called');
+        
+        //change map
+        document.getElementById('task_map').innerHTML = "<b>DIRECTORY</b><p><img src=\"directory.png\" alt=\"Rooms, offices and labs\" style=\"width:40%\"></p>";
         document.getElementById("stop_prompt").style.display = "none";
-		
-		//hide start div and clear dialog table of past conversation
-		document.getElementById('third_dialog_start_block').style.display = 'none';
-		table = document.getElementsByName('history')[0];
-		while (table.rows.length > 1)
-		{
-			table.deleteRow(0);
-		}
-		
-		//add robot cell
-		var table = document.getElementsByName('history')[0];
-		var system_row = table.insertRow(table.rows.length-1);
-		var system_response_cell = system_row.insertCell(0);
-		system_response_cell.innerHTML = "Please write the first and last name only.";
-		system_response_cell.style.backgroundColor = system_cell_color;
-		var system_name_cell = system_row.insertCell(0);
-		system_name_cell.innerHTML = "ROBOT";
-		system_name_cell.style.backgroundColor = system_cell_color;
-		
-		//ungray text area to allow user to respond
-		document.getElementsByName("user_input_box")[0].disabled = false;
-	
-		//draw a new task to display; updates task variables and displays new description
-		drawRandomQueryTask();
-		
-		//update instructions text to be a little clearer
-		document.getElementById('inst').innerHTML = "You can use the directory to look up room numbers and find the full name requested.";
-		
-		return false;
-	}
+        document.getElementById("prompt").style.display = "none";
+        
+        //hide start div and clear dialog table of past conversation
+        document.getElementById('third_dialog_start_block').style.display = 'none';
+        table = document.getElementsByName('history')[0];
+        while (table.rows.length > 1)
+        {
+            table.deleteRow(0);
+        }
+        
+        //add robot cell
+        var table = document.getElementsByName('history')[0];
+        var system_row = table.insertRow(table.rows.length-1);
+        var system_response_cell = system_row.insertCell(0);
+        system_response_cell.innerHTML = "Please write the first and last name only.";
+        system_response_cell.style.backgroundColor = system_cell_color;
+        var system_name_cell = system_row.insertCell(0);
+        system_name_cell.innerHTML = "ROBOT";
+        system_name_cell.style.backgroundColor = system_cell_color;
+        
+        //ungray text area to allow user to respond
+        document.getElementsByName("user_input_box")[0].disabled = false;
+    
+        //draw a new task to display; updates task variables and displays new description
+        drawRandomQueryTask();
+        
+        //update instructions text to be a little clearer
+        document.getElementById('inst').innerHTML = "You can use the directory to look up room numbers and find the full name requested.";
+        
+        return false;
+    }
 
-	//run when the user submits a new response to the system
-	function getDialogResponse(form)
-	{
+    //run when the user submits a new response to the system
+    function getDialogResponse(form)
+    {
         //event.preventDefault();
         num_responses = num_responses + 1;
         if (current_task == "main" && num_responses > 10) {
             document.getElementById("stop_prompt").style.display = "block";
         }
         //alert('In getDialogResponse, current_task =  ' + current_task);
-		//get user input and clear text box
-		var user_input_raw = form.user_input_box.value;
-		form.user_input_box.value = '';
-		
-		//do initial sanitization of user text and ignore command if it's empty/bogus
-		var temp_div = document.createElement("div");
-		temp_div.innerHTML = user_input_raw;
-		var user_input = temp_div.textContent || temp_div.innerText || "";
-		if (user_input.length == 0) return;
-		
-		//if user input is to be submitted, gray out text area to prevent overloading system
-		document.getElementsByName("user_input_box")[0].disabled = true;
-		
-		//add user text
-		var table = document.getElementsByName('history')[0];
-		var user_row = table.insertRow(table.rows.length-1);
-		var user_response_cell = user_row.insertCell(0);
-		user_response_cell.innerHTML = user_input;
-		user_response_cell.style.backgroundColor = user_cell_color;
-		var user_name_cell = user_row.insertCell(0);
-		user_name_cell.innerHTML = "YOU";
-		user_name_cell.style.backgroundColor = user_cell_color;
-		
-		//add robot initial [thinking...] cell
-		var system_row = table.insertRow(table.rows.length-1);
-		var system_response_cell = system_row.insertCell(0);
-		system_response_cell.innerHTML = "<i>typing...</i>";
-		system_response_cell.style.backgroundColor = system_cell_color;
-		var system_name_cell = system_row.insertCell(0);
-		system_name_cell.innerHTML = "ROBOT";
-		system_name_cell.style.backgroundColor = system_cell_color;
+        //get user input and clear text box
+        var user_input_raw = form.user_input_box.value;
+        form.user_input_box.value = '';
+        
+        //do initial sanitization of user text and ignore command if it's empty/bogus
+        var temp_div = document.createElement("div");
+        temp_div.innerHTML = user_input_raw;
+        var user_input = temp_div.textContent || temp_div.innerText || "";
+        if (user_input.length == 0) return;
+        
+        //if user input is to be submitted, gray out text area to prevent overloading system
+        document.getElementsByName("user_input_box")[0].disabled = true;
+        
+        //add user text
+        var table = document.getElementsByName('history')[0];
+        var user_row = table.insertRow(table.rows.length-1);
+        var user_response_cell = user_row.insertCell(0);
+        user_response_cell.innerHTML = user_input;
+        user_response_cell.style.backgroundColor = user_cell_color;
+        var user_name_cell = user_row.insertCell(0);
+        user_name_cell.innerHTML = "YOU";
+        user_name_cell.style.backgroundColor = user_cell_color;
+        
+        //add robot initial [thinking...] cell
+        var system_row = table.insertRow(table.rows.length-1);
+        var system_response_cell = system_row.insertCell(0);
+        system_response_cell.innerHTML = "<i>typing...</i>";
+        system_response_cell.style.backgroundColor = system_cell_color;
+        var system_name_cell = system_row.insertCell(0);
+        system_name_cell.innerHTML = "ROBOT";
+        system_name_cell.style.backgroundColor = system_cell_color;
 
         if (current_task == 'query') {
             //alert('Query task');
@@ -357,7 +364,7 @@
             jsTalkClient.callService(request, jsTalkCallback);
             //alert('Sent message');
         }
-	}
+    }
     
     function jsTalkCallback(python_ack) {
         //alert('In jsTalkCallback python_ack.python_ack = ' + python_ack.python_ack);
@@ -370,10 +377,10 @@
         }
     }
 
-	// handles drawing an error message
-	function invokeDialogAgentError () {
-		alert('DEBUG: there was an error calling dialog_agent.php');
-	}
+    // handles drawing an error message
+    function invokeDialogAgentError () {
+        alert('DEBUG: there was an error calling dialog_agent.php');
+    }
 
     // Format query response so that it can be handled by invokeDialogAgentOutput
     function formatQueryResponse(response) {
@@ -382,142 +389,142 @@
         invokeDialogAgentOutput(formatted_response);
     }
 
-	// handles the response, adds the html
-	function invokeDialogAgentOutput(response) {
+    // handles the response, adds the html
+    function invokeDialogAgentOutput(response) {
         response_text = response.python_response;
         //alert('In invokeDialogAgentOutput: Response = ' + response_text);
-		//alert('DEBUG: output from php:\n'.concat(response_text));
-	
-		//split input and output from php response
-		var input_output_pair = response_text.split("\n");
-		user_input = input_output_pair[0]; //sanitized
+        //alert('DEBUG: output from php:\n'.concat(response_text));
+    
+        //split input and output from php response
+        var input_output_pair = response_text.split("\n");
+        user_input = input_output_pair[0]; //sanitized
         //alert('user_input = ' + user_input);
-		if (user_input == "FAILED")
-		{
-			alert('ERROR: something failed when invoking the dialog agent');
-			alert('DEBUG: '.concat(response_text));
-			return;
-		}
-		system_output = input_output_pair.slice(1,input_output_pair.length); //system response(s)
+        if (user_input == "FAILED")
+        {
+            alert('ERROR: something failed when invoking the dialog agent');
+            alert('DEBUG: '.concat(response_text));
+            return;
+        }
+        system_output = input_output_pair.slice(1,input_output_pair.length); //system response(s)
         //alert('system_output = ' + system_output);
-		
-		//append system output to page conversation log
-		var table = document.getElementsByName('history')[0];
-		//for first line of system output, overwrite [thinking...] line already created with text
-		var system_row = table.rows[table.rows.length-2];
-		var system_response_cell = system_row.cells[1];
-		system_response_cell.innerHTML = system_output[0];
-		//add remaining lines of system output, if any
-		for (i = 1; i < system_output.length; i++)
-		{
-			var system_row = table.insertRow(table.rows.length-1);
-			var system_response_cell = system_row.insertCell(0);
-			system_response_cell.innerHTML = system_output[i];
-			system_response_cell.style.backgroundColor = system_cell_color;
-			var system_name_cell = system_row.insertCell(0);
-			system_name_cell.innerHTML = "ROBOT";
-			system_name_cell.style.backgroundColor = system_cell_color;
-		}
-		
-		//if the dialog has concluded
-		if (system_output[system_output.length-1] == "<END/>")
-		{
+        
+        //append system output to page conversation log
+        var table = document.getElementsByName('history')[0];
+        //for first line of system output, overwrite [thinking...] line already created with text
+        var system_row = table.rows[table.rows.length-2];
+        var system_response_cell = system_row.cells[1];
+        system_response_cell.innerHTML = system_output[0];
+        //add remaining lines of system output, if any
+        for (i = 1; i < system_output.length; i++)
+        {
+            var system_row = table.insertRow(table.rows.length-1);
+            var system_response_cell = system_row.insertCell(0);
+            system_response_cell.innerHTML = system_output[i];
+            system_response_cell.style.backgroundColor = system_cell_color;
+            var system_name_cell = system_row.insertCell(0);
+            system_name_cell.innerHTML = "ROBOT";
+            system_name_cell.style.backgroundColor = system_cell_color;
+        }
+        
+        //if the dialog has concluded
+        if (system_output[system_output.length-1] == "<END/>")
+        {
             //alert('Dialogue over');
-			//hide the table's final row (the one with the form for input)
-			
-			//make visible the DIV to start the next task
-			//if (current_task == "walk")
-			//{
-				//document.getElementById('second_dialog_start_block').style.display = 'block';
-			//}
-			
-			////make visible the DIV to start the final task
-			//else if (current_task == "deliver")
-			//{
-				//document.getElementById('third_dialog_start_block').style.display = 'block';
-			//}
-			
-			//end session and give user code for MTurk
-			if (current_task == "query")
-			{
-				document.getElementById('end_session_block').style.display = 'block';
-			}
+            //hide the table's final row (the one with the form for input)
+            
+            //make visible the DIV to start the next task
+            //if (current_task == "walk")
+            //{
+                //document.getElementById('second_dialog_start_block').style.display = 'block';
+            //}
+            
+            ////make visible the DIV to start the final task
+            //else if (current_task == "deliver")
+            //{
+                //document.getElementById('third_dialog_start_block').style.display = 'block';
+            //}
+            
+            //end session and give user code for MTurk
+            if (current_task == "query")
+            {
+                document.getElementById('end_session_block').style.display = 'block';
+            }
             else
             {
-				document.getElementById('third_dialog_start_block').style.display = 'block';
-			}
-		}
-		else
-		{
-			//re-activate user's textarea so a response can be typed
-			document.getElementsByName("user_input_box")[0].disabled = false;
-		}
-	}
-	
-	function endSession()
-	{
-		document.getElementById('wrap').style.display = 'none';
-		document.getElementById('inst').innerHTML = 'Please fill out this brief survey about your experience with the system.';
-		document.getElementById('survey_block').style.display = 'block';
-	}
-	
+                document.getElementById('third_dialog_start_block').style.display = 'block';
+            }
+        }
+        else
+        {
+            //re-activate user's textarea so a response can be typed
+            document.getElementsByName("user_input_box")[0].disabled = false;
+        }
+    }
+    
+    function endSession()
+    {
+        document.getElementById('wrap').style.display = 'none';
+        document.getElementById('inst').innerHTML = 'Please fill out this brief survey about your experience with the system.';
+        document.getElementById('survey_block').style.display = 'block';
+    }
+    
     
     function submitUnderstanding(form) {
         understanding_walk_selection = -1;
-		for (var i = 0; i < form.walk.length; i++) {
-			if (form.walk[i].checked)
-			{
-				understanding_walk_selection = i;
-				break;
-			}
-		}
-		understanding_bring_selection = -1;
-		for (var i = 0; i < form.bring.length; i++) {
-			if (form.bring[i].checked)
-			{
-				understanding_bring_selection = i;
-				break;
-			}
-		}
-		understanding_search_selection = -1;
-		for (var i = 0; i < form.search.length; i++) {
-			if (form.search[i].checked)
-			{
-				understanding_search_selection = i;
-				break;
-			}
-		}
+        for (var i = 0; i < form.walk.length; i++) {
+            if (form.walk[i].checked)
+            {
+                understanding_walk_selection = i;
+                break;
+            }
+        }
+        understanding_bring_selection = -1;
+        for (var i = 0; i < form.bring.length; i++) {
+            if (form.bring[i].checked)
+            {
+                understanding_bring_selection = i;
+                break;
+            }
+        }
+        understanding_search_selection = -1;
+        for (var i = 0; i < form.search.length; i++) {
+            if (form.search[i].checked)
+            {
+                understanding_search_selection = i;
+                break;
+            }
+        }
         
         if (!(understanding_walk_selection == 0 && understanding_bring_selection == 1 && understanding_search_selection == 2)) {
-            alert('You do not seem to have understood the prompts correctly. We would prefer it if you do not proceed with this HIT. You may start over but you must pass the system verifications before you can complete the HIT. ');
+            document.getElementById('failure_div').style.display = 'block';
+            document.getElementById('warning').style.display = 'none';
             document.getElementById('understand_task_button').disabled = true;
         } else {
             document.getElementById('understand_task').style.display = 'none';
-            openFluency();
-            //decideTask();    
+            decideTask();    
         }
     }
     
     var fluencyVerificationCount = 0;
     var options = [
-            [{text: "Dust the table lamp in Oscar Osborne\'s house", idx: "0"},
+            [{text: "Dust the table lamp in Oscar Osborne\'s office    ", idx: "0"},
              {text: "Dust lamp Oscar Osborne", idx: "1"},
              {text: "Dust lamp 211", idx: "2"},
              {text: "Dust 3 211", idx: "3"}
             ],
-            [{text: "Dust the lamp in Oscar's house", idx: "0"},
-             {text: "Dust the table lamp in Oscar Osborne\'s house", idx: "1"},
+            [{text: "Dust the lamp in Oscar's office    ", idx: "0"},
+             {text: "Dust the table lamp in Oscar Osborne\'s office    ", idx: "1"},
              {text: "Dust 3 211", idx: "2"},
-             {text: "Dust task", idx: "3"}
+             {text: "Dust 3 in 211", idx: "3"}
             ],
-            [{text: "Clean the lamp in Oscar's house", idx: "0"},
+            [{text: "Clean the lamp in Oscar's office    ", idx: "0"},
              {text: "Clean 3 211", idx: "1"},
              {text: "Clean lamp Oscar", idx: "2"},
-             {text: "Clean task", idx: "3"}
+             {text: "Clean item 3 211", idx: "3"}
             ],
             [{text: "the lamp", idx: "0"},
              {text: "3", idx: "1"},
-             {text: "Clean the lamp in Oscar's house", idx: "2"},
+             {text: "Clean the lamp in Oscar's office    ", idx: "2"},
              {text: "clean", idx: "3"}
             ],
         ];
@@ -535,20 +542,33 @@
     function openFluency() {
         document.getElementById('example').style.display = 'block';
     }
+    
+    function introduceTask() {
+        document.getElementById('example_introduce_task').style.display = 'none';
+        document.getElementById('example_map').style.display = 'none';
+        document.getElementById('prompt').style.display = 'none';
+        document.getElementById('proceed_button').style.display = 'none';
+        document.getElementById('example_dialog_history_block').style.display = 'none';
+        document.getElementById('inst').style.display = 'none';
+        document.getElementById('ask_for_ID').style.display = 'block';
+    }
         
     function fluencyVerification() {
-        //alert('fluencyVerificationCount = ' + fluencyVerificationCount);
         
         document.getElementById('example_instructions').style.display = 'none';
         document.getElementById('example_introduce_task').style.display = 'block';
+        document.getElementById('example_map').style.display = 'block';
+        document.getElementById('prompt').style.display = 'block';
+        document.getElementById('inst').style.display = 'block';
         document.getElementById('example_dialog_history_block').style.display = 'block';
         
-        var row_num = fluencyVerificationCount;
+        var row_group_num = fluencyVerificationCount;
+
+        var table_rows = document.getElementById("example_history").rows;
         
         if (fluencyVerificationCount > 0) {
-            // Verify previous step
             var selection = "";
-            var name = 'tr' + (row_num - 1);
+            var name = 'tr' + (row_group_num - 1);
             var radio = document.getElementsByName(name);
             for (var i = 0; i < radio.length; i++) {
                 if (radio[i].checked) {
@@ -556,38 +576,38 @@
                     break;
                 }
             }
-            
             if (selection != "0") {
-                alert('You do not seem to have understood the prompts correctly. We would prefer it if you do not proceed with this HIT. You may start over but you must pass the system verifications before you can complete the HIT. ');
+                document.getElementById('failure_div').style.display = 'block';
+                document.getElementById('warning').style.display = 'none';
                 document.getElementById('fluency_button').disabled = true;
                 return;
             } else {
-                var id = 'tr' + (row_num - 1) + '_options'; 
-                document.getElementById(id).style.display = 'none';
-                //document.getElementById(id).style.visiblity = 'collapse';
-                var id = 'tr' + (row_num - 1) + '_user'; 
-                document.getElementById(id).style.display = 'block';   
+                
+                var prev_options = 3 * (row_group_num - 1) + 1; 
+                table_rows[prev_options].style.display = "none";
+                var prev_user = 3 * (row_group_num - 1) + 2;
+                table_rows[prev_user].style.display = "table-row";
             }
         }
         
         if (fluencyVerificationCount == 4) {
-            var id = 'tr' + row_num + '_robot';
-            document.getElementById(id).style.display = 'block';
-            var id = 'tr' + row_num + '_user';
-            document.getElementById(id).style.display = 'block';
+            var cur_robot = 3 * row_group_num;
+            table_rows[cur_robot].style.display = "table-row";
+            var cur_user = (3 * row_group_num) + 1;
+            table_rows[cur_user].style.display = "table-row";
             document.getElementById('fluency_button').style.display = 'none';
             document.getElementById('proceed_button').style.display = 'block';
         } else {
-            var id = 'tr' + row_num + '_robot';
-            document.getElementById(id).style.display = 'block';
-            id = 'tr' + row_num + '_options';
-            document.getElementById(id).style.display = 'block';
+            var cur_robot = 3 * row_group_num;
+            table_rows[cur_robot].style.display = "table-row";
+            var cur_options = 3 * row_group_num + 1;
+            table_rows[cur_options].style.display = "table-row";
             
-            var row_options = shuffleArray(options[row_num]);
+            var row_options = shuffleArray(options[row_group_num]);
             for (var i=0; i<4; i++) {
-                id = 'tr' + row_num + '_' + i;
+                var id = 'tr' + row_group_num + '_' + i;
                 document.getElementById(id).value = row_options[i].idx;
-                id = 'tr' + row_num + '_' + i + '_text';
+                id = 'tr' + row_group_num + '_' + i + '_text';
                 document.getElementById(id).innerHTML = row_options[i].text;
             }
             
@@ -595,147 +615,147 @@
         }
     }
     
-	//invoke php to record likert and produce code for MTurk
-	function submitSurvey(form)
-	{
-		user_id = user_id_base;
-		var comment_raw = document.getElementById('user_survey_comment_box').value;
-		var temp_div = document.createElement("div");
-		temp_div.innerHTML = comment_raw;
-		var comment_text = temp_div.textContent || temp_div.innerText || "";
-	
-		var easy_selection = -1;
-		for (var i = 0; i < form.easy.length; i++) {
-			if (form.easy[i].checked)
-			{
-				easy_selection = i;
-				break;
-			}
-		}
+    //invoke php to record likert and produce code for MTurk
+    function submitSurvey(form)
+    {
+        user_id = user_id_base;
+        var comment_raw = document.getElementById('user_survey_comment_box').value;
+        var temp_div = document.createElement("div");
+        temp_div.innerHTML = comment_raw;
+        var comment_text = temp_div.textContent || temp_div.innerText || "";
+    
+        var easy_selection = -1;
+        for (var i = 0; i < form.easy.length; i++) {
+            if (form.easy[i].checked)
+            {
+                easy_selection = i;
+                break;
+            }
+        }
         //alert('easy');
-		var understand_selection = -1;
-		for (var i = 0; i < form.understand.length; i++) {
-			if (form.understand[i].checked)
-			{
-				understand_selection = i;
-				break;
-			}
-		}
+        var understand_selection = -1;
+        for (var i = 0; i < form.understand.length; i++) {
+            if (form.understand[i].checked)
+            {
+                understand_selection = i;
+                break;
+            }
+        }
         //alert('understand');
-		var delays = -1;
-		for (var i = 0; i < form.delays.length; i++) {
-			if (form.delays[i].checked)
-			{
-				delays_selection = i;
-				break;
-			}
-		}
+        var delays = -1;
+        for (var i = 0; i < form.delays.length; i++) {
+            if (form.delays[i].checked)
+            {
+                delays_selection = i;
+                break;
+            }
+        }
         //alert('delays');
         var sensible_selection = -1;
-		for (var i = 0; i < form.sensible.length; i++) {
-			if (form.sensible[i].checked)
-			{
-				sensible_selection = i;
-				break;
-			}
-		}
+        for (var i = 0; i < form.sensible.length; i++) {
+            if (form.sensible[i].checked)
+            {
+                sensible_selection = i;
+                break;
+            }
+        }
         //alert('sensible');
         var conv_long_selection = -1;
-		for (var i = 0; i < form.conv_long.length; i++) {
-			if (form.conv_long[i].checked)
-			{
-				conv_long_selection = i;
-				break;
-			}
-		}
+        for (var i = 0; i < form.conv_long.length; i++) {
+            if (form.conv_long[i].checked)
+            {
+                conv_long_selection = i;
+                break;
+            }
+        }
         //alert('conv_long');
-		if (easy_selection == -1 || understand_selection == -1 || delays_selection == -1 || sensible_selection == -1 || conv_long_selection == -1)
-		{
-			alert('Please answer all survey questions.');
-			return false;
-		}
-		
+        if (easy_selection == -1 || understand_selection == -1 || delays_selection == -1 || sensible_selection == -1 || conv_long_selection == -1)
+        {
+            alert('Please answer all survey questions.');
+            return false;
+        }
+        
         //alert('Before inst hide');
         
-		//hide instructions
-		document.getElementById('inst').style.display = 'none';
-		
+        //hide instructions
+        document.getElementById('inst').style.display = 'none';
+        
         //alert('Going to php');
         
-		//submit php request
-		getRequest(
-		  'submit_survey.php', // URL for the PHP file
-		  'user_id='.concat(user_id).concat('&easy=').concat(easy_selection).concat('&understand=').concat(understand_selection).concat('&delays=').concat(delays_selection).concat('&sensible=').concat(sensible_selection).concat('&conv_long=').concat(conv_long_selection).concat('&understanding_walk=').concat(understanding_walk_selection).concat('&understanding_bring=').concat(understanding_bring_selection).concat('&understanding_search=').concat(understanding_search_selection).concat('&comment=').concat(comment_text), // parameters for PHP
-		   submitSurveyOutput,  // handle successful request
-		   submitSurveyError    // handle error
-		);
-	}
-	
-	// handles the response, adds the html
-	function submitSurveyOutput(response_text)
-	{
-		document.getElementById('survey_block').innerHTML = response_text;
-	}
-	
-	// handles drawing an error message
-	function submitSurveyError () {
-		alert('DEBUG: there was an error calling submit_survey.php');
-	}
+        //submit php request
+        getRequest(
+          'submit_survey.php', // URL for the PHP file
+          'user_id='.concat(user_id).concat('&easy=').concat(easy_selection).concat('&understand=').concat(understand_selection).concat('&delays=').concat(delays_selection).concat('&sensible=').concat(sensible_selection).concat('&conv_long=').concat(conv_long_selection).concat('&understanding_walk=').concat(understanding_walk_selection).concat('&understanding_bring=').concat(understanding_bring_selection).concat('&understanding_search=').concat(understanding_search_selection).concat('&comment=').concat(comment_text), // parameters for PHP
+           submitSurveyOutput,  // handle successful request
+           submitSurveyError    // handle error
+        );
+    }
     
-	// helper function for cross-browser request object
-	function getRequest(url, params, success, error)
-	{
-		//alert('DEBUG: getRequest called with url '.concat(url).concat(' and params ').concat(params));
-		
-		//encode params
-		var params_enc = encodeURI(params)
-	
-		var req = false;
-		try{
-			// most browsers
-			req = new XMLHttpRequest();
-		} catch (e){
-			// IE
-			try{
-				req = new ActiveXObject("Msxml2.XMLHTTP");
-			} catch (e) {
-				// try an older version
-				try{
-					req = new ActiveXObject("Microsoft.XMLHTTP");
-				} catch (e){
-					return false;
-				}
-			}
-		}
-		if (!req) return false;
-		if (typeof success != 'function') success = function () {};
-		if (typeof error!= 'function') error = function () {};
-		req.onreadystatechange = function(){
-			if(req.readyState == 4){
-				return req.status === 200 ? 
-					success(req.responseText) : error(req.status)
-				;
-			}
-		}
-		req.open("POST", url, true);
-		req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-		req.send(params_enc);
-		return req;
-	}
+    // handles the response, adds the html
+    function submitSurveyOutput(response_text)
+    {
+        document.getElementById('survey_block').innerHTML = response_text;
+    }
+    
+    // handles drawing an error message
+    function submitSurveyError () {
+        alert('DEBUG: there was an error calling submit_survey.php');
+    }
+    
+    // helper function for cross-browser request object
+    function getRequest(url, params, success, error)
+    {
+        //alert('DEBUG: getRequest called with url '.concat(url).concat(' and params ').concat(params));
+        
+        //encode params
+        var params_enc = encodeURI(params)
+    
+        var req = false;
+        try{
+            // most browsers
+            req = new XMLHttpRequest();
+        } catch (e){
+            // IE
+            try{
+                req = new ActiveXObject("Msxml2.XMLHTTP");
+            } catch (e) {
+                // try an older version
+                try{
+                    req = new ActiveXObject("Microsoft.XMLHTTP");
+                } catch (e){
+                    return false;
+                }
+            }
+        }
+        if (!req) return false;
+        if (typeof success != 'function') success = function () {};
+        if (typeof error!= 'function') error = function () {};
+        req.onreadystatechange = function(){
+            if(req.readyState == 4){
+                return req.status === 200 ? 
+                    success(req.responseText) : error(req.status)
+                ;
+            }
+        }
+        req.open("POST", url, true);
+        req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        req.send(params_enc);
+        return req;
+    }
 </SCRIPT>
-	
+    
 <STYLE>
 #inst {
-	width:100%
-	float:top;
+    width:100%
+    float:top;
 }
 #wrap {
-	width:100%;
-	margin:0 auto;
+    width:100%;
+    margin:0 auto;
 }
 #left {
-	float:left;
-	width:50%;
+    float:left;
+    width:50%;
 }
 #right {
 float:right;
@@ -749,7 +769,7 @@ width:50%
 
 <p>
 <DIV ID="warning" style="color:red" >
-	Do not navigate away from or refresh the page until you have completed all tasks and the exit survey to receive your code. Leaving or refreshing the page <b>will</b> prevent you from completing this HIT.
+    Do not navigate away from or refresh the page until you have completed all tasks and the exit survey to receive your code. Leaving or refreshing the page <b>will</b> prevent you from completing this HIT.
 </DIV>
 </p>
 
@@ -757,7 +777,7 @@ width:50%
 <DIV ID="inst" style="display:none;">
     <font color="1F0975"; size="4">
         <b>
-	Instruct the robot so that the task specified is completed. Stick to single step high-level instructions. <br/>
+    Instruct the robot so that the task specified is completed. Stick to single step high-level instructions. <br/>
     If the robot does not understand you, vary your choice of words in for the task it has to do and the people and/or items involved. <br/>
         </b>
     </font>
@@ -767,24 +787,23 @@ width:50%
 <p>
 <DIV ID="wrap">
 <DIV ID="left">
-	<DIV ID="ask_for_ID">
-		<p>You will have a text conversation with a robot that knows how to perform the following tasks -  
+    <DIV ID="ask_for_ID" style='display:none'>
+        <p> Now you will instruct a similar robot via a text conversation. 
+            This robot that knows how to perform the following tasks -  
         <ul>
           <li>Walk to a location. </li>
           <li>Bring an item for someone. </li>
           <li>Search a room for someone. </li>
         </ul>
         </p>
-        <p> Following this, answer a question to verify that you are human and then receive a code to enter in Mechanical Turk to receive payment.
-        </p>
         
         <p> If the conversation extends too long, you may end it by replying 'stop' but ending the conversation before ten responses from your side without successfully communicating the task <b>will</b> invalidate your HIT.  </p>
         
-		<p><FORM NAME="ask_for_ID_form" ACTION="" METHOD="GET">
-			Click the button below to begin.<br/>
-			<INPUT TYPE="button" NAME="user_id_button" Value="Begin" onClick="begin()">
-		</FORM></p>
-	</DIV>
+        <p><FORM NAME="ask_for_ID_form" ACTION="" METHOD="GET">
+            Click the button below to begin.<br/>
+            <INPUT TYPE="button" NAME="user_id_button" Value="Begin" onClick="begin()">
+        </FORM></p>
+    </DIV>
 
     <DIV ID="understand_task" style="display:none">
         This is to verify that you are capable of understanding the objective of the HIT. <br/>
@@ -796,28 +815,28 @@ width:50%
         </ul>
         For each of the following prompts select the task which you should instruct the robot to perform.  
     <FORM NAME="understand_task_form" ACTION="" METHOD="GET">
-		<p><b>1)</b> Alice wants the robot. Send it to her office.
-		<TABLE style="width:50%">
-			<tr align="center" bgcolor='GhostWhite'><td style="width:20%">Walk task</td><td style="width:20%">Bring task</td><td style="width:20%">Search task</td></tr>
-			<tr align="center" bgcolor='AliceBlue'><td style="width:20%"><INPUT TYPE="radio" name="walk" value="0"></td><td style="width:20%"><INPUT TYPE="radio" name="walk" value="1"></td><td style="width:20%"><INPUT TYPE="radio" name="walk" value="2"></tr>
-		</TABLE></p>
-		<p><b>2)</b> Alice wants the item in slot 1.
-		<TABLE style="width:50%">
-			<tr align="center" bgcolor='GhostWhite'><td style="width:20%">Walk task</td><td style="width:20%">Bring task</td><td style="width:20%">Search task</td></tr>
-			<tr align="center" bgcolor='AliceBlue'><td style="width:20%"><INPUT TYPE="radio" name="bring" value="0"></td><td style="width:20%"><INPUT TYPE="radio" name="bring" value="1"></td><td style="width:20%"><INPUT TYPE="radio" name="bring" value="2"></tr>
-		</TABLE></p>
-		<p><b>3)</b> Make the robot find out whether Alice is in Bob's office.
-		<TABLE style="width:50%">
-			<tr align="center" bgcolor='GhostWhite'><td style="width:20%">Walk task</td><td style="width:20%">Bring task</td><td style="width:20%">Search task</td></tr>
-			<tr align="center" bgcolor='AliceBlue'><td style="width:20%"><INPUT TYPE="radio" name="search" value="0"></td><td style="width:20%"><INPUT TYPE="radio" name="search" value="1"></td><td style="width:20%"><INPUT TYPE="radio" name="search" value="2"></tr>
-		</TABLE></p>
-		<INPUT TYPE="button"  id="understand_task_button"  NAME="understand_task_button" Value="Submit" onClick="submitUnderstanding(this.form)">
-	</FORM>
+        <p><b>1)</b> Alice wants the robot. Send it to her office.
+        <TABLE style="width:50%">
+            <tr align="center" bgcolor='GhostWhite'><td style="width:20%">Walk task</td><td style="width:20%">Bring task</td><td style="width:20%">Search task</td></tr>
+            <tr align="center" bgcolor='AliceBlue'><td style="width:20%"><INPUT TYPE="radio" name="walk" value="0"></td><td style="width:20%"><INPUT TYPE="radio" name="walk" value="1"></td><td style="width:20%"><INPUT TYPE="radio" name="walk" value="2"></tr>
+        </TABLE></p>
+        <p><b>2)</b> Alice wants the item in slot 1.
+        <TABLE style="width:50%">
+            <tr align="center" bgcolor='GhostWhite'><td style="width:20%">Walk task</td><td style="width:20%">Bring task</td><td style="width:20%">Search task</td></tr>
+            <tr align="center" bgcolor='AliceBlue'><td style="width:20%"><INPUT TYPE="radio" name="bring" value="0"></td><td style="width:20%"><INPUT TYPE="radio" name="bring" value="1"></td><td style="width:20%"><INPUT TYPE="radio" name="bring" value="2"></tr>
+        </TABLE></p>
+        <p><b>3)</b> Make the robot find out whether Alice is in Bob's office.
+        <TABLE style="width:50%">
+            <tr align="center" bgcolor='GhostWhite'><td style="width:20%">Walk task</td><td style="width:20%">Bring task</td><td style="width:20%">Search task</td></tr>
+            <tr align="center" bgcolor='AliceBlue'><td style="width:20%"><INPUT TYPE="radio" name="search" value="0"></td><td style="width:20%"><INPUT TYPE="radio" name="search" value="1"></td><td style="width:20%"><INPUT TYPE="radio" name="search" value="2"></tr>
+        </TABLE></p>
+        <INPUT TYPE="button"  id="understand_task_button"  NAME="understand_task_button" Value="Submit" onClick="submitUnderstanding(this.form)">
+    </FORM>
     </DIV>
     
-    <div id="example" style="display: none;">
+    <div id="example" >
         <div id="example_instructions">
-            The objective of this HIT is to command a robot. The robot assumes commands to be
+            The objective of this HIT is to command a robot to perform high-level tasks. The robot assumes commands to be
             <ul>
               <li>In a single sentence</li>
               <li>Fairly short</li>
@@ -825,8 +844,10 @@ width:50%
             </ul>
             
             <p>
-                You should talk to the robot as if it were a person. 
-                You will now walk through an example conversation with a similar robot that knows how to clean objects in a house. 
+                In short, you should talk to the robot as if it were a person. The robot is still trying to learn words and you may have to say things in different ways before it understands. 
+            </p>
+            <p>
+                You will now walk through an example conversation with such a robot that knows how to clean objects in an office. 
             </p>
             <p>
                 Select what you feel is the most appropriate response at each step of the conversation to demonstrate that you have understood the task. 
@@ -837,22 +858,21 @@ width:50%
 
         
         
-        <div id="example_introduce_task" style='display:none'>
+        <div id="example_introduce_task" style="display:none;">
             <br/>
         <b>TASK TO COMPLETE</b><p >Oscar Osborne wants the item in slot 3 to be dusted.</p>
         </div>
         
-        <div id="example_dialog_history_block" style='display:none'>
-            <table name="example_history" style="width:100%; border-collapse:collapse; table-layout:fixed">
-            <form name="example_user_input_form" type="text" onsubmit="return false;"></form>
-            <tbody>
-                <tr id="tr0_robot" style='display:none; width:100%'>
-                    <td style="background-color: ghostwhite; width:20%">ROBOT</td>
-                    <td style="background-color: ghostwhite; width:80%">How can I help?</td>
+        <div id="example_dialog_history_block" style="display:none;">
+            <table id="example_history" name="example_history" style="width:100%;display:inline-block;">
+                <tbody >
+                <tr style="display:none">
+                    <td style="width:15%;background-color:ghostwhite;">ROBOT</td>
+                    <td style="width:85%;background-color:ghostwhite;">How can I help?</td>
                 </tr>
-                <tr id="tr0_options" style='display:none; width:100%'>
-                    <td style='width:15%'></td>
-                    <td style='width:85%'><table>
+                <tr style="display:none">
+                    <td style="width:15%;"></td>
+                    <td style="width:85%;"><table>
                         <tr bgcolor='AliceBlue'>
                             <td><INPUT TYPE="radio" id="tr0_0" name="tr0" value="-2"></td>
                             <td id="tr0_0_text">a</td>      
@@ -871,15 +891,15 @@ width:50%
                         </tr>
                     </table></td>
                 </tr>
-                <tr id="tr0_user" style='display:none; width:100%'>
-                    <td style="background-color: aliceblue; width:20%">YOU</td>
-                    <td style="background-color: aliceblue; width:80%">Dust the table lamp in Oscar Osborne's house</td>
+                <tr style="display:none">
+                    <td style="width:15%;background-color: aliceblue;">YOU</td>
+                    <td style="width:85%;background-color: aliceblue;">Dust the table lamp in Oscar Osborne's office    </td>
                 </tr>
-                <tr id="tr1_robot" style='display:none; width:100%'> 
-                    <td style="background-color: ghostwhite; width:20%">ROBOT</td>
-                    <td style="background-color: ghostwhite; width:80%">Sorry I couldn't understand that. Could you reword your original request?</td>
+                <tr style="display:none"> 
+                    <td style="width:15%;background-color: ghostwhite;">ROBOT</td>
+                    <td style="width:85%;background-color: ghostwhite;">Sorry I couldn't understand that. Could you reword your original request?</td>
                 </tr>
-                <tr id="tr1_options" style='display:none; width:100%'>
+                <tr style="display:none">
                     <td style='width:15%'></td>
                     <td style='width:85%'><table>
                         <tr bgcolor='AliceBlue'>
@@ -900,15 +920,15 @@ width:50%
                         </tr>
                     </table></td>
                 </tr>
-                <tr id="tr1_user" style='display:none; width:100%'>
-                    <td style="background-color: aliceblue; width:20%">YOU</td>
-                    <td style="background-color: aliceblue; width:80%">Dust the lamp in Oscar's house</td>
+                <tr style="display:none">
+                    <td style="width:15%;background-color: aliceblue;">YOU</td>
+                    <td style="width:85%;background-color: aliceblue;">Dust the lamp in Oscar's office    </td>
                 </tr>
-                <tr id="tr2_robot" style='display:none; width:100%'>
-                    <td style="background-color: ghostwhite; width:20%">ROBOT</td>
-                    <td style="background-color: ghostwhite; width:80%">Sorry I couldn't understand that. Could you reword your original request?</td>
+                <tr style="display:none">
+                    <td style="width:15%;background-color: ghostwhite;">ROBOT</td>
+                    <td style="width:85%;background-color: ghostwhite;">Sorry I couldn't understand that. Could you reword your original request?</td>
                 </tr>
-                <tr id="tr2_options" style='display:none; width:100%'>
+                <tr style="display:none">
                     <td style='width:15%'></td>
                     <td style='width:85%'><table>
                         <tr bgcolor='AliceBlue'>
@@ -929,15 +949,15 @@ width:50%
                         </tr>
                     </table></td>
                 </tr>
-                <tr id="tr2_user" style='display:none; width:100%'>
-                    <td style="background-color: aliceblue; width:20%">YOU</td>
-                    <td style="background-color: aliceblue; width:80%">Clean the lamp in Oscar's house</td>
+                <tr style="display:none">
+                    <td style="width:15%;background-color: aliceblue;">YOU</td>
+                    <td style="width:85%;background-color: aliceblue;">Clean the lamp in Oscar's office    </td>
                 </tr>
-                <tr id="tr3_robot" style='display:none; width:100%'>
-                    <td style="background-color: ghostwhite; width:20%">ROBOT</td>
-                    <td style="background-color: ghostwhite; width:80%">What should I clean in 211?</td>
+                <tr style="display:none">
+                    <td style="width:15%;background-color: ghostwhite;">ROBOT</td>
+                    <td style="width:85%;background-color: ghostwhite;">What should I clean in 211?</td>
                 </tr>
-                <tr id="tr3_options" style='display:none; width:100%'>
+                <tr style="display:none">
                     <td style='width:15%'></td>
                     <td style='width:85%'><table>
                         <tr bgcolor='AliceBlue'>
@@ -958,108 +978,134 @@ width:50%
                         </tr>
                     </table></td>
                 </tr>
-                <tr id="tr3_user" style='display:none; width:100%'>
-                    <td style="background-color: aliceblue; width:20%">YOU</td>
-                    <td style="background-color: aliceblue; width:80%">the lamp</td>
+                <tr style="display:none">
+                    <td style="width:15%;background-color: aliceblue;">YOU</td>
+                    <td style="width:85%;background-color: aliceblue;">the lamp</td>
                 </tr>
-                <tr id="tr4_robot" style='display:none; width:100%'>
-                    <td style="background-color: ghostwhite; width:20%">ROBOT</td>
-                    <td style="background-color: ghostwhite; width:80%">I cleaned the lamp in 211. Was this the right action?</td>
+                <tr style="display:none">
+                    <td style="width:15%;background-color: ghostwhite;">ROBOT</td>
+                    <td style="width:85%;background-color: ghostwhite;">I cleaned the lamp in 211. Was this the right action?</td>
                 </tr>
+                <tr style="display:none">
+                    <td style="width:15%;background-color: aliceblue;">YOU</td>
+                    <td style="width:85%;background-color: aliceblue;">yes</td>
                 </tr>
-                <tr id="tr4_user" style='display:none; width:100%'>
-                    <td style="background-color: aliceblue; width:20%">YOU</td>
-                    <td style="background-color: aliceblue; width:80%">yes</td>
-                </tr>
-            </tbody></table>
+                </tbody>
+            </table>
             
             <INPUT TYPE="button" id="fluency_button" NAME="fluency_button" Value="Continue" onClick="fluencyVerification()" onSubmit="fluencyVerification()"></INPUT>
         </div>
     </div>
-    <INPUT TYPE="button" id="proceed_button" NAME="proceed_button" Value="Proceed to HIT" onClick="decideTask()" onSubmit="decideTask()" style='display:none'></INPUT>
+    <INPUT TYPE="button" id="proceed_button" NAME="proceed_button" Value="Proceed to HIT" onClick="introduceTask()" onSubmit="introduceTask()" style='display:none'></INPUT>
 
-	<DIV ID="introduce_task" style="display:none">
-		<b>TASK TO COMPLETE</b><p ID="task_description_text"></p>
-	</DIV>
-	
-	<DIV ID="dialog_start_block" style="display:none">
-		<FORM NAME="user_start_dialog_form" ACTION="" METHOD="GET">
-			<INPUT TYPE="button" NAME="user_start_dialog_button" Value="Start Task" onClick="startDialog()">
-		</FORM>
-	</DIV>
+    <div id="failure_div" style="display:none;background-color:#E85B5B;">
+        <p>
+            I'm sorry but you cannot proceed with our HIT as we believe that you have either not fully understood our task or are not capable of completing it effectively.
+        </p>
+        <p>
+            We require workers to correctly pass all validation steps before attempting the HIT.
+            If you believe you are capable of completing the HIT but made a mistake by accident, you may restart by refreshing the page.
+            Note that your work will be treated as a completed HIT only if you pass all validations, have a text conversation with the robot and receive a code to enter in Amazon Mechanical Turk.
+        </p>
+        <p>
+            If you choose to leave at this point, this will not be treated as a completed HIT and not affect your acceptance rate.
+            Note that if you enter an invalid code in Amazon Mechanical Turk without restarting, and successfully finishing both the verification and the text conversation with the robot, your HIT will be rejected.
+        </p>
+    </div>
 
-	<DIV ID="dialog_history_block" style="display:none">
-		<TABLE NAME="history" style="width:100%">
-		<FORM NAME="user_input_form" type="text" onsubmit="return false;">
-		<TR ID="user_input_table_row">
-			<TD td style="width:15%">YOU</TD>
-			<TD td style="width:85%">
-				<INPUT TYPE="text" NAME="user_input_box" VALUE="" style="width:100%" onkeydown="if (event.keyCode == 13) {document.getElementsByName('user_input_button')[0].click();event.returnValue=false;event.cancel=true;}"></INPUT>
-				<INPUT TYPE="button" NAME="user_input_button" Value="submit" onClick="getDialogResponse(this.form)" onSubmit="getDialogResponse(this.form)" style="display:none"></INPUT>
-			</TD>
-		</TR>
-		</FORM>
-		</TABLE>
-	</DIV>
-	
-	<DIV ID="third_dialog_start_block" style="display:none">
-		<FORM NAME="user_start_third_dialog_form" ACTION="" METHOD="GET">
-			<INPUT TYPE="button" NAME="user_start_third_dialog_button" Value="Next task" onClick="startQuery()">
-		</FORM>
-	</DIV>
-	
-	<DIV ID="end_session_block" style="display:none">
-		<FORM NAME="user_end_session_form" ACTION="" METHOD="GET">
-			<INPUT TYPE="button" NAME="user_end_session_button" Value="Fill Survey" onClick="endSession()">
-		</FORM>
-	</DIV>
+    <DIV ID="introduce_task" style="display:none">
+        <b>TASK TO COMPLETE</b><p ID="task_description_text"></p>
+    </DIV>
+    
+    <DIV ID="dialog_start_block" style="display:none">
+        <FORM NAME="user_start_dialog_form" ACTION="" METHOD="GET">
+            <INPUT TYPE="button" NAME="user_start_dialog_button" Value="Start Task" onClick="startDialog()">
+        </FORM>
+    </DIV>
+
+    <DIV ID="dialog_history_block" style="display:none">
+        <TABLE NAME="history" style="width:100%">
+        <FORM NAME="user_input_form" type="text" onsubmit="return false;">
+        <TR ID="user_input_table_row">
+            <TD td style="width:15%">YOU</TD>
+            <TD td style="width:85%">
+                <INPUT TYPE="text" NAME="user_input_box" VALUE="" style="width:100%" onkeydown="if (event.keyCode == 13) {document.getElementsByName('user_input_button')[0].click();event.returnValue=false;event.cancel=true;}"></INPUT>
+                <INPUT TYPE="button" NAME="user_input_button" Value="submit" onClick="getDialogResponse(this.form)" onSubmit="getDialogResponse(this.form)" style="display:none"></INPUT>
+            </TD>
+        </TR>
+        </FORM>
+        </TABLE>
+    </DIV>
+    
+    <DIV ID="third_dialog_start_block" style="display:none">
+        <FORM NAME="user_start_third_dialog_form" ACTION="" METHOD="GET">
+            <INPUT TYPE="button" NAME="user_start_third_dialog_button" Value="Proceed" onClick="startQuery()">
+        </FORM>
+    </DIV>
+    
+    <DIV ID="end_session_block" style="display:none">
+        <FORM NAME="user_end_session_form" ACTION="" METHOD="GET">
+            <INPUT TYPE="button" NAME="user_end_session_button" Value="Fill Survey" onClick="endSession()">
+        </FORM>
+    </DIV>
 
 </DIV>
 <DIV ID="right">
 
-	<DIV ID="task_map" style="display:none">
-		<b>People and items the robot knows - </b>
-			<p><img src="bring_task_data.png" alt="Rooms, labs and offices" style="width:80%"></p>
-	</DIV>
+    <DIV ID="example_map" style="display:none">
+        <b>People and items the robot knows - </b>
+            <p><img src="example_data.png" alt="Rooms, labs and offices" style="width:80%"></p>
+    </DIV>
+
+    <DIV ID="task_map" style="display:none">
+        <b>People and items the robot knows - </b>
+            <p><img src="bring_task_data.png" alt="Rooms, labs and offices" style="width:80%"></p>
+    </DIV>
+    
+    <DIV ID="prompt" style="background-color: #FFF8C6; padding-bottom: 8px; padding-left: 20px; padding-right: 20px; padding-top: 8px; text-align: justify; display:none; width: 80%">
+        <p>The item numbers above are only for reference. Use names of the items when talking to the robot</p>
+    </DIV>
     
     <DIV ID="stop_prompt" style="background-color: #FFF8C6; padding-bottom: 8px; padding-left: 20px; padding-right: 20px; padding-top: 8px; text-align: justify; display:none; width: 80%">
         <p>You may now enter "stop" to terminate this dialogue. The HIT will still be considered successful provided you complete the remaining steps by clicking "next task" after the dialogue ends. However we would appreciate it if you could try further to convey the command to the robot. </p>
     </DIV>
-	
+    
+    
+    
 </DIV>
 </DIV>
 
 <DIV ID="survey_block" style="display:none">
-	<FORM NAME="survey_form" ACTION="" METHOD="GET">
-		<p><b>1)</b> The tasks were easy to understand.
-		<TABLE style="width:50%">
-			<tr align="center" bgcolor='GhostWhite'><td style="width:20%">Strongly Disagree</td><td style="width:20%">Somewhat Disagree</td><td style="width:20%">Neutral</td><td style="width:20%">Somewhat Agree</td><td style="width:20%">Strongly Agree</td></tr>
-			<tr align="center" bgcolor='AliceBlue'><td style="width:20%"><INPUT TYPE="radio" name="easy" value="0"></td><td style="width:20%"><INPUT TYPE="radio" name="easy" value="1"></td><td style="width:20%"><INPUT TYPE="radio" name="easy" value="2"></td><td style="width:20%"><INPUT TYPE="radio" name="easy" value="3"></td><td style="width:20%"><INPUT TYPE="radio" name="easy" value="4"></td></tr>
-		</TABLE></p>
-		<p><b>2)</b> The robot understood me.
-		<TABLE style="width:50%">
-			<tr align="center" bgcolor='GhostWhite'><td style="width:20%">Strongly Disagree</td><td style="width:20%">Somewhat Disagree</td><td style="width:20%">Neutral</td><td style="width:20%">Somewhat Agree</td><td style="width:20%">Strongly Agree</td></tr>
-			<tr align="center" bgcolor='AliceBlue'><td style="width:20%"><INPUT TYPE="radio" name="understand" value="0"></td><td style="width:20%"><INPUT TYPE="radio" name="understand" value="1"></td><td style="width:20%"><INPUT TYPE="radio" name="understand" value="2"></td><td style="width:20%"><INPUT TYPE="radio" name="understand" value="3"></td><td style="width:20%"><INPUT TYPE="radio" name="understand" value="4"></td></tr>
-		</TABLE></p>
-		<p><b>3)</b> The robot took too long to respond.
-		<TABLE style="width:50%">
-			<tr align="center" bgcolor='GhostWhite'><td style="width:20%">Strongly Disagree</td><td style="width:20%">Somewhat Disagree</td><td style="width:20%">Neutral</td><td style="width:20%">Somewhat Agree</td><td style="width:20%">Strongly Agree</td></tr>
-			<tr align="center" bgcolor='AliceBlue'><td style="width:20%"><INPUT TYPE="radio" name="delays" value="0"></td><td style="width:20%"><INPUT TYPE="radio" name="delays" value="1"></td><td style="width:20%"><INPUT TYPE="radio" name="delays" value="2"></td><td style="width:20%"><INPUT TYPE="radio" name="delays" value="3"></td><td style="width:20%"><INPUT TYPE="radio" name="delays" value="4"></td></tr>
-		</TABLE></p>
+    <FORM NAME="survey_form" ACTION="" METHOD="GET">
+        <p><b>1)</b> The tasks were easy to understand.
+        <TABLE style="width:50%">
+            <tr align="center" bgcolor='GhostWhite'><td style="width:20%">Strongly Disagree</td><td style="width:20%">Somewhat Disagree</td><td style="width:20%">Neutral</td><td style="width:20%">Somewhat Agree</td><td style="width:20%">Strongly Agree</td></tr>
+            <tr align="center" bgcolor='AliceBlue'><td style="width:20%"><INPUT TYPE="radio" name="easy" value="0"></td><td style="width:20%"><INPUT TYPE="radio" name="easy" value="1"></td><td style="width:20%"><INPUT TYPE="radio" name="easy" value="2"></td><td style="width:20%"><INPUT TYPE="radio" name="easy" value="3"></td><td style="width:20%"><INPUT TYPE="radio" name="easy" value="4"></td></tr>
+        </TABLE></p>
+        <p><b>2)</b> The robot understood me.
+        <TABLE style="width:50%">
+            <tr align="center" bgcolor='GhostWhite'><td style="width:20%">Strongly Disagree</td><td style="width:20%">Somewhat Disagree</td><td style="width:20%">Neutral</td><td style="width:20%">Somewhat Agree</td><td style="width:20%">Strongly Agree</td></tr>
+            <tr align="center" bgcolor='AliceBlue'><td style="width:20%"><INPUT TYPE="radio" name="understand" value="0"></td><td style="width:20%"><INPUT TYPE="radio" name="understand" value="1"></td><td style="width:20%"><INPUT TYPE="radio" name="understand" value="2"></td><td style="width:20%"><INPUT TYPE="radio" name="understand" value="3"></td><td style="width:20%"><INPUT TYPE="radio" name="understand" value="4"></td></tr>
+        </TABLE></p>
+        <p><b>3)</b> The robot took too long to respond.
+        <TABLE style="width:50%">
+            <tr align="center" bgcolor='GhostWhite'><td style="width:20%">Strongly Disagree</td><td style="width:20%">Somewhat Disagree</td><td style="width:20%">Neutral</td><td style="width:20%">Somewhat Agree</td><td style="width:20%">Strongly Agree</td></tr>
+            <tr align="center" bgcolor='AliceBlue'><td style="width:20%"><INPUT TYPE="radio" name="delays" value="0"></td><td style="width:20%"><INPUT TYPE="radio" name="delays" value="1"></td><td style="width:20%"><INPUT TYPE="radio" name="delays" value="2"></td><td style="width:20%"><INPUT TYPE="radio" name="delays" value="3"></td><td style="width:20%"><INPUT TYPE="radio" name="delays" value="4"></td></tr>
+        </TABLE></p>
         <p><b>4)</b> The robot asked sensible questions.
-		<TABLE style="width:50%">
-			<tr align="center" bgcolor='GhostWhite'><td style="width:20%">Strongly Disagree</td><td style="width:20%">Somewhat Disagree</td><td style="width:20%">Neutral</td><td style="width:20%">Somewhat Agree</td><td style="width:20%">Strongly Agree</td></tr>
-			<tr align="center" bgcolor='AliceBlue'><td style="width:20%"><INPUT TYPE="radio" name="sensible" value="0"></td><td style="width:20%"><INPUT TYPE="radio" name="sensible" value="1"></td><td style="width:20%"><INPUT TYPE="radio" name="sensible" value="2"></td><td style="width:20%"><INPUT TYPE="radio" name="sensible" value="3"></td><td style="width:20%"><INPUT TYPE="radio" name="sensible" value="4"></td></tr>
-		</TABLE></p>
+        <TABLE style="width:50%">
+            <tr align="center" bgcolor='GhostWhite'><td style="width:20%">Strongly Disagree</td><td style="width:20%">Somewhat Disagree</td><td style="width:20%">Neutral</td><td style="width:20%">Somewhat Agree</td><td style="width:20%">Strongly Agree</td></tr>
+            <tr align="center" bgcolor='AliceBlue'><td style="width:20%"><INPUT TYPE="radio" name="sensible" value="0"></td><td style="width:20%"><INPUT TYPE="radio" name="sensible" value="1"></td><td style="width:20%"><INPUT TYPE="radio" name="sensible" value="2"></td><td style="width:20%"><INPUT TYPE="radio" name="sensible" value="3"></td><td style="width:20%"><INPUT TYPE="radio" name="sensible" value="4"></td></tr>
+        </TABLE></p>
         <p><b>5)</b> The conversation was too long.
-		<TABLE style="width:50%">
-			<tr align="center" bgcolor='GhostWhite'><td style="width:20%">Strongly Disagree</td><td style="width:20%">Somewhat Disagree</td><td style="width:20%">Neutral</td><td style="width:20%">Somewhat Agree</td><td style="width:20%">Strongly Agree</td></tr>
-			<tr align="center" bgcolor='AliceBlue'><td style="width:20%"><INPUT TYPE="radio" name="conv_long" value="0"></td><td style="width:20%"><INPUT TYPE="radio" name="conv_long" value="1"></td><td style="width:20%"><INPUT TYPE="radio" name="conv_long" value="2"></td><td style="width:20%"><INPUT TYPE="radio" name="conv_long" value="3"></td><td style="width:20%"><INPUT TYPE="radio" name="conv_long" value="4"></td></tr>
-		</TABLE></p>
-		<p><b>6)</b>Feel free to leave comments on your experience (optional):<br/>
-			<textarea id="user_survey_comment_box" name="comment" form="survey_form" style="width:50%" rows="4"></textarea></p>
-		<INPUT TYPE="button" NAME="user_submit_survey_button" Value="Finish" onClick="submitSurvey(this.form)">
-	</FORM>
+        <TABLE style="width:50%">
+            <tr align="center" bgcolor='GhostWhite'><td style="width:20%">Strongly Disagree</td><td style="width:20%">Somewhat Disagree</td><td style="width:20%">Neutral</td><td style="width:20%">Somewhat Agree</td><td style="width:20%">Strongly Agree</td></tr>
+            <tr align="center" bgcolor='AliceBlue'><td style="width:20%"><INPUT TYPE="radio" name="conv_long" value="0"></td><td style="width:20%"><INPUT TYPE="radio" name="conv_long" value="1"></td><td style="width:20%"><INPUT TYPE="radio" name="conv_long" value="2"></td><td style="width:20%"><INPUT TYPE="radio" name="conv_long" value="3"></td><td style="width:20%"><INPUT TYPE="radio" name="conv_long" value="4"></td></tr>
+        </TABLE></p>
+        <p><b>6)</b>Feel free to leave comments on your experience (optional):<br/>
+            <textarea id="user_survey_comment_box" name="comment" form="survey_form" style="width:50%" rows="4"></textarea></p>
+        <INPUT TYPE="button" NAME="user_submit_survey_button" Value="Finish" onClick="submitSurvey(this.form)">
+    </FORM>
 </DIV>
 
 </p>
