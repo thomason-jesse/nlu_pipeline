@@ -304,7 +304,7 @@ def get_statistical_significance() :
             
     file_handle.close()
 
-def get_statistical_significance() :
+def get_statistical_significance_corrected() :
     results_file = open(path_to_batch + 'results_corrected.csv', 'r')
     results_reader = csv.reader(results_file, delimiter=',')
     results_header = results_reader.next()
