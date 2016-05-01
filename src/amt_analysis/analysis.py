@@ -1,4 +1,4 @@
-import sys, shutil, pickle, re, csv 
+import sys, shutil, pickle, re, csv, math, itertools 
 from os import listdir
 from os.path import isfile, join, isdir
 sys.path.append('../')
@@ -221,6 +221,158 @@ def summarize_results_by_agent_type_and_goal_corrected() :
     
     file_handle.close()
 
+def get_statistical_significance() :
+    results_file = open(path_to_batch + 'results.csv', 'r')
+    results_reader = csv.reader(results_file, delimiter=',')
+    results_header = results_reader.next()
+    
+    summary_file = open(path_to_batch + 'summary.csv', 'r')
+    summary_reader = csv.reader(results_file, delimiter=',')
+    summary_header = summary_reader.next()
+    
+    cols_to_evaluate = summary_header
+    cols_to_evaluate.remove('agent_type')
+    cols_to_evaluate.remove('performed_action')
+    cols_to_evaluate.remove('Number of dialogues')
+    
+    means = dict()
+    num_rows = dict()
+    variances = dict()
+    
+    for row in summary_reader :
+        agent_type = row[0]
+        means[agent_type] = dict()
+        for (col_num, col_val) in enumerate(row) :
+            col_name = summary_header[col_num]
+            if col_name in cols_to_evaluate :
+                means[agent_type][col_name] = float(col_val)
+            elif col_name == 'Number of dialogues' :
+                num_rows[agent_type] = int(col_val)
+    
+    for row in results_reader :
+        agent_type = row[0]
+        variances[agent_type] = dict()
+        for (col_num, col_val) in enumerate(row) :
+            col_name = results_header[col_num]
+            if col_name in cols_to_evaluate :
+                if col_name not in variances[agent_type] :
+                    variances[agent_type][col_name] = 0.0
+                variances[agent_type][col_name] = variances[agent_type][col_name] + (float(col_val) - means[agent_type][col_name]) ** 2
+    
+    for agent_type in variances :
+        for col_name in variances[agent] :
+            variances[agent_type][col_name] = variances[agent_type][col_name] / num_rows[agent_type]
+    
+    agent_types = means.keys()            
+    agent_pairs = list()
+    for i in range(0, len(agent_types)-1) :
+        agent_pairs = agent_pairs + list(itertools.product(agent_types[i], agent_types[i+1:]))        
+    
+    filename = path_to_batch + 'statistical_significance.csv'
+    file_handle = open(filename, 'w')
+    writer = csv.writer(file_handle, delimiter=',')
+    write_header = ['agent1', 'agent2', 'metric', 'mean1', 'mean2', 'significance']
+        
+    for (agent1, agent2) in agent_pairs :
+        for col_name in cols_to_evaluate :
+            y1 = means[agent1][col_name]
+            y2 = means[agent2][col_name]
+            s1 = variances[agent1][col_name]
+            s2 = variances[agent2][col_name]
+            n1 = num_rows[agent1]
+            n2 = num_rows[agent2]
+            t = (y1 - y2) / math.sqrt(((s1 ** 2) / n1) + ((s2 ** 2) / n2))
+            v = (((s1 ** 2) / n1) + ((s2 ** 2) / n2)) / (((((s1 ** 2) / n1) ** 2) / (n1 - 1)) + ((((s2 ** 2) / n2) ** 2) / (n2 - 1)))
+            v = int(round(v))
+            t_stat = stats.t.ppf(1-0.025, v)
+            if abs(t) > t_stat :
+                row = [agent1, agent2, col_name, y1, y2, 'significant']
+            else :
+                trending_t_stat = stats.t.ppf(1-0.05, v)
+                if abs(t) > trending_t_stat :
+                    row = [agent1, agent2, col_name, y1, y2, 'trending']
+                else :
+                    row = [agent1, agent2, col_name, y1, y2, 'not significant']
+            writer.writerow(row)
+            
+    file_handle.close()
+
+def get_statistical_significance_corrected() :
+    results_file = open(path_to_batch + 'results_corrected.csv', 'r')
+    results_reader = csv.reader(results_file, delimiter=',')
+    results_header = results_reader.next()
+    
+    summary_file = open(path_to_batch + 'summary_corrected.csv', 'r')
+    summary_reader = csv.reader(results_file, delimiter=',')
+    summary_header = summary_reader.next()
+    
+    cols_to_evaluate = summary_header
+    cols_to_evaluate.remove('agent_type')
+    cols_to_evaluate.remove('performed_action')
+    cols_to_evaluate.remove('Number of dialogues')
+    
+    means = dict()
+    num_rows = dict()
+    variances = dict()
+    
+    for row in summary_reader :
+        agent_type = row[0]
+        means[agent_type] = dict()
+        for (col_num, col_val) in enumerate(row) :
+            col_name = summary_header[col_num]
+            if col_name in cols_to_evaluate :
+                means[agent_type][col_name] = float(col_val)
+            elif col_name == 'Number of dialogues' :
+                num_rows[agent_type] = int(col_val)
+    
+    for row in results_reader :
+        agent_type = row[0]
+        variances[agent_type] = dict()
+        for (col_num, col_val) in enumerate(row) :
+            col_name = results_header[col_num]
+            if col_name in cols_to_evaluate :
+                if col_name not in variances[agent_type] :
+                    variances[agent_type][col_name] = 0.0
+                variances[agent_type][col_name] = variances[agent_type][col_name] + (float(col_val) - means[agent_type][col_name]) ** 2
+    
+    for agent_type in variances :
+        for col_name in variances[agent] :
+            variances[agent_type][col_name] = variances[agent_type][col_name] / num_rows[agent_type]
+    
+    agent_types = means.keys()            
+    agent_pairs = list()
+    for i in range(0, len(agent_types)-1) :
+        agent_pairs = agent_pairs + list(itertools.product(agent_types[i], agent_types[i+1:]))        
+    
+    filename = path_to_batch + 'statistical_significance_corrected.csv'
+    file_handle = open(filename, 'w')
+    writer = csv.writer(file_handle, delimiter=',')
+    write_header = ['agent1', 'agent2', 'metric', 'mean1', 'mean2', 'significance']
+        
+    for (agent1, agent2) in agent_pairs :
+        for col_name in cols_to_evaluate :
+            y1 = means[agent1][col_name]
+            y2 = means[agent2][col_name]
+            s1 = variances[agent1][col_name]
+            s2 = variances[agent2][col_name]
+            n1 = num_rows[agent1]
+            n2 = num_rows[agent2]
+            t = (y1 - y2) / math.sqrt(((s1 ** 2) / n1) + ((s2 ** 2) / n2))
+            v = (((s1 ** 2) / n1) + ((s2 ** 2) / n2)) / (((((s1 ** 2) / n1) ** 2) / (n1 - 1)) + ((((s2 ** 2) / n2) ** 2) / (n2 - 1)))
+            v = int(round(v))
+            t_stat = stats.t.ppf(1-0.025, v)
+            if abs(t) > t_stat :
+                row = [agent1, agent2, col_name, y1, y2, 'significant']
+            else :
+                trending_t_stat = stats.t.ppf(1-0.05, v)
+                if abs(t) > trending_t_stat :
+                    row = [agent1, agent2, col_name, y1, y2, 'trending']
+                else :
+                    row = [agent1, agent2, col_name, y1, y2, 'not significant']
+            writer.writerow(row)
+            
+    file_handle.close()
+
 def summarize_results_by_agent_type() :
     results_file = open(path_to_batch + 'results.csv', 'r')
     #results_file = open(path_to_batch + 'results_corrected.csv', 'r')
@@ -350,4 +502,6 @@ if __name__ == '__main__' :
     collate_results_corrected()
     summarize_results_by_agent_type_corrected()
     summarize_results_by_agent_type_and_goal_corrected()
+    get_statistical_significance()
+    get_statistical_significance_corrected()
     #compare_task_completion()
