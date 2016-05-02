@@ -29,8 +29,9 @@ for k_fold_folder in os.listdir('corpus'):
     for i in range(1, k + 1):
         file_list[i] = {}
 
-        file_list[i]['parser'] = path + '/' + str(i) + '/' + str(i) + '_train_parser.txt'
+        file_list[i]['parser'] = path + '/' + str(i) + '/' + str(i) + '_train_parser.txt' 
         file_list[i]['parser_short'] = path + '/' + str(i) + '/' + str(i) + '_train_parser_short.txt'
+        file_list[i]['parser_tiny'] = path + '/' + str(i) + '/' + str(i) + '_train_parser_tiny.txt'
         file_list[i]['lm'] = path + '/' + str(i) + '/' + str(i) + '_train_lm.txt'
         file_list[i]['recordings'] = path + '/' + str(i) + '/' + str(i) + '_recording_files.txt'
         file_list[i]['recordings_dir'] = path + '/' + str(i)
@@ -40,9 +41,12 @@ for k_fold_folder in os.listdir('corpus'):
     for i in range(1, k + 1):
         print "Generating sets for k=" + str(k) + ", fold " + str(i)
         
-        path = 'k-folds/' + str(k) + '_fold/' + str(i) 
+        path = 'k-folds/' + str(k) + '_fold/' + str(i)
+
         parser_train_file = open(path + '/parser_train.txt', 'w')
-        parser_train_file_short = open(path + '/parser_train_short.txt', 'w')
+        #parser_train_file_short = open(path + '/parser_train_short.txt', 'w')
+        parser_train_file_tiny = open(path + '/parser_train_tiny.txt', 'w')
+
         lm_train_file = open(path + '/lm_train.txt', 'w')
         recording_files = open(path + '/recordings_train.txt', 'w')
         transcript_file = open(path + '/recordings/train/transcript.txt', 'w')
@@ -50,9 +54,11 @@ for k_fold_folder in os.listdir('corpus'):
         for j in range(1, k + 1):
             #Appends data files from all folds except test fold. 
             if not j == i:
-                append(open(file_list[j]['lm'], 'r'), lm_train_file)
                 append(open(file_list[j]['parser'], 'r'), parser_train_file)
-                append(open(file_list[j]['parser_short'], 'r'), parser_train_file_short)
+                #append(open(file_list[j]['parser_short'], 'r'), parser_train_file_short)
+                append(open(file_list[j]['parser_tiny'], 'r'),  parser_train_file_tiny)
+
+                append(open(file_list[j]['lm'], 'r'), lm_train_file)
                 append(open(file_list[j]['recordings'], 'r'), recording_files)
                 append(open(file_list[j]['transcript'], 'r'), transcript_file)
 
@@ -62,8 +68,9 @@ for k_fold_folder in os.listdir('corpus'):
         #Creates test files by copying folds data files.  
         shutil.copyfile(file_list[i]['lm'], path + '/lm_test.txt')
         shutil.copyfile(file_list[i]['parser'], path + '/parser_test.txt')
-        shutil.copyfile(file_list[i]['parser_short'], path + '/parser_test_short.txt')
+        #shutil.copyfile(file_list[i]['parser_short'], path + '/parser_test_short.txt')
         shutil.copyfile(file_list[i]['recordings'], path + '/recordings_test.txt')
         shutil.copyfile(file_list[i]['transcript'], path + '/recordings/test/transcript.txt')
+        shutil.copyfile(file_list[i]['parser_tiny'], path + '/parser_test_tiny.txt')
 
         copyRecordings(file_list[i]['recordings_dir'], path + '/recordings/test')

@@ -130,7 +130,8 @@ for user in os.listdir('headset'):
     lm_training_file = open(path + user + '_train_lm.txt', 'w')
     transcript_file = open(path + user + '_transcript.txt', 'w')
     parser_training_short_file = open(path + user + '_train_parser_short.txt' , 'w')
-
+    parser_training_tiny_file = open(path + user + '_train_parser_tiny.txt' , 'w')
+    
     phrase_file = open(path + user + '_phrases.txt', 'r')
     denotation_file = open(path + user + '_denotations.txt', 'r')
     semantic_forms_file = open(path + user + '_semantic_forms.txt', 'r')
@@ -155,10 +156,15 @@ for user in os.listdir('headset'):
         parser_training_file.write(processed_phrase)
         parser_training_file.write(semantic_form + '\n')
 
-        #Writes phrase to short training file if sentence length does not exceed 10.
+        #Writes phrase to short and tiny training files if sentence length does not exceed their limit.
+        if len(processed_phrase.split()) <= 7:
+            parser_training_tiny_file.write(processed_phrase)
+            parser_training_tiny_file.write(semantic_form + '\n')
+       
         if len(processed_phrase.split()) <= 10:
             parser_training_short_file.write(processed_phrase)
             parser_training_short_file.write(semantic_form + '\n')
+ 
 
     lm_training_file.close()
     parser_training_file.close()
