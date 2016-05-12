@@ -10,7 +10,7 @@ class Knowledge:
 
     def __init__(self):
         #self.goal_actions = ['searchroom', 'speak_t', 'speak_e', 'remind', 'askperson', 'bring', 'at']
-        self.goal_actions = ['bring', 'at', 'searchroom']
+        self.goal_actions = ['bring', 'at']
         self.goal_params = ['patient', 'recipient', 'location']
 
         # This is kept as a single vector common to all values so that hopefully 
@@ -53,13 +53,13 @@ class Knowledge:
         # Probability that the obs is due to an utterance not in the 
         # N-best list. The actual probability will be this minus the sum 
         # of probabilities of N-best parses
-        self.max_obs_by_non_n_best_prob = math.exp(-26)
-        self.min_obs_by_non_n_best_prob = math.exp(-28)
+        self.max_obs_by_non_n_best_prob = math.exp(-56)
+        self.min_obs_by_non_n_best_prob = math.exp(-58)
         
         # Probability that an utterance not in the N-best list matches 
         # the partition and system_action - This can probably be 
         # calculated exactly but it will be hard to do so.
-        self.non_n_best_match_prob = 0.01
+        self.non_n_best_match_prob = math.exp(-10)
         
         # The system requires arguments to be passed to ASP in specific
         # orders for each action. This is not an obviously generalizable
@@ -209,8 +209,8 @@ class Knowledge:
                 self.true_constraints[action][param] = list()
                 self.false_constraints[action][param] = list()
                 
-        self.true_constraints['searchroom']['patient'] = ['person']
-        self.true_constraints['searchroom']['location'] = ['room']
+        #self.true_constraints['searchroom']['patient'] = ['person']
+        #self.true_constraints['searchroom']['location'] = ['room']
         #self.true_constraints['remind']['recipient'] = ['person']
         #self.true_constraints['remind']['location'] = ['room']
         #self.true_constraints['askperson']['patient'] = ['person']

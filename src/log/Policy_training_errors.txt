@@ -5439,3 +5439,633 @@ IndexError: list index out of range
 
 
 
+Error when training on file :/u/aish/Documents/Research/AMT_results/before_fluency_verification/Batch0/all_corrected_pickle_logs/56fb165f76b05_main.pklTraceback (most recent call last):
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 348, in train_policy_from_new_logs
+    self.train_policy_from_single_new_log(fname, relevant_log_type)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 391, in train_policy_from_single_new_log
+    self.update_state(response)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 191, in update_state
+    self.get_n_best_utterances_from_parses(n_best_parses)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 421, in get_n_best_utterances_from_parses
+    utterances = self.create_utterances_of_parse(parse)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 280, in create_utterances_of_parse
+    g = self.grounder.groundSemanticNode(parse, [], [], [])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 87, in groundSemanticNode
+    child_grounds.append(self.groundSemanticNode(c, lambda_names, lambda_types, lambda_assignments))
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 56, in groundSemanticNode
+    grounding_results = self.groundSemanticNode(root.children[0], new_names, new_types, new_assignments)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 108, in groundSemanticNode
+    satisfied = self.grounding_to_answer_set(child_grounds[0][child_ground_idx[0]])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 36, in grounding_to_answer_set
+    return [gr[1] for gr in g]
+IndexError: list index out of range
+
+
+
+Error when training on file :/u/aish/Documents/Research/AMT_results/before_fluency_verification/Batch2/corrected_pickle_logs/570538ab69769_main.pklTraceback (most recent call last):
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 348, in train_policy_from_new_logs
+    self.train_policy_from_single_new_log(fname, relevant_log_type)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 391, in train_policy_from_single_new_log
+    self.update_state(response)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 191, in update_state
+    self.get_n_best_utterances_from_parses(n_best_parses)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 421, in get_n_best_utterances_from_parses
+    utterances = self.create_utterances_of_parse(parse)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 261, in create_utterances_of_parse
+    p_action = self.get_action_from_parse(parse)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/DialogAgent.py", line 345, in get_action_from_parse
+    g = self.grounder.groundSemanticNode(arg, [], [], [])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 87, in groundSemanticNode
+    child_grounds.append(self.groundSemanticNode(c, lambda_names, lambda_types, lambda_assignments))
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 56, in groundSemanticNode
+    grounding_results = self.groundSemanticNode(root.children[0], new_names, new_types, new_assignments)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 108, in groundSemanticNode
+    satisfied = self.grounding_to_answer_set(child_grounds[0][child_ground_idx[0]])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 36, in grounding_to_answer_set
+    return [gr[1] for gr in g]
+IndexError: list index out of range
+
+
+
+Error when training on file :/u/aish/Documents/Research/AMT_results/before_fluency_verification/Batch2/corrected_pickle_logs/57063662c54b6_main.pklTraceback (most recent call last):
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 348, in train_policy_from_new_logs
+    self.train_policy_from_single_new_log(fname, relevant_log_type)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 391, in train_policy_from_single_new_log
+    self.update_state(response)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 191, in update_state
+    self.get_n_best_utterances_from_parses(n_best_parses)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 421, in get_n_best_utterances_from_parses
+    utterances = self.create_utterances_of_parse(parse)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 261, in create_utterances_of_parse
+    p_action = self.get_action_from_parse(parse)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/DialogAgent.py", line 345, in get_action_from_parse
+    g = self.grounder.groundSemanticNode(arg, [], [], [])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 87, in groundSemanticNode
+    child_grounds.append(self.groundSemanticNode(c, lambda_names, lambda_types, lambda_assignments))
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 56, in groundSemanticNode
+    grounding_results = self.groundSemanticNode(root.children[0], new_names, new_types, new_assignments)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 108, in groundSemanticNode
+    satisfied = self.grounding_to_answer_set(child_grounds[0][child_ground_idx[0]])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 36, in grounding_to_answer_set
+    return [gr[1] for gr in g]
+IndexError: list index out of range
+
+
+
+Error when training on file :/u/aish/Documents/Research/AMT_results/before_fluency_verification/Batch2/corrected_pickle_logs/5705e40aee320_main.pklTraceback (most recent call last):
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 348, in train_policy_from_new_logs
+    self.train_policy_from_single_new_log(fname, relevant_log_type)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 391, in train_policy_from_single_new_log
+    self.update_state(response)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 191, in update_state
+    self.get_n_best_utterances_from_parses(n_best_parses)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 421, in get_n_best_utterances_from_parses
+    utterances = self.create_utterances_of_parse(parse)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 261, in create_utterances_of_parse
+    p_action = self.get_action_from_parse(parse)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/DialogAgent.py", line 345, in get_action_from_parse
+    g = self.grounder.groundSemanticNode(arg, [], [], [])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 87, in groundSemanticNode
+    child_grounds.append(self.groundSemanticNode(c, lambda_names, lambda_types, lambda_assignments))
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 56, in groundSemanticNode
+    grounding_results = self.groundSemanticNode(root.children[0], new_names, new_types, new_assignments)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 108, in groundSemanticNode
+    satisfied = self.grounding_to_answer_set(child_grounds[0][child_ground_idx[0]])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 36, in grounding_to_answer_set
+    return [gr[1] for gr in g]
+IndexError: list index out of range
+
+
+
+Error when training on file :/u/aish/Documents/Research/AMT_results/before_fluency_verification/Batch2/corrected_pickle_logs/5705367923bf6_main.pklTraceback (most recent call last):
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 348, in train_policy_from_new_logs
+    self.train_policy_from_single_new_log(fname, relevant_log_type)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 391, in train_policy_from_single_new_log
+    self.update_state(response)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 191, in update_state
+    self.get_n_best_utterances_from_parses(n_best_parses)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 421, in get_n_best_utterances_from_parses
+    utterances = self.create_utterances_of_parse(parse)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 261, in create_utterances_of_parse
+    p_action = self.get_action_from_parse(parse)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/DialogAgent.py", line 345, in get_action_from_parse
+    g = self.grounder.groundSemanticNode(arg, [], [], [])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 87, in groundSemanticNode
+    child_grounds.append(self.groundSemanticNode(c, lambda_names, lambda_types, lambda_assignments))
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 56, in groundSemanticNode
+    grounding_results = self.groundSemanticNode(root.children[0], new_names, new_types, new_assignments)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 108, in groundSemanticNode
+    satisfied = self.grounding_to_answer_set(child_grounds[0][child_ground_idx[0]])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 36, in grounding_to_answer_set
+    return [gr[1] for gr in g]
+IndexError: list index out of range
+
+
+
+Error when training on file :/u/aish/Documents/Research/AMT_results/before_fluency_verification/Batch0/all_corrected_pickle_logs/56fb165f76b05_main.pklTraceback (most recent call last):
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 348, in train_policy_from_new_logs
+    self.train_policy_from_single_new_log(fname, relevant_log_type)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 391, in train_policy_from_single_new_log
+    self.update_state(response)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 191, in update_state
+    self.get_n_best_utterances_from_parses(n_best_parses)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 421, in get_n_best_utterances_from_parses
+    utterances = self.create_utterances_of_parse(parse)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 280, in create_utterances_of_parse
+    g = self.grounder.groundSemanticNode(parse, [], [], [])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 87, in groundSemanticNode
+    child_grounds.append(self.groundSemanticNode(c, lambda_names, lambda_types, lambda_assignments))
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 56, in groundSemanticNode
+    grounding_results = self.groundSemanticNode(root.children[0], new_names, new_types, new_assignments)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 108, in groundSemanticNode
+    satisfied = self.grounding_to_answer_set(child_grounds[0][child_ground_idx[0]])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 36, in grounding_to_answer_set
+    return [gr[1] for gr in g]
+IndexError: list index out of range
+
+
+
+Error when training on file :/u/aish/Documents/Research/AMT_results/before_fluency_verification/Batch2/corrected_pickle_logs/57063662c54b6_main.pklTraceback (most recent call last):
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 348, in train_policy_from_new_logs
+    self.train_policy_from_single_new_log(fname, relevant_log_type)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 391, in train_policy_from_single_new_log
+    self.update_state(response)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 191, in update_state
+    self.get_n_best_utterances_from_parses(n_best_parses)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 421, in get_n_best_utterances_from_parses
+    utterances = self.create_utterances_of_parse(parse)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 261, in create_utterances_of_parse
+    p_action = self.get_action_from_parse(parse)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/DialogAgent.py", line 345, in get_action_from_parse
+    g = self.grounder.groundSemanticNode(arg, [], [], [])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 87, in groundSemanticNode
+    child_grounds.append(self.groundSemanticNode(c, lambda_names, lambda_types, lambda_assignments))
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 56, in groundSemanticNode
+    grounding_results = self.groundSemanticNode(root.children[0], new_names, new_types, new_assignments)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 108, in groundSemanticNode
+    satisfied = self.grounding_to_answer_set(child_grounds[0][child_ground_idx[0]])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 36, in grounding_to_answer_set
+    return [gr[1] for gr in g]
+IndexError: list index out of range
+
+
+
+Error when training on file :/u/aish/Documents/Research/AMT_results/before_fluency_verification/Batch2/corrected_pickle_logs/5705367923bf6_main.pklTraceback (most recent call last):
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 348, in train_policy_from_new_logs
+    self.train_policy_from_single_new_log(fname, relevant_log_type)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 391, in train_policy_from_single_new_log
+    self.update_state(response)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 191, in update_state
+    self.get_n_best_utterances_from_parses(n_best_parses)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 421, in get_n_best_utterances_from_parses
+    utterances = self.create_utterances_of_parse(parse)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 261, in create_utterances_of_parse
+    p_action = self.get_action_from_parse(parse)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/DialogAgent.py", line 345, in get_action_from_parse
+    g = self.grounder.groundSemanticNode(arg, [], [], [])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 87, in groundSemanticNode
+    child_grounds.append(self.groundSemanticNode(c, lambda_names, lambda_types, lambda_assignments))
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 56, in groundSemanticNode
+    grounding_results = self.groundSemanticNode(root.children[0], new_names, new_types, new_assignments)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 108, in groundSemanticNode
+    satisfied = self.grounding_to_answer_set(child_grounds[0][child_ground_idx[0]])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 36, in grounding_to_answer_set
+    return [gr[1] for gr in g]
+IndexError: list index out of range
+
+
+
+Error when training on file :/u/aish/Documents/Research/AMT_results/before_fluency_verification/Batch2/corrected_pickle_logs/5705e40aee320_main.pklTraceback (most recent call last):
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 348, in train_policy_from_new_logs
+    self.train_policy_from_single_new_log(fname, relevant_log_type)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 391, in train_policy_from_single_new_log
+    self.update_state(response)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 191, in update_state
+    self.get_n_best_utterances_from_parses(n_best_parses)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 421, in get_n_best_utterances_from_parses
+    utterances = self.create_utterances_of_parse(parse)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 261, in create_utterances_of_parse
+    p_action = self.get_action_from_parse(parse)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/DialogAgent.py", line 345, in get_action_from_parse
+    g = self.grounder.groundSemanticNode(arg, [], [], [])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 87, in groundSemanticNode
+    child_grounds.append(self.groundSemanticNode(c, lambda_names, lambda_types, lambda_assignments))
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 56, in groundSemanticNode
+    grounding_results = self.groundSemanticNode(root.children[0], new_names, new_types, new_assignments)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 108, in groundSemanticNode
+    satisfied = self.grounding_to_answer_set(child_grounds[0][child_ground_idx[0]])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 36, in grounding_to_answer_set
+    return [gr[1] for gr in g]
+IndexError: list index out of range
+
+
+
+Error when training on file :/u/aish/Documents/Research/AMT_results/before_fluency_verification/Batch2/corrected_pickle_logs/570538ab69769_main.pklTraceback (most recent call last):
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 348, in train_policy_from_new_logs
+    self.train_policy_from_single_new_log(fname, relevant_log_type)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 391, in train_policy_from_single_new_log
+    self.update_state(response)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 191, in update_state
+    self.get_n_best_utterances_from_parses(n_best_parses)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 421, in get_n_best_utterances_from_parses
+    utterances = self.create_utterances_of_parse(parse)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 261, in create_utterances_of_parse
+    p_action = self.get_action_from_parse(parse)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/DialogAgent.py", line 345, in get_action_from_parse
+    g = self.grounder.groundSemanticNode(arg, [], [], [])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 87, in groundSemanticNode
+    child_grounds.append(self.groundSemanticNode(c, lambda_names, lambda_types, lambda_assignments))
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 56, in groundSemanticNode
+    grounding_results = self.groundSemanticNode(root.children[0], new_names, new_types, new_assignments)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 108, in groundSemanticNode
+    satisfied = self.grounding_to_answer_set(child_grounds[0][child_ground_idx[0]])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 36, in grounding_to_answer_set
+    return [gr[1] for gr in g]
+IndexError: list index out of range
+
+
+
+Error when training on file :/u/aish/Documents/Research/AMT_results/before_fluency_verification/Batch0/all_corrected_pickle_logs/56fb165f76b05_main.pklTraceback (most recent call last):
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 348, in train_policy_from_new_logs
+    self.train_policy_from_single_new_log(fname, relevant_log_type)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 391, in train_policy_from_single_new_log
+    self.update_state(response)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 191, in update_state
+    self.get_n_best_utterances_from_parses(n_best_parses)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 421, in get_n_best_utterances_from_parses
+    utterances = self.create_utterances_of_parse(parse)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 280, in create_utterances_of_parse
+    g = self.grounder.groundSemanticNode(parse, [], [], [])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 87, in groundSemanticNode
+    child_grounds.append(self.groundSemanticNode(c, lambda_names, lambda_types, lambda_assignments))
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 56, in groundSemanticNode
+    grounding_results = self.groundSemanticNode(root.children[0], new_names, new_types, new_assignments)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 108, in groundSemanticNode
+    satisfied = self.grounding_to_answer_set(child_grounds[0][child_ground_idx[0]])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 36, in grounding_to_answer_set
+    return [gr[1] for gr in g]
+IndexError: list index out of range
+
+
+
+Error when training on file :/u/aish/Documents/Research/AMT_results/before_fluency_verification/Batch2/corrected_pickle_logs/5705e40aee320_main.pklTraceback (most recent call last):
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 348, in train_policy_from_new_logs
+    self.train_policy_from_single_new_log(fname, relevant_log_type)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 391, in train_policy_from_single_new_log
+    self.update_state(response)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 191, in update_state
+    self.get_n_best_utterances_from_parses(n_best_parses)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 421, in get_n_best_utterances_from_parses
+    utterances = self.create_utterances_of_parse(parse)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 261, in create_utterances_of_parse
+    p_action = self.get_action_from_parse(parse)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/DialogAgent.py", line 345, in get_action_from_parse
+    g = self.grounder.groundSemanticNode(arg, [], [], [])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 87, in groundSemanticNode
+    child_grounds.append(self.groundSemanticNode(c, lambda_names, lambda_types, lambda_assignments))
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 56, in groundSemanticNode
+    grounding_results = self.groundSemanticNode(root.children[0], new_names, new_types, new_assignments)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 108, in groundSemanticNode
+    satisfied = self.grounding_to_answer_set(child_grounds[0][child_ground_idx[0]])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 36, in grounding_to_answer_set
+    return [gr[1] for gr in g]
+IndexError: list index out of range
+
+
+
+Error when training on file :/u/aish/Documents/Research/AMT_results/before_fluency_verification/Batch2/corrected_pickle_logs/570538ab69769_main.pklTraceback (most recent call last):
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 348, in train_policy_from_new_logs
+    self.train_policy_from_single_new_log(fname, relevant_log_type)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 391, in train_policy_from_single_new_log
+    self.update_state(response)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 191, in update_state
+    self.get_n_best_utterances_from_parses(n_best_parses)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 421, in get_n_best_utterances_from_parses
+    utterances = self.create_utterances_of_parse(parse)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 261, in create_utterances_of_parse
+    p_action = self.get_action_from_parse(parse)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/DialogAgent.py", line 345, in get_action_from_parse
+    g = self.grounder.groundSemanticNode(arg, [], [], [])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 87, in groundSemanticNode
+    child_grounds.append(self.groundSemanticNode(c, lambda_names, lambda_types, lambda_assignments))
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 56, in groundSemanticNode
+    grounding_results = self.groundSemanticNode(root.children[0], new_names, new_types, new_assignments)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 108, in groundSemanticNode
+    satisfied = self.grounding_to_answer_set(child_grounds[0][child_ground_idx[0]])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 36, in grounding_to_answer_set
+    return [gr[1] for gr in g]
+IndexError: list index out of range
+
+
+
+Error when training on file :/u/aish/Documents/Research/AMT_results/before_fluency_verification/Batch2/corrected_pickle_logs/5705367923bf6_main.pklTraceback (most recent call last):
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 348, in train_policy_from_new_logs
+    self.train_policy_from_single_new_log(fname, relevant_log_type)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 391, in train_policy_from_single_new_log
+    self.update_state(response)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 191, in update_state
+    self.get_n_best_utterances_from_parses(n_best_parses)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 421, in get_n_best_utterances_from_parses
+    utterances = self.create_utterances_of_parse(parse)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 261, in create_utterances_of_parse
+    p_action = self.get_action_from_parse(parse)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/DialogAgent.py", line 345, in get_action_from_parse
+    g = self.grounder.groundSemanticNode(arg, [], [], [])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 87, in groundSemanticNode
+    child_grounds.append(self.groundSemanticNode(c, lambda_names, lambda_types, lambda_assignments))
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 56, in groundSemanticNode
+    grounding_results = self.groundSemanticNode(root.children[0], new_names, new_types, new_assignments)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 108, in groundSemanticNode
+    satisfied = self.grounding_to_answer_set(child_grounds[0][child_ground_idx[0]])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 36, in grounding_to_answer_set
+    return [gr[1] for gr in g]
+IndexError: list index out of range
+
+
+
+Error when training on file :/u/aish/Documents/Research/AMT_results/before_fluency_verification/Batch2/corrected_pickle_logs/57063662c54b6_main.pklTraceback (most recent call last):
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 348, in train_policy_from_new_logs
+    self.train_policy_from_single_new_log(fname, relevant_log_type)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 391, in train_policy_from_single_new_log
+    self.update_state(response)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 191, in update_state
+    self.get_n_best_utterances_from_parses(n_best_parses)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 421, in get_n_best_utterances_from_parses
+    utterances = self.create_utterances_of_parse(parse)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 261, in create_utterances_of_parse
+    p_action = self.get_action_from_parse(parse)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/DialogAgent.py", line 345, in get_action_from_parse
+    g = self.grounder.groundSemanticNode(arg, [], [], [])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 87, in groundSemanticNode
+    child_grounds.append(self.groundSemanticNode(c, lambda_names, lambda_types, lambda_assignments))
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 56, in groundSemanticNode
+    grounding_results = self.groundSemanticNode(root.children[0], new_names, new_types, new_assignments)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 108, in groundSemanticNode
+    satisfied = self.grounding_to_answer_set(child_grounds[0][child_ground_idx[0]])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 36, in grounding_to_answer_set
+    return [gr[1] for gr in g]
+IndexError: list index out of range
+
+
+
+Error when training on file :/u/aish/Documents/Research/AMT_results/before_fluency_verification/Batch0/all_corrected_pickle_logs/56fb165f76b05_main.pklTraceback (most recent call last):
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 348, in train_policy_from_new_logs
+    self.train_policy_from_single_new_log(fname, relevant_log_type)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 391, in train_policy_from_single_new_log
+    self.update_state(response)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 191, in update_state
+    self.get_n_best_utterances_from_parses(n_best_parses)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 421, in get_n_best_utterances_from_parses
+    utterances = self.create_utterances_of_parse(parse)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 280, in create_utterances_of_parse
+    g = self.grounder.groundSemanticNode(parse, [], [], [])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 87, in groundSemanticNode
+    child_grounds.append(self.groundSemanticNode(c, lambda_names, lambda_types, lambda_assignments))
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 56, in groundSemanticNode
+    grounding_results = self.groundSemanticNode(root.children[0], new_names, new_types, new_assignments)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 108, in groundSemanticNode
+    satisfied = self.grounding_to_answer_set(child_grounds[0][child_ground_idx[0]])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 36, in grounding_to_answer_set
+    return [gr[1] for gr in g]
+IndexError: list index out of range
+
+
+
+Error when training on file :/u/aish/Documents/Research/AMT_results/before_fluency_verification/Batch2/corrected_pickle_logs/5705367923bf6_main.pklTraceback (most recent call last):
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 348, in train_policy_from_new_logs
+    self.train_policy_from_single_new_log(fname, relevant_log_type)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 391, in train_policy_from_single_new_log
+    self.update_state(response)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 191, in update_state
+    self.get_n_best_utterances_from_parses(n_best_parses)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 421, in get_n_best_utterances_from_parses
+    utterances = self.create_utterances_of_parse(parse)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 261, in create_utterances_of_parse
+    p_action = self.get_action_from_parse(parse)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/DialogAgent.py", line 345, in get_action_from_parse
+    g = self.grounder.groundSemanticNode(arg, [], [], [])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 87, in groundSemanticNode
+    child_grounds.append(self.groundSemanticNode(c, lambda_names, lambda_types, lambda_assignments))
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 56, in groundSemanticNode
+    grounding_results = self.groundSemanticNode(root.children[0], new_names, new_types, new_assignments)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 108, in groundSemanticNode
+    satisfied = self.grounding_to_answer_set(child_grounds[0][child_ground_idx[0]])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 36, in grounding_to_answer_set
+    return [gr[1] for gr in g]
+IndexError: list index out of range
+
+
+
+Error when training on file :/u/aish/Documents/Research/AMT_results/before_fluency_verification/Batch2/corrected_pickle_logs/5705e40aee320_main.pklTraceback (most recent call last):
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 348, in train_policy_from_new_logs
+    self.train_policy_from_single_new_log(fname, relevant_log_type)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 391, in train_policy_from_single_new_log
+    self.update_state(response)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 191, in update_state
+    self.get_n_best_utterances_from_parses(n_best_parses)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 421, in get_n_best_utterances_from_parses
+    utterances = self.create_utterances_of_parse(parse)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 261, in create_utterances_of_parse
+    p_action = self.get_action_from_parse(parse)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/DialogAgent.py", line 345, in get_action_from_parse
+    g = self.grounder.groundSemanticNode(arg, [], [], [])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 87, in groundSemanticNode
+    child_grounds.append(self.groundSemanticNode(c, lambda_names, lambda_types, lambda_assignments))
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 56, in groundSemanticNode
+    grounding_results = self.groundSemanticNode(root.children[0], new_names, new_types, new_assignments)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 108, in groundSemanticNode
+    satisfied = self.grounding_to_answer_set(child_grounds[0][child_ground_idx[0]])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 36, in grounding_to_answer_set
+    return [gr[1] for gr in g]
+IndexError: list index out of range
+
+
+
+Error when training on file :/u/aish/Documents/Research/AMT_results/before_fluency_verification/Batch2/corrected_pickle_logs/570538ab69769_main.pklTraceback (most recent call last):
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 348, in train_policy_from_new_logs
+    self.train_policy_from_single_new_log(fname, relevant_log_type)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 391, in train_policy_from_single_new_log
+    self.update_state(response)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 191, in update_state
+    self.get_n_best_utterances_from_parses(n_best_parses)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 421, in get_n_best_utterances_from_parses
+    utterances = self.create_utterances_of_parse(parse)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 261, in create_utterances_of_parse
+    p_action = self.get_action_from_parse(parse)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/DialogAgent.py", line 345, in get_action_from_parse
+    g = self.grounder.groundSemanticNode(arg, [], [], [])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 87, in groundSemanticNode
+    child_grounds.append(self.groundSemanticNode(c, lambda_names, lambda_types, lambda_assignments))
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 56, in groundSemanticNode
+    grounding_results = self.groundSemanticNode(root.children[0], new_names, new_types, new_assignments)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 108, in groundSemanticNode
+    satisfied = self.grounding_to_answer_set(child_grounds[0][child_ground_idx[0]])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 36, in grounding_to_answer_set
+    return [gr[1] for gr in g]
+IndexError: list index out of range
+
+
+
+Error when training on file :/u/aish/Documents/Research/AMT_results/before_fluency_verification/Batch2/corrected_pickle_logs/57063662c54b6_main.pklTraceback (most recent call last):
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 348, in train_policy_from_new_logs
+    self.train_policy_from_single_new_log(fname, relevant_log_type)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 391, in train_policy_from_single_new_log
+    self.update_state(response)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 191, in update_state
+    self.get_n_best_utterances_from_parses(n_best_parses)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 421, in get_n_best_utterances_from_parses
+    utterances = self.create_utterances_of_parse(parse)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 261, in create_utterances_of_parse
+    p_action = self.get_action_from_parse(parse)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/DialogAgent.py", line 345, in get_action_from_parse
+    g = self.grounder.groundSemanticNode(arg, [], [], [])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 87, in groundSemanticNode
+    child_grounds.append(self.groundSemanticNode(c, lambda_names, lambda_types, lambda_assignments))
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 56, in groundSemanticNode
+    grounding_results = self.groundSemanticNode(root.children[0], new_names, new_types, new_assignments)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 108, in groundSemanticNode
+    satisfied = self.grounding_to_answer_set(child_grounds[0][child_ground_idx[0]])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 36, in grounding_to_answer_set
+    return [gr[1] for gr in g]
+IndexError: list index out of range
+
+
+
+Error when training on file :/u/aish/Documents/Research/AMT_results/before_fluency_verification/Batch0/all_corrected_pickle_logs/56fb165f76b05_main.pklTraceback (most recent call last):
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 348, in train_policy_from_new_logs
+    self.train_policy_from_single_new_log(fname, relevant_log_type)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 391, in train_policy_from_single_new_log
+    self.update_state(response)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 191, in update_state
+    self.get_n_best_utterances_from_parses(n_best_parses)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 421, in get_n_best_utterances_from_parses
+    utterances = self.create_utterances_of_parse(parse)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 280, in create_utterances_of_parse
+    g = self.grounder.groundSemanticNode(parse, [], [], [])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 87, in groundSemanticNode
+    child_grounds.append(self.groundSemanticNode(c, lambda_names, lambda_types, lambda_assignments))
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 56, in groundSemanticNode
+    grounding_results = self.groundSemanticNode(root.children[0], new_names, new_types, new_assignments)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 108, in groundSemanticNode
+    satisfied = self.grounding_to_answer_set(child_grounds[0][child_ground_idx[0]])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 36, in grounding_to_answer_set
+    return [gr[1] for gr in g]
+IndexError: list index out of range
+
+
+
+Error when training on file :/u/aish/Documents/Research/AMT_results/before_fluency_verification/Batch2/corrected_pickle_logs/57063662c54b6_main.pklTraceback (most recent call last):
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 348, in train_policy_from_new_logs
+    self.train_policy_from_single_new_log(fname, relevant_log_type)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 391, in train_policy_from_single_new_log
+    self.update_state(response)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 191, in update_state
+    self.get_n_best_utterances_from_parses(n_best_parses)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 421, in get_n_best_utterances_from_parses
+    utterances = self.create_utterances_of_parse(parse)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 261, in create_utterances_of_parse
+    p_action = self.get_action_from_parse(parse)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/DialogAgent.py", line 345, in get_action_from_parse
+    g = self.grounder.groundSemanticNode(arg, [], [], [])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 87, in groundSemanticNode
+    child_grounds.append(self.groundSemanticNode(c, lambda_names, lambda_types, lambda_assignments))
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 56, in groundSemanticNode
+    grounding_results = self.groundSemanticNode(root.children[0], new_names, new_types, new_assignments)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 108, in groundSemanticNode
+    satisfied = self.grounding_to_answer_set(child_grounds[0][child_ground_idx[0]])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 36, in grounding_to_answer_set
+    return [gr[1] for gr in g]
+IndexError: list index out of range
+
+
+
+Error when training on file :/u/aish/Documents/Research/AMT_results/before_fluency_verification/Batch2/corrected_pickle_logs/5705e40aee320_main.pklTraceback (most recent call last):
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 348, in train_policy_from_new_logs
+    self.train_policy_from_single_new_log(fname, relevant_log_type)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 391, in train_policy_from_single_new_log
+    self.update_state(response)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 191, in update_state
+    self.get_n_best_utterances_from_parses(n_best_parses)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 421, in get_n_best_utterances_from_parses
+    utterances = self.create_utterances_of_parse(parse)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 261, in create_utterances_of_parse
+    p_action = self.get_action_from_parse(parse)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/DialogAgent.py", line 345, in get_action_from_parse
+    g = self.grounder.groundSemanticNode(arg, [], [], [])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 87, in groundSemanticNode
+    child_grounds.append(self.groundSemanticNode(c, lambda_names, lambda_types, lambda_assignments))
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 56, in groundSemanticNode
+    grounding_results = self.groundSemanticNode(root.children[0], new_names, new_types, new_assignments)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 108, in groundSemanticNode
+    satisfied = self.grounding_to_answer_set(child_grounds[0][child_ground_idx[0]])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 36, in grounding_to_answer_set
+    return [gr[1] for gr in g]
+IndexError: list index out of range
+
+
+
+Error when training on file :/u/aish/Documents/Research/AMT_results/before_fluency_verification/Batch2/corrected_pickle_logs/570538ab69769_main.pklTraceback (most recent call last):
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 348, in train_policy_from_new_logs
+    self.train_policy_from_single_new_log(fname, relevant_log_type)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 391, in train_policy_from_single_new_log
+    self.update_state(response)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 191, in update_state
+    self.get_n_best_utterances_from_parses(n_best_parses)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 421, in get_n_best_utterances_from_parses
+    utterances = self.create_utterances_of_parse(parse)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 261, in create_utterances_of_parse
+    p_action = self.get_action_from_parse(parse)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/DialogAgent.py", line 345, in get_action_from_parse
+    g = self.grounder.groundSemanticNode(arg, [], [], [])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 87, in groundSemanticNode
+    child_grounds.append(self.groundSemanticNode(c, lambda_names, lambda_types, lambda_assignments))
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 56, in groundSemanticNode
+    grounding_results = self.groundSemanticNode(root.children[0], new_names, new_types, new_assignments)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 108, in groundSemanticNode
+    satisfied = self.grounding_to_answer_set(child_grounds[0][child_ground_idx[0]])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 36, in grounding_to_answer_set
+    return [gr[1] for gr in g]
+IndexError: list index out of range
+
+
+
+Error when training on file :/u/aish/Documents/Research/AMT_results/before_fluency_verification/Batch2/corrected_pickle_logs/5705367923bf6_main.pklTraceback (most recent call last):
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 348, in train_policy_from_new_logs
+    self.train_policy_from_single_new_log(fname, relevant_log_type)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 391, in train_policy_from_single_new_log
+    self.update_state(response)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 191, in update_state
+    self.get_n_best_utterances_from_parses(n_best_parses)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 421, in get_n_best_utterances_from_parses
+    utterances = self.create_utterances_of_parse(parse)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 261, in create_utterances_of_parse
+    p_action = self.get_action_from_parse(parse)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/DialogAgent.py", line 345, in get_action_from_parse
+    g = self.grounder.groundSemanticNode(arg, [], [], [])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 87, in groundSemanticNode
+    child_grounds.append(self.groundSemanticNode(c, lambda_names, lambda_types, lambda_assignments))
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 56, in groundSemanticNode
+    grounding_results = self.groundSemanticNode(root.children[0], new_names, new_types, new_assignments)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 108, in groundSemanticNode
+    satisfied = self.grounding_to_answer_set(child_grounds[0][child_ground_idx[0]])
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/KBGrounder.py", line 36, in grounding_to_answer_set
+    return [gr[1] for gr in g]
+IndexError: list index out of range
+
+
+
+Error when training on file :/u/aish/Documents/Research/AMT_results/after_fluency/Batch2/corrected_pickle_logs/5716772f0f8ca_main.pklTraceback (most recent call last):
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 348, in train_policy_from_new_logs
+    self.train_policy_from_single_new_log(fname, relevant_log_type)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpTrainer.py", line 391, in train_policy_from_single_new_log
+    self.update_state(response)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 191, in update_state
+    self.get_n_best_utterances_from_parses(n_best_parses)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 436, in get_n_best_utterances_from_parses
+    self.n_best_utterances = self.cluster_utterances(self.n_best_utterances)
+  File "/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/PomdpDialogAgent.py", line 402, in cluster_utterances
+    params[param_name] = list(values[param_name])[0]
+KeyError: 'patient'
+
+
+

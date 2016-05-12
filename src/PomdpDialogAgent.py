@@ -441,8 +441,10 @@ class PomdpDialogAgent(DialogAgent) :
         print '\n'.join([str(utterance) for utterance in self.n_best_utterances])   # DEBUG
         
         sum_log_prob = float('-inf')
+        print 'sum_log_prob = ', sum_log_prob
         for utterance in self.n_best_utterances :
             sum_log_prob = add_log_probs(sum_log_prob, utterance.parse_prob)
+            print 'sum_log_prob = ', sum_log_prob
 
         sum_prob = math.exp(sum_log_prob)
         non_n_best_prob = 1.0 - sum_prob
@@ -456,7 +458,11 @@ class PomdpDialogAgent(DialogAgent) :
         
         other_utterance = Utterance('-OTHER-', parse_prob=numpy.log(non_n_best_prob))
         self.n_best_utterances.append(other_utterance)
+        print 'sum_log_prob = ', sum_log_prob
+        print 'non_n_best_prob = ', non_n_best_prob
+        print 'numpy.log(non_n_best_prob) = ', numpy.log(non_n_best_prob)
         sum_log_prob = add_log_probs(sum_log_prob, numpy.log(non_n_best_prob))
+        print 'sum_log_prob = ', sum_log_prob
         prob_with_utterances = list()
         
         for utterance in self.n_best_utterances :
@@ -477,8 +483,8 @@ class PomdpDialogAgent(DialogAgent) :
             self.max_prob_user_utterances = list()    
         self.max_prob_user_utterances.append(max_prob_utterance)
         
-        #print '\nN best utterances : ' # DEBUG
-        #print '\n'.join([str(utterance) for utterance in self.n_best_utterances])  # DEBUG
+        print '\nN best utterances : ' # DEBUG
+        print '\n'.join([str(utterance) for utterance in self.n_best_utterances])  # DEBUG
 
     def create_retraining_pairs(self, final_action, parser_train_data) :
         #print 'Lexicon - ', self.parser.lexicon.surface_forms   # DEBUG

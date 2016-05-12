@@ -3,8 +3,9 @@ from scipy import stats
 from os import listdir
 from os.path import isfile, join, isdir
 sys.path.append('../')
+#from file_organization import *
 
-path_to_batch = '/u/aish/Documents/Research/AMT_results/after_fluency/Batch3/'
+path_to_batch = '/u/aish/Documents/Research/AMT_results/after_fluency/Batch10/'
 
 def move_to_invalid(rejected_user_ids) :
     src_path = path_to_batch + 'completed/'
@@ -288,6 +289,26 @@ def get_statistical_significance() :
             s2 = variances[agent2][col_name]
             n1 = num_rows[agent1]
             n2 = num_rows[agent2]
+            print 'agent1 = ', agent1
+            print 'agent2 = ', agent2
+            print 'Metric = ', col_name
+            print 'y1 = ', y1
+            print 'y2 = ', y2
+            print 's1 = ', s1
+            print 's2 = ', s2
+            print 'n1 = ', n1
+            print 'n2 = ', n2
+            print 
+            
+            if (s1 == 0 and s2 == 0) :
+                # This is a very weird case - Zero variance. But it 
+                # sometimes happens in survey questions
+                if y1 > y2 :
+                    row = [agent1, agent2, col_name, y1, y2, 'significant', agent1]
+                else :
+                    row = [agent1, agent2, col_name, y1, y2, 'significant', agent2]
+                continue
+            
             t = (y1 - y2) / math.sqrt(((s1 ** 2) / n1) + ((s2 ** 2) / n2))
             v = (((s1 ** 2) / n1) + ((s2 ** 2) / n2)) / (((((s1 ** 2) / n1) ** 2) / (n1 - 1)) + ((((s2 ** 2) / n2) ** 2) / (n2 - 1)))
             v = int(round(v))
@@ -376,6 +397,16 @@ def get_statistical_significance_corrected() :
             s2 = variances[agent2][col_name]
             n1 = num_rows[agent1]
             n2 = num_rows[agent2]
+            
+            if (s1 == 0 and s2 == 0) :
+                # This is a very weird case - Zero variance. But it 
+                # sometimes happens in survey questions
+                if y1 > y2 :
+                    row = [agent1, agent2, col_name, y1, y2, 'significant', agent1]
+                else :
+                    row = [agent1, agent2, col_name, y1, y2, 'significant', agent2]
+                continue
+            
             t = (y1 - y2) / math.sqrt(((s1 ** 2) / n1) + ((s2 ** 2) / n2))
             v = (((s1 ** 2) / n1) + ((s2 ** 2) / n2)) / (((((s1 ** 2) / n1) ** 2) / (n1 - 1)) + ((((s2 ** 2) / n2) ** 2) / (n2 - 1)))
             v = int(round(v))
@@ -499,7 +530,7 @@ def compare_task_completion() :
     file_handle = open(filename, 'w')
     writer = csv.writer(file_handle, delimiter=',')
     
-    header = ['user_id', 'user_says', 'we_think', 'target_command', 'executed_action']
+    header = ['user_id', 'user_says', 'we_think', 'agent', 'target_command', 'executed_action']
     writer.writerow(header)
     
     for row in results_reader :
@@ -509,18 +540,28 @@ def compare_task_completion() :
         
     for row in corrected_reader :
         user_id = row[0]
+        agent = row[2]
         completed = row[idx]
         if completed != user_ids_with_results[user_id] :
             tc = open(tc_path + user_id + '_main.txt', 'r').read().strip()
             ea = open(ea_path + user_id + '_main.txt', 'r').read().strip()
-            row_to_write = [user_id, user_ids_with_results[user_id], completed, tc, ea]
+            row_to_write = [user_id, user_ids_with_results[user_id], completed, agent, tc, ea]
             writer.writerow(row_to_write)
             
     file_handle.close()
     
 if __name__ == '__main__' :
-    #rejected_user_ids = ['57053c209db61', '57053619b608', '5705fd9cb9fcb', '5705f87f0b3ab', '5706076b544b5', '5705343360d6a', '570538488b7f5']
-    #move_to_invalid(rejected_user_ids)
+    #Batch9 rejections
+    #rejected_user_ids = ['572f712fb177f', '572f908ae251a', '572f72f90afb3', '572f7212d3de6', '572f796ce33b7']
+    
+    #Batch8 rejections
+    #rejected_user_ids = ['572cd796723ae', '572cfb8577ac2', '572cd37b00f7e', '572cd31a6af5f', '572d02270b177', '572cf1b4eee3c']
+    
+    # Batch10 rejections
+    # Rejected mismatch in correctness of action as these are no longer allowed confusions (not search vs at)
+    rejected_user_ids = ['572f744f7d861', '572f724458596', '572fa7794c6cf', '572f7f2354f16', '572ce9f4ac723', '572d15a6b2941', '572ce65a73ede', '572ceaa4d1420', '572cef96101ee', '572cd4bfc6123', '572f716df1ba6', '572f8d716b2d4', '572f9c2b157f1', '572cd343a77e0', '572cd83864d0c']
+
+    move_to_invalid(rejected_user_ids)
     collate_results()
     summarize_results_by_agent_type()
     summarize_results_by_agent_type_and_goal()
@@ -529,4 +570,4 @@ if __name__ == '__main__' :
     summarize_results_by_agent_type_and_goal_corrected()
     get_statistical_significance()
     get_statistical_significance_corrected()
-    #compare_task_completion()
+    compare_task_completion()

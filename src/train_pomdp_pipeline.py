@@ -100,7 +100,10 @@ new_logs_dirs = ['/u/aish/Documents/Research/AMT_results/before_fluency_verifica
     '/u/aish/Documents/Research/AMT_results/before_fluency_verification/Batch1/corrected_pickle_logs/', \
     '/u/aish/Documents/Research/AMT_results/before_fluency_verification/Batch2/corrected_pickle_logs/', \
     '/u/aish/Documents/Research/AMT_results/testing_fluency/corrected_pickle_logs/', \
-    '/u/aish/Documents/Research/AMT_results/after_fluency/Batch0/corrected_pickle_logs/']
+    '/u/aish/Documents/Research/AMT_results/after_fluency/Batch0/corrected_pickle_logs/', \
+    '/u/aish/Documents/Research/AMT_results/after_fluency/Batch1/corrected_pickle_logs/', \
+    '/u/aish/Documents/Research/AMT_results/after_fluency/Batch2/corrected_pickle_logs/', \
+    ]
     
 for i in range(0, 5) :
     for (j, log_dir) in enumerate(new_logs_dirs) :

@@ -36,6 +36,8 @@ class Utterance:
 
     # assumes elements of referring_params list are atomic
     def __eq__(self, other) :
+        if not isinstance(other, Utterance) :
+            return False
         if self.action_type != other.action_type :
             return False
         if self.referring_goal != other.referring_goal :
@@ -125,8 +127,12 @@ class Utterance:
         if self.action_type == 'deny' and self.referring_goal is not None :
             return False
         
-        # Check that if a relevant param has a value, it is valid
+        # Check that if a goal is present, it is valid
         goal = self.referring_goal
+        if goal is not None and goal not in knowledge.goal_actions :
+            return False
+        
+        # Check that if a relevant param has a value, it is valid
         if goal is not None :
             relevant_params = knowledge.param_order[goal]
             for param_name in relevant_params :

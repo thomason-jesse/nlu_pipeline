@@ -89,9 +89,13 @@ class Partition:
         return True     
                 
     def is_valid(self, knowledge, grounder) :
-        # Basic sanity check - alteast one valid goal
+        # Basic sanity check - alteast one goal and all goals are valid
         if self.possible_goals is None or len(self.possible_goals) < 1 :
             return False
+        for goal in self.possible_goals :
+            if goal not in knowledge.goal_actions :
+                return False   
+            
         for param_name in self.possible_param_values :
             if len(self.possible_param_values[param_name]) < 1 :
                 return False

@@ -287,10 +287,10 @@ class DialogueServer :
                     self.handle_user(req.user_id)   
                     print 'Returned'    # DEBUG
                     self.started_users.add(req.user_id)     
-                    self.user_log.close()
-                    self.error_log.close()
-                    self.user_log = open(MAIN_LOG_PATH + USER_LOG_FILE, 'a')
-                    self.error_log = open(MAIN_LOG_PATH + MAIN_ERROR_LOG_FILE, 'a')
+                    self.user_log.flush()
+                    self.error_log.flush()
+                    #self.user_log = open(MAIN_LOG_PATH + USER_LOG_FILE, 'a')
+                    #self.error_log = open(MAIN_LOG_PATH + MAIN_ERROR_LOG_FILE, 'a')
                     success = True
                 except KeyboardInterrupt, SystemExit :
                     raise
@@ -334,6 +334,7 @@ class DialogueServer :
             # Randomly choose an agent
             r = numpy.random.random_sample()
             if r < 1.0 / 3 :   
+            #if r < 0 :   
                 print 'Only parser learning'
                 self.user_log.write(user_id + ',only_parser\n')
                 self.error_log.write(user_id + ',only_parser\n') 
@@ -351,6 +352,7 @@ class DialogueServer :
                 dialog_thread.daemon = True
                 dialog_thread.start()
             elif r < 2.0 / 3 :
+            #elif r < 0.5 :
                 print 'Only dialog learning'
                 self.user_log.write(user_id + ',only_dialog\n')
                 self.error_log.write(user_id + ',only_dialog\n')

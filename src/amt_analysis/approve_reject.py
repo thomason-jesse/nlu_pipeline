@@ -2,7 +2,7 @@ import sys, csv
 from os import listdir
 from os.path import isfile, join
 
-path_to_batch = '/u/aish/Documents/Research/AMT_results/after_fluency/Batch3/'
+path_to_batch = '/u/aish/Documents/Research/AMT_results/after_fluency/Batch9/'
 
 def load_submitted_codes() :
     filename = path_to_batch + 'amt.csv'

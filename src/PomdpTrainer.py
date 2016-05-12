@@ -85,7 +85,7 @@ class PomdpTrainer(PomdpDialogAgent) :
         w = FeatureWrapper(b)
         f = self.policy.get_feature_vector(w, 'confirm_action')
             
-    def init_weights_from_hand_coded_policy(self, rare_cases_weight=3) :
+    def init_weights_from_hand_coded_policy(self, rare_cases_weight=100) :
         probs = [np.log(p) for p in [0, 0.00001, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.98, 0.991, 1.0]]
         #probs = [np.log(p) for p in [0, 0.00001, 0.2, 0.4, 0.6, 0.8, 1.0]]
         #probs = [0.05 * x for x in range(0, 21)]
@@ -121,7 +121,7 @@ class PomdpTrainer(PomdpDialogAgent) :
                 # These actions are rarer and need high sample weight to 
                 # be learned
                 num_hard += 1
-                sample_weight = rare_cases_weight * 1.7
+                sample_weight = rare_cases_weight 
             
             for a in self.knowledge.summary_system_actions :
                 new_feature_vector = self.policy.get_feature_vector(wrapper, a)

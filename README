@@ -25,6 +25,8 @@ Launch the segbot simulator.
 
 $ roslaunch bwi_launch simulation.launch
 
+$ roslaunch bwi_kr_execution bwi_kr_for_dialog.launch
+
 The simulator has to be launched to allow the robot to execute actions given to it in dialoge. It also
 launches the ASP knowledge base used to ground predicates such as person(ray).
 
