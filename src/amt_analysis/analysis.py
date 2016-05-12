@@ -228,6 +228,7 @@ def get_statistical_significance() :
     results_reader = csv.reader(results_file, delimiter=',')
     results_header = results_reader.next()
     agent_type_idx = results_header.index('agent_type')
+    success_idx = results_header.index('correct_action')
     
     summary_file = open(path_to_batch + 'summary.csv', 'r')
     summary_reader = csv.reader(summary_file, delimiter=',')
@@ -237,6 +238,7 @@ def get_statistical_significance() :
     cols_to_evaluate = copy.deepcopy(summary_header)
     cols_to_evaluate.remove('agent_type')
     cols_to_evaluate.remove('performed_action')
+    cols_to_evaluate.remove('dialog_length')
     cols_to_evaluate.remove('Number of dialogues')
     print 'cols_to_evaluate = ', cols_to_evaluate
      
@@ -249,13 +251,18 @@ def get_statistical_significance() :
         means[agent_type] = dict()
         for (col_num, col_val) in enumerate(row) :
             col_name = summary_header[col_num]
-            if col_name in cols_to_evaluate :
+            if col_name in cols_to_evaluate + ['dialog_length'] :
                 means[agent_type][col_name] = float(col_val)
             elif col_name == 'Number of dialogues' :
                 num_rows[agent_type] = int(col_val)
+            
+
+    num_rows_dialog_length = dict()
     
     for row in results_reader :
         agent_type = row[agent_type_idx]
+        success = row[success_idx]
+        
         variances[agent_type] = dict()
         for (col_num, col_val) in enumerate(row) :
             col_name = results_header[col_num]
@@ -264,11 +271,21 @@ def get_statistical_significance() :
                 if col_name not in variances[agent_type] :
                     variances[agent_type][col_name] = 0.0
                 variances[agent_type][col_name] = variances[agent_type][col_name] + (float(col_val) - means[agent_type][col_name]) ** 2
+            elif col_name == 'dialog_length' and success :
+                if col_name not in variances[agent_type] :
+                    variances[agent_type][col_name] = 0.0
+                variances[agent_type][col_name] = variances[agent_type][col_name] + (float(col_val) - means[agent_type][col_name]) ** 2
+                if agent_type not in num_rows_dialog_length :
+                    num_rows_dialog_length[agent_type] = 0
+                num_rows_dialog_length[agent_type] = num_rows_dialog_length[agent_type] + 1
     
     for agent_type in variances :
         for col_name in variances[agent_type] :
-            print 'agent_type = ', agent_type, ', col_name = ', col_name
-            variances[agent_type][col_name] = variances[agent_type][col_name] / num_rows[agent_type]
+            if col_name != 'dialog_length' :
+                print 'agent_type = ', agent_type, ', col_name = ', col_name
+                variances[agent_type][col_name] = variances[agent_type][col_name] / num_rows[agent_type]
+            else :
+                variances[agent_type][col_name] = variances[agent_type][col_name] / num_rows_dialog_length[agent_type]
     
     agent_types = means.keys()            
     agent_pairs = list()
@@ -282,13 +299,17 @@ def get_statistical_significance() :
     write_header = ['agent1', 'agent2', 'metric', 'mean1', 'mean2', 'significance', 'winner']
         
     for (agent1, agent2) in agent_pairs :
-        for col_name in cols_to_evaluate :
+        for col_name in cols_to_evaluate + ['dialog_length'] :
             y1 = means[agent1][col_name]
             y2 = means[agent2][col_name]
             s1 = variances[agent1][col_name]
             s2 = variances[agent2][col_name]
-            n1 = num_rows[agent1]
-            n2 = num_rows[agent2]
+            if col_name == 'dialog_length' :
+                n1 = num_rows_dialog_length[agent1]
+                n2 = num_rows_dialog_length[agent2]
+            else :
+                n1 = num_rows[agent1]
+                n2 = num_rows[agent2]
             print 'agent1 = ', agent1
             print 'agent2 = ', agent2
             print 'Metric = ', col_name
@@ -336,6 +357,7 @@ def get_statistical_significance_corrected() :
     results_reader = csv.reader(results_file, delimiter=',')
     results_header = results_reader.next()
     agent_type_idx = results_header.index('agent_type')
+    success_idx = results_header.index('correct_action')
     
     summary_file = open(path_to_batch + 'summary_corrected.csv', 'r')
     summary_reader = csv.reader(summary_file, delimiter=',')
@@ -345,6 +367,7 @@ def get_statistical_significance_corrected() :
     cols_to_evaluate = copy.deepcopy(summary_header)
     cols_to_evaluate.remove('agent_type')
     cols_to_evaluate.remove('performed_action')
+    cols_to_evaluate.remove('dialog_length')
     cols_to_evaluate.remove('Number of dialogues')
     print 'cols_to_evaluate = ', cols_to_evaluate
      
@@ -357,13 +380,18 @@ def get_statistical_significance_corrected() :
         means[agent_type] = dict()
         for (col_num, col_val) in enumerate(row) :
             col_name = summary_header[col_num]
-            if col_name in cols_to_evaluate :
+            if col_name in cols_to_evaluate + ['dialog_length'] :
                 means[agent_type][col_name] = float(col_val)
             elif col_name == 'Number of dialogues' :
                 num_rows[agent_type] = int(col_val)
+            
+
+    num_rows_dialog_length = dict()
     
     for row in results_reader :
         agent_type = row[agent_type_idx]
+        success = row[success_idx]
+        
         variances[agent_type] = dict()
         for (col_num, col_val) in enumerate(row) :
             col_name = results_header[col_num]
@@ -372,11 +400,21 @@ def get_statistical_significance_corrected() :
                 if col_name not in variances[agent_type] :
                     variances[agent_type][col_name] = 0.0
                 variances[agent_type][col_name] = variances[agent_type][col_name] + (float(col_val) - means[agent_type][col_name]) ** 2
+            elif col_name == 'dialog_length' and success :
+                if col_name not in variances[agent_type] :
+                    variances[agent_type][col_name] = 0.0
+                variances[agent_type][col_name] = variances[agent_type][col_name] + (float(col_val) - means[agent_type][col_name]) ** 2
+                if agent_type not in num_rows_dialog_length :
+                    num_rows_dialog_length[agent_type] = 0
+                num_rows_dialog_length[agent_type] = num_rows_dialog_length[agent_type] + 1
     
     for agent_type in variances :
         for col_name in variances[agent_type] :
-            print 'agent_type = ', agent_type, ', col_name = ', col_name
-            variances[agent_type][col_name] = variances[agent_type][col_name] / num_rows[agent_type]
+            if col_name != 'dialog_length' :
+                print 'agent_type = ', agent_type, ', col_name = ', col_name
+                variances[agent_type][col_name] = variances[agent_type][col_name] / num_rows[agent_type]
+            else :
+                variances[agent_type][col_name] = variances[agent_type][col_name] / num_rows_dialog_length[agent_type]
     
     agent_types = means.keys()            
     agent_pairs = list()
@@ -390,13 +428,27 @@ def get_statistical_significance_corrected() :
     write_header = ['agent1', 'agent2', 'metric', 'mean1', 'mean2', 'significance', 'winner']
         
     for (agent1, agent2) in agent_pairs :
-        for col_name in cols_to_evaluate :
+        for col_name in cols_to_evaluate + ['dialog_length'] :
             y1 = means[agent1][col_name]
             y2 = means[agent2][col_name]
             s1 = variances[agent1][col_name]
             s2 = variances[agent2][col_name]
-            n1 = num_rows[agent1]
-            n2 = num_rows[agent2]
+            if col_name == 'dialog_length' :
+                n1 = num_rows_dialog_length[agent1]
+                n2 = num_rows_dialog_length[agent2]
+            else :
+                n1 = num_rows[agent1]
+                n2 = num_rows[agent2]
+            print 'agent1 = ', agent1
+            print 'agent2 = ', agent2
+            print 'Metric = ', col_name
+            print 'y1 = ', y1
+            print 'y2 = ', y2
+            print 's1 = ', s1
+            print 's2 = ', s2
+            print 'n1 = ', n1
+            print 'n2 = ', n2
+            print 
             
             if (s1 == 0 and s2 == 0) :
                 # This is a very weird case - Zero variance. But it 
@@ -435,19 +487,34 @@ def summarize_results_by_agent_type() :
     reader = csv.reader(results_file, delimiter=',')
     sums = dict()
     num_rows = dict()
-    cols_to_ignore = header = ["user_id", "code", "agent_type", "target_task", "comment"]
+    num_rows_dialog_length = dict()
+    
+    cols_to_ignore = header = ["user_id", "code", "agent_type", "target_task", "comment", "dialog_length"]
     header = reader.next()
     agent_idx = header.index("agent_type")
     target_idx = header.index("target_task")
+    
+    success_idx = header.index('correct_action')
+    
     for row in reader :
         agent_type = row[agent_idx]
+        success = row[success_idx]
+        
         if agent_type not in sums :
             sums[agent_type] = dict()
         if agent_type not in num_rows :
             num_rows[agent_type] = 0
         num_rows[agent_type] = num_rows[agent_type] + 1
+        if agent_type not in num_rows_dialog_length :
+            num_rows_dialog_length[agent_type] = 0
+        
         for (idx, col) in enumerate(header) :
             if col not in cols_to_ignore :
+                if col not in sums[agent_type] :
+                    sums[agent_type][col] = 0
+                sums[agent_type][col] = sums[agent_type][col] + int(row[idx])
+            elif col == "dialog_length" and success :
+                num_rows_dialog_length[agent_type] = num_rows_dialog_length[agent_type] + 1
                 if col not in sums[agent_type] :
                     sums[agent_type][col] = 0
                 sums[agent_type][col] = sums[agent_type][col] + int(row[idx])
@@ -456,7 +523,7 @@ def summarize_results_by_agent_type() :
     file_handle = open(filename, 'w')
     writer = csv.writer(file_handle, delimiter=',')
     
-    write_header = ['agent_type'] + [col for col in header if col not in cols_to_ignore] + ['Number of dialogues']
+    write_header = ['agent_type'] + [col for col in header if col not in cols_to_ignore] + ['dialog_length', 'Number of dialogues']
     writer.writerow(write_header)
     print write_header
     for agent_type in sums.keys() :
@@ -465,6 +532,9 @@ def summarize_results_by_agent_type() :
             avg = float(sums[agent_type][col]) / num_rows[agent_type]
             avg = round(avg, 2)
             row.append(avg)
+            
+        dialog_length_avg = sums[agent_type]['dialog_length'] / float(num_rows_dialog_length[agent_type])
+        row.append(dialog_length_avg)    
         row.append(num_rows[agent_type])
         print row
         writer.writerow(row)
@@ -473,22 +543,38 @@ def summarize_results_by_agent_type() :
 
 def summarize_results_by_agent_type_corrected() :
     results_file = open(path_to_batch + 'results_corrected.csv', 'r')
+    #results_file = open(path_to_batch + 'results_corrected.csv', 'r')
     reader = csv.reader(results_file, delimiter=',')
     sums = dict()
     num_rows = dict()
-    cols_to_ignore = header = ["user_id", "code", "agent_type", "target_task", "comment"]
+    num_rows_dialog_length = dict()
+    
+    cols_to_ignore = header = ["user_id", "code", "agent_type", "target_task", "comment", "dialog_length"]
     header = reader.next()
     agent_idx = header.index("agent_type")
     target_idx = header.index("target_task")
+    
+    success_idx = header.index('correct_action')
+    
     for row in reader :
         agent_type = row[agent_idx]
+        success = row[success_idx]
+        
         if agent_type not in sums :
             sums[agent_type] = dict()
         if agent_type not in num_rows :
             num_rows[agent_type] = 0
         num_rows[agent_type] = num_rows[agent_type] + 1
+        if agent_type not in num_rows_dialog_length :
+            num_rows_dialog_length[agent_type] = 0
+        
         for (idx, col) in enumerate(header) :
             if col not in cols_to_ignore :
+                if col not in sums[agent_type] :
+                    sums[agent_type][col] = 0
+                sums[agent_type][col] = sums[agent_type][col] + int(row[idx])
+            elif col == "dialog_length" and success :
+                num_rows_dialog_length[agent_type] = num_rows_dialog_length[agent_type] + 1
                 if col not in sums[agent_type] :
                     sums[agent_type][col] = 0
                 sums[agent_type][col] = sums[agent_type][col] + int(row[idx])
@@ -497,7 +583,7 @@ def summarize_results_by_agent_type_corrected() :
     file_handle = open(filename, 'w')
     writer = csv.writer(file_handle, delimiter=',')
     
-    write_header = ['agent_type'] + [col for col in header if col not in cols_to_ignore] + ['Number of dialogues']
+    write_header = ['agent_type'] + [col for col in header if col not in cols_to_ignore] + ['dialog_length', 'Number of dialogues']
     writer.writerow(write_header)
     print write_header
     for agent_type in sums.keys() :
@@ -506,6 +592,9 @@ def summarize_results_by_agent_type_corrected() :
             avg = float(sums[agent_type][col]) / num_rows[agent_type]
             avg = round(avg, 2)
             row.append(avg)
+            
+        dialog_length_avg = sums[agent_type]['dialog_length'] / float(num_rows_dialog_length[agent_type])
+        row.append(dialog_length_avg)    
         row.append(num_rows[agent_type])
         print row
         writer.writerow(row)
@@ -559,15 +648,15 @@ if __name__ == '__main__' :
     
     # Batch10 rejections
     # Rejected mismatch in correctness of action as these are no longer allowed confusions (not search vs at)
-    rejected_user_ids = ['572f744f7d861', '572f724458596', '572fa7794c6cf', '572f7f2354f16', '572ce9f4ac723', '572d15a6b2941', '572ce65a73ede', '572ceaa4d1420', '572cef96101ee', '572cd4bfc6123', '572f716df1ba6', '572f8d716b2d4', '572f9c2b157f1', '572cd343a77e0', '572cd83864d0c']
+    #rejected_user_ids = ['572f744f7d861', '572f724458596', '572fa7794c6cf', '572f7f2354f16', '572ce9f4ac723', '572d15a6b2941', '572ce65a73ede', '572ceaa4d1420', '572cef96101ee', '572cd4bfc6123', '572f716df1ba6', '572f8d716b2d4', '572f9c2b157f1', '572cd343a77e0', '572cd83864d0c']
 
-    move_to_invalid(rejected_user_ids)
+    #move_to_invalid(rejected_user_ids)
     collate_results()
     summarize_results_by_agent_type()
-    summarize_results_by_agent_type_and_goal()
+    #summarize_results_by_agent_type_and_goal()
     collate_results_corrected()
     summarize_results_by_agent_type_corrected()
-    summarize_results_by_agent_type_and_goal_corrected()
+    #summarize_results_by_agent_type_and_goal_corrected()
     get_statistical_significance()
     get_statistical_significance_corrected()
-    compare_task_completion()
+    #compare_task_completion()
