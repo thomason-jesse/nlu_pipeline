@@ -247,6 +247,7 @@ def get_statistical_significance() :
     variances = dict()
     
     for row in summary_reader :
+        print row
         agent_type = row[0]
         means[agent_type] = dict()
         for (col_num, col_val) in enumerate(row) :
@@ -254,7 +255,7 @@ def get_statistical_significance() :
             if col_name in cols_to_evaluate + ['dialog_length'] :
                 means[agent_type][col_name] = float(col_val)
             elif col_name == 'Number of dialogues' :
-                num_rows[agent_type] = int(col_val)
+                num_rows[agent_type] = float(col_val)
             
 
     num_rows_dialog_length = dict()
@@ -528,7 +529,7 @@ def summarize_results_by_agent_type() :
     print write_header
     for agent_type in sums.keys() :
         row = [agent_type]
-        for col in write_header[1:len(write_header)-1] :
+        for col in write_header[1:len(write_header)-2] :
             avg = float(sums[agent_type][col]) / num_rows[agent_type]
             avg = round(avg, 2)
             row.append(avg)
@@ -588,7 +589,7 @@ def summarize_results_by_agent_type_corrected() :
     print write_header
     for agent_type in sums.keys() :
         row = [agent_type]
-        for col in write_header[1:len(write_header)-1] :
+        for col in write_header[1:len(write_header)-2] :
             avg = float(sums[agent_type][col]) / num_rows[agent_type]
             avg = round(avg, 2)
             row.append(avg)
