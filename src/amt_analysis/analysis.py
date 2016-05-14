@@ -44,7 +44,19 @@ def get_ids_with_codes() :
             if len(user_id) > 0 :
                 ids_with_codes[user_id] = code
     return ids_with_codes
-    
+
+def remap_target_command(fake_people_command) :
+    parts = re.split('[(,)]', fake_people_command)
+    if parts[0] == 'search' :
+        parts[0] = 'searchroom'
+        parts[1] = people_map[parts[1]]
+        return parts[0] + '(' + parts[1] + ',' + parts[2] + ')'
+    elif parts[0] == 'bring' :
+        parts[2] = people_map[parts[2]]
+        return parts[0] + '(' + parts[1] + ',' + parts[2] + ')'
+    else :
+        return fake_people_command
+
 def collate_results() :
     ids_with_codes = get_ids_with_codes()
     log_path = path_to_batch + 'completed/log/'
@@ -57,7 +69,7 @@ def collate_results() :
     file_handle = open(filename, 'w')
     writer = csv.writer(file_handle, delimiter=',')
     
-    header = ["user_id", "code", "agent_type", "target_task", "performed_action", "correct_action", "task_easy", "robot_understood", "robot_delayed", "asked_sensible_questions", "conversation_too_long", "dialog_length", "comment"]
+    header = ["user_id", "code", "agent_type", "target_task", "performed_action", "partially_correct", "correct_action", "task_easy", "robot_understood", "robot_delayed", "asked_sensible_questions", "conversation_too_long", "dialog_length", "comment"]
     writer.writerow(header)
     
     for (user_id, code) in ids_with_codes.items() :
@@ -66,9 +78,20 @@ def collate_results() :
         
         tc_path = path_to_batch + 'completed/target_commands/'
         tc_file = open(tc_path + user_id + '_main.txt', 'r')
-        target_command = tc_file.read().strip().split('(')[0]
+        target_command_full = tc_file.read().strip()
+        target_command = target_command_full.split('(')[0]
         
-        row = [user_id, code, log[0], target_command, int(log[2] != None), int(log[3])]
+        ea_path = path_to_batch + 'completed/executed_actions/'
+        ea_file = ea_path + user_id + '_main.txt'
+        partially_correct = 0
+        if isfile(ea_file) :
+            text = open(ea_file).read()
+            executed_action = text.strip().split('(')[0]
+            remapped_target_command = remap_target_command(target_command_full).split('(')[0]
+            if executed_action == remapped_target_command :
+                partially_correct = 1
+        
+        row = [user_id, code, log[0], target_command, int(log[2] != None), partially_correct, int(log[3])]
         survey_file_handle = open(survey_path + user_id + '.txt', 'r')
         lineno = 0
         comment = ''
@@ -103,7 +126,7 @@ def collate_results_corrected() :
     file_handle = open(filename, 'w')
     writer = csv.writer(file_handle, delimiter=',')
     
-    header = ["user_id", "code", "agent_type", "target_task", "performed_action", "correct_action", "task_easy", "robot_understood", "robot_delayed", "asked_sensible_questions", "conversation_too_long", "dialog_length", "comment"]
+    header = ["user_id", "code", "agent_type", "target_task", "performed_action", "partially_correct", "correct_action", "task_easy", "robot_understood", "robot_delayed", "asked_sensible_questions", "conversation_too_long", "dialog_length", "comment"]
     writer.writerow(header)
     
     for (user_id, code) in ids_with_codes.items() :
@@ -112,9 +135,20 @@ def collate_results_corrected() :
         
         tc_path = path_to_batch + 'completed/target_commands/'
         tc_file = open(tc_path + user_id + '_main.txt', 'r')
-        target_command = tc_file.read().strip().split('(')[0]
+        target_command_full = tc_file.read().strip()
+        target_command = target_command_full.split('(')[0]
         
-        row = [user_id, code, log[0], target_command, int(log[2] != None), int(log[3])]
+        ea_path = path_to_batch + 'completed/executed_actions/'
+        ea_file = ea_path + user_id + '_main.txt'
+        partially_correct = 0
+        if isfile(ea_file) :
+            text = open(ea_file).read()
+            executed_action = text.strip().split('(')[0]
+            remapped_target_command = remap_target_command(target_command_full).split('(')[0]
+            if executed_action == remapped_target_command :
+                partially_correct = 1
+        
+        row = [user_id, code, log[0], target_command, int(log[2] != None), partially_correct, int(log[3])]
         survey_file_handle = open(survey_path + user_id + '.txt', 'r')
         lineno = 0
         comment = ''
@@ -138,7 +172,6 @@ def collate_results_corrected() :
         writer.writerow(row)
         
     file_handle.close()
-
     
 def summarize_results_by_agent_type_and_goal() :
     results_file = open(path_to_batch + 'results.csv', 'r')
