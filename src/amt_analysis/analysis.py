@@ -7,6 +7,12 @@ sys.path.append('../')
 
 path_to_batch = '/u/aish/Documents/Research/AMT_results/after_fluency/Batch10/'
 
+people_map = {'alice' : 'stacy', 'bob' : 'jesse', 'carol' : 'shiqi', \
+    'dave' : 'jivko', 'eve' : 'aishwarya', 'frannie' : 'scott', \
+    'george' : 'rodolfo', 'mallory' : 'peter', 'peggy' : 'dana', \
+    'walter' : 'ray'}
+
+
 def move_to_invalid(rejected_user_ids) :
     src_path = path_to_batch + 'completed/'
     dst_path = path_to_batch + 'rejected/'
