@@ -333,8 +333,25 @@ class DialogueServer :
             
             # Randomly choose an agent
             r = numpy.random.random_sample()
-            if r < 1.0 / 3 :   
-            #if r < 0 :   
+            if r < 0.25 :
+                print 'Only parser learning - use only top hypothesis'
+                self.user_log.write(user_id + ',top_hypothesis\n')
+                self.error_log.write(user_id + ',top_hypothesis\n') 
+                pomdp_agent = self.create_pomdp_dialog_agent('only_parser_parser', 'only_parser_policy')
+                pomdp_agent.input = u_in
+                pomdp_agent.output = u_out
+                pomdp_agent.final_action_log = final_action_log
+                pomdp_agent.dialog_objects_logfile = log
+                pomdp_agent.log_header = 'top_hypothesis'
+                pomdp_agent.use_multiple_parses = False 
+                pomdp_agent.policy.training = False
+                pomdp_agent.policy.untrained = True # So that it uses hand coded policy
+                pomdp_agent.error_log = open(error_log, 'a')
+                
+                dialog_thread = Thread(target=self.run_pomdp_dialog, args=((pomdp_agent,)))
+                dialog_thread.daemon = True
+                dialog_thread.start()
+            elif r < 0.5 :
                 print 'Only parser learning'
                 self.user_log.write(user_id + ',only_parser\n')
                 self.error_log.write(user_id + ',only_parser\n') 
@@ -351,8 +368,7 @@ class DialogueServer :
                 dialog_thread = Thread(target=self.run_pomdp_dialog, args=((pomdp_agent,)))
                 dialog_thread.daemon = True
                 dialog_thread.start()
-            elif r < 2.0 / 3 :
-            #elif r < 0.5 :
+            elif r < 0.75 :
                 print 'Only dialog learning'
                 self.user_log.write(user_id + ',only_dialog\n')
                 self.error_log.write(user_id + ',only_dialog\n')

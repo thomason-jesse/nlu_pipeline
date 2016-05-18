@@ -48,6 +48,9 @@ class PomdpDialogAgent(DialogAgent) :
         self.cur_turn_log = None
         self.log_header = 'pomdp'
         
+        # Use only top-1 or top-N parses to update state
+        self.use_multiple_parses = True
+        
     # Returns True if the dialog terminates on its own and False if the u
     # user entered stop
     def run_dialog(self) :
@@ -184,7 +187,10 @@ class PomdpDialogAgent(DialogAgent) :
     # Parse the user response and update belief state
     def update_state(self, response) :
         # get n best parses for confirmation
-        n_best_parses = self.get_n_best_parses(response)
+        if self.use_multiple_parses :
+            n_best_parses = self.get_n_best_parses(response)
+        else :
+            n_best_parses = self.get_n_best_parses(response, num_parses_needed=1)
 
         # Create an n-best list of Utterance objects along with probabiltiies 
         # obtained from their confidences
