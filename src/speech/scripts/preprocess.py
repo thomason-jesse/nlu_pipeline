@@ -23,7 +23,8 @@ Corpus length filtering usage: ./preprocess.py filter_len [original_corpus_folde
 
         filtered_corpus_folder - The folder in which to put the filtered corpus. 
 
-        filtering_length       - The cutoff length to use for the filtering. 
+        filtering_length       - The cutoff length to use for the filtering, inclusive. 
+                                 In other words: <= filtering_length
 
 To split a corpus into folds: ./preprocess.py split_into_folds [original_corpus_folder] [fold_corpus_folder] [num_folds]
 
@@ -35,7 +36,7 @@ To split a corpus into folds: ./preprocess.py split_into_folds [original_corpus_
 
         num_folds              - The desired number of folds. 
 
-To create a training file for a parser: ./preprocess.py create_parser_training_file [corpus_folder] [parser_training_file_path]
+To create a training file for a parser: ./preprocess.py create_parser_training_file [corpus_folder] [parser_training_file_path] [Optional: filter_length]
     
     Parameters: 
         corpus_folder             - The folder containing all the corpus files
@@ -43,6 +44,28 @@ To create a training file for a parser: ./preprocess.py create_parser_training_f
                                     training file. 
 
         parser_training_file_folder - The folder where the training file is to be put.  
+
+        filter_length               - An optional parameter. If given, is the maximum 
+                                      number of tokens that will be accepted when 
+                                      pulling phrases to put in the training file. 
+
+To create a training file for a language model: ./preprocess.py create_lm_training_file [corpus_folder] [lm_training_file_folder]
+    
+    Parameters: 
+        corpus_folder               - The folder containing all the corpus files
+                                      that will be used to create a parser
+                                      training file. 
+
+        lm_training_file_folder     - The folder where the training file is to be put. 
+
+To create transcription files for a folder of .usr files: Corpus transcript files: ./preprocess.py create_transcript_files [corpus_folder] [transcript_files_folder]
+
+    Parameters:
+        corpus_folder               - The top level folder which contains .usr files
+                                      to create transcription files for. 
+
+        transcript_files_folder     - The folder in which the transcription files
+                                      are to be placed. 
 
 author: Rodolfo Corona, rcorona@utexas.edu
 """
@@ -73,14 +96,14 @@ def preprocess_phrase(phrase):
     preprocessed_phrase = ''
 
     #Processes phrase into new phrase. 
-    for word in phrase:
+    for word in phrase.split():
         if word in abbreviations:
-            preprocessed_phrase += abbreviations[word]
+            preprocessed_phrase += abbreviations[word] + ' '
         else:
-            preprocessed_phrase += word
+            preprocessed_phrase += word + ' ' 
 
     #Removes comas, since they are not needed by any system. 
-    return preprocessed_phrase.replace(',', '')
+    return preprocessed_phrase.replace(',', '').strip()
 
 """
 This method fixes semantic form errors
@@ -167,7 +190,7 @@ def preprocess_folder_general(raw_folder_name, preprocessed_folder_name):
 
         #Writes corresponding raw recording file path to keep track of. 
         recording_name = raw_folder_name + '/recordings/' + user + '_recording_' + str(number) + '.raw'
-        data += recording_name + '\n'
+        data += os.path.abspath(recording_name) + '\n'
 
         #Writes the phrase's data if it's semantic form is valid. 
         if semantic_form_valid(semantic_form):
@@ -204,21 +227,6 @@ def preprocess_corpus(corpus_folder, preprocessed_folder_name):
     print ''
 
 """
-Computes the number of tokens
-present in a phrase based
-on how the parser would tokenize them. 
-"""
-def get_tokenized_phrase_len(phrase):
-    length = 0
-    
-    #Counts individual tokens. (Tokenizes based on appostrophe) 
-    for word in phrase.split():
-        length += len(word.split("'"))
-
-    return length
-        
-
-"""
 Creates a filtered corpus from a given one based
 on a tokenized phrase length filter. In other
 words, if a phrase has more tokens than the given
@@ -250,7 +258,7 @@ def filter_corpus_len(corpus_folder, filtered_corpus_folder, length):
                 phrase, semantic_form, denotation, recording = line.split(';')
 
                 #Writes data if below threshold. 
-                if get_tokenized_phrase_len(phrase) < length:
+                if get_tokenized_phrase_len(phrase) <= length:
                     filtered_file.write(line)
 
             #Closes both files. 
@@ -262,6 +270,9 @@ Makes a directory if it doesn't already
 exist. 
 """
 def make_dir(directory):
+    #Converts to absolute path. 
+    directory = os.path.abspath(directory)
+
     if not os.path.isdir(directory):
         os.mkdir(directory)
 
@@ -289,6 +300,9 @@ def make_exp_dir_structure(exp_dir):
     #Folder to store log files in for experiments or training runs.
     make_dir(exp_dir + '/logs')
 
+    #Folder to store ASR related training files. 
+    make_dir(exp_dir + '/ast_training')
+
 """
 Takes a corpus folder and creates a
 new corpus from it by splitting it
@@ -304,6 +318,9 @@ def split_into_folds(corpus_folder, fold_corpus_folder, num_folds):
     if len(corpus_files) % num_folds > 0:
         print 'Corpus with ' + str(len(corpus_files)) + ' files will not split into ' + str(num_folds) + ' equal folds!'
         sys.exit()
+
+    #Makes fold corpus folder if necessary. 
+    make_dir(fold_corpus_folder)
 
     #Makes a directory for each fold within the new corpus folder. 
     for i in range(num_folds):
@@ -332,13 +349,38 @@ def split_into_folds(corpus_folder, fold_corpus_folder, num_folds):
 ###############################################################################
 
 """
+Computes the number of tokens
+present in a phrase based
+on how the parser would tokenize them. 
+"""
+def get_tokenized_phrase_len(phrase):
+    length = 0
+    
+    #Counts individual tokens. (Tokenizes based on appostrophe) 
+    for word in phrase.split():
+        length += len(word.split("'"))
+
+    return length
+
+def get_tokenized_phrase(phrase):
+
+    #Currently only processing needed to tokenize. 
+    return phrase.replace("'", " '")
+
+"""
 Creates a training file for a parser
 in the desired folder
 using all the corpus files found in the 
 given corpus_folder. 
 """
-def create_parser_training_file(corpus_folder, parser_training_file_folder): 
+def create_parser_training_file(corpus_folder, parser_training_file_folder, filter_len=None): 
     parser_training_file = open(parser_training_file_folder + '/parser_train.txt', 'w')
+
+    #Gets phrase length limit.
+    if filter_len == None:
+        length_lim = float('inf')
+    else:
+        length_lim = int(filter_len)
 
     #Consolidates all corpus data into one file for training. 
     for file_name in os.listdir(corpus_folder):
@@ -349,21 +391,98 @@ def create_parser_training_file(corpus_folder, parser_training_file_folder):
             for line in corpus_file:
                 phrase, semantic_form, _, _ = line.split(';')
 
-                parser_training_file.write(phrase + '\n' + semantic_form + '\n\n')
+                #Adds phrase if it is under the token length limit. 
+                if get_tokenized_phrase_len(phrase) <= length_lim:
+                    parser_training_file.write(get_tokenized_phrase(phrase) + '\n' + semantic_form + '\n\n')
 
     #Closes the training file. 
     parser_training_file.close()
 
 ###############################################################################
 
+###############################################################################
+#################### ASR TRAINING RELATED FUNCTIONS ###########################
+###############################################################################
+
+def create_lm_training_file(corpus_folder, lm_training_file_folder):
+    lm_training_file = open(lm_training_file_folder + '/lm_train.txt', 'w')
+
+    #Consolidates all corpus data into one file for training. 
+    for file_name in os.listdir(corpus_folder):
+        if file_name.endswith('.usr'):
+            corpus_file = open(corpus_folder + '/' + file_name, 'r')
+
+            #Adds each phrase to file with start and end of sentence tokens. 
+            for line in corpus_file:
+                phrase, _, _, _ = line.split(';')
+
+                lm_training_file.write('<s> ' + phrase + ' </s>' + '\n')
+
+    #Closes the training file. 
+    lm_training_file.close()
+
+"""
+Extracts necessary transcript information
+from usr file and writes it to given
+ids and transcript files. 
+"""
+def extract_transcripts(file_name, ids_file, transcript_file):
+    #Opens file and gets user's name. 
+    usr_file = open(file_name, 'r')
+    usr_name = file_name.split('/')[-1].split('.')[0]
+    
+    #Creates an id and transcription for each phrase. 
+    for line in usr_file:
+        phrase, _, _, recording_path = line.split(';')
+
+        #Extracts file id from recording name. 
+        file_id = usr_name + '/recordings/' + recording_path.strip().split('/')[-1].split('.')[0] + '\n'
+
+        #Composes phrase transcription for file. 
+        transcription = '<s> ' + phrase + ' </s> (' + file_id.strip() + ')\n'
+
+        #Writes them to their respective files.
+        ids_file.write(file_id)
+        transcript_file.write(transcription)
+
+"""
+Create transcription files that will be used
+by Sphinx to either adapt an accoustic model
+or calculate WER. 
+"""
+def create_asr_transcripts(corpus_folder, transcript_files_folder):
+    #Gets base name of corpus folder to name files, generally should be either 'train' or 'test'
+    name = corpus_folder.split('/')[-1]
+
+    #Will contain relative paths for recordings according to top level folder. 
+    #Used by Sphinx to coordinate accoustic model adaptation and WER computations. 
+    ids_file = open(transcript_files_folder + '/' + name + '.fileids', 'w')
+
+    #Will contain file ids along with their transcription. 
+    transcript_file = open(transcript_files_folder + '/' + name + '.transcription', 'w')
+
+    #Goes through each user file and extracts necessary information to create files. 
+    for file_name in os.listdir(corpus_folder):
+        if file_name.endswith('.usr'):
+            extract_transcripts(corpus_folder + '/' + file_name, ids_file, transcript_file)
+
+    #Closes up files. 
+    ids_file.close()
+    transcript_file.close()
+
+##################################################################################
+
 """
 Simply prints all the usage options for the script. 
 """
 def print_usage():
-    print 'Usage: ./preprocess.py general [corpus_folder] [preprocessed_folder]'
-    print 'Usage: ./preprocess.py filter_len [original_corpus_folder] [filtered_corpus_folder] [filtering_length]'
-    print 'Usage: ./preprocess.py split_into_folds [original_corpus_folder] [fold_corpus_folder] [num_folds]'
-    print 'Usage: ./preprocess.py create_parser_training_file [corpus_folder] [parser_training_file_folder]'
+    print 'Usage:'
+    print 'general preprocessing: ./preprocess.py general [corpus_folder] [preprocessed_folder]'
+    print 'Phrase length filtering: ./preprocess.py filter_len [original_corpus_folder] [filtered_corpus_folder] [filtering_length]'
+    print 'Fold splitting: ./preprocess.py split_into_folds [original_corpus_folder] [fold_corpus_folder] [num_folds]'
+    print 'Parser train file: ./preprocess.py create_parser_training_file [corpus_folder] [parser_training_file_folder] [Optional: filter_length]'
+    print 'LM train file:  ./preprocess.py create_lm_training_file [corpus_folder] [lm_training_file_folder]'
+    print 'Corpus transcript files: ./preprocess.py create_transcript_files [corpus_folder] [transcript_files_folder]'
 
 if __name__ == '__main__':
     if not len(sys.argv) >= 4:
@@ -392,10 +511,26 @@ if __name__ == '__main__':
     
     #Create a training file for the parser. 
     elif sys.argv[1] == 'create_parser_training_file':
-        if not len(sys.argv) == 4:
-            print 'Usage: ./preprocess.py create_parser_training_file [corpus_folder] [parser_training_file_path]'
-        else:
+        if len(sys.argv) == 4:
             create_parser_training_file(sys.argv[2], sys.argv[3])
+        elif len(sys.argv) == 5:
+            create_parser_training_file(sys.argv[2], sys.argv[3], sys.argv[4])
+        else:
+            print 'Usage: ./preprocess.py create_parser_training_file [corpus_folder] [parser_training_file_path] [Optional: filter_length]'
+
+    #Create a training file for a language model. 
+    elif sys.argv[1] == 'create_lm_training_file':
+        if len(sys.argv) == 4:
+            create_lm_training_file(sys.argv[2], sys.argv[3])
+        else:
+            print 'LM train file:  ./preprocess.py create_lm_training_file [corpus_folder] [lm_training_file_folder]'
+
+    #Create transcript files for a corpus. 
+    elif sys.argv[1] == 'create_transcript_files':
+        if len(sys.argv) == 4:
+            create_asr_transcripts(sys.argv[2], sys.argv[3])
+        else:
+            print 'Corpus transcript files: ./preprocess.py create_transcript_files [corpus_folder] [transcript_files_folder]'
 
     else:
         print_usage()
