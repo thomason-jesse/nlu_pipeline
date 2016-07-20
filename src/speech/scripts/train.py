@@ -13,6 +13,7 @@ __author__ = ['rcorona', 'aishwarya']
 
 import sys
 import subprocess
+import shutil
 
 #Adds path to parser scripts so that they may be imported.
 #TODO CHANGE IF PATH CHANGES
@@ -81,7 +82,7 @@ def train_new_lm(lm_train_file, lm_path):
     #Calls it to create lm. 
     subprocess.call(args)
 
-def adapt_accoustic_model(acoustic_model_path, corpus_folder, recordings_dir):
+def adapt_accoustic_model(acoustic_model_path, corpus_folder, recordings_dir, dict_path):
     #Paths needed for execution. 
     bin_path = '../bin'
     sphinxbase_lib_path = '../resources/sphinxbase_install/lib/'
@@ -100,7 +101,7 @@ def adapt_accoustic_model(acoustic_model_path, corpus_folder, recordings_dir):
     args.append('-di')
     args.append(recordings_dir)
     args.append('-do')
-    args.append(corpus_folder + '/models/acc_model')
+    args.append(corpus_folder + '/models/ac_model_adapt_files')
     args.append('-ei')
     args.append('raw')
     args.append('-eo')
@@ -111,10 +112,79 @@ def adapt_accoustic_model(acoustic_model_path, corpus_folder, recordings_dir):
     #Extracts features from adaptation recordings. 
     subprocess.call(args)
 
+    #Accumulates observation counts. 
+    args = [bin_path + '/bw']
+    args.append('-hmmdir')
+    args.append(acoustic_model_path)
+    args.append('-moddeffn')
+    args.append(acoustic_model_path + '/mdef')
+    args.append('-ts2cbfn')
+    args.append('.ptm.')
+    args.append('-feat')
+    args.append('1s_c_d_dd')
+    args.append('-svspec')
+    args.append('0-12/13-25/26-38')
+    args.append('-cmn')
+    args.append('current')
+    args.append('-agc')
+    args.append('none')
+    args.append('-dictfn')
+    args.append(dict_path)
+    args.append('-ctlfn')
+    args.append(corpus_folder + '/asr_training/train.fileids')
+    args.append('-lsnfn')
+    args.append(corpus_folder + '/asr_training/train.transcription')
+    args.append('-accumdir')
+    args.append(corpus_folder + '/models/ac_model_adapt_files')
+    args.append('-cepdir')
+    args.append(corpus_folder + '/models/ac_model_adapt_files')
+
+    #Calls executable to accumulate counts. 
+    subprocess.call(args)
+
+    #Copies acoustic model folder to new folder. This folder will now be adapted. 
+    #If directory exists from previous run, it's deleted before creating a new folder copy. 
+    if os.path.isdir(corpus_folder + '/models/adapted_ac_model'):
+        shutil.rmtree(corpus_folder + '/models/adapted_ac_model')
+
+    shutil.copytree(acoustic_model_path, corpus_folder + '/models/adapted_ac_model')
+
+    #Sets path for adapted acoustic model. 
+    adapted_ac_model = corpus_folder + '/models/adapted_ac_model'
+
+    #Uses MAP algorithm to adapt model.
+    args = [bin_path + '/map_adapt']
+    args.append('-moddeffn')
+    args.append(acoustic_model_path + '/mdef')
+    args.append('-ts2cbfn')
+    args.append('.ptm.')
+    args.append('-meanfn')
+    args.append(acoustic_model_path + '/means')
+    args.append('-varfn')
+    args.append(acoustic_model_path + '/variances')
+    args.append('-mixwfn')
+    args.append(acoustic_model_path + '/mixture_weights')
+    args.append('-tmatfn')
+    args.append(acoustic_model_path + '/transition_matrices')
+    args.append('-accumdir')
+    args.append(corpus_folder + '/models/ac_model_adapt_files')
+    args.append('-mapmeanfn')
+    args.append(adapted_ac_model + '/means')
+    args.append('-mapvarfn')
+    args.append(adapted_ac_model + '/variances')
+    args.append('-mapmixwfn')
+    args.append(adapted_ac_model + '/mixture_weights')
+    args.append('-maptmatfn')
+    args.append(adapted_ac_model + '/transition_matrices')
+
+    #Runs executable to adapt model.
+    subprocess.call(args)
+
+
 def print_usage():
     print 'To train new parser: ./train.py new_parser [parser_train_file] [parser_save_path] [ont_path] [lex_path]'
     print 'To train new language model: ./train.py new_lm [lm_train_file] [lm_save_path]'
-    print 'To adapt an accoustic model: ./train.py adapt_acc_model [accoustic_model_path] [corpus_folder] [recordings_dir]'
+    print 'To adapt an accoustic model: ./train.py adapt_ac_model [accoustic_model_path] [corpus_folder] [recordings_dir] [dict_path]'
 
 if __name__ == '__main__':
     if not len(sys.argv) >= 4:
@@ -135,8 +205,8 @@ if __name__ == '__main__':
             print_usage()
 
     #Adapt an accoustic model. 
-    elif sys.argv[1] == 'adapt_acc_model':
-        if len(sys.argv) == 5:
-            adapt_accoustic_model(sys.argv[2], sys.argv[3], sys.argv[4])
+    elif sys.argv[1] == 'adapt_ac_model':
+        if len(sys.argv) == 6:
+            adapt_accoustic_model(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
         else:
             print_usage()
