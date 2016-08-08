@@ -58,7 +58,7 @@ To create a training file for a language model: ./preprocess.py create_lm_traini
 
         lm_training_file_folder     - The folder where the training file is to be put. 
 
-To create transcription files for a folder of .usr files: Corpus transcript files: ./preprocess.py create_transcript_files [corpus_folder] [transcript_files_folder]
+To create transcription files for a folder of .usr files: ./preprocess.py create_transcript_files [corpus_folder] [transcript_files_folder]
 
     Parameters:
         corpus_folder               - The top level folder which contains .usr files
@@ -66,6 +66,15 @@ To create transcription files for a folder of .usr files: Corpus transcript file
 
         transcript_files_folder     - The folder in which the transcription files
                                       are to be placed. 
+
+To create ASR training files from a .usr file folder: ./preprocess.py create_asr_test_files [usr_files_folder] [test_files_folder] [num_test_files]
+
+    Parameters:
+        usr_files_folder            - The folder containing the .usr files to use to create the test files. 
+
+        test_files_folder           - The folder in which to place the generated test files. 
+
+        num_test_files              - The number of test files to generate. 
 
 author: Rodolfo Corona, rcorona@utexas.edu
 """
@@ -287,9 +296,9 @@ def make_exp_dir_structure(exp_dir):
     make_dir(exp_dir)
 
     #Makes general corpus folder as well as its train and test subfolders. 
-    make_dir(exp_dir + '/general')
-    make_dir(exp_dir + '/general/train')
-    make_dir(exp_dir + '/general/test')
+    make_dir(exp_dir + '/corpus')
+    make_dir(exp_dir + '/corpus/train')
+    make_dir(exp_dir + '/corpus/test')
 
     #Folder to store parser training file. 
     make_dir(exp_dir + '/parser_training')
@@ -305,6 +314,18 @@ def make_exp_dir_structure(exp_dir):
 
     #Folder to store ASR related training files. 
     make_dir(exp_dir + '/asr_training')
+
+    #Folder to store experiment related files. 
+    make_dir(exp_dir + '/experiments')
+
+    #Contains ASR test files. 
+    make_dir(exp_dir + '/experiments/asr')
+    
+    #Testing files for ASR
+    make_dir(exp_dir + '/experiments/asr/test_files')
+
+    #Result files from running ASR on test files. 
+    make_dir(exp_dir + '/experiments/asr/result_files')
 
 """
 Takes a corpus folder and creates a
@@ -339,11 +360,11 @@ def split_into_folds(corpus_folder, fold_corpus_folder, num_folds):
             #True for one out of num_folds files. 
             if (counter % num_folds) == i:
                 #Adds to test set. 
-                shutil.copy(corpus_file, path + '/general/test/')
+                shutil.copy(corpus_file, path + '/corpus/test/')
             #True (num_folds - 1) out of num_folds files. 
             else:
                 #Adds to training set. 
-                shutil.copy(corpus_file, path + '/general/train/')
+                shutil.copy(corpus_file, path + '/corpus/train/')
 
             counter += 1
                 
@@ -404,8 +425,52 @@ def create_parser_training_file(corpus_folder, parser_training_file_folder, filt
 ###############################################################################
 
 ###############################################################################
-#################### ASR TRAINING RELATED FUNCTIONS ###########################
+#################### ASR RELATED FUNCTIONS ###########################
 ###############################################################################
+
+"""
+Prepares a desired number of test files that will be used with the ASR
+by splitting all the usr files into the desired number of sets. 
+In other words, if you want two or n test sets, use this function. 
+"""
+def create_asr_test_files(usr_files_folder, test_files_folder, num_test_files):
+    #String input cast to int.
+    num_test_files = int(num_test_files)
+
+    #Creates list of usr files to use for asr test files. 
+    usr_files = []
+
+    for file_name in os.listdir(usr_files_folder):
+        if file_name.endswith('.usr'):
+            usr_files.append(usr_files_folder + '/' + file_name)
+
+    #Ensures usr files are evenly divisible by desired number of test files. 
+    if len(usr_files) % num_test_files > 0:
+        print "Number of usr files does not evenly divide desired number of test files!"
+        sys.exit()
+
+    #Splits usr files into equal-sized bins for test files. 
+    test_files_lists = {}
+
+    for i in range(num_test_files):
+        test_files_lists[i] = []
+
+    for i in range(len(usr_files)):
+        test_files_lists[i % num_test_files].append(usr_files[i])
+
+    #Writes test files. 
+    for i in range(num_test_files):
+        test_file = open(test_files_folder + '/' + str(i) + '.test', 'w')
+
+        for usr_file_name in test_files_lists[i]:
+            usr_file = open(usr_file_name, 'r')
+
+            #Adds phrase to 
+            for line in usr_file:
+                test_file.write(line)
+
+        test_file.close()
+                
 
 def create_lm_training_file(corpus_folder, lm_training_file_folder):
     lm_training_file = open(lm_training_file_folder + '/lm_train.txt', 'w')
@@ -486,6 +551,7 @@ def print_usage():
     print 'Parser train file: ./preprocess.py create_parser_training_file [corpus_folder] [parser_training_file_folder] [Optional: filter_length]'
     print 'LM train file:  ./preprocess.py create_lm_training_file [corpus_folder] [lm_training_file_folder]'
     print 'Corpus transcript files: ./preprocess.py create_transcript_files [corpus_folder] [transcript_files_folder]'
+    print 'Create ASR testing files: ./preprocess.py create_asr_test_files [usr_files_folder] [test_files_folder] [num_test_files]'
 
 if __name__ == '__main__':
     if not len(sys.argv) >= 4:
@@ -535,5 +601,12 @@ if __name__ == '__main__':
         else:
             print 'Corpus transcript files: ./preprocess.py create_transcript_files [corpus_folder] [transcript_files_folder]'
 
+    #Create test files for running experiments. 
+    elif sys.argv[1] == 'create_asr_test_files':
+        if len(sys.argv) == 5:
+            create_asr_test_files(sys.argv[2], sys.argv[3], sys.argv[4])
+        else:
+            print 'Create ASR testing files: ./preprocess.py create_asr_test_files [usr_files_folder] [test_files_folder] [num_test_files]'
+    
     else:
         print_usage()
