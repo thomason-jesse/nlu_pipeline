@@ -1,0 +1,140 @@
+INFO: mdef.c(518): Reading model definition: ../../model/en-us/en-us/mdef
+INFO: mdef.c(531): Found byte-order mark BMDF, assuming this is a binary mdef file
+INFO: bin_mdef.c(336): Reading binary model definition: ../../model/en-us/en-us/mdef
+INFO: bin_mdef.c(516): 42 CI-phone, 137053 CD-phone, 3 emitstate/phone, 126 CI-sen, 5126 Sen, 29324 Sen-Seq
+INFO: dict.c(320): Allocating 138623 * 32 bytes (4331 KiB) for word entries
+INFO: dict.c(333): Reading main dictionary: ../../model/en-us/cmudict-en-us.dict
+INFO: dict.c(213): Allocated 1014 KiB for strings, 1677 KiB for phones
+INFO: dict.c(336): 134522 words read
+INFO: dict.c(358): Reading filler dictionary: ../../model/en-us/en-us/noisedict
+INFO: dict.c(213): Allocated 0 KiB for strings, 0 KiB for phones
+INFO: dict.c(361): 5 words read
+INFO: dict.c(320): Allocating 4096 * 32 bytes (128 KiB) for word entries
+INFO: dict.c(320): Allocating 4096 * 32 bytes (128 KiB) for word entries
+INFO: dict.c(89): Reallocating to 256 KiB for word entries
+INFO: dict.c(89): Reallocating to 384 KiB for word entries
+INFO: dict.c(89): Reallocating to 512 KiB for word entries
+INFO: dict.c(89): Reallocating to 640 KiB for word entries
+INFO: dict.c(89): Reallocating to 768 KiB for word entries
+INFO: dict.c(89): Reallocating to 896 KiB for word entries
+INFO: dict.c(89): Reallocating to 1024 KiB for word entries
+INFO: dict.c(89): Reallocating to 1152 KiB for word entries
+INFO: dict.c(89): Reallocating to 1280 KiB for word entries
+INFO: dict.c(89): Reallocating to 1408 KiB for word entries
+INFO: dict.c(89): Reallocating to 1536 KiB for word entries
+INFO: dict.c(89): Reallocating to 1664 KiB for word entries
+INFO: dict.c(89): Reallocating to 1792 KiB for word entries
+INFO: dict.c(89): Reallocating to 1920 KiB for word entries
+INFO: dict.c(89): Reallocating to 2048 KiB for word entries
+INFO: dict.c(89): Reallocating to 2176 KiB for word entries
+INFO: dict.c(89): Reallocating to 2304 KiB for word entries
+INFO: dict.c(89): Reallocating to 2432 KiB for word entries
+INFO: dict.c(89): Reallocating to 2560 KiB for word entries
+INFO: dict.c(89): Reallocating to 2688 KiB for word entries
+INFO: dict.c(89): Reallocating to 2816 KiB for word entries
+INFO: dict.c(89): Reallocating to 2944 KiB for word entries
+INFO: dict.c(89): Reallocating to 3072 KiB for word entries
+INFO: dict.c(89): Reallocating to 3200 KiB for word entries
+INFO: dict.c(89): Reallocating to 3328 KiB for word entries
+INFO: dict.c(89): Reallocating to 3456 KiB for word entries
+INFO: dict.c(89): Reallocating to 3584 KiB for word entries
+INFO: dict.c(89): Reallocating to 3712 KiB for word entries
+INFO: dict.c(89): Reallocating to 3840 KiB for word entries
+INFO: dict.c(89): Reallocating to 3968 KiB for word entries
+INFO: dict.c(89): Reallocating to 4096 KiB for word entries
+INFO: dict.c(89): Reallocating to 4224 KiB for word entries
+INFO: dict.c(89): Reallocating to 4352 KiB for word entries
+INFO: dict.c(89): Reallocating to 4480 KiB for word entries
+INFO: dict.c(89): Reallocating to 4608 KiB for word entries
+INFO: dict.c(89): Reallocating to 4736 KiB for word entries
+INFO: dict.c(89): Reallocating to 4864 KiB for word entries
+INFO: dict.c(89): Reallocating to 4992 KiB for word entries
+INFO: dict.c(89): Reallocating to 5120 KiB for word entries
+INFO: dict.c(89): Reallocating to 5248 KiB for word entries
+INFO: dict.c(89): Reallocating to 5376 KiB for word entries
+INFO: dict.c(89): Reallocating to 5504 KiB for word entries
+INFO: dict.c(89): Reallocating to 5632 KiB for word entries
+INFO: dict.c(89): Reallocating to 5760 KiB for word entries
+INFO: dict.c(89): Reallocating to 5888 KiB for word entries
+INFO: dict.c(89): Reallocating to 6016 KiB for word entries
+INFO: dict.c(89): Reallocating to 6144 KiB for word entries
+INFO: dict.c(89): Reallocating to 6272 KiB for word entries
+INFO: dict.c(89): Reallocating to 6400 KiB for word entries
+INFO: dict.c(89): Reallocating to 6528 KiB for word entries
+INFO: dict.c(89): Reallocating to 6656 KiB for word entries
+INFO: dict.c(89): Reallocating to 6784 KiB for word entries
+INFO: dict.c(89): Reallocating to 6912 KiB for word entries
+INFO: dict.c(89): Reallocating to 7040 KiB for word entries
+INFO: dict.c(89): Reallocating to 7168 KiB for word entries
+INFO: dict.c(89): Reallocating to 7296 KiB for word entries
+INFO: dict.c(89): Reallocating to 7424 KiB for word entries
+INFO: dict.c(89): Reallocating to 7552 KiB for word entries
+INFO: dict.c(89): Reallocating to 7680 KiB for word entries
+INFO: dict.c(89): Reallocating to 7808 KiB for word entries
+INFO: dict.c(89): Reallocating to 7936 KiB for word entries
+INFO: dict.c(89): Reallocating to 8064 KiB for word entries
+INFO: dict.c(89): Reallocating to 8192 KiB for word entries
+INFO: dict.c(89): Reallocating to 8320 KiB for word entries
+INFO: dict.c(89): Reallocating to 8448 KiB for word entries
+INFO: dict.c(89): Reallocating to 8576 KiB for word entries
+INFO: dict.c(89): Reallocating to 8704 KiB for word entries
+INFO: dict.c(89): Reallocating to 8832 KiB for word entries
+INFO: dict.c(89): Reallocating to 8960 KiB for word entries
+INFO: dict.c(89): Reallocating to 9088 KiB for word entries
+INFO: dict.c(89): Reallocating to 9216 KiB for word entries
+INFO: dict.c(89): Reallocating to 9344 KiB for word entries
+INFO: dict.c(89): Reallocating to 9472 KiB for word entries
+INFO: dict.c(89): Reallocating to 9600 KiB for word entries
+INFO: dict.c(89): Reallocating to 9728 KiB for word entries
+INFO: dict.c(89): Reallocating to 9856 KiB for word entries
+INFO: dict.c(89): Reallocating to 9984 KiB for word entries
+INFO: dict.c(89): Reallocating to 10112 KiB for word entries
+INFO: dict.c(89): Reallocating to 10240 KiB for word entries
+INFO: dict.c(89): Reallocating to 10368 KiB for word entries
+INFO: dict.c(89): Reallocating to 10496 KiB for word entries
+INFO: dict.c(89): Reallocating to 10624 KiB for word entries
+INFO: dict.c(89): Reallocating to 10752 KiB for word entries
+INFO: dict.c(89): Reallocating to 10880 KiB for word entries
+INFO: dict.c(89): Reallocating to 11008 KiB for word entries
+INFO: dict.c(89): Reallocating to 11136 KiB for word entries
+INFO: dict.c(89): Reallocating to 11264 KiB for word entries
+INFO: dict.c(89): Reallocating to 11392 KiB for word entries
+INFO: dict.c(89): Reallocating to 11520 KiB for word entries
+INFO: dict.c(89): Reallocating to 11648 KiB for word entries
+INFO: dict.c(89): Reallocating to 11776 KiB for word entries
+INFO: dict.c(89): Reallocating to 11904 KiB for word entries
+INFO: dict.c(89): Reallocating to 12032 KiB for word entries
+INFO: dict.c(89): Reallocating to 12160 KiB for word entries
+INFO: dict.c(89): Reallocating to 12288 KiB for word entries
+INFO: dict.c(89): Reallocating to 12416 KiB for word entries
+INFO: dict.c(89): Reallocating to 12544 KiB for word entries
+INFO: dict.c(89): Reallocating to 12672 KiB for word entries
+INFO: dict.c(89): Reallocating to 12800 KiB for word entries
+INFO: dict.c(89): Reallocating to 12928 KiB for word entries
+INFO: dict.c(89): Reallocating to 13056 KiB for word entries
+INFO: dict.c(89): Reallocating to 13184 KiB for word entries
+INFO: dict.c(89): Reallocating to 13312 KiB for word entries
+INFO: dict.c(89): Reallocating to 13440 KiB for word entries
+INFO: dict.c(89): Reallocating to 13568 KiB for word entries
+INFO: dict.c(89): Reallocating to 13696 KiB for word entries
+INFO: dict.c(89): Reallocating to 13824 KiB for word entries
+INFO: dict.c(89): Reallocating to 13952 KiB for word entries
+INFO: dict.c(89): Reallocating to 14080 KiB for word entries
+INFO: dict.c(89): Reallocating to 14208 KiB for word entries
+INFO: dict.c(89): Reallocating to 14336 KiB for word entries
+INFO: dict.c(89): Reallocating to 14464 KiB for word entries
+INFO: dict.c(89): Reallocating to 14592 KiB for word entries
+INFO: dict.c(89): Reallocating to 14720 KiB for word entries
+INFO: dict.c(89): Reallocating to 14848 KiB for word entries
+INFO: dict.c(89): Reallocating to 14976 KiB for word entries
+INFO: dict.c(89): Reallocating to 15104 KiB for word entries
+INFO: dict.c(89): Reallocating to 15232 KiB for word entries
+INFO: dict.c(89): Reallocating to 15360 KiB for word entries
+INFO: dict.c(89): Reallocating to 15488 KiB for word entries
+INFO: dict.c(89): Reallocating to 15616 KiB for word entries
+INFO: dict.c(89): Reallocating to 15744 KiB for word entries
+Word ID (CARNEGIE) = -1
+Word ID (ASDFASFASSD) = -1
+Word ID(<s>) = 0
+Word ID(FOOBIE) = 3
+Word ID(BLETCH) = 4

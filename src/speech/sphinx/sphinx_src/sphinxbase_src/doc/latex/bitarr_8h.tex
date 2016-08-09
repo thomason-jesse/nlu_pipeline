@@ -1,0 +1,216 @@
+\section{include/sphinxbase/bitarr.h File Reference}
+\label{bitarr_8h}\index{include/sphinxbase/bitarr.\-h@{include/sphinxbase/bitarr.\-h}}
+
+
+An implementation bit array -\/ memory efficient storage for digit int and float data.  
+
+
+{\ttfamily \#include $<$assert.\-h$>$}\\*
+{\ttfamily \#include $<$string.\-h$>$}\\*
+{\ttfamily \#include $<$sphinxbase/prim\-\_\-type.\-h$>$}\\*
+{\ttfamily \#include $<$sphinxbase/sphinxbase\-\_\-export.\-h$>$}\\*
+\subsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct {\bf bitarr\-\_\-mask\-\_\-s}
+\begin{DoxyCompactList}\small\item\em Structure that specifies bits required to efficiently store certain data. \end{DoxyCompactList}\item 
+struct {\bf bitarr\-\_\-address\-\_\-s}
+\begin{DoxyCompactList}\small\item\em Structure that stores address of certain value in bit array. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef struct {\bf bitarr\-\_\-mask\-\_\-s} {\bf bitarr\-\_\-mask\-\_\-t}\label{bitarr_8h_abcb7d3674c4b4bbed7af00ddfc07a11f}
+
+\begin{DoxyCompactList}\small\item\em Structure that specifies bits required to efficiently store certain data. \end{DoxyCompactList}\item 
+typedef struct {\bf bitarr\-\_\-address\-\_\-s} {\bf bitarr\-\_\-address\-\_\-t}\label{bitarr_8h_a0ec20752a791dac325045da770b3510d}
+
+\begin{DoxyCompactList}\small\item\em Structure that stores address of certain value in bit array. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+S\-P\-H\-I\-N\-X\-B\-A\-S\-E\-\_\-\-E\-X\-P\-O\-R\-T uint64 {\bf bitarr\-\_\-read\-\_\-int57} ({\bf bitarr\-\_\-address\-\_\-t} address, uint8 length, uint64 mask)
+\begin{DoxyCompactList}\small\item\em Read uint64 value from bit array. \end{DoxyCompactList}\item 
+S\-P\-H\-I\-N\-X\-B\-A\-S\-E\-\_\-\-E\-X\-P\-O\-R\-T void {\bf bitarr\-\_\-write\-\_\-int57} ({\bf bitarr\-\_\-address\-\_\-t} address, uint8 length, uint64 value)
+\begin{DoxyCompactList}\small\item\em Write specified value into bit array. \end{DoxyCompactList}\item 
+S\-P\-H\-I\-N\-X\-B\-A\-S\-E\-\_\-\-E\-X\-P\-O\-R\-T uint32 {\bf bitarr\-\_\-read\-\_\-int25} ({\bf bitarr\-\_\-address\-\_\-t} address, uint8 length, uint32 mask)
+\begin{DoxyCompactList}\small\item\em Read uint32 value from bit array. \end{DoxyCompactList}\item 
+S\-P\-H\-I\-N\-X\-B\-A\-S\-E\-\_\-\-E\-X\-P\-O\-R\-T void {\bf bitarr\-\_\-write\-\_\-int25} ({\bf bitarr\-\_\-address\-\_\-t} address, uint8 length, uint32 value)
+\begin{DoxyCompactList}\small\item\em Write specified value into bit array. \end{DoxyCompactList}\item 
+S\-P\-H\-I\-N\-X\-B\-A\-S\-E\-\_\-\-E\-X\-P\-O\-R\-T void {\bf bitarr\-\_\-mask\-\_\-from\-\_\-max} ({\bf bitarr\-\_\-mask\-\_\-t} $\ast$bit\-\_\-mask, uint32 max\-\_\-value)
+\begin{DoxyCompactList}\small\item\em Fills mask for certain int range according to provided max value. \end{DoxyCompactList}\item 
+S\-P\-H\-I\-N\-X\-B\-A\-S\-E\-\_\-\-E\-X\-P\-O\-R\-T uint8 {\bf bitarr\-\_\-required\-\_\-bits} (uint32 max\-\_\-value)
+\begin{DoxyCompactList}\small\item\em Computes amount of bits required ti store integers upto value provided. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+An implementation bit array -\/ memory efficient storage for digit int and float data. Implementation of basic operations of read/write digits consuming as little space as possible. 
+
+Definition in file {\bf bitarr.\-h}.
+
+
+
+\subsection{Function Documentation}
+\index{bitarr.\-h@{bitarr.\-h}!bitarr\-\_\-mask\-\_\-from\-\_\-max@{bitarr\-\_\-mask\-\_\-from\-\_\-max}}
+\index{bitarr\-\_\-mask\-\_\-from\-\_\-max@{bitarr\-\_\-mask\-\_\-from\-\_\-max}!bitarr.h@{bitarr.\-h}}
+\subsubsection[{bitarr\-\_\-mask\-\_\-from\-\_\-max}]{\setlength{\rightskip}{0pt plus 5cm}S\-P\-H\-I\-N\-X\-B\-A\-S\-E\-\_\-\-E\-X\-P\-O\-R\-T void bitarr\-\_\-mask\-\_\-from\-\_\-max (
+\begin{DoxyParamCaption}
+\item[{{\bf bitarr\-\_\-mask\-\_\-t} $\ast$}]{bit\-\_\-mask, }
+\item[{uint32}]{max\-\_\-value}
+\end{DoxyParamCaption}
+)}\label{bitarr_8h_ac4e41af285dcd2f5f85037ae7889b57c}
+
+
+Fills mask for certain int range according to provided max value. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em bit\-\_\-mask} & mask that is filled \\
+\hline
+{\em max\-\_\-value} & bigest integer that is going to be stored using this mask \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 133 of file bitarr.\-c.
+
+
+
+References bitarr\-\_\-required\-\_\-bits().
+
+\index{bitarr.\-h@{bitarr.\-h}!bitarr\-\_\-read\-\_\-int25@{bitarr\-\_\-read\-\_\-int25}}
+\index{bitarr\-\_\-read\-\_\-int25@{bitarr\-\_\-read\-\_\-int25}!bitarr.h@{bitarr.\-h}}
+\subsubsection[{bitarr\-\_\-read\-\_\-int25}]{\setlength{\rightskip}{0pt plus 5cm}S\-P\-H\-I\-N\-X\-B\-A\-S\-E\-\_\-\-E\-X\-P\-O\-R\-T uint32 bitarr\-\_\-read\-\_\-int25 (
+\begin{DoxyParamCaption}
+\item[{{\bf bitarr\-\_\-address\-\_\-t}}]{address, }
+\item[{uint8}]{length, }
+\item[{uint32}]{mask}
+\end{DoxyParamCaption}
+)}\label{bitarr_8h_aa20810e5fdf947a16c03e262dfb6b46f}
+
+
+Read uint32 value from bit array. 
+
+Assumes mask == (1 $<$$<$ length) -\/ 1 where length $<$= 25 
+\begin{DoxyParams}{Parameters}
+{\em address} & to read from \\
+\hline
+{\em length} & number of bits for value \\
+\hline
+{\em mask} & of read value \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+uint32 value that was read 
+\end{DoxyReturn}
+
+
+Definition at line 108 of file bitarr.\-c.
+
+\index{bitarr.\-h@{bitarr.\-h}!bitarr\-\_\-read\-\_\-int57@{bitarr\-\_\-read\-\_\-int57}}
+\index{bitarr\-\_\-read\-\_\-int57@{bitarr\-\_\-read\-\_\-int57}!bitarr.h@{bitarr.\-h}}
+\subsubsection[{bitarr\-\_\-read\-\_\-int57}]{\setlength{\rightskip}{0pt plus 5cm}S\-P\-H\-I\-N\-X\-B\-A\-S\-E\-\_\-\-E\-X\-P\-O\-R\-T uint64 bitarr\-\_\-read\-\_\-int57 (
+\begin{DoxyParamCaption}
+\item[{{\bf bitarr\-\_\-address\-\_\-t}}]{address, }
+\item[{uint8}]{length, }
+\item[{uint64}]{mask}
+\end{DoxyParamCaption}
+)}\label{bitarr_8h_a77b31974d463a8d7e52540cb120d73f3}
+
+
+Read uint64 value from bit array. 
+
+Assumes mask == (1 $<$$<$ length) -\/ 1 where length $<$= 57 
+\begin{DoxyParams}{Parameters}
+{\em address} & to read from \\
+\hline
+{\em length} & number of bits for value \\
+\hline
+{\em mask} & of read value \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+uint64 value that was read 
+\end{DoxyReturn}
+
+
+Definition at line 90 of file bitarr.\-c.
+
+\index{bitarr.\-h@{bitarr.\-h}!bitarr\-\_\-required\-\_\-bits@{bitarr\-\_\-required\-\_\-bits}}
+\index{bitarr\-\_\-required\-\_\-bits@{bitarr\-\_\-required\-\_\-bits}!bitarr.h@{bitarr.\-h}}
+\subsubsection[{bitarr\-\_\-required\-\_\-bits}]{\setlength{\rightskip}{0pt plus 5cm}S\-P\-H\-I\-N\-X\-B\-A\-S\-E\-\_\-\-E\-X\-P\-O\-R\-T uint8 bitarr\-\_\-required\-\_\-bits (
+\begin{DoxyParamCaption}
+\item[{uint32}]{max\-\_\-value}
+\end{DoxyParamCaption}
+)}\label{bitarr_8h_a6e3a8cff610940311ae62c7832269196}
+
+
+Computes amount of bits required ti store integers upto value provided. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em max\-\_\-value} & bigest integer that going to be stored using this amount of bits \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+amount of bits required to store integers from range with maximum provided 
+\end{DoxyReturn}
+
+
+Definition at line 139 of file bitarr.\-c.
+
+
+
+Referenced by bitarr\-\_\-mask\-\_\-from\-\_\-max().
+
+\index{bitarr.\-h@{bitarr.\-h}!bitarr\-\_\-write\-\_\-int25@{bitarr\-\_\-write\-\_\-int25}}
+\index{bitarr\-\_\-write\-\_\-int25@{bitarr\-\_\-write\-\_\-int25}!bitarr.h@{bitarr.\-h}}
+\subsubsection[{bitarr\-\_\-write\-\_\-int25}]{\setlength{\rightskip}{0pt plus 5cm}S\-P\-H\-I\-N\-X\-B\-A\-S\-E\-\_\-\-E\-X\-P\-O\-R\-T void bitarr\-\_\-write\-\_\-int25 (
+\begin{DoxyParamCaption}
+\item[{{\bf bitarr\-\_\-address\-\_\-t}}]{address, }
+\item[{uint8}]{length, }
+\item[{uint32}]{value}
+\end{DoxyParamCaption}
+)}\label{bitarr_8h_ac3d0d63f49bbbca64fe5cc20bef0d2f8}
+
+
+Write specified value into bit array. 
+
+Assumes value $<$ (1 $<$$<$ length) and length $<$= 25. Assumes the memory is zero initially. 
+\begin{DoxyParams}{Parameters}
+{\em address} & in bit array ti write to \\
+\hline
+{\em length} & amount of active bytes in value to write \\
+\hline
+{\em value} & integer to write \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 120 of file bitarr.\-c.
+
+\index{bitarr.\-h@{bitarr.\-h}!bitarr\-\_\-write\-\_\-int57@{bitarr\-\_\-write\-\_\-int57}}
+\index{bitarr\-\_\-write\-\_\-int57@{bitarr\-\_\-write\-\_\-int57}!bitarr.h@{bitarr.\-h}}
+\subsubsection[{bitarr\-\_\-write\-\_\-int57}]{\setlength{\rightskip}{0pt plus 5cm}S\-P\-H\-I\-N\-X\-B\-A\-S\-E\-\_\-\-E\-X\-P\-O\-R\-T void bitarr\-\_\-write\-\_\-int57 (
+\begin{DoxyParamCaption}
+\item[{{\bf bitarr\-\_\-address\-\_\-t}}]{address, }
+\item[{uint8}]{length, }
+\item[{uint64}]{value}
+\end{DoxyParamCaption}
+)}\label{bitarr_8h_a17161f257ad544b0e45b07e0085e7435}
+
+
+Write specified value into bit array. 
+
+Assumes value $<$ (1 $<$$<$ length) and length $<$= 57. Assumes the memory is zero initially. 
+\begin{DoxyParams}{Parameters}
+{\em address} & to write to \\
+\hline
+{\em length} & amount of active bytes in value to write \\
+\hline
+{\em value} & integer to write \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 95 of file bitarr.\-c.
+

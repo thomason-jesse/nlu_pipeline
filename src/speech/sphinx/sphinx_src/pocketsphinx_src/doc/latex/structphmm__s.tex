@@ -1,0 +1,62 @@
+\section{phmm\-\_\-s Struct Reference}
+\label{structphmm__s}\index{phmm\-\_\-s@{phmm\-\_\-s}}
+
+
+Models a single unique $<$senone-\/sequence, tmat$>$ pair.  
+
+
+
+
+{\ttfamily \#include $<$allphone\-\_\-search.\-h$>$}
+
+\subsection*{Data Fields}
+\begin{DoxyCompactItemize}
+\item 
+{\bf hmm\-\_\-t} {\bf hmm}\label{structphmm__s_a829311265f8df700c9fb628f5bdff0ad}
+
+\begin{DoxyCompactList}\small\item\em Base H\-M\-M structure. \end{DoxyCompactList}\item 
+s3pid\-\_\-t {\bf pid}
+\begin{DoxyCompactList}\small\item\em Phone id (temp. \end{DoxyCompactList}\item 
+{\bf s3cipid\-\_\-t} {\bf ci}\label{structphmm__s_afe385b65ca02fb4e3a087a0997ea4eac}
+
+\begin{DoxyCompactList}\small\item\em Parent basephone for this P\-H\-M\-M. \end{DoxyCompactList}\item 
+bitvec\-\_\-t $\ast$ {\bf lc}\label{structphmm__s_aad9f810256dea9ee491d21eb3a349d1c}
+
+\begin{DoxyCompactList}\small\item\em Set (bit-\/vector) of left context phones seen for this P\-H\-M\-M. \end{DoxyCompactList}\item 
+bitvec\-\_\-t $\ast$ {\bf rc}\label{structphmm__s_a94ead49959a95398643178d8dc1609f8}
+
+\begin{DoxyCompactList}\small\item\em Set (bit-\/vector) of right context phones seen for this P\-H\-M\-M. \end{DoxyCompactList}\item 
+struct {\bf phmm\-\_\-s} $\ast$ {\bf next}\label{structphmm__s_a62c94d334abbbd2431d5e7e0ace79a14}
+
+\begin{DoxyCompactList}\small\item\em Next unique P\-H\-M\-M for same parent basephone. \end{DoxyCompactList}\item 
+struct {\bf plink\-\_\-s} $\ast$ {\bf succlist}\label{structphmm__s_a152d26f99b39098c8027cd2d8372e05c}
+
+\begin{DoxyCompactList}\small\item\em List of predecessor P\-H\-M\-M nodes. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Models a single unique $<$senone-\/sequence, tmat$>$ pair. 
+
+Can represent several different triphones, but all with the same parent basephone. (N\-O\-T\-E\-: Word-\/position attribute of triphone is ignored.) 
+
+Definition at line 60 of file allphone\-\_\-search.\-h.
+
+
+
+\subsection{Field Documentation}
+\index{phmm\-\_\-s@{phmm\-\_\-s}!pid@{pid}}
+\index{pid@{pid}!phmm_s@{phmm\-\_\-s}}
+\subsubsection[{pid}]{\setlength{\rightskip}{0pt plus 5cm}s3pid\-\_\-t phmm\-\_\-s\-::pid}\label{structphmm__s_aee52956004053c676230cd8567366b60}
+
+
+Phone id (temp. 
+
+during init.) 
+
+Definition at line 62 of file allphone\-\_\-search.\-h.
+
+
+
+The documentation for this struct was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+src/libpocketsphinx/allphone\-\_\-search.\-h\end{DoxyCompactItemize}

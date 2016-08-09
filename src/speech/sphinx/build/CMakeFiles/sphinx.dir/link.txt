@@ -1,0 +1,1 @@
+/usr/bin/cc  -fPIC -O3 -DNDEBUG   -shared -Wl,-soname,libsphinx.so -o libsphinx.so CMakeFiles/sphinx.dir/src/sphinx.c.o 

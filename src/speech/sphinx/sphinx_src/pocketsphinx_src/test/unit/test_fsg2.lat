@@ -1,0 +1,39 @@
+# getcwd: /this/is/bogus
+# -logbase 1.000100e+00
+#
+Frames 250
+#
+Nodes 11 (NODEID WORD STARTFRAME FIRST-ENDFRAME LAST-ENDFRAME)
+0 <sil> 211 224 249 ; 6
+1 <sil> 169 171 223 ; 6
+2 <sil> 166 168 168 ; 6
+3 meters 128 153 193 ; 6
+4 nine 107 126 136 ; 5
+5 eight 119 124 132 ; 5
+6 forward 64 105 146 ; 2
+7 <sil> 61 63 63 ; 1
+8 <sil> 58 60 60 ; 1
+9 go 43 50 72 ; 1
+10 <sil> 0 2 49 ; 0
+#
+Initial 10
+Final 0
+#
+BestSegAscr 0 (NODEID ENDFRAME ASCORE)
+#
+Edges (FROM-NODEID TO-NODEID ASCORE)
+1 0 -2722816
+2 1 -1204224
+3 1 -2097152
+3 2 -1732608
+4 3 -992256
+5 3 -698368
+6 5 -2097152
+6 4 -1876992
+7 6 -657408
+8 7 -975872
+9 6 -324608
+9 7 -576512
+9 8 -519168
+10 9 -579584
+End

@@ -1,0 +1,141 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.6">
+  <compounddef id="structlm__trie__quant__s" kind="struct" prot="public">
+    <compoundname>lm_trie_quant_s</compoundname>
+      <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="structlm__trie__quant__s_1a73fa4af73d4a3767d221921f71a95940" prot="public" static="no" mutable="no">
+        <type><ref refid="structbins__s" kindref="compound">bins_t</ref></type>
+        <definition>bins_t lm_trie_quant_s::tables[NGRAM_MAX_ORDER-1][2]</definition>
+        <argsstring>[NGRAM_MAX_ORDER-1][2]</argsstring>
+        <name>tables</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/scratch/cluster/rcorona/nlu_pipeline/src/speech/libs/sphinxbase/src/libsphinxbase/lm/lm_trie_quant.c" line="55" column="1" bodyfile="/scratch/cluster/rcorona/nlu_pipeline/src/speech/libs/sphinxbase/src/libsphinxbase/lm/lm_trie_quant.c" bodystart="55" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structlm__trie__quant__s_1a218f78c52d512605133668b765e3260b" prot="public" static="no" mutable="no">
+        <type><ref refid="structbins__s" kindref="compound">bins_t</ref> *</type>
+        <definition>bins_t* lm_trie_quant_s::longest</definition>
+        <argsstring></argsstring>
+        <name>longest</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/scratch/cluster/rcorona/nlu_pipeline/src/speech/libs/sphinxbase/src/libsphinxbase/lm/lm_trie_quant.c" line="56" column="1" bodyfile="/scratch/cluster/rcorona/nlu_pipeline/src/speech/libs/sphinxbase/src/libsphinxbase/lm/lm_trie_quant.c" bodystart="56" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structlm__trie__quant__s_1add104d4880f471d73fd886b2eae7ca66" prot="public" static="no" mutable="no">
+        <type>uint8 *</type>
+        <definition>uint8* lm_trie_quant_s::mem</definition>
+        <argsstring></argsstring>
+        <name>mem</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/scratch/cluster/rcorona/nlu_pipeline/src/speech/libs/sphinxbase/src/libsphinxbase/lm/lm_trie_quant.c" line="57" column="1" bodyfile="/scratch/cluster/rcorona/nlu_pipeline/src/speech/libs/sphinxbase/src/libsphinxbase/lm/lm_trie_quant.c" bodystart="57" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structlm__trie__quant__s_1a348c9280b8fccbac99890a5bf3a69d94" prot="public" static="no" mutable="no">
+        <type>size_t</type>
+        <definition>size_t lm_trie_quant_s::mem_size</definition>
+        <argsstring></argsstring>
+        <name>mem_size</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/scratch/cluster/rcorona/nlu_pipeline/src/speech/libs/sphinxbase/src/libsphinxbase/lm/lm_trie_quant.c" line="58" column="1" bodyfile="/scratch/cluster/rcorona/nlu_pipeline/src/speech/libs/sphinxbase/src/libsphinxbase/lm/lm_trie_quant.c" bodystart="58" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structlm__trie__quant__s_1a3696f006dc23c7faddd81419aae4de64" prot="public" static="no" mutable="no">
+        <type>uint8</type>
+        <definition>uint8 lm_trie_quant_s::prob_bits</definition>
+        <argsstring></argsstring>
+        <name>prob_bits</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/scratch/cluster/rcorona/nlu_pipeline/src/speech/libs/sphinxbase/src/libsphinxbase/lm/lm_trie_quant.c" line="59" column="1" bodyfile="/scratch/cluster/rcorona/nlu_pipeline/src/speech/libs/sphinxbase/src/libsphinxbase/lm/lm_trie_quant.c" bodystart="59" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structlm__trie__quant__s_1a7d8ec82f7dde68d7a7e4ea495972bddc" prot="public" static="no" mutable="no">
+        <type>uint8</type>
+        <definition>uint8 lm_trie_quant_s::bo_bits</definition>
+        <argsstring></argsstring>
+        <name>bo_bits</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/scratch/cluster/rcorona/nlu_pipeline/src/speech/libs/sphinxbase/src/libsphinxbase/lm/lm_trie_quant.c" line="60" column="1" bodyfile="/scratch/cluster/rcorona/nlu_pipeline/src/speech/libs/sphinxbase/src/libsphinxbase/lm/lm_trie_quant.c" bodystart="60" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structlm__trie__quant__s_1ad70aed4374709125a85a915815538a61" prot="public" static="no" mutable="no">
+        <type>uint32</type>
+        <definition>uint32 lm_trie_quant_s::prob_mask</definition>
+        <argsstring></argsstring>
+        <name>prob_mask</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/scratch/cluster/rcorona/nlu_pipeline/src/speech/libs/sphinxbase/src/libsphinxbase/lm/lm_trie_quant.c" line="61" column="1" bodyfile="/scratch/cluster/rcorona/nlu_pipeline/src/speech/libs/sphinxbase/src/libsphinxbase/lm/lm_trie_quant.c" bodystart="61" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structlm__trie__quant__s_1a2b8c82b5f452346651055c0cd7a3b3f2" prot="public" static="no" mutable="no">
+        <type>uint32</type>
+        <definition>uint32 lm_trie_quant_s::bo_mask</definition>
+        <argsstring></argsstring>
+        <name>bo_mask</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="/scratch/cluster/rcorona/nlu_pipeline/src/speech/libs/sphinxbase/src/libsphinxbase/lm/lm_trie_quant.c" line="62" column="1" bodyfile="/scratch/cluster/rcorona/nlu_pipeline/src/speech/libs/sphinxbase/src/libsphinxbase/lm/lm_trie_quant.c" bodystart="62" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <collaborationgraph>
+      <node id="149">
+        <label>lm_trie_quant_s</label>
+        <link refid="structlm__trie__quant__s"/>
+        <childnode refid="150" relation="usage">
+          <edgelabel>tables</edgelabel>
+          <edgelabel>longest</edgelabel>
+        </childnode>
+      </node>
+      <node id="150">
+        <label>bins_s</label>
+        <link refid="structbins__s"/>
+      </node>
+    </collaborationgraph>
+    <location file="/scratch/cluster/rcorona/nlu_pipeline/src/speech/libs/sphinxbase/src/libsphinxbase/lm/lm_trie_quant.c" line="54" column="1" bodyfile="/scratch/cluster/rcorona/nlu_pipeline/src/speech/libs/sphinxbase/src/libsphinxbase/lm/lm_trie_quant.c" bodystart="54" bodyend="63"/>
+    <listofallmembers>
+      <member refid="structlm__trie__quant__s_1a7d8ec82f7dde68d7a7e4ea495972bddc" prot="public" virt="non-virtual"><scope>lm_trie_quant_s</scope><name>bo_bits</name></member>
+      <member refid="structlm__trie__quant__s_1a2b8c82b5f452346651055c0cd7a3b3f2" prot="public" virt="non-virtual"><scope>lm_trie_quant_s</scope><name>bo_mask</name></member>
+      <member refid="structlm__trie__quant__s_1a218f78c52d512605133668b765e3260b" prot="public" virt="non-virtual"><scope>lm_trie_quant_s</scope><name>longest</name></member>
+      <member refid="structlm__trie__quant__s_1add104d4880f471d73fd886b2eae7ca66" prot="public" virt="non-virtual"><scope>lm_trie_quant_s</scope><name>mem</name></member>
+      <member refid="structlm__trie__quant__s_1a348c9280b8fccbac99890a5bf3a69d94" prot="public" virt="non-virtual"><scope>lm_trie_quant_s</scope><name>mem_size</name></member>
+      <member refid="structlm__trie__quant__s_1a3696f006dc23c7faddd81419aae4de64" prot="public" virt="non-virtual"><scope>lm_trie_quant_s</scope><name>prob_bits</name></member>
+      <member refid="structlm__trie__quant__s_1ad70aed4374709125a85a915815538a61" prot="public" virt="non-virtual"><scope>lm_trie_quant_s</scope><name>prob_mask</name></member>
+      <member refid="structlm__trie__quant__s_1a73fa4af73d4a3767d221921f71a95940" prot="public" virt="non-virtual"><scope>lm_trie_quant_s</scope><name>tables</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>
