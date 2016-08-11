@@ -101,7 +101,7 @@ if __name__ == '__main__':
         #Runs sphinx ASR experiment. 
         sphinx = SphinxExperiment(sys.argv[2])
         sphinx.init_decoder(sys.argv[3], sys.argv[4], sys.argv[5])
-        sphinx.n_best(sys.argv[6], sys.argv[7], sys.argv[8])
+        sphinx.n_best(sys.argv[6], sys.argv[7], int(sys.argv[8]))
         sphinx.close_decoder()
 
     else: 
