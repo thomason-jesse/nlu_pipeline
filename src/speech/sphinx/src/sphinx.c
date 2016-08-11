@@ -37,8 +37,12 @@
 
 FILE* results = 0; 
 
-ps_decoder_t* sphinx_init(const char *ac, const char* lm, const char* dict) {
-	ps_decoder_t *ps = 0;
+//Globals
+
+//Decoder for asr. 
+ps_decoder_t* ps = 0;
+
+void sphinx_init(const char *ac, const char* lm, const char* dict) {
 	cmd_ln_t *config = 0;
 	
 	//TODO Check for and return errors. 
@@ -53,12 +57,69 @@ ps_decoder_t* sphinx_init(const char *ac, const char* lm, const char* dict) {
 				"-samprate", "16000", NULL);
 
 	ps = ps_init(config);
+}
 
-	/*
-	if (config)
-		cmd_ln_free_r(config);
+void sphinx_close() {
+	if (ps)
+		ps_free(ps);	
+}
 
-	return ps; */
+int sphinx_n_best(const char *phrase, const char *recording_path, const char* nbest_file_path, int n) {
+	ps_nbest_t *nbest;
+	char const *hyp;
+	int32 score, log, defErr;
 
-	return ps;  
+	//Opens recording. 
+	FILE *raw_file = fopen(recording_path, "rb");
+
+	//Opens nbest file.
+	FILE *nbest_file = fopen(nbest_file_path, "a"); 
+
+	//Decoder must be initialized prior to calling this function. 
+	if (!ps) {
+		printf("Decoder not initialized! Call sphinx_init prior to using this function."); 
+		
+		return -1; 
+	}
+
+	//Checks for IO errors. 
+	if (!nbest_file) {
+		printf("Problem opening nbest file! Tried to open in append mode, did you create file?"); 
+
+		return -1; 
+	}
+
+	if (!raw_file) {
+		printf("Error opening recording file!"); 
+		
+		return -1; 
+	}
+
+	//Decodes phrase and gets n-best hypotheses.  
+	ps_decode_raw(ps, raw_file, -1);
+	nbest = ps_nbest(ps);
+
+	//Writes pound to delimit new phrase as well as its ground truth. 
+	fprintf(nbest_file, "#%s\n", phrase);	
+
+	int num = 0; 
+
+	//Gets n hypotheses (or as many as possible if there are less than n available). 
+	while ((num < n) && nbest && (nbest = ps_nbest_next(nbest))) {	
+		//Gets next hypothesis and writes it.  
+		hyp = ps_nbest_hyp(nbest, &score);
+		fprintf(nbest_file, "%s;%d\n", hyp, score); 
+
+		num++; 
+	}
+
+	//Frees nbest memory.  
+	if (nbest)
+	    ps_nbest_free(nbest);	
+
+	//Closes files. 
+	fclose(nbest_file); 
+	fclose(raw_file); 
+
+	return 0; 
 }

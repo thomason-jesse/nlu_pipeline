@@ -8,3 +8,6 @@ include_directories(/scratch/cluster/rcorona/nlu_pipeline/src/speech/sphinx/sphi
 include_directories(/scratch/cluster/rcorona/nlu_pipeline/src/speech/sphinx/sphinx_builds/pocketsphinx_install/include/pocketsphinx)
 
 add_library(sphinx SHARED /scratch/cluster/rcorona/nlu_pipeline/src/speech/sphinx/src/sphinx.c)
+
+target_link_libraries(sphinx /scratch/cluster/rcorona/nlu_pipeline/src/speech/sphinx/sphinx_builds/sphinxbase_install/lib/libsphinxbase.so)
+target_link_libraries(sphinx /scratch/cluster/rcorona/nlu_pipeline/src/speech/sphinx/sphinx_builds/pocketsphinx_install/lib/libpocketsphinx.so)

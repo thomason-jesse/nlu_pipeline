@@ -41,20 +41,12 @@
 #include <fcntl.h>
 
 //Initializes sphinx. 
-ps_decoder_t* sphinx_init(const char* ac, const char* lm, const char* dict);
+void sphinx_init(const char* ac, const char* lm, const char* dict);
 
-/*
 //Frees everything allocated by sphinx. 
-void sphinx_close(ps_decoder_t* ps); 
-
-//Interrupts sphinx to exit program. 
-void sphinx_interrupt(); 
+void sphinx_close(); 
 
 //Gets nbest hypothesis of utterance in file. 
-int sphinx_n_best_f(const char *recording, const char* recordings_dir, const char* results_dir, int n, ps_decoder_t* ps);
-
-//Gets nbest hypothesis of utterance from mic. 
-int sphinx_n_best_m(int n); 
-*/
+int sphinx_n_best(const char *phrase, const char *recording_path, const char *nbest_file_path, int n);
 
 #endif
