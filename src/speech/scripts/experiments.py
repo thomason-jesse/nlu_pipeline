@@ -33,6 +33,11 @@ import ctypes
 import os
 import sys
 
+#Adds nlu_pipeline src folder in order to import modules from it. 
+sys.path.append('/scratch/cluster/rcorona/nlu_pipeline/src/')
+
+import CKYParser
+
 """
 This class is used to perform experiments with the
 Sphinx ASR system, such as getting an n-best hypothesis list. 
@@ -85,6 +90,14 @@ class SphinxExperiment:
 
             #Runs Sphinx ASR on it to get n-best hypotheses. 
             self.lib_handle.sphinx_n_best(ctypes.c_char_p(phrase), ctypes.c_char_p(recording_file_name), ctypes.c_char_p(nbest_result_file_name), ctypes.c_int(n))
+
+"""
+This method takes a file with n results
+from speech recognition and re-ranks them
+using the CKYParser class. 
+"""
+def re_rank_CKY():
+    pass #TODO
 
 """
 Prints the usage for all the functions
