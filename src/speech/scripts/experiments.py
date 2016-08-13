@@ -96,26 +96,48 @@ This method takes a file with n results
 from speech recognition and re-ranks them
 using the CKYParser class. 
 """
-def re_rank_CKY():
-    pass #TODO
+def re_rank_CKY(nbest_file_name, re_ranked_file_name):
+    nbest_file = open(nbest_file_name, 'r')
+
+    #Keeps track of data. 
+    data = []
+    hypotheses = None
+    phrase = None
+
+    for line in nbest_file:
+        #Delimits new phrase. 
+        if line.startswith('#'):
+            #Adds last phrase and hypotheses if it exists. 
+            if not (hypotheses == None or phrase == None):
+                data.append([phrase, hypotheses])
+
+            phrase = line.strip().split('#')[1]
+            
+            #Starts new list of hypotheses. 
+            hypotheses = []
+        else: 
+            hypotheses.append(line.strip())
+        
+    
+    
 
 """
 Prints the usage for all the functions
-offered by the script. 
-"""
-def print_usage():
-    print 'ASR Nbest: ./experiments asr_n_best [sphinx_shared_library] [ac_model] [lm] [dict] [test_file] [nbest_file] [n]'
+conducting ASR experiments, such as getting
+the n-best hypothesis from Spinx, re-ranking,
+etc. 
 
-if __name__ == '__main__':
-    if not len(sys.argv) == 9:
-        print_usage()
+Usage
+--------
+ASR Nbest: ./experiments asr_n_best [sphinx_shared_library] [ac_model] [lm] [dict] [test_file] [nbest_file] [n]
 
-    elif sys.argv[1] == 'asr_n_best':
-        #Runs sphinx ASR experiment. 
-        sphinx = SphinxExperiment(sys.argv[2])
-        sphinx.init_decoder(sys.argv[3], sys.argv[4], sys.argv[5])
-        sphinx.n_best(sys.argv[6], sys.argv[7], int(sys.argv[8]))
-        sphinx.close_decoder()
+    Parameters:
+        sphinx_shared_library       - Path to the shared library which contains all the functions from sphinx, which
+                                      this script wraps. 
 
-    else: 
-        print_usage()
+        ac_model                    - Path to the acoustic model you wish to use. 
+
+        lm                          - Path to the language model you would like to use. 
+
+        dict                        - Path to the dictionary file you would like to use. 
+
