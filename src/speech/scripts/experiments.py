@@ -167,7 +167,12 @@ def re_rank_CKY(nbest_file_name, re_ranked_file_name, parser_path):
             elif tokenized_hypothesis in scores:
                 parse_score = scores[tokenized_hypothesis]
             else:
-                parse_score = parser.most_likely_cky_parse(tokenized_hypothesis).next()[1]
+                #Some times parser suffers an error. 
+                try:
+                    parse_score = parser.most_likely_cky_parse(tokenized_hypothesis).next()[1]
+                except TypeError:
+                    parse_score = float('-inf')
+                    
                 scores[tokenized_hypothesis] = parse_score
             
             hypotheses.append([hypothesis, parse_score])
