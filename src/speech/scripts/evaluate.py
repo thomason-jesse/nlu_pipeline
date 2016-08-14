@@ -15,6 +15,17 @@ WER: ./evaluate.py wer [result_file] [evaluation_file_name]
         evaluation_file_name    - The file in which to write the result
                                   of the evaluation to. 
 
+Correct hypothesis in top n: ./evaluate.py top_n [result_file] [evaluation_file_name] [n]
+
+    Parameters: 
+        
+        result_file             - The file to evaluate. 
+
+        evaluation_file_name    - The file in which to write the result
+                                  of the evaluation. 
+
+        n                       - The number of hypotheses to consider for each phrase. 
+
 Author: Rodolfo Corona, rcorona@utexas.edu
 """
 
@@ -80,8 +91,66 @@ def wer(result_file_name, evaluation_file_name):
     os.remove('hyp.txt')
     evaluation_file.close()
 
+def correct_in_top_n(result_file_name, evaluation_file_name, n):
+    result_file = open(result_file_name, 'r')
+
+    #Casts in case still in string form. 
+    n = int(n)
+
+    #Reads in data. 
+    data = []
+    line = None
+
+    while not line == '':
+        line = result_file.readline()
+
+        #Pound delimits phrase. 
+        if line.startswith('#'):
+            phrase = line.strip().split('#')[1]
+            hypotheses = []
+
+
+            #Reads in n top scoring hypotheses. 
+            for i in range(n):
+                line = result_file.readline().strip()
+
+                hypothesis = line.split(';')[0]
+                hypotheses.append(hypothesis)
+
+            data.append([phrase, hypotheses])
+
+    #Counters for evaluation metric. 
+    total_phrases = len(data)
+    num_correct = 0
+
+    for data_point in data:
+        phrase = data_point[0]
+        hypotheses = data_point[1]
+        correct_present = False
+
+        #Looks for correct phrase in hypotheses. 
+        for hypothesis in hypotheses:
+            if hypothesis == phrase:
+                correct_present = True
+
+        if correct_present:
+            num_correct += 1
+
+    #Gets accuracy. 
+    percent_correct = float(num_correct) / float(total_phrases)
+
+    #Writes result of evaluations. 
+    evaluation_file = open(evaluation_file_name, 'w')
+
+    evaluation_file.write('NUM PHRASES: ' + str(total_phrases) + '\n')
+    evaluation_file.write('NUM CORRECT WITHIN ' + str(n) + ' HYPOTHESES: ' + str(num_correct) + '\n')
+    evaluation_file.write('ACCURACY: ' + str(percent_correct) + '\n')
+
+    evaluation_file.close()
+
 def print_usage():
     print 'WER: ./evaluate.py wer [result_file] [evaluation_file_name]'
+    print 'Correct hypothesis in top n: ./evaluate.py top_n [result_file] [evaluation_file_name] [n]'
 
 if __name__ == '__main__':
     if not len(sys.argv) >= 2:
@@ -92,6 +161,12 @@ if __name__ == '__main__':
             print_usage()
         else:
             wer(sys.argv[2], sys.argv[3])
+
+    elif sys.argv[1] == 'top_n':
+        if not len(sys.argv) == 5:
+            print_usage()
+        else:
+            correct_in_top_n(sys.argv[2], sys.argv[3], sys.argv[4])
 
     else:
         print_usage()
