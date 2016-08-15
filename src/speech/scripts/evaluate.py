@@ -69,9 +69,14 @@ def wer(result_file_name, evaluation_file_name):
     transcript_file = open('transcripts.txt', 'w')
     hyp_file = open('hyp.txt', 'w')
 
+    #Used for naming phrases, needed by wer script. 
+    count = 0
+
     for data_point in data:
-        transcript_file.write(data_point[0] + '\n')
-        hyp_file.write(data_point[1] + '\n')
+        transcript_file.write(data_point[0] + ' (phrase' + str(count) + ')\n')
+        hyp_file.write(data_point[1] + ' (phrase' + str(count) + ')\n')
+
+        count += 1
 
     #Closes files so they may be read by WER evaluation script. 
     transcript_file.close()
@@ -87,8 +92,8 @@ def wer(result_file_name, evaluation_file_name):
     subprocess.call(args, stdout=evaluation_file, stderr=evaluation_file)
 
     #Deletes temp files and closes evaluation. 
-    os.remove('transcripts.txt')
-    os.remove('hyp.txt')
+#os.remove('transcripts.txt')
+#os.remove('hyp.txt')
     evaluation_file.close()
 
 def correct_in_top_n(result_file_name, evaluation_file_name, n):
