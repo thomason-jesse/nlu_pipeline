@@ -55,4 +55,23 @@ def visualize_cross_folds_wer(folds_experiment_directory, experiment_name):
 
     print word_error_rates
 
-    sys.exit()            
+    sys.exit()
+
+"""
+Prints the usage for the script. 
+"""
+def print_usage():
+    print  'Visualize WER: ./visualize wer [folds_experiment_folder] [experiment_name]'
+
+if __name__ == '__main__':
+    if not len(sys.argv) >= 2:
+        print_usage()
+
+    elif sys.argv[1] == 'wer':
+        if len(sys.argv) == 4:
+            visualize_cross_folds_wer(sys.argv[2], sys.argv[3])
+        else:
+            print_usage()
+
+    else:
+        print_usage()
