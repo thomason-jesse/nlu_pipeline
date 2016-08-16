@@ -9,6 +9,11 @@ Author: Rodolfo Corona, rcorona@utexas.edu
 
 import os
 import sys
+import matplotlib.pyplot as plt
+import numpy as np
+
+#More descriptive labels for experiment types. 
+experiment_types = {'nbest': 'Sphinx ASR', 'cky': 'Parser Re-ranking'}
 
 """
 This function extracts the WER rate 
@@ -53,9 +58,37 @@ def visualize_cross_folds_wer(folds_experiment_directory, experiment_name):
 
                 word_error_rates[exp_type].append(wer)
 
-    print word_error_rates
+    #Calculates averages for each experiment type and keeps track of its label.
+    averages = []
+    labels = []
 
-    sys.exit()
+    for experiment_type in word_error_rates:
+        averages.append(sum(word_error_rates[experiment_type]) / len(word_error_rates[experiment_type]))
+        labels.append(experiment_types[experiment_type])
+
+    averages = tuple(averages)
+    labels = tuple(labels)
+
+    #Visualizes them using pyplot. 
+    indeces = np.arange(len([element for element in averages]))
+    width = 0.35
+
+    fig, ax = plt.subplots()
+
+    #Builds a bar for each average. 
+    bars = ax.bar(indeces, averages, width, color = 'r')
+
+    #Sets labels.
+    ax.set_title('Word Error Rates on test set ' + experiment_name)
+    
+    ax.set_xticks(indeces + (width / 2))
+    ax.set_xticklabels(labels)
+
+    ax.set_xlabel('Experiment Type')
+    ax.set_ylabel('WER')
+
+    plt.show()
+
 
 """
 Prints the usage for the script. 
