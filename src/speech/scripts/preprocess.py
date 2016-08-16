@@ -327,6 +327,14 @@ def make_exp_dir_structure(exp_dir):
     #Result files from running ASR on test files. 
     make_dir(exp_dir + '/experiments/asr/result_files')
 
+    #Keeps files resulting from evaluating experiment results. 
+    make_dir(exp_dir + '/evaluations')
+
+    #Adds directories for all experiment types.
+    make_dir(exp_dir + '/evaluations/wer')
+    make_dir(exp_dir + '/evaluations/top_1')
+    make_dir(exp_dir + '/evaluations/top_5')
+
 """
 Takes a corpus folder and creates a
 new corpus from it by splitting it
