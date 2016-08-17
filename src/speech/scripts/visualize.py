@@ -85,7 +85,7 @@ def visualize_cross_folds_wer(folds_experiment_directory, experiment_name):
     ax.set_yticks(yticks)
 
     #Sets labels.
-    ax.set_title('Word Error Rates on test set ' + experiment_name)
+    ax.set_title('Avg. Word Error Rate on Test Set ' + experiment_name + ' Across 4 Folds')
     
     ax.set_xticks(indeces + (width / 2))
     ax.set_xticklabels(labels)
@@ -162,7 +162,7 @@ def visualize_cross_folds_top_n(folds_experiment_directory, experiment_name, n):
     ax.set_yticks(yticks)
 
     #Sets labels.
-    ax.set_title('Percent of phrases with correct hyp in top ' + str(n) + ' results for test set ' + experiment_name)
+    ax.set_title('Avg. Percent of Phrases with Correct Hyp in Top ' + str(n) + ' Hypotheses for Test Set ' + experiment_name + ' Across 4 Folds')
     
     ax.set_xticks(indeces + (width / 2))
     ax.set_xticklabels(labels)
