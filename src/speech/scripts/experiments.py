@@ -37,8 +37,15 @@ import sys
 nlu_pipeline_path = '/home/rcorona/Desktop/UTCS/nlu_pipeline/src/'
 sys.path.append(nlu_pipeline_path)
 
-import CKYParser
-from utils import *
+#Nlu pipeline modules.
+try:
+    import CKYParser
+    from utils import *
+except ImportError:
+    print 'ERROR: Unable to load nlu_pipeline_modules! Verify that nlu_pipeline_path is set correctly!'
+    sys.exit()
+
+
 
 """
 This class is used to perform experiments with the

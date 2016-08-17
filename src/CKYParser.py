@@ -44,6 +44,28 @@ class Parameters:
         # print "lexicon_entry: "+str(self.lexicon_entry_given_token)  # DEBUG
         # print "semantic: "+str(self.semantic)  # DEBUG
 
+    #Prints a dictionarie's values in a more formatted way. 
+    def print_dict(self, title, dictionary):
+        print title
+        print '#--------------------'
+
+        for value in dictionary:
+            print str(value) + ': ' + str(dictionary[value])
+
+        print ''
+
+    #Prints the model's parameters. 
+    def print_parameters(self):
+        self.print_dict("_CCG_given_token_counts", self._CCG_given_token_counts)
+        self.print_dict("_CCG_production_counts", self._CCG_production_counts)
+        self.print_dict("_lexicon_entry_counts", self._lexicon_entry_given_token_counts)
+        self.print_dict("_semantic_counts", self._semantic_counts)
+        self.print_dict("token_given_token", self.token_given_token)
+        self.print_dict("CCG_given_token", self.CCG_given_token)
+        self.print_dict("CCG_production", self.CCG_production)
+        self.print_dict("lexicon_entry_given_token", self.lexicon_entry_given_token)
+        self.print_dict("semantic", self.semantic)
+
     # update the probability tables given counts
     def update_probabilities(self):
 
@@ -419,6 +441,9 @@ class CKYParser:
 
         # cache
         self.cached_combinations = {}  # indexed by left, then right node, value at result
+
+    def print_parameters(self):
+        self.theta.print_parameters()
 
     # access language model parameters to get a language score for a given parse node y
     # parse node leaves with string semantic forms are assumed to be unknown tokens
