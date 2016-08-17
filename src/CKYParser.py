@@ -49,8 +49,12 @@ class Parameters:
         print title
         print '#--------------------'
 
-        for value in dictionary:
-            print str(value) + ': ' + str(dictionary[value])
+        import operator
+
+        sorted_dict = sorted(dictionary.items(), key=operator.itemgetter(1), reverse=True)
+
+        for datum in sorted_dict:
+            print str(datum[0]) + ': ' + str(datum[1])
 
         print ''
 
