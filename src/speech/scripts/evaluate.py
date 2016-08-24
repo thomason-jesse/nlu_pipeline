@@ -56,7 +56,7 @@ def wer(result_file_name, evaluation_file_name):
 
         #Pound delimits phrase. 
         if line.startswith('#'):
-            phrase = line.strip().split('#')[1]
+            phrase = line.strip().split('#')[1].split(';')[0]
 
             #Line immediately after phrase is top scoring hypothesis. 
             line = result_file.readline().strip()
@@ -111,7 +111,7 @@ def correct_in_top_n(result_file_name, evaluation_file_name, n):
 
         #Pound delimits phrase. 
         if line.startswith('#'):
-            phrase = line.strip().split('#')[1]
+            phrase = line.strip().split('#')[1].split(';')[0]
             hypotheses = []
 
 

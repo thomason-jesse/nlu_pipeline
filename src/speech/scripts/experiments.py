@@ -98,10 +98,13 @@ class SphinxExperiment:
         #Gets nbest hypotheses for each phrase in test file. 
         for line in test_file:
             #Gets phrase and pertinent recording file name from line. 
-            phrase, _, _, recording_file_name = line.strip().split(';')
+            phrase, semantic_form, denotation, recording_file_name = line.strip().split(';')
+
+            #Formats ground truth to feed to Sphinx. 
+            ground_truth = ';'.join([phrase, semantic_form, denotation])
 
             #Runs Sphinx ASR on it to get n-best hypotheses. 
-            self.lib_handle.sphinx_n_best(ctypes.c_char_p(phrase), ctypes.c_char_p(recording_file_name), ctypes.c_char_p(nbest_result_file_name), ctypes.c_int(n))
+            self.lib_handle.sphinx_n_best(ctypes.c_char_p(ground_truth), ctypes.c_char_p(recording_file_name), ctypes.c_char_p(nbest_result_file_name), ctypes.c_int(n))
 
 ###############################################################################
 ######################### Parser re-ranking functions #########################
@@ -146,7 +149,7 @@ def re_rank_CKY(nbest_file_name, re_ranked_file_name, parser_path):
     #Keeps track of data. 
     data = []
     hypotheses = None
-    phrase = None
+    ground_truth = None
     parse_score = None
 
     #Keeps track of phrases which have already been scored to speed up process. 
@@ -156,10 +159,10 @@ def re_rank_CKY(nbest_file_name, re_ranked_file_name, parser_path):
         #Delimits new phrase. 
         if line.startswith('#'):
             #Adds last phrase and hypotheses if it exists. 
-            if not (hypotheses == None or phrase == None or parse_score == None):
+            if not (hypotheses == None or ground_truth == None or parse_score == None):
                 data.append([phrase, hypotheses])
 
-            phrase = line.strip().split('#')[1]
+            ground_truth = line.strip().split('#')[1]
             
             #Starts new list of hypotheses. 
             hypotheses = []
