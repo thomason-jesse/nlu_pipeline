@@ -11,16 +11,16 @@ neg_inf = float('-inf')
 
 
 class Parameters:
-    def __init__(self, ont, lex, use_language_model=False):
+    def __init__(self, ont, lex, use_language_model=False, lexicon_weight=1.0):
         self.ontology = ont
         self.lexicon = lex
         self.use_language_model = use_language_model
 
         # get initial count data structures
         self._token_given_token_counts = {}
-        self._CCG_given_token_counts = self.init_ccg_given_token()
-        self._CCG_production_counts = self.init_ccg_production()
-        self._lexicon_entry_given_token_counts = self.init_lexicon_entry()
+        self._CCG_given_token_counts = self.init_ccg_given_token(lexicon_weight)
+        self._CCG_production_counts = self.init_ccg_production(lexicon_weight)
+        self._lexicon_entry_given_token_counts = self.init_lexicon_entry(lexicon_weight)
         self._semantic_counts = {}
 
         # print "_CCG_given_token_counts: "+str(self._CCG_given_token_counts)  # DEBUG
@@ -45,29 +45,54 @@ class Parameters:
         # print "semantic: "+str(self.semantic)  # DEBUG
 
     #Prints a dictionarie's values in a more formatted way. 
-    def print_dict(self, title, dictionary):
+    def print_dict(self, title, dictionary, decoding_keys=None):
         print title
         print '#--------------------'
 
         import operator
 
+        #Sorts dictionary by value in descending order. 
         sorted_dict = sorted(dictionary.items(), key=operator.itemgetter(1), reverse=True)
 
         for datum in sorted_dict:
-            print str(datum[0]) + ': ' + str(datum[1])
+            indeces = datum[0]
+
+            if not decoding_keys == None:
+                decode_list = []
+
+                #There must be the same number of decoding keys as indeces in the data. 
+                for i in range(len(indeces)):
+                    try:
+                        decode_list.append(decoding_keys[i][indeces[i]])
+                    except KeyError:
+                        decode_list.append(indeces[i])
+
+                indeces = tuple(decode_list)
+
+            print str(indeces) + ': ' + str(datum[1])
 
         print ''
 
     #Prints the model's parameters. 
     def print_parameters(self):
+        index_to_surface_form = {}
+
+        for surface_form in self.lexicon.surface_forms:
+            index_to_surface_form[self.lexicon.surface_forms.index(surface_form)] = surface_form
+
+        lexicon_entries = {}
+
+        for entry in self.lexicon.entries:
+            lexicon_entries[self.lexicon.entries.index(entry)] = entry
+
         self.print_dict("_CCG_given_token_counts", self._CCG_given_token_counts)
         self.print_dict("_CCG_production_counts", self._CCG_production_counts)
         self.print_dict("_lexicon_entry_counts", self._lexicon_entry_given_token_counts)
         self.print_dict("_semantic_counts", self._semantic_counts)
-        self.print_dict("token_given_token", self.token_given_token)
-        self.print_dict("CCG_given_token", self.CCG_given_token)
+        self.print_dict("token_given_token", self.token_given_token, [index_to_surface_form, index_to_surface_form])
+        self.print_dict("CCG_given_token", self.CCG_given_token, [{}, index_to_surface_form])
         self.print_dict("CCG_production", self.CCG_production)
-        self.print_dict("lexicon_entry_given_token", self.lexicon_entry_given_token)
+        self.print_dict("lexicon_entry_given_token", self.lexicon_entry_given_token, [lexicon_entries, index_to_surface_form])
         self.print_dict("semantic", self.semantic)
 
     # update the probability tables given counts
@@ -185,13 +210,13 @@ class Parameters:
                     math.log(1.0/len(language_model_surface_forms))+min_token_given_token
 
     # indexed by (categories idx, surface forms idx), value parameter weight
-    def init_ccg_given_token(self):
-        return {(self.lexicon.semantic_forms[sem_idx].category, sf_idx): 1.0
+    def init_ccg_given_token(self, lexicon_weight):
+        return {(self.lexicon.semantic_forms[sem_idx].category, sf_idx): lexicon_weight
                 for sf_idx in range(0, len(self.lexicon.entries))
                 for sem_idx in self.lexicon.entries[sf_idx]}
 
     # indexed by categories idxs (production, left, right), value parameter weight
-    def init_ccg_production(self):
+    def init_ccg_production(self, lexicon_weight):
         ccg_production = {}
         for cat_idx in range(0, len(self.lexicon.categories)):
 
@@ -204,16 +229,16 @@ class Parameters:
                 else:  # consumes to the right
                     r = child
                     l = self.lexicon.categories.index([cat_idx, d, child])
-                ccg_production[(cat_idx, l, r)] = 1.0
+                ccg_production[(cat_idx, l, r)] = lexicon_weight
 
             # add production rules of form X -> X X for X<>X=X (merge)
-            ccg_production[(cat_idx, cat_idx, cat_idx)] = 1.0
+            ccg_production[(cat_idx, cat_idx, cat_idx)] = 1.0 #doesn't use lexicon weight, just non-zero. 
 
         return ccg_production
 
     # indexed by (surface forms idx, semantic forms idx), value parameter weight
-    def init_lexicon_entry(self):
-        return {(sem_idx, sf_idx): 1.0
+    def init_lexicon_entry(self, lexicon_weight):
+        return {(sem_idx, sf_idx): lexicon_weight
                 for sf_idx in range(0, len(self.lexicon.entries))
                 for sem_idx in self.lexicon.entries[sf_idx]}
 
@@ -417,7 +442,7 @@ def count_ccg_surface_form_pairs(y):
 
 
 class CKYParser:
-    def __init__(self, ont, lex, use_language_model=False):
+    def __init__(self, ont, lex, use_language_model=False, lexicon_weight=1.0):
 
         # resources given on instantiation
         self.ontology = ont
@@ -429,7 +454,7 @@ class CKYParser:
         self.type_raise_bare_nouns()
 
         # model parameter values
-        self.theta = Parameters(ont, lex, use_language_model=use_language_model)
+        self.theta = Parameters(ont, lex, use_language_model=use_language_model, lexicon_weight=lexicon_weight)
 
         # additional linguistic information and parameters
         # TODO: read this from configuration files or have user specify it on instantiation
