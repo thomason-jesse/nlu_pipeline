@@ -160,7 +160,7 @@ def re_rank_CKY(nbest_file_name, re_ranked_file_name, parser_path):
         if line.startswith('#'):
             #Adds last phrase and hypotheses if it exists. 
             if not (hypotheses == None or ground_truth == None or parse_score == None):
-                data.append([phrase, hypotheses])
+                data.append([ground_truth, hypotheses])
 
             ground_truth = line.strip().split('#')[1]
             
@@ -188,18 +188,18 @@ def re_rank_CKY(nbest_file_name, re_ranked_file_name, parser_path):
             hypotheses.append([hypothesis, parse_score])
 
     #Reranks list.
-    for phrase_hyp_list in data:
-        phrase_hyp_list[1] = sorted(phrase_hyp_list[1], key=get_hyp_score, reverse=True)
+    for truth_hyp_list in data:
+        truth_hyp_list[1] = sorted(truth_hyp_list[1], key=get_hyp_score, reverse=True)
         
     #Writes re-ranked hypotheses to new file. 
     re_ranked_file = open(re_ranked_file_name, 'w')
     
-    for phrase_hyp_list in data:
+    for truth_hyp_list in data:
         #Writes ground truth phrase. 
-        re_ranked_file.write('#' + phrase_hyp_list[0] + '\n')
+        re_ranked_file.write('#' + truth_hyp_list[0] + '\n')
 
         #Writes hypotheses. 
-        for hypothesis in phrase_hyp_list[1]:
+        for hypothesis in truth_hyp_list[1]:
             re_ranked_file.write(hypothesis[0] + ';' + str(hypothesis[1]) + '\n')
 
     re_ranked_file.close()
