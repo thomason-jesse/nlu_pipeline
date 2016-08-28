@@ -34,7 +34,7 @@ import os
 import sys
 
 #Adds nlu_pipeline src folder in order to import modules from it. 
-nlu_pipeline_path = '/home/rcorona/Desktop/UTCS/nlu_pipeline/src/'
+nlu_pipeline_path = '/scratch/cluster/rcorona/nlu_pipeline/src/'
 sys.path.append(nlu_pipeline_path)
 
 #Nlu pipeline modules.

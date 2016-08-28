@@ -24,7 +24,7 @@ if __name__ == '__main__' :
     print "semantic forms: " + str(lex.semantic_forms)
     print "entries: " + str(lex.entries)
     
-    parser = CKYParser.CKYParser(ont, lex, use_language_model=True)
+    parser = CKYParser.CKYParser(ont, lex, use_language_model=True, lexicon_weight=100.0)
     
     # Set parser hyperparams to best known values for training
     parser.max_multiword_expression = 2  # max span of a multi-word expression to be considered during tokenization
