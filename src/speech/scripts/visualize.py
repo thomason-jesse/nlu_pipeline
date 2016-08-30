@@ -65,7 +65,11 @@ def visualize_cross_folds_wer(folds_experiment_directory, experiment_name):
 
     for experiment_type in word_error_rates:
         averages.append(sum(word_error_rates[experiment_type]) / len(word_error_rates[experiment_type]))
-        labels.append(experiment_types[experiment_type])
+        
+        if experiment_type in experiment_types:
+            labels.append(experiment_types[experiment_type])
+        else:
+            labels.append(experiment_type)
 
     averages = tuple(averages)
     labels = tuple(labels)
