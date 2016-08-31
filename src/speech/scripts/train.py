@@ -35,7 +35,10 @@ the given training file and saves it
 to the given parser_path using
 a given ontology and lexicon. 
 """
-def train_new_parser(parser_train_file, parser_path, ont_path, lex_path):
+def train_new_parser(parser_train_file, parser_path, ont_path, lex_path, lex_weight):
+    #Converts to ensure floating point and not string. 
+    lex_weight = float(lex_weight)
+
     #Instantiates ontology. 
     print "reading in Ontology"
     ont = Ontology.Ontology(ont_path)
@@ -52,7 +55,7 @@ def train_new_parser(parser_train_file, parser_path, ont_path, lex_path):
     print "entries: " + str(lex.entries)
     
     #Used to train new parser. 
-    parser = CKYParser.CKYParser(ont, lex, use_language_model=True)
+    parser = CKYParser.CKYParser(ont, lex, use_language_model=True, lexicon_weight=lex_weight)
     
     #Used to train existing parser on new data. 
     #parser = load_obj_general(sys.argv[5])
@@ -187,7 +190,7 @@ def adapt_accoustic_model(acoustic_model_path, corpus_folder, recordings_dir, di
 
 
 def print_usage():
-    print 'To train new parser: ./train.py new_parser [parser_train_file] [parser_save_path] [ont_path] [lex_path]'
+    print 'To train new parser: ./train.py new_parser [parser_train_file] [parser_save_path] [ont_path] [lex_path] [lex_weight]'
     print 'To train new language model: ./train.py new_lm [lm_train_file] [lm_save_path]'
     print 'To adapt an accoustic model: ./train.py adapt_ac_model [accoustic_model_path] [corpus_folder] [recordings_dir] [dict_path]'
 
@@ -197,10 +200,10 @@ if __name__ == '__main__':
     
     #Train new parser case. 
     elif sys.argv[1] == 'new_parser':
-        if not len(sys.argv) == 6:
+        if not len(sys.argv) == 7:
             print_usage()
         else:
-            train_new_parser(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
+            train_new_parser(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6])
 
     #Train a new language model. 
     elif sys.argv[1] == 'new_lm':
