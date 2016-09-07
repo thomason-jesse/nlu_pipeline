@@ -143,8 +143,8 @@ found within given constraints.
 NOTE: Expects phrase to already be tokenized for parser. 
 """
 def get_first_valid_parse(phrase, parser, num_max_phrases=20):
-    if len(response) == 0 :
-            return None
+    if len(phrase) == 0 :
+        return (None, float('-inf'))
 
     #TODO Consider adding check for number of unknown words. 
 
@@ -165,18 +165,23 @@ def get_first_valid_parse(phrase, parser, num_max_phrases=20):
                 # Lambda headed parses are very unlikely to be correct. Drop them
                 continue
                 
-            top_level_category = self.parser.lexicon.categories[parse.node.category]
+            top_level_category = parser.lexicon.categories[parse.node.category]
                
             # M - imperative (full action), C - confirmation, NP - noun phrase for params
             if not top_level_category == 'M':
                 continue
-           
-            #Valid parse found. 
+          
+            elif parser.print_parse(parse.node).startswith('and'):
+                continue
+
+            #Valid parse found.
             return (parse, score)
         
     except (KeyboardInterrupt, SystemExit):
         raise
-        
+
+    """
+    Might need this to handle other errors???
     except:
         error = str(sys.exc_info()[0])
             
@@ -187,9 +192,10 @@ def get_first_valid_parse(phrase, parser, num_max_phrases=20):
             self.error_log.flush() 
        
         print traceback.format_exc()
-            
+    """
+
     #No valid parse found within beam. 
-    return None
+    return (None, float('-inf'))
 
 """
 This method takes a file with n results
@@ -240,8 +246,7 @@ def re_rank_CKY(nbest_file_name, re_ranked_file_name, parser_path):
                     parse = (None, float('-inf'))
                     
                 parses[tokenized_hypothesis] = parse
-           
-            print [hypothesis, parse]
+          
             hypotheses.append([hypothesis, parse])
 
     #Reranks list.
@@ -257,10 +262,17 @@ def re_rank_CKY(nbest_file_name, re_ranked_file_name, parser_path):
 
         #Writes hypotheses. 
         for hypothesis in truth_hyp_list[1]:
-            #Prepares hypothesis string for writing. 
-            hyp_str = hypothesis[0] + ';'                           #The hypothesis phrase string itself. 
-            hyp_str += parser.print_parse(hypothesis[1][0]) + ';'   #The hypothesis' parse semantic form. 
-            hyp_str += str(hypothesis[1][1]) + '\n'                 #The parse's score. 
+            #The hypothesis phrase string itself.
+            hyp_str = hypothesis[0] + ';'                            
+            
+            #The hypothesis' parse semantic form. 
+            if not hypothesis[1] == None:
+                hyp_str += parser.print_parse(hypothesis[1][0]) + ';'
+            else:
+                hyp_str += "None"
+
+            #The parse's score. 
+            hyp_str += str(hypothesis[1][1]) + '\n'
 
             re_ranked_file.write(hyp_str)
 
