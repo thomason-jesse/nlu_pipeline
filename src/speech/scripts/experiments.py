@@ -266,10 +266,10 @@ def re_rank_CKY(nbest_file_name, re_ranked_file_name, parser_path):
             hyp_str = hypothesis[0] + ';'                            
             
             #The hypothesis' parse semantic form. 
-            if not hypothesis[1] == None:
-                hyp_str += parser.print_parse(hypothesis[1][0]) + ';'
+            if not hypothesis[1][0] == None:
+                hyp_str += parser.print_parse(hypothesis[1][0].node) + ';'
             else:
-                hyp_str += "None"
+                hyp_str += "None;"
 
             #The parse's score. 
             hyp_str += str(hypothesis[1][1]) + '\n'
