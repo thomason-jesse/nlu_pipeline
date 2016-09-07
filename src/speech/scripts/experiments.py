@@ -26,7 +26,7 @@ ASR Nbest: ./experiments asr_n_best [sphinx_shared_library] [ac_model] [lm] [dic
 
         n                           - The number of hypotheses to generate per phrase in the test file. 
 
-Author: Rodolfo Corona, rcorona@utexas.edu
+Author(s): Rodolfo Corona, rcorona@utexas.edu | Aishwarya Padmakumar, aish@cs.utexas.edu
 """
 
 import ctypes
@@ -133,7 +133,63 @@ Gets score of hypothesis element.
 Used for re-ranking. 
 """
 def get_hyp_score(hypothesis):
-    return hypothesis[1]
+    return hypothesis[1][1]
+
+"""
+Returns the best valid parse found given a parser
+and a phrase. Returns None if no valid parse is 
+found within given constraints.
+
+NOTE: Expects phrase to already be tokenized for parser. 
+"""
+def get_first_valid_parse(phrase, parser, num_max_phrases=20):
+    if len(response) == 0 :
+            return None
+
+    #TODO Consider adding check for number of unknown words. 
+
+    try:    
+        parse_generator = parser.most_likely_cky_parse(phrase)
+        num_parses_examined = 0
+            
+        for (parse, score, _) in parse_generator:
+            num_parses_examined += 1
+                
+            if num_parses_examined == num_max_phrases:
+                break
+           
+            elif parse is None:
+                break
+                
+            elif parse.node.is_lambda and parse.node.is_lambda_instantiation :
+                # Lambda headed parses are very unlikely to be correct. Drop them
+                continue
+                
+            top_level_category = self.parser.lexicon.categories[parse.node.category]
+               
+            # M - imperative (full action), C - confirmation, NP - noun phrase for params
+            if not top_level_category == 'M':
+                continue
+           
+            #Valid parse found. 
+            return (parse, score)
+        
+    except (KeyboardInterrupt, SystemExit):
+        raise
+        
+    except:
+        error = str(sys.exc_info()[0])
+            
+        if self.error_log is not None :
+            self.error_log.write('Parser error for string: ' + response)
+            self.error_log.write(error + '\n')
+            self.error_log.write(traceback.format_exc() + '\n\n\n')
+            self.error_log.flush() 
+       
+        print traceback.format_exc()
+            
+    #No valid parse found within beam. 
+    return None
 
 """
 This method takes a file with n results
@@ -153,13 +209,13 @@ def re_rank_CKY(nbest_file_name, re_ranked_file_name, parser_path):
     parse_score = None
 
     #Keeps track of phrases which have already been scored to speed up process. 
-    scores = {}
+    parses = {}
 
     for line in nbest_file:
         #Delimits new phrase. 
         if line.startswith('#'):
             #Adds last phrase and hypotheses if it exists. 
-            if not (hypotheses == None or ground_truth == None or parse_score == None):
+            if not (hypotheses == None or ground_truth == None or parse == None):
                 data.append([ground_truth, hypotheses])
 
             ground_truth = line.strip().split('#')[1]
@@ -173,19 +229,20 @@ def re_rank_CKY(nbest_file_name, re_ranked_file_name, parser_path):
 
             #Hypotheses greater than 7 tokens in length are not considered. 
             if len(tokenized_hypothesis.split()) > 7:
-                parse_score = float('-inf')
-            elif tokenized_hypothesis in scores:
-                parse_score = scores[tokenized_hypothesis]
+                parse_score = (None, float('-inf'))
+            elif tokenized_hypothesis in parses:
+                parse = parses[tokenized_hypothesis]
             else:
                 #Some times parser suffers an error. 
                 try:
-                    parse_score = parser.most_likely_cky_parse(tokenized_hypothesis).next()[1]
+                    parse = get_first_valid_parse(hypothesis, parser)
                 except TypeError:
-                    parse_score = float('-inf')
+                    parse = (None, float('-inf'))
                     
-                scores[tokenized_hypothesis] = parse_score
-            
-            hypotheses.append([hypothesis, parse_score])
+                parses[tokenized_hypothesis] = parse
+           
+            print [hypothesis, parse]
+            hypotheses.append([hypothesis, parse])
 
     #Reranks list.
     for truth_hyp_list in data:
@@ -200,7 +257,12 @@ def re_rank_CKY(nbest_file_name, re_ranked_file_name, parser_path):
 
         #Writes hypotheses. 
         for hypothesis in truth_hyp_list[1]:
-            re_ranked_file.write(hypothesis[0] + ';' + str(hypothesis[1]) + '\n')
+            #Prepares hypothesis string for writing. 
+            hyp_str = hypothesis[0] + ';'                           #The hypothesis phrase string itself. 
+            hyp_str += parser.print_parse(hypothesis[1][0]) + ';'   #The hypothesis' parse semantic form. 
+            hyp_str += str(hypothesis[1][1]) + '\n'                 #The parse's score. 
+
+            re_ranked_file.write(hyp_str)
 
     re_ranked_file.close()
 
