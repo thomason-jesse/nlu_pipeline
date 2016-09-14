@@ -451,7 +451,7 @@ class CKYParser:
 
         # type-raise bare nouns in lexicon
         self.type_raised = {}  # map from semantic form idx to their type-raised form idx
-        self.type_raise_bare_nouns()
+        #self.type_raise_bare_nouns() NOTE: Not currently needed for speech, consider re-adding this later if possible/wanted. 
 
         # model parameter values
         self.theta = Parameters(ont, lex, use_language_model=use_language_model, lexicon_weight=lexicon_weight)
