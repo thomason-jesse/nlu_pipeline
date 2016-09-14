@@ -63,13 +63,13 @@ kitchen:l
 #imp preds
 searchroom:<p,<l,a>>
 at:<l,a>
-bring:<p,<i,a>>
+bring:<i,<p,a>>
 speak_t:<t,a>
 speak_e:<p,a>
 walk:<l,a>
 
 #int preds
-possesses:<p,<i,t>>
+possesses:<l,<p,t>>
 office:<l,t>
 
 #Adjective preds.
@@ -193,10 +193,11 @@ and:<t,<t,t>>
 or:<t,<t,t>>
 not:<t,t>
 
-the:<<i,t>,i>
-the:<<l,t>,l>
+the_i:<<i,t>,i>
+the_l:<<l,t>,l>
+#the:<<l,t>,l>
 
 a:<<i,t>,i>
 
 equals:<i,<i,t>>
-equals:<l,<l,t>>
+#equals:<l,<l,t>>

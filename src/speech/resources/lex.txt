@@ -1,6 +1,7 @@
 #imperative
 search :- M/PP/NP : lambda r:l.(lambda x:p.(searchroom(x,r)))
 bring :- M/NP/NP : lambda y:p.(lambda x:i.(bring(x,y)))
+bring :- M/PP/NP : lambda y:i.(lambda x:p.(bring(y,x)))
 walk :- M/PP : lambda x:l.(at(x))
 
 #prepositional arguments to commands
@@ -22,18 +23,18 @@ no :- C : no
 none :- C : none
 
 #these are weird now bc there's some implicit knowledge in hasoffice that the second arg is an office
-'s office :- NP\NP : lambda y:p.(the(lambda x:l.(possesses(x,y))))
-office of :- N/NP : lambda y:p.(lambda x:l.(possesses(x,y)))
+'s office :- NP\NP : lambda x:p.(the_l(lambda y:l.(possesses(y,x))))
+office of :- N/NP : lambda x:p.(lambda y:l.(possesses(y,x)))
 
 #entity descriptor words
 #can be type-raised to N/N : lambda x:e.(pred(x))
-room :- N : room
-person :- N : person
-item :- N : item
+#room :- N : room
+#person :- N : person
+#item :- N : item
 
 #closed category
-the :- NP/(N/N) : lambda P:<l,t>.(the(lambda x:l.(P(x))))
-the :- NP/(N/N) : lambda P:<i,t>.(the(lambda x:i.(P(x))))
+the :- NP/(N/N) : lambda P:<l,t>.(the_l(lambda x:l.(P(x))))
+the :- NP/(N/N) : lambda P:<i,t>.(the_i(lambda x:i.(P(x))))
 
 a :- NP/(N/N) : lambda P:<i,t>.(a(lambda x:i.(P(x))))
 
