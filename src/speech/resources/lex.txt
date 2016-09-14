@@ -23,7 +23,7 @@ no :- C : no
 none :- C : none
 
 #these are weird now bc there's some implicit knowledge in hasoffice that the second arg is an office
-'s office :- NP\NP : lambda x:p.(the_l(lambda y:l.(possesses(y,x))))
+'s office :- NP\NP : lambda x:p.(the(lambda y:l.(possesses(y,x))))
 office of :- N/NP : lambda x:p.(lambda y:l.(possesses(y,x)))
 
 #entity descriptor words
@@ -33,8 +33,8 @@ office of :- N/NP : lambda x:p.(lambda y:l.(possesses(y,x)))
 #item :- N : item
 
 #closed category
-the :- NP/(N/N) : lambda P:<l,t>.(the_l(lambda x:l.(P(x))))
-the :- NP/(N/N) : lambda P:<i,t>.(the_i(lambda x:i.(P(x))))
+the :- NP/(N/N) : lambda P:<l,t>.(the(lambda x:l.(P(x))))
+#the :- NP/(N/N) : lambda P:<i,t>.(the_i(lambda x:i.(P(x))))
 
 a :- NP/(N/N) : lambda P:<i,t>.(a(lambda x:i.(P(x))))
 

@@ -193,8 +193,8 @@ and:<t,<t,t>>
 or:<t,<t,t>>
 not:<t,t>
 
-the_i:<<i,t>,i>
-the_l:<<l,t>,l>
+#the_i:<<i,t>,i>
+the:<<l,t>,l>
 #the:<<l,t>,l>
 
 a:<<i,t>,i>
