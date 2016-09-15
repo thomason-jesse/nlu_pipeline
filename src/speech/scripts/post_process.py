@@ -42,7 +42,7 @@ def populate_result_file_with_semantic_forms(result_file_name, test_file_name):
     for line in test_file: 
         phrase, semantic_form, _, _ = line.strip().split(';')
 
-        semantic_forms[phrase] = semantic_form
+        semantic_forms[phrase] = 'M : ' + add_type_constraints(semantic_form.replace('M : ', ''))
 
     #Creates temp file to write changes to. 
     result_file = open(result_file_name, 'r')
@@ -61,17 +61,59 @@ def populate_result_file_with_semantic_forms(result_file_name, test_file_name):
             else:
                 semantic_form = semantic_forms[phrase]
 
-            #If for some reason already contains semantic form, then does not add it. 
-            if not semantic_form in line:
-                #Writes edited ground  truth line. 
-                temp_file.write(line.strip() + ';' + semantic_forms[phrase] + '\n')
-            else:
-                temp_file.write(line)
+            #Writes edited ground  truth line. 
+            temp_file.write('#' + phrase + ';' + semantic_forms[phrase] + '\n')
         else:
             temp_file.write(line)
 
     #Moves temp file to overwrite result file. 
     os.rename('temp.txt', result_file_name)
+
+def add_type_constraints(semantic_form):
+    #Gets action and generates typed semantic form as necessary.
+    action = semantic_form.split('(')[0]
+
+    if action == 'walk':
+        first_element = semantic_form.split('(')[1]
+
+        #If not 'the', then must be a location, so keep semantic form intact. 
+        if not first_element == 'the':
+            new_semantic_form = semantic_form
+                
+        #Otherwise, is predicate, so replace generic e type with l (for location). 
+        else:
+            new_semantic_form = semantic_form.replace('lambda x:e', 'lambda x:l', 1)
+
+            #Currently only expects one lambda, so assert that this is in fact true. 
+            if 'lambda x:e' in new_semantic_form:
+                print "More than one lambda expression in walk command!: " + semantic_form + '\n'
+                sys.exit()
+
+    elif action == 'searchroom':
+        new_semantic_form = semantic_form
+
+        #Currently expects no lambda expressions, so assert this. 
+        if 'lambda' in new_semantic_form:
+            print "Lambda expression found in 'searchroom' command!: " + new_semantic_form + '\n'
+            sys.exit()
+
+    elif action == 'bring':
+        if 'lambda' in semantic_form:
+            #Replace generic 'e' type with item type 'i'. 
+            new_semantic_form = semantic_form.replace('lambda x:e', 'lambda x:i', 1)
+
+            #Currently only expects one lambda expression, so assert this. 
+            if 'lambda x:e' in new_semantic_form:
+                print "More than one lambda expression found in bring command!: " + semantic_form + '\n'
+                sys.exit()
+        else:
+            new_semantic_form = semantic_form
+    else:
+        print "Unaccounted for action!: " + action + '\n'
+        sys.exit()
+ 
+    #Returns typed semantic form.
+    return new_semantic_form
 
 def add_type_constraints_to_file(file_name): 
     old_file = open(file_name, 'r')
@@ -83,53 +125,15 @@ def add_type_constraints_to_file(file_name):
             tmp_file.write(line)
         else:
             #Gets generic semantic form. 
-            semantic_form = line.split('M : ')[1].strip() 
-            
-            #Gets action and generates typed semantic form as necessary.
-            action = semantic_form.split('(')[0]
-
-            if action == 'walk':
-                first_element = semantic_form.split('(')[1]
-
-                #If not 'the', then must be a location, so keep semantic form intact. 
-                if not first_element == 'the':
-                    new_semantic_form = semantic_form
-                
-                #Otherwise, is predicate, so replace generic e type with l (for location). 
-                else:
-                    new_semantic_form = semantic_form.replace('lambda x:e', 'lambda x:l', 1)
-
-                    #Currently only expects one lambda, so assert that this is in fact true. 
-                    if 'lambda x:e' in new_semantic_form:
-                        print "More than one lambda expression in walk command!: " + semantic_form + '\n'
-                        sys.exit()
-
-            elif action == 'searchroom':
-                new_semantic_form = semantic_form
-
-                #Currently expects no lambda expressions, so assert this. 
-                if 'lambda' in new_semantic_form:
-                    print "Lambda expression found in 'searchroom' command!: " + new_semantic_form + '\n'
-                    sys.exit()
-            elif action == 'bring':
-                if 'lambda' in semantic_form:
-                    #Replace generic 'e' type with item type 'i'. 
-                    new_semantic_form = semantic_form.replace('lambda x:e', 'lambda x:i', 1)
-
-                    #Currently only expects one lambda expression, so assert this. 
-                    if 'lambda x:e' in new_semantic_form:
-                        print "More than one lambda expression found in bring command!: " + semantic_form + '\n'
-                        sys.exit()
-                else:
-                    new_semantic_form = semantic_form
-            else:
-                print "Unaccounted for action!: " + action + '\n'
-                sys.exit()
-            
+            new_semantic_form = add_type_constraints(line.split('M : ')[1].strip()) 
+           
             #Writes new semantic form to new file. 
             tmp_file.write('M : ' + new_semantic_form + '\n')
 
     tmp_file.close()
+
+    #Overwrites old file with new one, now containing type constraints. 
+    os.rename('temp.txt', file_name)
 
 def print_usage():
     print 'To populate result file with semantic forms: ./post_process.py populate_semantic_forms [result_file_name] [test_file_name]'
