@@ -37,7 +37,10 @@ a given ontology and lexicon.
 """
 def train_new_parser(parser_train_file, parser_path, ont_path, lex_path, lex_weight):
     #Converts to ensure floating point and not string. 
-    lex_weight = float(lex_weight)
+    if lex_weight == 'sys.maxint':
+        lex_weight = sys.maxint
+    else:
+        lex_weight = float(lex_weight)
 
     #Instantiates ontology. 
     print "reading in Ontology"

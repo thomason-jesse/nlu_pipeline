@@ -34,7 +34,7 @@ import os
 import subprocess
 
 #Adds nlu_pipeline src folder in order to import modules from it. 
-nlu_pipeline_path = '/home/rcorona/catkin_ws/src/nlu_pipeline/src/'
+nlu_pipeline_path = '/scratch/cluster/rcorona/nlu_pipeline/src/'
 sys.path.append(nlu_pipeline_path)
 
 #Nlu pipeline modules.
@@ -184,7 +184,7 @@ def semantic_form(result_file_name, evaluation_file_name, parser_file):
 
             #Line immediately after phrase is top scoring hypothesis. 
             line = result_file.readline().strip()
-            hypothesis = line.split(';')[0]
+            hypothesis = line.split(';')
 
             data.append([semantic_form, hypothesis, phrase])
 
@@ -203,8 +203,13 @@ def semantic_form(result_file_name, evaluation_file_name, parser_file):
         #Gets semantic node from true semantic form. 
         true_node = parser.lexicon.read_semantic_form_from_str(true_semantic_form, None, None, [], False)
    
-        #Parses top hypothesis to get semantic node. 
-        hyp_node = parser.most_likely_cky_parse(hyp).next()[0].node
+        #Parses top hypothesis to get semantic node.
+        if len(hyp) == 2:
+            hyp_node = parser.most_likely_cky_parse(hyp[0]).next()[0].node
+        elif hyp[1] == "None":
+            continue
+        else:
+            hyp_node = parser.lexicon.read_semantic_form_from_str(hyp[1], None, None, [], False)
 
         #Evaluates equality. 
         if true_node == hyp_node:
@@ -218,7 +223,7 @@ def semantic_form(result_file_name, evaluation_file_name, parser_file):
         print "Ground truth semantic form: " + parser.print_parse(true_node)
         print ''
 
-        print "Hyp str: " + hyp 
+        print "Hyp str: " + hyp[0] 
         print "Hyp node: " + str(hyp_node)
         print "Hyp semantic form: " + parser.print_parse(hyp_node)
         print  ''
