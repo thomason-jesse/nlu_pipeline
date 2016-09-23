@@ -9,8 +9,15 @@ Author: Rodolfo Corona, rcorona@utexas.edu
 
 import os
 import sys
+
+#Forces matplotlib to not use visual display. 
+import matplotlib
+matplotlib.use('Agg')
+
 import matplotlib.pyplot as plt
 import numpy as np
+import error_analysis
+
 
 #More descriptive labels for experiment types. 
 experiment_types = {'nbest': 'Sphinx ASR', 'cky': 'Parser Re-ranking'}
@@ -176,6 +183,26 @@ def visualize_cross_folds_top_n(folds_experiment_directory, experiment_name, n):
 
     plt.show()
 
+"""
+Plots the cdf of correct hypotheses indeces
+in an experiment result file. 
+"""
+def visualize_correct_hyp_indeces(corpus_folder, exp_extension, cdf_file_name, percents_file_name):
+    #Counts correct hyps and their indeces and generates cdf for it. 
+    cdf, percent_increases = error_analysis.count_correct_hyp_indeces(corpus_folder, exp_extension)
+    
+    #First plots cdf. 
+    plt.plot(cdf[0], cdf[1])
+    plt.plot((10.0, 10.0), (0.0, 1.0))
+    plt.xlim((0.0, 500.0))
+    plt.savefig(cdf_file_name)
+    plt.close()
+
+    #Now percentage increases. 
+    plt.xticks(np.arange(0.0, 100.0, 10.0))
+    plt.plot(percent_increases[0], percent_increases[1])
+    plt.savefig(percents_file_name)
+    plt.close()
 
 
 """
@@ -184,6 +211,7 @@ Prints the usage for the script.
 def print_usage():
     print 'Visualize WER: ./visualize wer [folds_experiment_folder] [experiment_name]'
     print 'Visualize Top N results: ./visualize top_n [folds_experiment_folder] [experiment_name] [n]'
+    print 'Visualize Correct Hyp Indeces: ./visualize correct_hyp_indeces [folds_experiment_folder] [experiment ext] [cdf_file_name] [percent_increase_file_name]'
 
 if __name__ == '__main__':
     if not len(sys.argv) >= 2:
@@ -198,6 +226,12 @@ if __name__ == '__main__':
     elif sys.argv[1] == 'top_n':
         if len(sys.argv) == 5:
             visualize_cross_folds_top_n(sys.argv[2], sys.argv[3], sys.argv[4])
+        else:
+            print_usage()
+
+    elif sys.argv[1] == 'correct_hyp_indeces':
+        if len(sys.argv) == 6:
+            visualize_correct_hyp_indeces(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
         else:
             print_usage()
 

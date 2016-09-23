@@ -6,6 +6,7 @@ import operator
 import copy
 import ParseNode
 import SemanticNode
+import sys
 
 neg_inf = float('-inf')
 
@@ -19,6 +20,7 @@ class Parameters:
         # get initial count data structures
         self._token_given_token_counts = {}
         self._CCG_given_token_counts = self.init_ccg_given_token(lexicon_weight)
+
         self._CCG_production_counts = self.init_ccg_production(lexicon_weight)
         self._lexicon_entry_given_token_counts = self.init_lexicon_entry(lexicon_weight)
         self._semantic_counts = {}
@@ -85,12 +87,17 @@ class Parameters:
         for entry in self.lexicon.entries:
             lexicon_entries[self.lexicon.entries.index(entry)] = entry
 
-        self.print_dict("_CCG_given_token_counts", self._CCG_given_token_counts)
+        ccg_categories = {}
+
+        for entry in self._CCG_given_token_counts:
+            ccg_categories[entry[0]] = self.lexicon.compose_str_from_category(entry[0])
+
+        self.print_dict("_CCG_given_token_counts", self._CCG_given_token_counts, [ccg_categories, index_to_surface_form])
         self.print_dict("_CCG_production_counts", self._CCG_production_counts)
         self.print_dict("_lexicon_entry_counts", self._lexicon_entry_given_token_counts)
         self.print_dict("_semantic_counts", self._semantic_counts)
         self.print_dict("token_given_token", self.token_given_token, [index_to_surface_form, index_to_surface_form])
-        self.print_dict("CCG_given_token", self.CCG_given_token, [{}, index_to_surface_form])
+        self.print_dict("CCG_given_token", self.CCG_given_token, [ccg_categories, index_to_surface_form])
         self.print_dict("CCG_production", self.CCG_production)
         self.print_dict("lexicon_entry_given_token", self.lexicon_entry_given_token, [lexicon_entries, index_to_surface_form])
         self.print_dict("semantic", self.semantic)

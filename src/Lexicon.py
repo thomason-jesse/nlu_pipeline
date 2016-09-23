@@ -10,6 +10,7 @@ class Lexicon:
         self.categories = []  # will grow on its own
         self.surface_forms, self.semantic_forms, self.entries, self.pred_to_surface = self.read_lex_from_file(
             lexicon_fname, allow_expanding_ont)
+
         self.reverse_entries = []
         self.sem_form_expected_args = None
         self.sem_form_return_cat = None

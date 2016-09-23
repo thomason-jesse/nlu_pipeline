@@ -69,23 +69,46 @@ def count_correct_hyp_indeces(corpus_folder, exp_extension):
                             lowest_correct_index = count
 
                             if count in counts:
-                                counts[count] += 1
+                                counts[count] += 1.0
                             else:
-                                counts[count] = 1
+                                counts[count] = 1.0
 
                     #Increments count and gets next line. 
                     count += 1
                     line = result_file.readline()
 
-    #Prints counts found
-    print counts
-    print num_phrases
+    #Gets total number of recoverable correct hypotheses. 
+    total = 0.0
 
+    for index in counts:
+        total += counts[index]
 
-                        
+    #Now generates CDF and percentage increases. 
+    summation = 0.0
+    percent_buff = None
+    cdf = [[], []]
+    percentage_increases = [[], []]
 
+    for index in sorted(counts.keys()):
+        summation += counts[index]
+        percent = summation / total
 
+        cdf[0].append(index)
+        cdf[1].append(percent)
 
+        #TODO Make this limit dynamic (i.e. add a variable). 
+        if (index <= 100):
+            #Skips first index. 
+            if percent_buff:
+                percentage_increases[0].append(index)
+                percentage_increases[1].append(percent - percent_buff)
+
+            percent_buff = percent
+
+    #Returns result of analysis. 
+    return [cdf, percentage_increases]
+
+        
 
 """
 This function will print out
@@ -119,6 +142,7 @@ if __name__ == '__main__':
             print_usage()
     elif sys.argv[1] == 'correct_hyp_indeces':
         if len(sys.argv) == 4:
+            #TODO print results here if this is main program. 
             count_correct_hyp_indeces(sys.argv[2], sys.argv[3])
         else:
             print_usage()
