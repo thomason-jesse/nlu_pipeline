@@ -24,6 +24,8 @@ Author: Rodolfo Corona, rcorona@utexas.edu
 
 import sys
 import os
+import re
+import pickle
 
 """
 This function goes through a result file from an experiment
@@ -138,6 +140,68 @@ def add_type_constraints_to_file(file_name):
 def print_usage():
     print 'To populate result file with semantic forms: ./post_process.py populate_semantic_forms [result_file_name] [test_file_name]'
     print 'To add type constraints to semantic forms in a file: ./post_process.py type_constraints [file_name]'
+    print 'Determine groundable items in corpus: ./preprocess.py create_entities_for_grounding [corpus_folder] [dict_pickle_name]'
+
+"""
+This goes through a file and extracts all of the items being described
+that could be grounded to in a corpus. 
+"""
+def find_groundable_items(corpus_folder, pickle_file_name):
+    #Will keep all unique items. 
+    adjective_items = []
+    single_items = set()
+
+    #Expression used to find properties. 
+    regex = re.compile('[a-z]+\(x\)')
+
+    #Looks for items in each of the corpus' files. 
+    for file_name in os.listdir(corpus_folder):
+
+        #Only processes it if valid type. 
+        if file_name.endswith('.usr'):
+            for line in open(corpus_folder + '/' + file_name, 'r'):
+                #Unpacks  line. Removes category from semantic form. 
+                phrase, sem_form, denotation, recording = line.strip().split(';')
+                sem_form = ':'.join(sem_form.split(':')[1:]).strip()
+
+                #Items are only found in bring action.
+                if 'bring' in sem_form: 
+                    properties = re.findall(regex, sem_form)
+
+                    #Ensures it has properties before adding. 
+                    if len(properties) > 0:
+                        properties = set(properties)
+
+                        #Checks to see if item with these properties exists. 
+                        exists = False
+
+                        for item in adjective_items: 
+                            if item == properties:
+                                exists = True
+
+                        #If new item, then add it to items. 
+                        if not exists:
+                            adjective_items.append(properties)
+
+                    else:
+                        single_items.add(sem_form.split('bring(')[1].split(',')[0])
+
+    #Now makes items for grounder. 
+    items = {}
+    counter = 0
+
+    #Adjective described have properties. 
+    for item in adjective_items:
+        items['item' + str(counter)] = item
+        counter += 1
+
+    #Single items don't, but have a name. 
+    for item in single_items:
+        items[item] = None
+
+    #Now pickles the set of items. 
+    pickle.dump(items, open(pickle_file_name, 'w'))
+
 
 if __name__ == '__main__':
     if not len(sys.argv) >= 2:
@@ -152,6 +216,13 @@ if __name__ == '__main__':
     elif sys.argv[1] == 'type_constraints':
         if len(sys.argv) == 3:
             add_type_constraints_to_file(sys.argv[2])
+        else:
+            print_usage()
+
+    #Create pickled dictionaries containing the entities in a corpus. 
+    elif sys.argv[1] == 'create_entities_for_grounding':
+        if len(sys.argv) == 4:
+            find_groundable_items(sys.argv[2], sys.argv[3])
         else:
             print_usage()
 
