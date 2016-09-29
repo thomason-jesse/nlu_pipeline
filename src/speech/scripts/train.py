@@ -14,6 +14,7 @@ __author__ = ['rcorona', 'aishwarya']
 import sys
 import subprocess
 import shutil
+import time
 
 #Adds path to parser scripts so that they may be imported.
 #TODO CHANGE IF PATH CHANGES
@@ -72,6 +73,7 @@ def train_new_parser(parser_train_file, parser_path, ont_path, lex_path, lex_wei
 
     # Read in train data. 
     data = parser.read_in_paired_utterance_semantics(parser_train_file)
+
     converged = parser.train_learner_on_semantic_forms(data, 10, reranker_beam=15)
     print '\n\n\nHand designed examples: converged = ', converged
 

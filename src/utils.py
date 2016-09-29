@@ -3,6 +3,7 @@ __author__ = 'aishwarya'
 import os
 import pickle
 import numpy
+import time
 
 # For typechecking
 from SemanticNode import SemanticNode
@@ -127,3 +128,20 @@ def get_dict_val(dict_name, key):
         return None
     else:
         return dict_name[key]
+
+class FuncTimer:
+    def __init__(self, func_name):
+        self.func_name = None
+        self.start_t = None
+        self.end_t = None
+
+        self.start(func_name)
+
+    def start(self, func_name):
+        self.func_name = func_name
+#print "START FUNCTION: " + self.func_name
+        self.start_t = time.time()
+
+    def end(self):
+        self.end_t = time.time()
+        print "END FUNCTION: " + self.func_name + " TIME: " + str(self.end_t - self.start_t)

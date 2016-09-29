@@ -7,6 +7,7 @@ import copy
 import ParseNode
 import SemanticNode
 import sys
+from utils import FuncTimer
 
 neg_inf = float('-inf')
 
@@ -104,6 +105,7 @@ class Parameters:
 
     # update the probability tables given counts
     def update_probabilities(self):
+        timer = FuncTimer("update_probabilities")
 
         min_token_given_token = 0
         min_ccg_given_token = 0
@@ -216,6 +218,8 @@ class Parameters:
                 self.token_given_token[(-1, sf_idx)] = \
                     math.log(1.0/len(language_model_surface_forms))+min_token_given_token
 
+        timer.end()
+
     # indexed by (categories idx, surface forms idx), value parameter weight
     def init_ccg_given_token(self, lexicon_weight):
         return {(self.lexicon.semantic_forms[sem_idx].category, sf_idx): lexicon_weight
@@ -224,6 +228,8 @@ class Parameters:
 
     # indexed by categories idxs (production, left, right), value parameter weight
     def init_ccg_production(self, lexicon_weight):
+        timer = FuncTimer("init_ccg_production")
+        
         ccg_production = {}
         for cat_idx in range(0, len(self.lexicon.categories)):
 
@@ -241,6 +247,8 @@ class Parameters:
             # add production rules of form X -> X X for X<>X=X (merge)
             ccg_production[(cat_idx, cat_idx, cat_idx)] = 1.0 #doesn't use lexicon weight, just non-zero. 
 
+        
+        timer.end()
         return ccg_production
 
     # indexed by (surface forms idx, semantic forms idx), value parameter weight
@@ -251,6 +259,7 @@ class Parameters:
 
     # takes in a parse node and returns its log probability
     def get_semantic_score(self, n):
+        timer = FuncTimer("get_semantic_score")
 
         counts = self.count_semantics(n)
         score = 0.0
@@ -258,10 +267,15 @@ class Parameters:
             if key in self.semantic:
                 for _ in range(0, counts[key]):
                     score += self.semantic[key]
+
+        timer.end()
+
         return score
 
     # take in ParseNode y and calculate bigram token counts as dictionary
     def count_token_bigrams(self, y):
+        timer = FuncTimer()
+
         t = [l.surface_form for l in y.get_leaves()]
         for t_idx in range(0, len(t)):
             if type(t[t_idx]) is str:
@@ -276,10 +290,13 @@ class Parameters:
             if key not in b:
                 b[key] = 0
             b[key] += 1
+
+        timer.end()
         return b
 
     # takes in a parse or semantic node and returns the counts of its (pred, arg, pos) entries
     def count_semantics(self, sn):
+        timer = FuncTimer("count_semantics")
 
         # convert passed ParseNodes to SemanticNode member
         try:
@@ -308,10 +325,14 @@ class Parameters:
                         counts[ckey] = 0
                     counts[ckey] += child_counts[ckey]
 
+        timer.end()
+
         return counts
 
     # take in examples t=(x,y,z) for x an expression, y an incorrect semantic form, z a correct semantic form
     def update_learned_parameters(self, t):
+
+        timer = FuncTimer("update_learned_parameters")
 
         # update counts given new training data
         for x, y, z, y_lex, z_lex in t:
@@ -398,6 +419,8 @@ class Parameters:
         # update probabilities given new counts
         self.update_probabilities()
 
+        timer.end()
+
         # print "token_given_token: "+str(self.token_given_token)  # DEBUG
         # print "CCG_given_token: "+str(self.CCG_given_token)  # DEBUG
         # print "CCG_production: "+str(self.CCG_production)  # DEBUG
@@ -411,6 +434,8 @@ class Parameters:
 
 # take in ParseNode y to calculate (surface forms idx, semantic forms idx) pairs
 def count_lexical_entries(y):
+    timer = FuncTimer("count_lexical_entries")
+
     pairs = {}
     token_assignments = y.get_leaves()
     for ta in token_assignments:
@@ -418,11 +443,16 @@ def count_lexical_entries(y):
         if k not in pairs:
             pairs[k] = 0
         pairs[k] += 1
+
+    timer.end()
+
     return pairs
 
 
 # take in ParseNode y to calculate (CCG, CCG, CCG) productions
 def count_ccg_productions(y):
+    timer = FuncTimer("count_ccg_productions")
+
     productions = {}
     to_explore = [y]
     while len(to_explore) > 0:
@@ -433,11 +463,16 @@ def count_ccg_productions(y):
                 productions[key] = 0
             productions[key] += 1
             to_explore.extend(n.children)
+
+    timer.end()
+
     return productions
 
 
 # take in ParseNode y to calculate (CCG, token) pairs
 def count_ccg_surface_form_pairs(y):
+    timer = FuncTimer("count_ccg_surface_form_pairs")
+    
     pairs = {}
     token_assignments = y.get_leaves()
     for ta in token_assignments:
@@ -445,11 +480,16 @@ def count_ccg_surface_form_pairs(y):
         if k not in pairs:
             pairs[k] = 0
         pairs[k] += 1
+
+    timer.end()
+
     return pairs
 
 
 class CKYParser:
     def __init__(self, ont, lex, use_language_model=False, lexicon_weight=1.0):
+        timer = FuncTimer("CKYParser __init__")
+
 
         # resources given on instantiation
         self.ontology = ont
@@ -478,12 +518,16 @@ class CKYParser:
         # cache
         self.cached_combinations = {}  # indexed by left, then right node, value at result
 
+        timer.end()
+
     def print_parameters(self):
         self.theta.print_parameters()
 
     # access language model parameters to get a language score for a given parse node y
     # parse node leaves with string semantic forms are assumed to be unknown tokens
     def get_language_model_score(self, y):
+        timer = FuncTimer("get_language_model_score")
+
         t = [l.surface_form for l in y.get_leaves()]
         for t_idx in range(0, len(t)):
             if type(t[t_idx]) is str:
@@ -494,11 +538,16 @@ class CKYParser:
         for t_idx in range(0, len(t)-1):
             key = (t[t_idx], t[t_idx+1])
             score += self.theta.token_given_token[key] if key in self.theta.token_given_token else 0.0
+        
+        timer.end()
+
         return score
 
     # perform type-raising on leaf-level lexicon entries
     # this alters the given lexicon
     def type_raise_bare_nouns(self):
+        timer = FuncTimer("type_raise_bare_nouns")
+    
         bare_noun_cat_idx = self.lexicon.categories.index('N')
         raised_cat_idx = self.lexicon.categories.index([bare_noun_cat_idx, 1, bare_noun_cat_idx])
         e_idx = self.ontology.types.index('e')
@@ -537,8 +586,12 @@ class CKYParser:
             self.lexicon.entries[sf_idx].append(len(self.lexicon.semantic_forms)-1)
             self.type_raised[sem_idx] = len(self.lexicon.semantic_forms)-1
 
+        timer.end()
+
     # print a SemanticNode as a string using the known ontology
     def print_parse(self, p, show_category=False, show_non_lambda_types=False):
+        timer = FuncTimer("print_parse")
+        
         if p is None:
             return "NONE"
         elif show_category and p.category is not None:
@@ -558,10 +611,15 @@ class CKYParser:
         if p.children is not None:
             s += '(' + ','.join([self.print_parse(c, show_non_lambda_types=show_non_lambda_types)
                                  for c in p.children]) + ')'
+        
+        timer.end()
+            
         return s
 
     # read in data set of form utterance\nCCG : semantic_form\n\n...
     def read_in_paired_utterance_semantics(self, fname, allow_expanding_ont=False):
+        timer = FuncTimer("read_in_paired_utterance_semantics")
+        
         d = []
         f = open(fname, 'r')
         f_lines = f.readlines()
@@ -580,21 +638,32 @@ class CKYParser:
             form.category = ccg
             d.append([input_str, form])
             i += 3
+
+        timer.end()
         return d
 
     # take in a data set D=(x,y) for x expressions and y correct semantic form and update CKYParser parameters
     def train_learner_on_semantic_forms(self, d, epochs=10, reranker_beam=1):
+        timer = FuncTimer("train_learner_on_semantic_forms")
+
         for e in range(0, epochs):
             print "epoch " + str(e)  # DEBUG
+
             t, failures = self.get_training_pairs(d, reranker_beam=reranker_beam)
+
             if len(t) == 0:
+                timer.end()
+
                 print "training converged at epoch " + str(e)
                 if failures == 0:
                     return True
                 else:
                     return False
             random.shuffle(t)
+
             self.theta.update_learned_parameters(t)
+
+        timer.end()
         return False
 
     # take in data set d=(x,y) for x strings and y correct semantic forms and calculate training pairs
@@ -602,6 +671,8 @@ class CKYParser:
     # k determines how many parses to get for re-ranking
     # beam determines how many cky_trees to look through before giving up on a given input
     def get_training_pairs(self, d, reranker_beam=1): 
+        timer = FuncTimer("get_training_pairs") 
+        
         t = []
         num_trainable = 0
         num_matches = 0
@@ -611,8 +682,10 @@ class CKYParser:
             print "Training on: [" + str(x) + "," + str(y) + "]" 
             correct_parse = None
             correct_new_lexicon_entries = []
+
             cky_parse_generator = self.most_likely_cky_parse(x, reranker_beam=reranker_beam, known_root=y)
             chosen_parse, chosen_score, chosen_new_lexicon_entries = next(cky_parse_generator)
+
             current_parse = chosen_parse
             correct_score = chosen_score
             current_new_lexicon_entries = chosen_new_lexicon_entries
@@ -660,6 +733,8 @@ class CKYParser:
         print "\ttrained "+str(num_trainable)+"/"+str(len(d))  # DEBUG
         print "\tgenlex only "+str(num_genlex_only)+"/"+str(len(d))  # DEBUG
         print "\tfailed "+str(num_fails)+"/"+str(len(d))  # DEBUG
+
+        timer.end()
         return t, num_fails
 
     # yields the next most likely CKY parse of input string s
@@ -667,6 +742,8 @@ class CKYParser:
     # providing it as an argument to this method allows top-down generation
     # to find new lexical entries for surface forms not yet recognized
     def most_likely_cky_parse(self, s, reranker_beam=1, known_root=None):
+        timer = FuncTimer("most_likely_cky_parse")
+        
         if len(s) == 0:
             raise AssertionError("Cannot parse provided string of length zero")
 
@@ -679,6 +756,13 @@ class CKYParser:
         for tks in tk_seqs:
             skip_score = {}
             if len(tks) > 1:
+        
+                #Limits number of parses considered if longer than 7 tokens. 
+                if len(tks) > 7:
+                    self.max_cky_trees_per_token_sequence_beam = 50
+                else:
+                    self.max_cky_trees_per_token_sequence_beam = 100
+                
                 for idx in range(0, len(tks)):
                     if tks[idx] in self.lexicon.surface_forms:
                         # TODO: could parameterize prior on surface forms
@@ -747,6 +831,7 @@ class CKYParser:
                                                                                reranker_beam, known_root=known_root)
                     parse_tree, parse_score, new_lexicon_entries = next(parse_tree_generator)
                     while parse_tree is not None:
+                        timer.end()
                         yield parse_tree, parse_score + tree_score, new_lexicon_entries
                         parse_tree, parse_score, new_lexicon_entries = next(parse_tree_generator)
 
@@ -760,11 +845,14 @@ class CKYParser:
                 break
 
         # out of parse trees to try
+        timer.end()
         yield None, neg_inf, []
 
     # yields the next most likely parse tree after re-ranking in beam k
     # searches over leaf assignments in beam given a leaf assignment generator
     def most_likely_reranked_cky_parse(self, ccg_tree, semantic_assignment_generator, k, known_root=None):
+
+        timer = FuncTimer("most_likely_reranked_cky_parse")
 
         # get up to top k candidates
         candidates = []  # list of trees
@@ -793,6 +881,8 @@ class CKYParser:
                 for idx in range(0, len(candidates)):
                     if scores[best_idx] < scores[idx]:
                         best_idx = idx
+
+                timer.end()
                 yield candidates[idx], scores[idx], new_lex[idx]
                 del candidates[idx]
                 del scores[idx]
@@ -804,9 +894,11 @@ class CKYParser:
         # yield remaining best candidates in order
         score_dict = {idx: scores[idx] for idx in range(0, len(scores))}
         for idx, score in sorted(score_dict.items(), key=operator.itemgetter(1), reverse=True):
+            timer.end()
             yield candidates[idx], score, new_lex[idx]
 
         # out of candidates
+        timer.end()
         yield None, neg_inf, []
 
     # yields the next most likely assignment of semantic values to ccg nodes
@@ -814,6 +906,8 @@ class CKYParser:
     # returns None if no assignment to missing leaf entries will allow propagation to root
     def most_likely_tree_generator(self, parse_leaves, ccg_tree, sem_root=None):
 
+        timer = FuncTimer("most_likely_tree_generator")
+        
         # print "most_likely_tree_generator: called for ccg_tree: "+str(ccg_tree)  # DEBUG
         parse_roots, parse_leaves_keys = self.form_root_from_leaves(parse_leaves, ccg_tree)
         # print "parse_roots: "+str([self.print_parse(p.node) for p in parse_roots])  # DEBUG
@@ -821,6 +915,7 @@ class CKYParser:
         # yield parse and total score (leaves+syntax) if structure matches
         # set of new lexical entries required is empty in this case
         if len(parse_roots) == 1 and parse_roots[0].node is not None:
+            timer.end()
             yield parse_roots[0], []  # the ParseNode root of the finished parse tree
 
         # if structure does not match and there are None nodes, perform top-down generation from
@@ -879,10 +974,13 @@ class CKYParser:
 
                         # the ParseNode root of the finished parse tree
                         if len(candidate_parse_leaves) == 1:
+                            timer.end()
                             yield candidate_parse_leaves[0], new_lex_entries
 
     # given parse leaves, form as close to root as possible
     def form_root_from_leaves(self, parse_leaves, ccg_tree):
+
+        timer = FuncTimer('form_root_from_leaves')
 
         # try to build parse tree from lexical assignments guided by CKY structure
         spans = []
@@ -941,11 +1039,15 @@ class CKYParser:
                         found_combination = True  # start iteration over since we modified list
                         # print "found combination at "+str(root_span)  # DEBUG
                         break
+        timer.end()
+                          
         return parse_leaves, spans
 
     # greedily yields the next most likely tree generated from given parse root
     # subject to the constraints of the ccg_tree and stopping upon reaching all known_leaf_keys
     def get_most_likely_tree_from_root(self, parse_root, root_key, ccg_tree, known_leaf_keys):
+        timer = FuncTimer("get_most_likely_tree_from_root")
+
 
         # print "get_most_likely_tree_from_root called"  # DEBUG
         # print "root_key: "+str(root_key)  # DEBUG
@@ -953,6 +1055,7 @@ class CKYParser:
 
         # if root key is the only entry in the chart, can only associate it with the known parse root
         if len(ccg_tree.keys()) == 1:
+            timer.end()
             yield parse_root, 0
         else:
 
@@ -968,6 +1071,7 @@ class CKYParser:
                         parse_root.children.append(ParseNode.ParseNode(parse_root, children[c]))
                     if ccg_tree[root_key][1] in known_leaf_keys and ccg_tree[root_key][2] in known_leaf_keys:
                         # print "...get_most_likely_tree_from_root yielding two known leaf keys"  # DEBUG
+                        timer.end()
                         yield parse_root, children_score
                     for c in range(0, 2):  # expand children
                         subtree_generators = [self.get_most_likely_tree_from_root(parse_root.children[c],
@@ -982,13 +1086,17 @@ class CKYParser:
                                     for child2, score2 in subtree_generators[(c+1) % 2]:
                                         parse_root.children[(c+1) % 2] = child2
                                         # print "...get_most_likely_tree_from_root yielding deeper children"  # DEBUG
+                                        timer.end()
                                         yield parse_root, children_score+score1+score2
                                 else:
                                     # print "...get_most_likely_tree_from_root yielding deeper child"  # DEBUG
+                                    timer.end()
                                     yield parse_root, children_score+score1
 
     # yields next most likely pair of children from a given semantic root using production rule parameter scores
     def get_most_likely_children_from_root(self, n):
+        timer = FuncTimer("get_most_likely_children_from_root")
+
 
         candidate_pairs = self.perform_reverse_fa(n)
         if self.can_perform_split(n):
@@ -1005,10 +1113,13 @@ class CKYParser:
             children = [candidate_pairs[pair_idx][0], candidate_pairs[pair_idx][2]] \
                 if candidate_pairs[pair_idx][1] == 1 else \
                 [candidate_pairs[pair_idx][2], candidate_pairs[pair_idx][0]]
+
+            timer.end()
             yield children, score
 
     # yields next most likely assignment of semantic values to ccg tree leaves
     def most_likely_semantic_leaves(self, tks, ccg_tree, known_root=None):
+        timer = FuncTimer("most_likely_semantic_leaves")
 
         # get syntax categories for tree leaves
         leaf_categories = []
@@ -1093,12 +1204,16 @@ class CKYParser:
                                          if assignment[idx] is not None and
                                          semantic_candidates[idx][assignment[idx]] is not None else None)
                      for idx in range(0, len(spans))]
+            
+            timer.end()
             yield nodes, score
 
     # yields the next most likely ccg parse tree given a set of possible token sequences
     # finds the best parse tree given each token sequence and returns in-order the one
     # with the highest score
     def most_likely_ccg_parse_tree(self, tk_seqs):
+        timer = FuncTimer("most_likely_ccg_parse_tree")
+        
         ccg_parse_tree_generators = [self.most_likely_ccg_parse_tree_given_tokens(tks)
                                      for tks in tk_seqs]
         best_per_seq = [next(ccg_parse_tree_generators[idx])
@@ -1130,6 +1245,8 @@ class CKYParser:
             # print "most_likely_ccg_parse_tree: yielding " + \
                 # str(best_per_seq[best_idx][0])+" with score "+str(best_score) + \
                 # " from tokens "+str(tk_seqs[best_idx])  # DEBUG
+
+            timer.end()
             yield best_per_seq[best_idx][0], best_score, tk_seqs[best_idx]
             candidate, score = next(ccg_parse_tree_generators[best_idx])
             empty = True
@@ -1152,10 +1269,14 @@ class CKYParser:
                 del tk_seqs[best_idx]
                 best_idx = 0
                 tied_idxs = [0]
+
+        timer.end()
         yield None, neg_inf, None
 
     # yields the next most likely ccg parse tree given a set of tokens
     def most_likely_ccg_parse_tree_given_tokens(self, tks, new_sense_leaf_limit=0):
+
+        timer = FuncTimer("most_likely_ccg_parse_tree_given_tokens")
 
         # print "most_likely_ccg_parse_tree_given_tokens initialized with tks="+str(tks) + \
             # ", new_sense_leaf_limit="+str(new_sense_leaf_limit)  # DEBUG
@@ -1344,6 +1465,7 @@ class CKYParser:
             # print "most_likely_ccg_parse_tree_given_tokens with tks="+str(tks) + \
             #  ", new_sense_leaf_limit=" + str(new_sense_leaf_limit)+", score="+str(chart[key][best_idx][3]) +\
             #  " yielding"  # DEBUG
+            timer.end()
             yield tree, chart[key][best_idx][3]  # return tree and score
             del chart[key][best_idx]
             roots_yielded += 1
@@ -1352,11 +1474,14 @@ class CKYParser:
             print "WARNING: beam search limit hit"  # DEBUG
 
         # no parses left
+        timer.end()
         yield None, neg_inf
 
     # return A<>B; A and B must have matching lambda headers and syntactic categories to be AND merged
     def perform_merge(self, a, b):
         # print "performing Merge with '"+self.print_parse(a, True)+"' taking '"+self.print_parse(b, True)+"'"  # DEBUG
+
+        timer = FuncTimer("perform_merge")
 
         and_idx = self.ontology.preds.index('and')
 
@@ -1421,6 +1546,8 @@ class CKYParser:
         if self.safety and not ab.validate_tree_structure():
             raise RuntimeError("ERROR: invalidly linked structure generated by FA: " +
                                self.print_parse(ab, True))
+        
+        timer.end()
         return ab
 
     # return true if A,B can be merged
@@ -1451,6 +1578,8 @@ class CKYParser:
 
     # return A(B); A must be lambda headed with type equal to B's root type
     def perform_fa(self, a, b, renumerate=True):
+        timer = FuncTimer("perform_fa")
+        
         if self.safety:
             if not a.validate_tree_structure():  # DEBUG
                 raise RuntimeError("WARNING: got invalidly linked node '"+self.print_parse(a)+"'")
@@ -1483,6 +1612,8 @@ class CKYParser:
             if self.safety and not a_new.validate_tree_structure():
                 raise RuntimeError("ERROR: invalidly linked structure generated by FA: " +
                                    self.print_parse(a_new, True))
+            
+            timer.end()
             return a_new
 
         # A is lambda headed and so has a single child which will be the root of the composed tree
@@ -1609,6 +1740,8 @@ class CKYParser:
         if self.safety and not ab.validate_tree_structure():
             raise RuntimeError("ERROR: invalidly linked structure generated by FA: " +
                                self.print_parse(ab, True))
+        
+        timer.end()
         return ab
 
     # return true if A(B) is a valid for functional application
@@ -1684,6 +1817,8 @@ class CKYParser:
     def perform_split(self, ab):
         # print "performing Split with '"+self.print_parse(ab, True)+"'" #DEBUG
 
+        timer = FuncTimer("perform_split")
+
         curr = ab
         while curr.is_lambda and curr.is_lambda_instantiation:
             curr = curr.children[0]  # first non-lambda must be 'and' predicate
@@ -1713,6 +1848,8 @@ class CKYParser:
                     if not candidate_pairs[idx][jdx].validate_tree_structure():
                         raise RuntimeError("ERROR: invalidly linked structure generated by split: " +
                                            self.print_parse(to_return[-1], True))
+        
+        timer.end()
         return candidate_pairs
 
     # return true if AB can be split
@@ -1728,6 +1865,8 @@ class CKYParser:
 
     # given A1(A2), attempt to determine an A1, A2 that satisfy and return them
     def perform_reverse_fa(self, a):
+        timer = FuncTimer("perform_reverse_fa")
+
         consumables = self.lexicon.category_consumes[a.category]
         if len(consumables) == 0:
             return []
@@ -1879,6 +2018,7 @@ class CKYParser:
                                                "with params "+",".join([str(lambda_type), str(preserve_host_children),
                                                                         str(aa)]))
 
+        timer.end()
         return candidate_pairs
 
     # given a string, return the set of possible tokenizations of that string given lexical entries
