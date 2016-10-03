@@ -11,16 +11,16 @@ neg_inf = float('-inf')
 
 
 class Parameters:
-    def __init__(self, ont, lex, use_language_model=False):
+    def __init__(self, ont, lex, use_language_model=False, lexicon_weight=1.0):
         self.ontology = ont
         self.lexicon = lex
         self.use_language_model = use_language_model
 
         # get initial count data structures
         self._token_given_token_counts = {}
-        self._CCG_given_token_counts = self.init_ccg_given_token()
-        self._CCG_production_counts = self.init_ccg_production()
-        self._lexicon_entry_given_token_counts = self.init_lexicon_entry()
+        self._CCG_given_token_counts = self.init_ccg_given_token(lexicon_weight)
+        self._CCG_production_counts = self.init_ccg_production(lexicon_weight)
+        self._lexicon_entry_given_token_counts = self.init_lexicon_entry(lexicon_weight)
         self._semantic_counts = {}
 
         # print "_CCG_given_token_counts: "+str(self._CCG_given_token_counts)  # DEBUG
@@ -159,13 +159,13 @@ class Parameters:
                     math.log(1.0/len(language_model_surface_forms))+min_token_given_token
 
     # indexed by (categories idx, surface forms idx), value parameter weight
-    def init_ccg_given_token(self):
-        return {(self.lexicon.semantic_forms[sem_idx].category, sf_idx): 1.0
+    def init_ccg_given_token(self, lexicon_weight):
+        return {(self.lexicon.semantic_forms[sem_idx].category, sf_idx): lexicon_weight
                 for sf_idx in range(0, len(self.lexicon.entries))
                 for sem_idx in self.lexicon.entries[sf_idx]}
 
     # indexed by categories idxs (production, left, right), value parameter weight
-    def init_ccg_production(self):
+    def init_ccg_production(self, lexicon_weight):
         ccg_production = {}
         for cat_idx in range(0, len(self.lexicon.categories)):
 
@@ -178,16 +178,16 @@ class Parameters:
                 else:  # consumes to the right
                     r = child
                     l = self.lexicon.categories.index([cat_idx, d, child])
-                ccg_production[(cat_idx, l, r)] = 1.0
+                ccg_production[(cat_idx, l, r)] = lexicon_weight
 
             # add production rules of form X -> X X for X<>X=X (merge)
-            ccg_production[(cat_idx, cat_idx, cat_idx)] = 1.0
+            ccg_production[(cat_idx, cat_idx, cat_idx)] = 1.0  # doesn't use lexicon weight; just non-zero
 
         return ccg_production
 
     # indexed by (surface forms idx, semantic forms idx), value parameter weight
-    def init_lexicon_entry(self):
-        return {(sem_idx, sf_idx): 1.0
+    def init_lexicon_entry(self, lexicon_weight):
+        return {(sem_idx, sf_idx): lexicon_weight
                 for sf_idx in range(0, len(self.lexicon.entries))
                 for sem_idx in self.lexicon.entries[sf_idx]}
 
