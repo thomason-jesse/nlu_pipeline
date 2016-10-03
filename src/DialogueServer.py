@@ -362,8 +362,7 @@ class DialogueServer :
             error_log = MAIN_LOG_PATH + DIALOG_ERROR_LOG_PATH + user_id + '.txt'
             
             # Randomly choose an agent
-            #r = numpy.random.random_sample()
-            r = 0.1
+            r = numpy.random.random_sample()
             if r < 1.0 / 3 :   
                 print 'Only parser learning'
                 self.user_log.write(user_id + ',only_parser\n')
