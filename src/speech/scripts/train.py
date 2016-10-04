@@ -18,7 +18,7 @@ import time
 
 #Adds path to parser scripts so that they may be imported.
 #TODO CHANGE IF PATH CHANGES
-sys.path.append('/scratch/cluster/rcorona/nlu_pipeline/src')
+sys.path.append('/u/jesse/catkin_ws/src/nlu_pipeline/src')
 
 #Nlu pipeline modules.
 try:
@@ -26,8 +26,9 @@ try:
     import Lexicon
     import CKYParser
     from utils import *
-except ImportError:
+except ImportError as e:
     print 'ERROR: Unable to load nlu_pipeline_modules! Verify that nlu_pipeline_path is set correctly!'
+    print e
     sys.exit()
 
 """
@@ -65,8 +66,8 @@ def train_new_parser(parser_train_file, parser_path, ont_path, lex_path, lex_wei
     #parser = load_obj_general(sys.argv[5])
 
     # Set parser hyperparams to best known values for test time
-    parser.max_multiword_expression = 2  # max span of a multi-word expression to be considered during tokenization
-    parser.max_new_senses_per_utterance = 2  # max number of new word senses that can be induced on a training example
+    parser.max_multiword_expression = 3  # max span of a multi-word expression to be considered during tokenization
+    parser.max_new_senses_per_utterance = 0  # max number of new word senses that can be induced on a training example
     parser.max_cky_trees_per_token_sequence_beam = 100  # for tokenization of an utterance, max cky trees considered
     parser.max_hypothesis_categories_for_unknown_token_beam = 2  # for unknown token, max syntax categories tried
     parser.max_expansions_per_non_terminal = 5 # max number of backpointers stored per nonterminal per cell in CKY chart
