@@ -276,7 +276,7 @@ class Parameters:
 
     # take in ParseNode y and calculate bigram token counts as dictionary
     def count_token_bigrams(self, y):
-        timer = FuncTimer()
+        # timer = FuncTimer()
 
         t = [l.surface_form for l in y.get_leaves()]
         for t_idx in range(0, len(t)):

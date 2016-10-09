@@ -70,12 +70,12 @@ def train_new_parser(parser_train_file, parser_path, ont_path, lex_path, lex_wei
     parser.max_new_senses_per_utterance = 0  # max number of new word senses that can be induced on a training example
     parser.max_cky_trees_per_token_sequence_beam = 100  # for tokenization of an utterance, max cky trees considered
     parser.max_hypothesis_categories_for_unknown_token_beam = 2  # for unknown token, max syntax categories tried
-    parser.max_expansions_per_non_terminal = 5 # max number of backpointers stored per nonterminal per cell in CKY chart
+    parser.max_expansions_per_non_terminal = 5  # number of backpointers stored per nonterminal per cell in CKY chart
 
     # Read in train data. 
     data = parser.read_in_paired_utterance_semantics(parser_train_file)
 
-    converged = parser.train_learner_on_semantic_forms(data, 10, reranker_beam=15)
+    converged = parser.train_learner_on_semantic_forms(data, 1000, reranker_beam=1)
     print '\n\n\nHand designed examples: converged = ', converged
 
     #Saves trained parser. 
