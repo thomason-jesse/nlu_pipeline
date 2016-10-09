@@ -39,16 +39,16 @@ the :- NP/(N/N) : lambda P:<l,t>.(the(lambda x:l.(P(x))))
 a :- NP/(N/N) : lambda P:<i,t>.(a(lambda x:i.(P(x))))
 
 # room atoms
-3516 :- NP : l3_516
-3508 :- NP : l3_508
-3512 :- NP : l3_512
-3510 :- NP : l3_510
-3402 :- NP : l3_402
-3418 :- NP : l3_418
-3420 :- NP : l3_420
-3432 :- NP : l3_432
-3502 :- NP : l3_502
-3414b :- NP : l3_414b
+three five one six :- NP : l3_516
+three five zero eight :- NP : l3_508
+three five one two :- NP : l3_512
+three five one zero :- NP : l3_510
+three four zero two :- NP : l3_402
+three four one eight :- NP : l3_418
+three four two zero :- NP : l3_420
+three four three two :- NP : l3_432
+three five zero two :- NP : l3_502
+three four fourteen b :- NP : l3_414b
 
 # people atoms
 bruce :- NP : bruce
