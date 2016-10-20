@@ -32,6 +32,8 @@ Author: Rodolfo Corona, rcorona@utexas.edu
 import sys
 import os
 import subprocess
+from experiments import get_first_valid_parse
+from experiments import tokenize_for_parser
 
 #Adds nlu_pipeline src folder in order to import modules from it. 
 nlu_pipeline_path = '/scratch/cluster/rcorona/nlu_pipeline/src/'
@@ -40,6 +42,9 @@ sys.path.append(nlu_pipeline_path)
 #Nlu pipeline modules.
 try:
     import CKYParser
+    from Grounder import Grounder
+    from Lexicon import Lexicon
+    from Ontology import Ontology
     from utils import *
 except ImportError:
     print 'ERROR: Unable to load nlu_pipeline_modules! Verify that nlu_pipeline_path is set correctly!'
@@ -197,26 +202,38 @@ def semantic_form(result_file_name, evaluation_file_name, parser_file):
 
     #Evaluates data set. 
     for truth_hyp_phrase in data:
+        total_count += 1
+
         true_semantic_form, hyp, phrase = truth_hyp_phrase
         true_semantic_form = ':'.join(true_semantic_form.split(':')[1:])
 
         #Gets semantic node from true semantic form. 
         true_node = parser.lexicon.read_semantic_form_from_str(true_semantic_form, None, None, [], False)
-   
+
         #Parses top hypothesis to get semantic node.
-        if len(hyp) == 2:
-            hyp_node = parser.most_likely_cky_parse(hyp[0]).next()[0].node
+        if len(hyp) == 2: #In this case, only score and  phrase hyp are present. 
+            parse = get_first_valid_parse(tokenize_for_parser(hyp[0]), parser)[0]
+
+            #Continues of no valid parse was found for hypothesis. 
+            if parse == None:
+                continue
+            else:
+                hyp_node = parse.node
+
+        #In this case, score, phrase, and semantic form are present, so check form is valid. 
         elif hyp[1] == "None":
             continue
         else:
             hyp_node = parser.lexicon.read_semantic_form_from_str(hyp[1], None, None, [], False)
 
-        #Evaluates equality. 
-        if true_node == hyp_node:
+        #Evaluates equality.
+        are_equal = true_node.equal_allowing_commutativity(hyp_node, parser.commutative_idxs, True, parser.ontology)
+
+        if are_equal:
             count_correct += 1
 
-        total_count += 1
 
+        #Prints information for the logs. 
         print '**********************************************'
         print "Ground truth phrase: " + phrase
         print "Ground truth node: " + str(true_node) 
@@ -228,14 +245,62 @@ def semantic_form(result_file_name, evaluation_file_name, parser_file):
         print "Hyp semantic form: " + parser.print_parse(hyp_node)
         print  ''
 
-        print "Equal: " + str(true_node == hyp_node)
+        print "Equal: " + str(are_equal)
         print '***********************************************'
         print ''
+
+    #Writes evaluation results.
+    evaluation_file = open(evaluation_file_name, 'w')
+    evaluation_file.write("TOTAL:" + str(total_count) + '\n')
+    evaluation_file.write("CORRECT:" + str(count_correct) + '\n')
+    evaluation_file.close()
+
+def grounded_forms(ont_file, lex_file, kb_pickle):
+    #Loads information needed for grounding. 
+    ontology = Ontology(ont_file)
+    lexicon = Lexicon(ontology, lex_file) 
+    kb_predicates = load_obj_general(kb_pickle)
+    
+    grounder = Grounder(ontology, perception_module=None, kb_predicates=kb_predicates, classifier_predicates=None, test_features_file=None)
+
+    examples_reader = open('ground.txt')
+    lines = examples_reader.readlines()
+    examples_reader.close()
+    
+    examples = list()
+    i = 0
+    while i < len(lines) :
+        if len(lines[i].strip()) == 0 :
+            i += 1
+            continue
+            
+        text = lines[i].strip()
+        ccg_str, form_str = lines[i+1].strip().split(" : ")
+        ccg = lexicon.read_category_from_str(ccg_str)
+        form = lexicon.read_semantic_form_from_str(form_str, None, None, [], allow_expanding_ont=False)
+        form.category = ccg
+        grounding = lines[i+2].strip()
+        examples.append((text, form, grounding))
+        i += 3
+    
+    print kb_predicates
+
+    for (text, sem_form, grounding) in examples :
+        print text
+        print 'True grounding = ', grounding
+        groundings, lambda_assignments = grounder.ground_semantic_node(sem_form)
+        grounding_strs = [(str(grounding), prob) for (grounding, prob) in groundings]
+        print 'Predicted groundings = ', grounding_strs
+        print 'Lambda assignemnts = ', lambda_assignments
+        print 
+
 
 def print_usage():
     print 'WER: ./evaluate.py wer [result_file] [evaluation_file_name]'
     print 'Correct hypothesis in top n: ./evaluate.py top_n [result_file] [evaluation_file_name] [n]'
     print 'Semantic form evaluation: ./evaluate.py semantic_form [result_file] [evaluation_file_name] [parser]'
+    print 'Grounding: ./evaluate.py grounding [ont file] [lex file] [kb pickle file]'
+
 
 if __name__ == '__main__':
     if not len(sys.argv) >= 2:
@@ -258,6 +323,12 @@ if __name__ == '__main__':
             print_usage()
         else:
             semantic_form(sys.argv[2], sys.argv[3], sys.argv[4])
+
+    elif sys.argv[1] == 'grounding':
+        if len(sys.argv) == 5:
+            grounded_forms(sys.argv[2], sys.argv[3], sys.argv[4])
+        else:
+            print_usage()
 
     else:
         print_usage()

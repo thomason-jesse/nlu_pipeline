@@ -137,11 +137,6 @@ def add_type_constraints_to_file(file_name):
     #Overwrites old file with new one, now containing type constraints. 
     os.rename('temp.txt', file_name)
 
-def print_usage():
-    print 'To populate result file with semantic forms: ./post_process.py populate_semantic_forms [result_file_name] [test_file_name]'
-    print 'To add type constraints to semantic forms in a file: ./post_process.py type_constraints [file_name]'
-    print 'Determine groundable items in corpus: ./preprocess.py create_entities_for_grounding [corpus_folder] [dict_pickle_name]'
-
 """
 This goes through a file and extracts all of the items being described
 that could be grounded to in a corpus. 
@@ -199,8 +194,40 @@ def find_groundable_items(corpus_folder, pickle_file_name):
     for item in single_items:
         items[item] = None
 
-    #Now pickles the set of items. 
-    pickle.dump(items, open(pickle_file_name, 'w'))
+    #Keeps kb of item properties. 
+    kb = {}
+
+    #Populates kb. 
+    for item in items:
+       if not items[item] == None: 
+            for pred in items[item]:
+                #Adds item to predicate's list. 
+                if pred in kb:
+                    kb[pred].append(item)
+                else:
+                    kb[pred] = [item]
+
+    for pred in kb:
+        print str(pred) + ': ' + str(kb[pred])
+
+    #Adds in known atoms. 
+    kb['possesses'] = [('scott', 'l3_404'), ('ray', 'l3_512'), ('dana', 'l3_510'), ('peter', 'l3_508'), ('shiqi', 'l3_432'), ('jivko', 'l3_420'),
+                       ('stacy', 'l3_502'), ('jesse', 'l3_414b'), ('aishwarya', 'l3_414b'), ('rodolfo', 'l3_414b')]
+
+    kb['office'] = ['l3_404', 'l3_512', 'l3_510', 'l3_508', 'l3_432', 'l3_420', 'l3_502', 'l3_414b']
+
+
+    for pred in kb:
+        print str(pred) + ': ' + str(kb[pred])
+
+    #Now pickles the kb. 
+    pickle.dump(kb, open(pickle_file_name, 'w'))
+
+
+def print_usage():
+    print 'To populate result file with semantic forms: ./post_process.py populate_semantic_forms [result_file_name] [test_file_name]'
+    print 'To add type constraints to semantic forms in a file: ./post_process.py type_constraints [file_name]'
+    print 'Determine groundable items in corpus: ./postprocess.py create_entities_for_grounding [corpus_folder] [dict_pickle_name]'
 
 
 if __name__ == '__main__':

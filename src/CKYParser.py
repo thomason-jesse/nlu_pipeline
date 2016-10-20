@@ -7,7 +7,7 @@ import copy
 import ParseNode
 import SemanticNode
 import sys
-from utils import FuncTimer
+import numpy as np
 
 from IPython import embed
 
@@ -43,6 +43,9 @@ class Parameters:
 
         # update probabilities given new counts
         self.update_probabilities()
+
+        #For setting and using the null node values. 
+        self.set_null_node_values = False
 
         # print "CCG_given_token: "+str(self.CCG_given_token)  # DEBUG
         # print "CCG_production: "+str(self.CCG_production)  # DEBUG
@@ -107,7 +110,6 @@ class Parameters:
 
     # update the probability tables given counts
     def update_probabilities(self):
-        timer = FuncTimer("update_probabilities")
 
         min_token_given_token = 0
         min_ccg_given_token = 0
@@ -230,7 +232,6 @@ class Parameters:
 
     # indexed by categories idxs (production, left, right), value parameter weight
     def init_ccg_production(self, lexicon_weight):
-        timer = FuncTimer("init_ccg_production")
         
         ccg_production = {}
         for cat_idx in range(0, len(self.lexicon.categories)):
@@ -261,7 +262,6 @@ class Parameters:
 
     # takes in a parse node and returns its log probability
     def get_semantic_score(self, n):
-        timer = FuncTimer("get_semantic_score")
 
         counts = self.count_semantics(n)
         score = 0.0
@@ -276,7 +276,6 @@ class Parameters:
 
     # take in ParseNode y and calculate bigram token counts as dictionary
     def count_token_bigrams(self, y):
-        # timer = FuncTimer()
 
         t = [l.surface_form for l in y.get_leaves()]
         for t_idx in range(0, len(t)):
@@ -298,7 +297,6 @@ class Parameters:
 
     # takes in a parse or semantic node and returns the counts of its (pred, arg, pos) entries
     def count_semantics(self, sn):
-        timer = FuncTimer("count_semantics")
 
         # convert passed ParseNodes to SemanticNode member
         try:
@@ -334,7 +332,6 @@ class Parameters:
     # take in examples t=(x,y,z) for x an expression, y an incorrect semantic form, z a correct semantic form
     def update_learned_parameters(self, t):
 
-        timer = FuncTimer("update_learned_parameters")
 
         # update counts given new training data
         for x, y, z, y_lex, z_lex in t:
@@ -433,10 +430,8 @@ class Parameters:
         #                         str(self.semantic[(pred, arg, pos)])
         #                         for pred, arg, pos in self.semantic])  # DEBUG
 
-
 # take in ParseNode y to calculate (surface forms idx, semantic forms idx) pairs
 def count_lexical_entries(y):
-    timer = FuncTimer("count_lexical_entries")
 
     pairs = {}
     token_assignments = y.get_leaves()
@@ -453,7 +448,6 @@ def count_lexical_entries(y):
 
 # take in ParseNode y to calculate (CCG, CCG, CCG) productions
 def count_ccg_productions(y):
-    timer = FuncTimer("count_ccg_productions")
 
     productions = {}
     to_explore = [y]
@@ -473,7 +467,6 @@ def count_ccg_productions(y):
 
 # take in ParseNode y to calculate (CCG, token) pairs
 def count_ccg_surface_form_pairs(y):
-    timer = FuncTimer("count_ccg_surface_form_pairs")
     
     pairs = {}
     token_assignments = y.get_leaves()
@@ -490,7 +483,6 @@ def count_ccg_surface_form_pairs(y):
 
 class CKYParser:
     def __init__(self, ont, lex, use_language_model=False, lexicon_weight=1.0):
-        timer = FuncTimer("CKYParser __init__")
 
         # resources given on instantiation
         self.ontology = ont
@@ -527,7 +519,6 @@ class CKYParser:
     # access language model parameters to get a language score for a given parse node y
     # parse node leaves with string semantic forms are assumed to be unknown tokens
     def get_language_model_score(self, y):
-        timer = FuncTimer("get_language_model_score")
 
         t = [l.surface_form for l in y.get_leaves()]
         for t_idx in range(0, len(t)):
@@ -547,7 +538,6 @@ class CKYParser:
     # perform type-raising on leaf-level lexicon entries
     # this alters the given lexicon
     def type_raise_bare_nouns(self):
-        timer = FuncTimer("type_raise_bare_nouns")
     
         bare_noun_cat_idx = self.lexicon.categories.index('N')
         raised_cat_idx = self.lexicon.categories.index([bare_noun_cat_idx, 1, bare_noun_cat_idx])
@@ -591,7 +581,6 @@ class CKYParser:
 
     # print a SemanticNode as a string using the known ontology
     def print_parse(self, p, show_category=False, show_non_lambda_types=False):
-        timer = FuncTimer("print_parse")
         
         if p is None:
             return "NONE"
@@ -619,7 +608,6 @@ class CKYParser:
 
     # read in data set of form utterance\nCCG : semantic_form\n\n...
     def read_in_paired_utterance_semantics(self, fname, allow_expanding_ont=False):
-        timer = FuncTimer("read_in_paired_utterance_semantics")
         
         d = []
         f = open(fname, 'r')
@@ -645,7 +633,6 @@ class CKYParser:
 
     # take in a data set D=(x,y) for x expressions and y correct semantic form and update CKYParser parameters
     def train_learner_on_semantic_forms(self, d, epochs=10, reranker_beam=1):
-        timer = FuncTimer("train_learner_on_semantic_forms")
 
         for e in range(0, epochs):
             print "epoch " + str(e)  # DEBUG
@@ -672,7 +659,6 @@ class CKYParser:
     # k determines how many parses to get for re-ranking
     # beam determines how many cky_trees to look through before giving up on a given input
     def get_training_pairs(self, d, reranker_beam=1): 
-        timer = FuncTimer("get_training_pairs") 
         
         t = []
         num_trainable = 0
@@ -746,7 +732,6 @@ class CKYParser:
     # providing it as an argument to this method allows top-down generation
     # to find new lexical entries for surface forms not yet recognized
     def most_likely_cky_parse(self, s, reranker_beam=1, known_root=None):
-        timer = FuncTimer("most_likely_cky_parse")
         
         if len(s) == 0:
             raise AssertionError("Cannot parse provided string of length zero")
@@ -857,7 +842,6 @@ class CKYParser:
     # searches over leaf assignments in beam given a leaf assignment generator
     def most_likely_reranked_cky_parse(self, ccg_tree, semantic_assignment_generator, k, known_root=None):
 
-        timer = FuncTimer("most_likely_reranked_cky_parse")
 
         # get up to top k candidates
         candidates = []  # list of trees
@@ -911,7 +895,6 @@ class CKYParser:
     # returns None if no assignment to missing leaf entries will allow propagation to root
     def most_likely_tree_generator(self, parse_leaves, ccg_tree, sem_root=None):
 
-        timer = FuncTimer("most_likely_tree_generator")
         
         # print "most_likely_tree_generator: called for ccg_tree: "+str(ccg_tree)  # DEBUG
         parse_roots, parse_leaves_keys = self.form_root_from_leaves(parse_leaves, ccg_tree)
@@ -990,7 +973,6 @@ class CKYParser:
     # given parse leaves, form as close to root as possible
     def form_root_from_leaves(self, parse_leaves, ccg_tree):
 
-        timer = FuncTimer('form_root_from_leaves')
 
         # try to build parse tree from lexical assignments guided by CKY structure
         spans = []
@@ -1056,7 +1038,6 @@ class CKYParser:
     # greedily yields the next most likely tree generated from given parse root
     # subject to the constraints of the ccg_tree and stopping upon reaching all known_leaf_keys
     def get_most_likely_tree_from_root(self, parse_root, root_key, ccg_tree, known_leaf_keys):
-        timer = FuncTimer("get_most_likely_tree_from_root")
 
 
         # print "get_most_likely_tree_from_root called"  # DEBUG
@@ -1107,7 +1088,6 @@ class CKYParser:
 
     # yields next most likely pair of children from a given semantic root using production rule parameter scores
     def get_most_likely_children_from_root(self, n):
-        timer = FuncTimer("get_most_likely_children_from_root")
 
         # print "get_most_likely_children_from_root called with n " + self.print_parse(n)  # DEBUG
 
@@ -1135,7 +1115,6 @@ class CKYParser:
 
     # yields next most likely assignment of semantic values to ccg tree leaves
     def most_likely_semantic_leaves(self, tks, ccg_tree, known_root=None):
-        # timer = FuncTimer("most_likely_semantic_leaves")
 
         # get syntax categories for tree leaves
         leaf_categories = []
@@ -1228,7 +1207,6 @@ class CKYParser:
     # finds the best parse tree given each token sequence and returns in-order the one
     # with the highest score
     def most_likely_ccg_parse_tree(self, tk_seqs):
-        timer = FuncTimer("most_likely_ccg_parse_tree")
         
         ccg_parse_tree_generators = [self.most_likely_ccg_parse_tree_given_tokens(tks)
                                      for tks in tk_seqs]
@@ -1292,7 +1270,6 @@ class CKYParser:
     # yields the next most likely ccg parse tree given a set of tokens
     def most_likely_ccg_parse_tree_given_tokens(self, tks, new_sense_leaf_limit=0):
 
-        timer = FuncTimer("most_likely_ccg_parse_tree_given_tokens")
 
         # print "most_likely_ccg_parse_tree_given_tokens initialized with tks="+str(tks) + \
             # ", new_sense_leaf_limit="+str(new_sense_leaf_limit)  # DEBUG
@@ -1326,6 +1303,10 @@ class CKYParser:
                         score = self.theta.CCG_given_token[(cat_idx, sf_idx)] \
                             if (cat_idx, sf_idx) in self.theta.CCG_given_token \
                             else self.theta.CCG_given_token[(cat_idx, -1)]
+
+                        #Downweights multi-word expressions proportional to span, should hopefully reduce over-fitting. 
+                        score *= span
+
                         chart[pos].append([cat_idx, None, None, score])
                     if max_entries[1] is None or max_entries[1] < len(self.lexicon.entries[sf_idx]):
                         max_entries[0] = pos
@@ -1498,7 +1479,6 @@ class CKYParser:
     def perform_merge(self, a, b):
         # print "performing Merge with '"+self.print_parse(a, True)+"' taking '"+self.print_parse(b, True)+"'"  # DEBUG
 
-        timer = FuncTimer("perform_merge")
 
         and_idx = self.ontology.preds.index('and')
 
@@ -1595,7 +1575,6 @@ class CKYParser:
 
     # return A(B); A must be lambda headed with type equal to B's root type
     def perform_fa(self, a, b, renumerate=True):
-        timer = FuncTimer("perform_fa")
         
         if self.safety:
             if not a.validate_tree_structure():  # DEBUG
@@ -1834,7 +1813,6 @@ class CKYParser:
     def perform_split(self, ab):
         # print "performing Split with '"+self.print_parse(ab, True)+"'" #DEBUG
 
-        timer = FuncTimer("perform_split")
 
         curr = ab
         while curr.is_lambda and curr.is_lambda_instantiation:
@@ -1882,7 +1860,6 @@ class CKYParser:
 
     # given A1(A2), attempt to determine an A1, A2 that satisfy and return them
     def perform_reverse_fa(self, a):
-        timer = FuncTimer("perform_reverse_fa")
 
         consumables = self.lexicon.category_consumes[a.category]
         if len(consumables) == 0:

@@ -65,6 +65,9 @@ def train_new_parser(parser_train_file, parser_path, ont_path, lex_path, lex_wei
     #Used to train existing parser on new data. 
     #parser = load_obj_general(sys.argv[5])
 
+    #Computes values for NULL node score contribution. 
+    parser.compute_null_node_scores()
+
     # Set parser hyperparams to best known values for test time
     parser.max_multiword_expression = 4  # max span of a multi-word expression to be considered during tokenization
     parser.max_new_senses_per_utterance = 0  # max number of new word senses that can be induced on a training example

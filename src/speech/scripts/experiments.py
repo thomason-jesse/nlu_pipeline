@@ -32,6 +32,7 @@ Author(s): Rodolfo Corona, rcorona@utexas.edu | Aishwarya Padmakumar, aish@cs.ut
 import ctypes
 import os
 import sys
+import numpy as np
 
 #TODO Change if necessary. 
 #Adds nlu_pipeline src folder in order to import modules from it. 
@@ -131,10 +132,16 @@ def un_tokenize_from_parser(phrase):
 
 """
 Gets score of hypothesis element.
-Used for re-ranking. 
+Used for CKY re-ranking. 
 """
 def get_hyp_score(hypothesis):
     return hypothesis[1][1]
+
+"""
+Returns the last element of a list. 
+"""
+def get_last_element_as_float(l):
+    return float(l[-1])
 
 """
 Returns the best valid parse found given a parser
@@ -174,9 +181,15 @@ def get_first_valid_parse(phrase, parser, num_max_phrases=20):
           
             elif parser.print_parse(parse.node).startswith('and'):
                 continue
+        
+            #Final check to make sure parse follows parser's lexicon rules. 
+            try:
+                #This will fail if parse is not valid. 
+                parser.lexicon.read_semantic_form_from_str(parser.print_parse(parse.node), None, None, [], False)
 
-            #Valid parse found.
-            return (parse, score)
+                return (parse, score)
+            except: 
+                continue 
         
     except (KeyboardInterrupt, SystemExit):
         raise
@@ -198,6 +211,160 @@ def get_first_valid_parse(phrase, parser, num_max_phrases=20):
     #No valid parse found within beam. 
     return (None, float('-inf'))
 
+#Computes values needed for incorporating NULL nodes into parse scores. 
+def compute_parser_null_node_values(parser):
+    #p(null) i.e. the prior on a null token. 
+    parser.theta.null_prior = float('-inf')
+
+    parser.theta.CCG_given_token #p(c|s)
+    parser.theta.lexicon.entries # |SF|
+    parser.theta.lexicon.categories #|CCG| 
+
+    #Computes sum _c sum _s p(c|s)
+    for pair in parser.theta.CCG_given_token:
+        parser.theta.null_prior = np.logaddexp(parser.theta.null_prior, parser.theta.CCG_given_token[pair])
+
+    #Normalizes by |SF| * |CCG|
+    parser.theta.null_prior -= np.log(len(parser.theta.lexicon.entries)) + np.log(len(parser.theta.lexicon.categories))
+
+    #computes p(root|root, null) for each CCG category i.e. the contribution from adding the null node to the root.
+    parser.theta.null_conditional_prob = {}
+
+    print "********************"
+    print  parser.theta.CCG_production
+    print parser.theta.lexicon.categories
+
+    for i in range(len(parser.theta.lexicon.categories)):
+        #Starts with log probability of 0. 
+        parser.theta.null_conditional_prob[i] = float('-inf')
+
+        for j in range(len(parser.theta.lexicon.categories)):
+            #Gets production probability p(root ccg | root ccg, c) for every CCG category c. 
+            if (i, i, j) in parser.theta.CCG_production:
+                log_prob = parser.theta.CCG_production[(i, i, j)]
+            else:
+                log_prob = float('-inf')
+
+            #Adds probability to sum. 
+            parser.theta.null_conditional_prob[i] = np.logaddexp(parser.theta.null_conditional_prob[i], log_prob) 
+
+        #Normalizes (i.e. divides by |CCG| ). 
+        parser.theta.null_conditional_prob[i] -= np.log(len(parser.theta.lexicon.categories))
+
+    #Computes p(_ | _, null) i.e. the average probability of a production. 
+    parser.theta.null_average_production_prob = float('-inf')
+
+    for i in range(len(parser.theta.lexicon.categories)):
+        for j in range(len(parser.theta.lexicon.categories)):
+            for k in range(len(parser.theta.lexicon.categories)): 
+                #Gets probability for category. 
+                if (i, j, k) in parser.theta.CCG_production:
+                    log_prob = parser.theta.CCG_production[(i, j, k)]
+                else:
+                    log_prob = float('-inf')
+
+                parser.theta.null_average_production_prob = np.logaddexp(parser.theta.null_average_production_prob, log_prob)
+
+    #Normalizes
+    parser.theta.null_average_production_prob -= np.log(len(parser.theta.lexicon.categories) ** 3)
+
+    print "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+    print parser.theta.null_prior
+    print parser.theta.null_conditional_prob
+    print parser.theta.null_average_production_prob
+    print "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+
+"""
+Re-ranks a result file using a given function. 
+"""
+def re_rank_function(in_file_name, out_file_name, parser_path, function):
+    if function == 'null_node':
+        re_rank_null_node(in_file_name, out_file_name, parser_path)
+
+"""
+Re-ranks a CKY re-ranked file's results
+with the incorporation of null nodes
+in order to better compare phrases
+of different token lengths. 
+"""
+def re_rank_null_node(in_file_name, out_file_name, parser_path):
+    in_file = open(in_file_name, 'r')
+
+    #Loads parser
+    parser = load_obj_general(parser_path)
+
+    #Computes values needed for null node contribution. 
+    compute_parser_null_node_values(parser)
+
+    #Keeps track of data. 
+    data = []
+    hypotheses = None
+    ground_truth = None
+
+    #Limits the number of hypotheses to re-rank.
+    limit = 10
+
+    for line in in_file:
+        #Delimits new phrase. 
+        if line.startswith('#'):
+            counter = 0
+
+            #Adds last phrase and hypotheses if it exists. 
+            if not (hypotheses == None or ground_truth == None):
+                data.append([ground_truth, hypotheses])
+
+            ground_truth = line.strip().split('#')[1]
+            
+            #Starts new list of hypotheses. 
+            hypotheses = []
+        else:
+            counter += 1
+    
+            #Gets hypothesis and feeds it to parser to get top scoring parse score. 
+            hypothesis_values = line.strip().split(';')
+            hypothesis = hypothesis_values[0]
+
+            tokenized_hypothesis = tokenize_for_parser(hypothesis)
+
+            #Gets number of tokens in hypothesis. 
+            num_toks = len(tokenized_hypothesis.split())
+
+            #Hypotheses greater than 7 tokens in length are not considered. 
+            if counter > limit or num_toks > 7:
+                parse_score = float('-inf')
+            else:
+                #Determines number of null nodes to add to parse score. 
+                num_nulls = 7 - num_toks
+
+                #Computes new parse score with added null nodes. 
+                parse_score = float(hypothesis_values[-1]) + num_nulls * (parser.theta.null_prior + parser.theta.null_average_production_prob)
+            
+            hypothesis_values[-1] = str(parse_score)
+
+            hypotheses.append(hypothesis_values)
+
+    #Gets the last hypothesis. 
+    if not (hypotheses == None or ground_truth == None):
+        data.append([ground_truth, hypotheses])
+
+    #Reranks list.
+    for truth_hyp_list in data:
+        truth_hyp_list[1] = sorted(truth_hyp_list[1], key=get_last_element_as_float, reverse=True)
+        
+    #Writes re-ranked hypotheses to new file. 
+    re_ranked_file = open(out_file_name, 'w')
+    
+    for truth_hyp_list in data:
+        #Writes ground truth phrase. 
+        re_ranked_file.write('#' + truth_hyp_list[0] + '\n')
+
+        #Writes hypotheses. 
+        for hypothesis in truth_hyp_list[1]:
+            re_ranked_file.write(';'.join(hypothesis) + '\n')
+
+    re_ranked_file.close()
+
+
 """
 This method takes a file with n results
 from speech recognition and re-ranks them
@@ -209,18 +376,25 @@ def re_rank_CKY(nbest_file_name, re_ranked_file_name, parser_path):
     #Loads parser. 
     parser = load_obj_general(parser_path)
 
+    #Computes values needed for null node contribution.
+    compute_parser_null_node_values(parser)
+
+    #TODO Incorporate computed null node values into this function (Currently not implemented). 
+
     #Keeps track of data. 
     data = []
     hypotheses = None
     ground_truth = None
-    parse_score = None
+    parse = None
 
-    #Keeps track of phrases which have already been scored to speed up process. 
-    parses = {}
+    #Limits the number of hypotheses to re-rank.
+    limit = 10
 
     for line in nbest_file:
         #Delimits new phrase. 
         if line.startswith('#'):
+            counter = 0
+
             #Adds last phrase and hypotheses if it exists. 
             if not (hypotheses == None or ground_truth == None or parse == None):
                 data.append([ground_truth, hypotheses])
@@ -230,25 +404,27 @@ def re_rank_CKY(nbest_file_name, re_ranked_file_name, parser_path):
             #Starts new list of hypotheses. 
             hypotheses = []
         else:
+            counter += 1
+    
             #Gets hypothesis and feeds it to parser to get top scoring parse score. 
             hypothesis = line.strip().split(';')[0]
             tokenized_hypothesis = tokenize_for_parser(hypothesis)
 
             #Hypotheses greater than 7 tokens in length are not considered. 
-            if len(tokenized_hypothesis.split()) > 7:
-                parse_score = (None, float('-inf'))
-            elif tokenized_hypothesis in parses:
-                parse = parses[tokenized_hypothesis]
+            if counter > limit or len(tokenized_hypothesis.split()) > 7:
+                parse = (None, float('-inf'))
             else:
                 #Some times parser suffers an error. 
                 try:
-                    parse = get_first_valid_parse(hypothesis, parser)
+                    parse = get_first_valid_parse(tokenized_hypothesis, parser)
                 except TypeError:
                     parse = (None, float('-inf'))
                     
-                parses[tokenized_hypothesis] = parse
-          
             hypotheses.append([hypothesis, parse])
+
+    #Gets the last hypothesis. 
+    if not (hypotheses == None or ground_truth == None or parse == None):
+        data.append([ground_truth, hypotheses])
 
     #Reranks list.
     for truth_hyp_list in data:
@@ -290,7 +466,7 @@ etc.
 """
 def print_usage():
     print 'ASR Nbest: ./experiments asr_n_best [sphinx_shared_library] [ac_model] [lm] [dict] [test_file] [nbest_file] [n]'
-    print 'CKYParser re-rank: ./experiments parser_rerank [nbest_file] [re-ranked_file_name] [parser_path]'
+    print 'CKYParser re-rank: ./experiments parser_rerank [nbest_file] [re-ranked_file_name] [parser_path] [optional: null_node]'
 
 if __name__ == '__main__':
     if not len(sys.argv) >= 2:
@@ -306,7 +482,7 @@ if __name__ == '__main__':
             sphinx.close_decoder()
 
     elif sys.argv[1] == 'parser_rerank':
-        if not len(sys.argv) == 5:
-            print_usage()
-        else:
+        if len(sys.argv) == 5:
             re_rank_CKY(sys.argv[2], sys.argv[3], sys.argv[4])
+        elif len(sys.argv) == 6:
+            re_rank_function(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
