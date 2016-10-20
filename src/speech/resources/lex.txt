@@ -23,7 +23,7 @@ no :- C : no
 none :- C : none
 
 #these are weird now bc there's some implicit knowledge in hasoffice that the second arg is an office
-'s office :- NP\NP : lambda x:p.(the(lambda y:l.(possesses(y,x))))
+'s office :- NP\NP : lambda x:p.(the(lambda y:l.(and(office(y), possesses(y,x)))))
 office of :- N/NP : lambda x:p.(lambda y:l.(possesses(y,x)))
 
 #entity descriptor words
