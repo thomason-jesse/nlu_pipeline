@@ -85,6 +85,7 @@ import sys
 import os
 import glob
 import shutil
+import post_process
 
 ###########################################################################
 ################ GENERAL PREPROCESSING FUNCTIONS ##########################
@@ -311,6 +312,9 @@ def make_exp_dir_structure(exp_dir):
 
     #Folder to store log files in for experiments or training runs.
     make_dir(exp_dir + '/logs')
+    make_dir(exp_dir + '/logs/training/')
+    make_dir(exp_dir + '/logs/experiments/')
+    make_dir(exp_dir + '/logs/evaluations/')
 
     #Folder to store ASR related training files. 
     make_dir(exp_dir + '/asr_training')
@@ -334,9 +338,11 @@ def make_exp_dir_structure(exp_dir):
     make_dir(exp_dir + '/evaluations/wer')
     make_dir(exp_dir + '/evaluations/top_1')
     make_dir(exp_dir + '/evaluations/top_5')
+    make_dir(exp_dir + '/evaluations/sem_full')
+    make_dir(exp_dir + '/evaluations/sem_partial')
 
 """
-Takes a corpus folder and creates a
+Takes a preprocessed corpus folder and creates a
 new corpus from it by splitting it
 into folds. This new corpus
 may be used for cross-fold
@@ -429,6 +435,29 @@ def create_parser_training_file(corpus_folder, parser_training_file_folder, filt
 
     #Closes the training file. 
     parser_training_file.close()
+
+"""
+Adds type constraints to a .usr file for use
+by parser. 
+"""
+def add_type_constraints_to_usr_file(file_name):
+    old_file = open(file_name, 'r')
+    tmp_file = open('temp.txt', 'w')
+
+    for line in old_file:
+        line_elements = line.split(';')    
+
+        #Gets semantic form and replaces it. 
+        new_semantic_form = post_process.add_type_constraints(line.split(';')[1].split('M : ')[1].strip()) 
+        line_elements[1] = 'M : ' + new_semantic_form 
+
+        #Writes new semantic form to new file. 
+        tmp_file.write(';'.join(line_elements))
+
+    tmp_file.close()
+
+    #Overwrites old file with new one, now containing type constraints. 
+    os.rename('temp.txt', file_name)
 
 ###############################################################################
 
@@ -527,8 +556,7 @@ by Sphinx to either adapt an accoustic model
 or calculate WER. 
 """
 def create_asr_transcripts(corpus_folder, transcript_files_folder):
-    #Gets base name of corpus folder to name files, generally should be either 'train' or 'test'
-    name = corpus_folder.split('/')[-1]
+    name = 'train'
 
     #Will contain relative paths for recordings according to top level folder. 
     #Used by Sphinx to coordinate accoustic model adaptation and WER computations. 

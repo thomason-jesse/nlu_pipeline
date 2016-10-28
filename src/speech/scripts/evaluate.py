@@ -255,6 +255,108 @@ def semantic_form(result_file_name, evaluation_file_name, parser_file):
     evaluation_file.write("CORRECT:" + str(count_correct) + '\n')
     evaluation_file.close()
 
+def semantic_form_partial(result_file_name, evaluation_file_name, parser_file): 
+    result_file = open(result_file_name, 'r')
+
+    #Gets absolute path for evaluation file name. 
+    evaluation_file_name = os.path.abspath(evaluation_file_name)
+
+    #Reads in data. 
+    data = []
+    line = None
+
+    while not line == '':
+        line = result_file.readline()
+
+        #Pound delimits phrase. 
+        if line.startswith('#'):
+            phrase, semantic_form = line.strip().split('#')[1].split(';')
+
+            #Line immediately after phrase is top scoring hypothesis. 
+            line = result_file.readline().strip()
+            hypothesis = line.split(';')
+
+            data.append([semantic_form, hypothesis, phrase])
+
+    #Loads parser. 
+    parser = load_obj_general(parser_file)
+
+    #Counts for evaluation. 
+    recall = 0.0
+    precision = 0.0
+    f1_score = 0.0
+    total_count = 0.0
+
+    print parser.ontology.preds
+
+    #Evaluates data set. 
+    for truth_hyp_phrase in data:
+        total_count += 1.0
+
+        true_semantic_form, hyp, phrase = truth_hyp_phrase
+        true_semantic_form = ':'.join(true_semantic_form.split(':')[1:])
+
+        #Gets semantic node from true semantic form. 
+        true_node = parser.lexicon.read_semantic_form_from_str(true_semantic_form, None, None, [], False)
+
+        #Parses top hypothesis to get semantic node.
+        if len(hyp) == 2: #In this case, only score and  phrase hyp are present. 
+            parse = get_first_valid_parse(tokenize_for_parser(hyp[0]), parser)[0]
+
+            #Continues if no valid parse was found for hypothesis. 
+            if parse == None:
+                continue
+            else:
+                hyp_node = parse.node
+
+        #In this case, score, phrase, and semantic form are present, so check form is valid. 
+        elif hyp[1] == "None":
+            continue
+        else:
+            hyp_node = parser.lexicon.read_semantic_form_from_str(hyp[1], None, None, [], False)
+
+        #Evaluates recall and precision for hypothesis and adds values to counts. 
+        true_preds = [triple[0] for triple in parser.theta.count_semantics(true_node)]
+        hyp_preds = [triple[0] for triple in parser.theta.count_semantics(hyp_node)]
+        true_args = [triple[1] for triple in parser.theta.count_semantics(true_node)]
+        hyp_args = [triple[1] for triple in parser.theta.count_semantics(hyp_node)]
+
+        hyp_precision = 0.0
+        hyp_recall = 0.0
+
+        #precision = # correct preds out of total guessed. 
+        for hyp_pred in hyp_preds:
+            if hyp_pred in true_preds:
+                hyp_precision += 1.0
+
+        #recall = # correct preds out of total number correct. 
+        for true_pred in true_preds:
+            if true_pred in hyp_preds:
+                hyp_recall += 1.0
+
+        #Adds values. 
+        hyp_precision /= len(hyp_preds)
+        hyp_recall /= len(true_preds)
+
+        precision += hyp_precision
+        recall += hyp_recall
+
+        if not (hyp_precision == 0 and hyp_recall == 0):
+            f1_score += 2 * hyp_precision * hyp_recall / (hyp_precision + hyp_recall)   
+        
+
+    #Normalizes
+    precision /= total_count
+    recall /= total_count
+    f1_score /= total_count
+
+    #Writes evaluation results.
+    evaluation_file = open(evaluation_file_name, 'w')
+    evaluation_file.write("AVG PRECISION:" + str(precision) + '\n')
+    evaluation_file.write("AVG RECALL:" + str(recall) + '\n')
+    evaluation_file.write("AVG F1:" + str(f1_score))
+    evaluation_file.close()
+
 def grounded_forms(ont_file, lex_file, kb_pickle):
     #Loads information needed for grounding. 
     ontology = Ontology(ont_file)
@@ -298,7 +400,7 @@ def grounded_forms(ont_file, lex_file, kb_pickle):
 def print_usage():
     print 'WER: ./evaluate.py wer [result_file] [evaluation_file_name]'
     print 'Correct hypothesis in top n: ./evaluate.py top_n [result_file] [evaluation_file_name] [n]'
-    print 'Semantic form evaluation: ./evaluate.py semantic_form [result_file] [evaluation_file_name] [parser]'
+    print 'Semantic form evaluation: ./evaluate.py semantic_form [result_file] [evaluation_file_name] [parser] [full/partial]'
     print 'Grounding: ./evaluate.py grounding [ont file] [lex file] [kb pickle file]'
 
 
@@ -319,10 +421,14 @@ if __name__ == '__main__':
             correct_in_top_n(sys.argv[2], sys.argv[3], sys.argv[4])
 
     elif sys.argv[1] == 'semantic_form':
-        if not len(sys.argv) == 5:
+        if not len(sys.argv) == 6:
             print_usage()
-        else:
+        elif sys.argv[5] == 'full':
             semantic_form(sys.argv[2], sys.argv[3], sys.argv[4])
+        elif sys.argv[5] == 'partial':
+            semantic_form_partial(sys.argv[2], sys.argv[3], sys.argv[4])
+        else:
+            print_usage()
 
     elif sys.argv[1] == 'grounding':
         if len(sys.argv) == 5:

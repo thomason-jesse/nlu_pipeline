@@ -42,6 +42,7 @@ sys.path.append(nlu_pipeline_path)
 #Nlu pipeline modules.
 try:
     import CKYParser
+    from CKYParser import count_ccg_productions
     from utils import *
 except ImportError:
     print 'ERROR: Unable to load nlu_pipeline_modules! Verify that nlu_pipeline_path is set correctly!'
@@ -282,6 +283,18 @@ def re_rank_function(in_file_name, out_file_name, parser_path, function):
         re_rank_null_node(in_file_name, out_file_name, parser_path)
 
 """
+Gets the average probability of the
+productions in a given parse. 
+"""
+def get_avg_parse_production_prob(parser, parse):
+    #Gets semantic node using semantic form string. 
+    parse_node = parser.lexicon.read_semantic_form_from_str(parse, None, None, [], False)
+ 
+    print count_ccg_productions(parser.most_likely_cky_parse("go to ray 's office").next()[0])
+
+    sys.exit()
+
+"""
 Re-ranks a CKY re-ranked file's results
 with the incorporation of null nodes
 in order to better compare phrases
@@ -337,7 +350,7 @@ def re_rank_null_node(in_file_name, out_file_name, parser_path):
                 num_nulls = 7 - num_toks
 
                 #Computes new parse score with added null nodes. 
-                parse_score = float(hypothesis_values[-1]) + num_nulls * (parser.theta.null_prior + parser.theta.null_average_production_prob)
+                parse_score = float(hypothesis_values[-1]) + num_nulls * (parser.theta.null_prior + get_avg_parse_production_prob(parser, hypothesis_values[1]))#parser.theta.null_average_production_prob)
             
             hypothesis_values[-1] = str(parse_score)
 
@@ -409,14 +422,35 @@ def re_rank_CKY(nbest_file_name, re_ranked_file_name, parser_path):
             #Gets hypothesis and feeds it to parser to get top scoring parse score. 
             hypothesis = line.strip().split(';')[0]
             tokenized_hypothesis = tokenize_for_parser(hypothesis)
+            num_toks = len(tokenized_hypothesis.split())
 
             #Hypotheses greater than 7 tokens in length are not considered. 
-            if counter > limit or len(tokenized_hypothesis.split()) > 7:
+            if counter > limit or num_toks > 7:
                 parse = (None, float('-inf'))
             else:
                 #Some times parser suffers an error. 
                 try:
+                    #Gets parse. 
                     parse = get_first_valid_parse(tokenized_hypothesis, parser)
+
+                    if not parse[0] == None:
+                        #Computes avg. production probability. 
+                        avg_prod_prob = float('-inf')
+                        num_prods = 0.0
+                        productions = count_ccg_productions(parse[0])
+
+                        for production in productions:
+                            avg_prod_prob = np.logaddexp(avg_prod_prob, parser.theta.CCG_production[production])
+                            num_prods += float(productions[production])
+
+                        avg_prod_prob -= np.log(num_prods)
+
+                        #Modifies score according to number of null nodes. 
+                        num_nulls = 7 - num_toks
+                        parse_score = parse[1] + num_nulls * (parser.theta.null_prior + avg_prod_prob)
+
+                        parse = (parse[0], parse_score)
+
                 except TypeError:
                     parse = (None, float('-inf'))
                     
