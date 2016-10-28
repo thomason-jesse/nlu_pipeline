@@ -3,13 +3,13 @@ __author__ = 'aishwarya'
 import os
 import pickle
 import numpy
-import time
 
 # For typechecking
 from SemanticNode import SemanticNode
 
 
-models_path = 'src/nlu_pipeline/src/models/'
+#models_path = '/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/nlu_pipeline/src/models/'
+models_path = '/v/filer4b/v20q001/aish/Documents/Research/Code/catkin_ws/src/dialog_active_learning/src/models/'
 
 
 def save_model(obj, name):
@@ -35,7 +35,7 @@ def load_obj_general(name):
 def load_model(name, path=models_path):
     try:
         print os.path.join(path, str(name) + '.pkl')  # DEBUG
-        with open(os.path.join(path, str(name) + '.pkl'), 'r') as f:
+        with open(os.path.join(path, str(name) + '.pkl'), 'rb') as f:
             return pickle.load(f)
     except IOError:
         return None
@@ -104,6 +104,11 @@ def arg_max(d):
 def predicate_holds(predicate, argument, grounder):
     if argument is None:
         return False
+        
+    # Special case - things starting with "item_" are items
+    if argument.startswith('item_') and predicate == 'item' :
+        return True
+        
     if argument not in grounder.ontology.preds:
         return False
     if predicate not in grounder.ontology.preds:
@@ -128,20 +133,3 @@ def get_dict_val(dict_name, key):
         return None
     else:
         return dict_name[key]
-
-class FuncTimer:
-    def __init__(self, func_name):
-        self.func_name = None
-        self.start_t = None
-        self.end_t = None
-
-        self.start(func_name)
-
-    def start(self, func_name):
-        self.func_name = func_name
-#print "START FUNCTION: " + self.func_name
-        self.start_t = time.time()
-
-    def end(self):
-        self.end_t = time.time()
-        print "END FUNCTION: " + self.func_name + " TIME: " + str(self.end_t - self.start_t)

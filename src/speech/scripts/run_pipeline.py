@@ -11,9 +11,11 @@ Author: Rodolfo Corona, rcorona@utexas.edu
 #Python imports
 import sys
 import os
+import subprocess
 
 #Speech pipeline imports.
 import preprocess
+import train
 
 """
 Sets up an experiment
@@ -55,11 +57,75 @@ def set_up(preprocessed_corpus_path, n_fold_dir_path, n):
         preprocess.create_asr_test_files(test_path, fold_path + '/experiments/asr/test_files/', 2)
 
 """
+Trains language models, acoustic models, and
+parsers for each fold in an experiment directory. 
+"""
+def train_models(experiment_dir_path): 
+    for fold_name in os.listdir(experiment_dir_path):
+        #Forks and nohups training operations. 
+        pid = os.fork()
+
+        if pid == 0:
+            fold_path = experiment_dir_path + '/' + fold_name
+
+            #Trains ASR LM.
+            print 'Training fold ' + fold_name + ' LM...'
+
+            #Prepares arguments. 
+            args = ['./train.py', 'new_lm']                         #Specifies LM training. 
+            args.append(fold_path + '/asr_training/lm_train.txt')   #LM training file. 
+            args.append(fold_path + '/models/in-domain.lm')         #LM model save path. 
+
+            #Log file for output.
+            log_file = open(fold_path + '/logs/training/train_lm.txt', 'w')
+           
+            #Calls LM training program. 
+            subprocess.call(args, stdout=log_file, stderr=log_file)
+            log_file.close()
+           
+            #Adapts acoustic model to domain.
+            print 'Adapting acoustic model for fold ' + fold_name + '...'
+
+            args = ['./train.py', 'adapt_ac_model']                     #Specifies acoustic model adaptation. 
+            args.append('../resources/en-us/')                          #The directory containing the original acoustic model to be adapted. 
+            args.append(fold_path)                                      #The fold path. 
+            args.append('../corpora/raw/headset/')                      #The directory where the raw recording files are kept. 
+            args.append('../resources/cmudict-en-us.dict')              #The dictionary (i.e. lexicon) used by the ASR system. 
+
+            #Log file. 
+            log_file = open(fold_path + '/logs/training/adapt_ac.txt', 'w')
+
+            #Calls AC model adaptation program. 
+            subprocess.call(args, stdout=log_file, stderr = log_file)
+            log_file.close()
+
+            #Trains parser.
+            print  'Training parser for fold ' + fold_name + '...'
+
+            args = ['./train.py', 'new_parser']                             #Specifies parser training. 
+            args.append(fold_path + '/parser_training/parser_train.txt')    #Parser training file. 
+            args.append(fold_path + '/models/parser.cky')                   #Parser pickle file to save model. 
+            args.append('../resources/ont.txt')                             #The ontology to be used. 
+            args.append('../resources/lex.txt')                             #The lexicon to be used. 
+            args.append('50.0')                                             #The lexicon weight to use. 
+
+            #Log file. 
+            log_file = open(fold_path + '/logs/training/train_parser.txt', 'w')
+
+            #Calls parser training. 
+            subprocess.call(args, stdout=log_file, stderr=log_file)
+            log_file.close()
+
+            #Exits child process. 
+            sys.exit()
+
+"""
 Prints the usage instructions  
 for the script. 
 """
 def print_usage():
     print 'Create n-fold experiment folder with all files needed for training: ./run_pipeline.py set_up [preprocessed_corpus_path] [n_fold_dir_path] [n]'
+    print 'Train models: ./run_pipeline.py train [experiment_dir]'
 
 if __name__ == '__main__':
     if len(sys.argv) >= 2:
@@ -68,6 +134,13 @@ if __name__ == '__main__':
                 set_up(sys.argv[2], sys.argv[3], sys.argv[4])
             else:
                 print_usage()
+        
+        elif sys.argv[1] == 'train':
+            if len(sys.argv) == 3:
+                train_models(sys.argv[2])
+            else:
+                print_usage()
+
         else: 
             print_usage()
     else:

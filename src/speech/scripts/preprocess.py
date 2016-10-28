@@ -307,9 +307,6 @@ def make_exp_dir_structure(exp_dir):
     #Folder to store models in (e.g parser and language models).
     make_dir(exp_dir + '/models')
 
-    #Folder to keep files needed during acoustic model adaptation.
-    make_dir(exp_dir + '/models/ac_model_adapt_files')
-
     #Folder to store log files in for experiments or training runs.
     make_dir(exp_dir + '/logs')
     make_dir(exp_dir + '/logs/training/')
