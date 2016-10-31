@@ -16,6 +16,7 @@ import subprocess
 #Speech pipeline imports.
 import preprocess
 import train
+import evaluate
 
 """
 Sets up an experiment
@@ -69,8 +70,6 @@ def train_models(experiment_dir_path):
             fold_path = experiment_dir_path + '/' + fold_name
 
             #Trains ASR LM.
-            print 'Training fold ' + fold_name + ' LM...'
-
             #Prepares arguments. 
             args = ['./train.py', 'new_lm']                         #Specifies LM training. 
             args.append(fold_path + '/asr_training/lm_train.txt')   #LM training file. 
@@ -84,8 +83,6 @@ def train_models(experiment_dir_path):
             log_file.close()
            
             #Adapts acoustic model to domain.
-            print 'Adapting acoustic model for fold ' + fold_name + '...'
-
             args = ['./train.py', 'adapt_ac_model']                     #Specifies acoustic model adaptation. 
             args.append('../resources/en-us/')                          #The directory containing the original acoustic model to be adapted. 
             args.append(fold_path)                                      #The fold path. 
@@ -100,8 +97,6 @@ def train_models(experiment_dir_path):
             log_file.close()
 
             #Trains parser.
-            print  'Training parser for fold ' + fold_name + '...'
-
             args = ['./train.py', 'new_parser']                             #Specifies parser training. 
             args.append(fold_path + '/parser_training/parser_train.txt')    #Parser training file. 
             args.append(fold_path + '/models/parser.cky')                   #Parser pickle file to save model. 
@@ -120,12 +115,79 @@ def train_models(experiment_dir_path):
             sys.exit()
 
 """
+Runs the first experiment, which consists
+of running the ASR on the corpus' first fold, ending with
+re-ranking it using the CKY-reranker. Also re-ranks the second
+test set in order to be able to compare performance with second experiment
+(re-ranking and re-training). 
+"""
+def exp1(experiment_dir_path): 
+    #Runs a separate thread for each fold. 
+    for fold_name in os.listdir(experiment_dir_path):
+        pid = os.fork()
+
+        if pid == 0: 
+            fold_path = experiment_dir_path + '/' + fold_name
+            result_file_path = fold_path + '/experiments/asr/result_files/'
+            test_file_path = fold_path + '/experiments/asr/test_files/'
+
+            #Runs ASR and parser re-ranking on each test fold.
+            for test_file in os.listdir(test_file_path):    
+                test_name = test_file.split('.')[0]
+
+                args = ['./experiments.py', 'asr_n_best']               #Specifies ASR experiment. 
+                args.append('../sphinx/build/libsphinx.so')             #Path to shared library file used by Pocketsphinx. 
+                args.append(fold_path + '/models/adapted_ac_model/')    #Path to fold's acoustic model. 
+                args.append(fold_path + '/models/in-domain.lm')         #Path to fold's in-domain LM. 
+                args.append('../resources/cmudict-en-us.dict')          #Path to english dictionary used by Sphinx. 
+                args.append(test_file_path + test_file)                 #Path to the test file being experimented on. 
+                args.append(result_file_path + test_name + '.nbest')    #Path to result file from experiment. 
+                args.append('10')                                       #Specifies that top 10 hypotheses should be used. 
+
+                #Log file. 
+                log_file = open(fold_path + '/logs/experiments/' + test_name + '.nbest', 'w')
+
+                #Runs experiment. 
+                subprocess.call(args, stdout=log_file, stderr=log_file)
+                
+                #Re-ranks file using CKY Parser. 
+                args = ['./experiments.py', 'parser_rerank'] 
+                args.append(result_file_path + test_name + '.nbest') 
+                args.append(result_file_path + test_name + '.cky') 
+                args.append(fold_path + '/models/parser.cky')
+                args.append(fold_name)
+
+                #Log file. 
+                log_file = open(fold_path + '/logs/experiments/' + test_name + '.cky', 'w')
+
+                #Runs  experiment. 
+                subprocess.call(args, stdout=log_file, stderr=log_file)
+
+            #Now evaluates files. 
+            for result_file in os.listdir(result_file_path):
+                result_file_name = result_file_path + result_file
+                eval_path = fold_path + '/evaluations'
+                parser_path = fold_path + '/models/parser.cky'
+
+                evaluate.semantic_form(result_file_name, eval_path + '/sem_full/' + result_file, parser_path)
+                evaluate.semantic_form(result_file_name, eval_path + '/sem_partial/' + result_file, parser_path)
+                evaluate.wer(result_file_name, eval_path + '/wer/' + result_file)
+                evaluate.correct_in_top_n(result_file_name, eval_path + '/top_1/' + result_file, 1)
+                evaluate.correct_in_top_n(result_file_name, eval_path + '/top_5/' + result_file, 5)
+
+            #Child process exit. 
+            sys.exit()
+
+
+
+"""
 Prints the usage instructions  
 for the script. 
 """
 def print_usage():
     print 'Create n-fold experiment folder with all files needed for training: ./run_pipeline.py set_up [preprocessed_corpus_path] [n_fold_dir_path] [n]'
     print 'Train models: ./run_pipeline.py train [experiment_dir]'
+    print 'Run 1st experiments (re-ranking on initial speech output): ./run_pipeline.py exp1 [experiment_dir]'
 
 if __name__ == '__main__':
     if len(sys.argv) >= 2:
@@ -138,6 +200,12 @@ if __name__ == '__main__':
         elif sys.argv[1] == 'train':
             if len(sys.argv) == 3:
                 train_models(sys.argv[2])
+            else:
+                print_usage()
+
+        elif sys.argv[1] == 'exp1':
+            if len(sys.argv) == 3:
+                exp1(sys.argv[2])
             else:
                 print_usage()
 

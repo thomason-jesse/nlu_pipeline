@@ -58,7 +58,7 @@ This evaluates the WER rate
 for all the phrases in a result
 file using the top hypothesis. 
 """
-def wer(result_file_name, evaluation_file_name):
+def wer(result_file_name, evaluation_file_name, temp_name=''):
     result_file = open(result_file_name, 'r')
 
     #Gets absolute path for evaluation file name. 
@@ -83,8 +83,8 @@ def wer(result_file_name, evaluation_file_name):
 
     #Creates temporary files to run evaluations on.
     os.chdir('../bin')
-    transcript_file = open('transcripts.txt', 'w')
-    hyp_file = open('hyp.txt', 'w')
+    transcript_file = open(temp_name + 'transcripts.txt', 'w')
+    hyp_file = open(temp_name + 'hyp.txt', 'w')
 
     #Used for naming phrases, needed by wer script. 
     count = 0
@@ -185,7 +185,7 @@ def semantic_form(result_file_name, evaluation_file_name, parser_file):
 
         #Pound delimits phrase. 
         if line.startswith('#'):
-            phrase, semantic_form = line.strip().split('#')[1].split(';')
+            phrase, semantic_form, _ = line.strip().split('#')[1].split(';')
 
             #Line immediately after phrase is top scoring hypothesis. 
             line = result_file.readline().strip()
@@ -270,7 +270,7 @@ def semantic_form_partial(result_file_name, evaluation_file_name, parser_file):
 
         #Pound delimits phrase. 
         if line.startswith('#'):
-            phrase, semantic_form = line.strip().split('#')[1].split(';')
+            phrase, semantic_form, _ = line.strip().split('#')[1].split(';')
 
             #Line immediately after phrase is top scoring hypothesis. 
             line = result_file.readline().strip()
@@ -286,8 +286,6 @@ def semantic_form_partial(result_file_name, evaluation_file_name, parser_file):
     precision = 0.0
     f1_score = 0.0
     total_count = 0.0
-
-    print parser.ontology.preds
 
     #Evaluates data set. 
     for truth_hyp_phrase in data:

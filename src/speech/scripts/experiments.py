@@ -231,10 +231,6 @@ def compute_parser_null_node_values(parser):
     #computes p(root|root, null) for each CCG category i.e. the contribution from adding the null node to the root.
     parser.theta.null_conditional_prob = {}
 
-    print "********************"
-    print  parser.theta.CCG_production
-    print parser.theta.lexicon.categories
-
     for i in range(len(parser.theta.lexicon.categories)):
         #Starts with log probability of 0. 
         parser.theta.null_conditional_prob[i] = float('-inf')
@@ -269,12 +265,6 @@ def compute_parser_null_node_values(parser):
     #Normalizes
     parser.theta.null_average_production_prob -= np.log(len(parser.theta.lexicon.categories) ** 3)
 
-    print "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
-    print parser.theta.null_prior
-    print parser.theta.null_conditional_prob
-    print parser.theta.null_average_production_prob
-    print "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
-
 """
 Re-ranks a result file using a given function. 
 """
@@ -300,7 +290,7 @@ with the incorporation of null nodes
 in order to better compare phrases
 of different token lengths. 
 """
-def re_rank_null_node(in_file_name, out_file_name, parser_path):
+def re_rank_null_node(in_file_name, out_file_name, parser_path, temp_name=''):
     in_file = open(in_file_name, 'r')
 
     #Loads parser
@@ -383,16 +373,15 @@ This method takes a file with n results
 from speech recognition and re-ranks them
 using the CKYParser class. 
 """
-def re_rank_CKY(nbest_file_name, re_ranked_file_name, parser_path):
+def re_rank_CKY(nbest_file_name, re_ranked_file_name, parser_path, temp_name=''):
     nbest_file = open(nbest_file_name, 'r')
+    new_nbest_file = open(temp_name + 'temp.txt', 'w')  #Will be same as nbest, but contain parses so that it may be evaluated using the semantic form evaluations. 
 
     #Loads parser. 
     parser = load_obj_general(parser_path)
 
     #Computes values needed for null node contribution.
     compute_parser_null_node_values(parser)
-
-    #TODO Incorporate computed null node values into this function (Currently not implemented). 
 
     #Keeps track of data. 
     data = []
@@ -416,6 +405,8 @@ def re_rank_CKY(nbest_file_name, re_ranked_file_name, parser_path):
             
             #Starts new list of hypotheses. 
             hypotheses = []
+
+            new_nbest_file.write(line)
         else:
             counter += 1
     
@@ -456,6 +447,23 @@ def re_rank_CKY(nbest_file_name, re_ranked_file_name, parser_path):
                     
             hypotheses.append([hypothesis, parse])
 
+            #Writes to new nbest file. 
+            line_elements = line.strip().split(';')
+
+            #Hypothesis string.
+            new_line_elements = [line_elements[0]] 
+
+            #The parse's semantic form.
+            if parse[0] == None:
+                new_line_elements.append(str(None))
+            else:
+                new_line_elements.append(parser.print_parse(parse[0].node))  
+            
+            new_line_elements.append(str(parse[1]))    #The parse's score. 
+            new_line_elements.append(line_elements[1]) #The speech hypothesis ASR score.
+
+            new_nbest_file.write(';'.join(new_line_elements) + '\n')
+
     #Gets the last hypothesis. 
     if not (hypotheses == None or ground_truth == None or parse == None):
         data.append([ground_truth, hypotheses])
@@ -489,6 +497,9 @@ def re_rank_CKY(nbest_file_name, re_ranked_file_name, parser_path):
 
     re_ranked_file.close()
 
+    #Updates n-best file. 
+    os.rename(temp_name + 'temp.txt', nbest_file_name)
+
 #########################################################################################################
 
 
@@ -500,7 +511,7 @@ etc.
 """
 def print_usage():
     print 'ASR Nbest: ./experiments asr_n_best [sphinx_shared_library] [ac_model] [lm] [dict] [test_file] [nbest_file] [n]'
-    print 'CKYParser re-rank: ./experiments parser_rerank [nbest_file] [re-ranked_file_name] [parser_path] [optional: null_node]'
+    print 'CKYParser re-rank: ./experiments parser_rerank [nbest_file] [re-ranked_file_name] [parser_path] [temp_name] [optional: null_node]'
 
 if __name__ == '__main__':
     if not len(sys.argv) >= 2:
@@ -512,11 +523,11 @@ if __name__ == '__main__':
         else:
             sphinx = SphinxExperiment(sys.argv[2])
             sphinx.init_decoder(sys.argv[3], sys.argv[4], sys.argv[5])
-            sphinx.nbest(sys.argv[6], sys.argv[7], sys.argv[8])
+            sphinx.n_best(sys.argv[6], sys.argv[7], sys.argv[8])
             sphinx.close_decoder()
 
     elif sys.argv[1] == 'parser_rerank':
-        if len(sys.argv) == 5:
-            re_rank_CKY(sys.argv[2], sys.argv[3], sys.argv[4])
-        elif len(sys.argv) == 6:
-            re_rank_function(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
+        if len(sys.argv) == 6:
+            re_rank_CKY(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
+        elif len(sys.argv) == 7:
+            re_rank_function(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6])
