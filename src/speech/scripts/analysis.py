@@ -2,15 +2,16 @@
 
 """
 The functions in this script may
-be used in order to conduct error
+be used in order to conduct
 analysis on experiment results and
-evaluations. 
+evaluations (including error analysis). 
 
 Author: Rodolfo Corona, rcorona@utexas.edu
 """
 
 import sys
 import os
+from scipy.stats import ttest_rel
 
 #Path to nlu_pipeline modules. #TODO Change if needed. 
 nlu_pipeline_path = '/scratch/cluster/rcorona/nlu_pipeline/src/'
@@ -167,6 +168,274 @@ def extract_corpus_statistics(usr_file_folder):
     return [avg_length, avg_num_phrases, num_usrs, phrase_range]
 
 """
+Extracts recall, precision, and f1 scores
+from a partial semantic form evaluation 
+file. 
+"""
+def extract_sem_partial_scores_from_file(evaluation_file_name):
+    evaluation_file = open(evaluation_file_name, 'r')
+    lines = evaluation_file.readlines()
+
+    precision = float(lines[0].strip().split(':')[1])
+    recall = float(lines[1].strip().split(':')[1])
+    f1 = float(lines[2].strip().split(':')[1])
+
+    return [f1, precision, recall]
+
+def extract_sem_full_avg_from_file(evaluation_file_name):
+    evaluation_file = open(evaluation_file_name, 'r')
+    lines = evaluation_file.readlines()
+
+    total = float(lines[0].strip().split(':')[1])
+    correct = float(lines[1].strip().split(':')[1])
+
+    return correct / total
+
+"""
+This function extracts the top n evaluation
+results from a given file. 
+"""
+def extract_topn_result_from_file(topn_file_name):
+    topn_file = open(topn_file_name, 'r')
+
+    for line in topn_file:
+        if line.startswith('ACCURACY'):
+            return float(line.split(':')[1].strip()) * 100
+
+
+"""
+This function extracts the WER rate 
+reported by the word_align.pl script
+in a given file. 
+"""
+def extract_wer_from_file(wer_file_name):
+    wer_file = open(wer_file_name)
+
+    #Line with WER follows distinct format. 
+    for line in wer_file:
+        if line.startswith('TOTAL Percent'):
+            wer = float(line.split('Error = ')[1].split('%')[0])
+
+            return wer
+
+"""
+Consolidates the results from 
+all folds on the top N evaluation
+metric for an experiment type. 
+"""
+def consolidate_topn_results(fold_folder, experiment_name, n):
+    #Scores for each fold. 
+    folds = {}
+
+    for fold_name in os.listdir(fold_folder):
+        evaluation_file = fold_folder + '/' + fold_name + '/evaluations/top_' + str(n) + '/' + experiment_name 
+
+        #Extracts scores from file.  
+        score = extract_topn_result_from_file(evaluation_file)
+    
+        folds[fold_name] = score
+
+    return folds
+
+
+"""
+Consolidates the results from 
+all folds on the WER
+evaluation metric for an experiment type. 
+"""
+def consolidate_wer_results(fold_folder, experiment_name):
+    #Scores for each fold. 
+    folds = {}
+
+    for fold_name in os.listdir(fold_folder):
+        evaluation_file = fold_folder + '/' + fold_name + '/evaluations/wer/' + experiment_name 
+
+        #Extracts scores from file.  
+        wer = extract_wer_from_file(evaluation_file)
+    
+        folds[fold_name] = wer
+
+    return folds
+
+
+"""
+Consolidates the results from all
+fold results on the partial semantic
+form evaluation metric for an experiment type. 
+"""
+def consolidate_sem_partial_results(fold_folder, experiment_name):
+    #Scores for each fold. 
+    folds = {}
+
+    for fold_name in os.listdir(fold_folder):
+        evaluation_file = fold_folder + '/' + fold_name + '/evaluations/sem_partial/' + experiment_name 
+
+        #Extracts scores from file.  
+        f1, p, r = extract_sem_partial_scores_from_file(evaluation_file)
+    
+        folds[fold_name] = {'f1': f1, 'p': p, 'r': r}
+
+    return folds
+
+"""
+Consolidates the results from all
+fold results on the full semantic
+form evaluation metric for an experiment type. 
+"""
+def consolidate_sem_full_results(fold_folder, experiment_name):
+    results = {}
+
+    for fold_name in os.listdir(fold_folder):
+        evaluation_file = fold_folder + '/' + fold_name + '/evaluations/sem_full/' + experiment_name 
+
+        #Extracts scores from file.  
+        results[fold_name] = extract_sem_full_avg_from_file(evaluation_file)
+  
+    return results
+
+"""
+Gets the average value in a list
+of floats. 
+"""
+def l_avg(l):
+    return sum(l) / float(len(l))
+
+"""
+Performs a t-test between
+two experiments accross all folds
+for the full semantic evaluation metric.
+"""
+def t_test_sem_full(corpus_folds_dir, exp1, exp2):
+    exp1_results = consolidate_sem_full_results(corpus_folds_dir, exp1)
+    exp2_results = consolidate_sem_full_results(corpus_folds_dir, exp2)
+
+    #Aligns scores for experiments. 
+    exp1_scores = []
+    exp2_scores = []
+
+    #NOTE Assumes both experiments have same folds. 
+    for fold_name in exp1_results:
+        exp1_scores.append(exp1_results[fold_name])
+        exp2_scores.append(exp2_results[fold_name])
+
+    print exp1 + ' avg: ' + str(l_avg(exp1_scores))
+    print exp2 + ' avg: ' + str(l_avg(exp2_scores))
+    print 'p-value: ' + str(ttest_rel(exp1_scores, exp2_scores)[1])
+
+"""
+Performs a t-test between
+two expeirments accross all folds
+for the WER evaluation metric. 
+"""
+def t_test_wer(corpus_folds_dir, exp1, exp2):
+    exp1_results = consolidate_wer_results(corpus_folds_dir, exp1)
+    exp2_results = consolidate_wer_results(corpus_folds_dir, exp2)
+
+    exp1_rates = []
+    exp2_rates = []
+
+    #NOTE Assumes both experiments have same folds. 
+    for fold_name in exp1_results:
+        exp1_rates.append(exp1_results[fold_name])
+        exp2_rates.append(exp2_results[fold_name])
+
+    print exp1 + ' avg: ' + str(l_avg(exp1_rates))
+    print exp2 + ' avg: ' + str(l_avg(exp2_rates))
+    print 'p-value: ' + str(ttest_rel(exp1_rates, exp2_rates)[1])
+
+def t_test_topn(corpus_folds_dir, exp1, exp2, n):
+    exp1_results = consolidate_topn_results(corpus_folds_dir, exp1, n)
+    exp2_results = consolidate_topn_results(corpus_folds_dir, exp2, n)
+
+    exp1_scores = []
+    exp2_scores = []
+
+    #NOTE Assumes both experiments have same folds. 
+    for fold_name in exp1_results:
+        exp1_scores.append(exp1_results[fold_name])
+        exp2_scores.append(exp2_results[fold_name])
+
+    print exp1 + ' avg: ' + str(l_avg(exp1_scores))
+    print exp2 + ' avg: ' + str(l_avg(exp2_scores))
+    print 'p-value: ' + str(ttest_rel(exp1_scores, exp2_scores)[1])
+
+"""
+Performs a t-test between 
+two experiments accross all folds
+for the partial semantic evaluation 
+metric. 
+"""
+def t_test_sem_partial(corpus_folds_dir, exp1, exp2):
+    exp1_results = consolidate_sem_partial_results(corpus_folds_dir, exp1)
+    exp2_results = consolidate_sem_partial_results(corpus_folds_dir, exp2)
+
+    #Prepares ordered arrays for to run t-test. 
+    exp1_f1 = []
+    exp2_f1 = []
+
+    exp1_p = []
+    exp2_p = []
+
+    exp1_r = []
+    exp2_r = []
+
+    #NOTE Assumes both experiments have same folds, which should be the case if the script got to here. 
+    for fold_name in exp1_results:
+        exp1_f1.append(exp1_results[fold_name]['f1'])
+        exp2_f1.append(exp2_results[fold_name]['f1'])
+
+        exp1_p.append(exp1_results[fold_name]['p'])
+        exp2_p.append(exp2_results[fold_name]['p'])
+
+        exp1_r.append(exp1_results[fold_name]['r'])
+        exp2_r.append(exp2_results[fold_name]['r'])
+
+    print 'F1' 
+    print '-----'
+    print 'p-value: ' + str(ttest_rel(exp1_f1, exp2_f1)[1])
+    print exp1 + ' avg.: ' + str(l_avg(exp1_f1)) 
+    print exp2 + ' avg.: ' + str(l_avg(exp2_f1)) 
+    print ''
+
+    print 'P'
+    print '-----'
+    print 'p-value: ' + str(ttest_rel(exp1_p, exp2_p)[1])
+    print exp1 + ' avg.: ' + str(l_avg(exp1_p))
+    print exp2 + ' avg.: ' + str(l_avg(exp2_p))
+    print ''
+
+    print 'R'
+    print '-----'
+    print 'p-value: ' + str(ttest_rel(exp1_r, exp2_r)[1])
+    print exp1 + ' avg.: ' + str(l_avg(exp1_r))
+    print exp2 + ' avg.: ' + str(l_avg(exp2_r))
+
+"""
+Performs a t-test between the 
+results of two experiments using
+a specified evaluation metric. 
+"""
+def t_test(corpus_folds_dir, eval_metric, exp1, exp2):
+    if eval_metric == 'sem_partial':
+        t_test_sem_partial(corpus_folds_dir, exp1, exp2)
+
+    elif eval_metric == 'sem_full':
+        t_test_sem_full(corpus_folds_dir, exp1, exp2)
+
+    elif eval_metric == 'wer':
+        t_test_wer(corpus_folds_dir, exp1, exp2)
+
+    elif eval_metric == 'top_1':
+        t_test_topn(corpus_folds_dir, exp1, exp2, 1)
+
+    elif eval_metric == 'top_5':
+        t_test_topn(corpus_folds_dir, exp1, exp2, 5)
+
+    else:
+        print 'Invalid evaluation metric specified!'
+        sys.exit()
+
+"""
 Prints the usage options
 for this script. 
 """
@@ -174,7 +443,7 @@ def print_usage():
     print 'Print parser parameters: ./analysis.py print_parser [parser_file]'
     print 'Count correct hypothesis indeces: ./analysis.py correct_hyp_indeces [corpus_folder] [exp_extension]'
     print 'Gather corpus statistics: ./analysis.py corpus_stats [corpus_usr_file_folder]'
-
+    print 't-test for statistical significance in diff between two experiment types: ./analysis.py t_test [corpus_folds_dir] [evaluation_metric] [exp1_name] [exp2_name]'
 
 if __name__ == '__main__':
     if not len(sys.argv) >= 2:
@@ -202,6 +471,12 @@ if __name__ == '__main__':
             print "NUM PHRASE RANGE: " + str(phrase_range)
             print "NUMBER OF USERS: " + str(num_usrs)
 
+        else:
+            print_usage()
+
+    elif sys.argv[1] == 't_test':
+        if len(sys.argv) == 6:
+            t_test(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
         else:
             print_usage()
 
