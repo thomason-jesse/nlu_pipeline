@@ -16,27 +16,11 @@ matplotlib.use('Agg')
 
 import matplotlib.pyplot as plt
 import numpy as np
-import error_analysis
+import analysis
 
 
 #More descriptive labels for experiment types. 
 experiment_types = {'nbest': 'Sphinx ASR', 'cky': 'Parser Re-ranking'}
-
-"""
-This function extracts the WER rate 
-reported by the word_align.pl script
-in a given file. 
-"""
-def extract_wer_from_file(wer_file_name):
-    wer_file = open(wer_file_name)
-
-    #Line with WER follows distinct format. 
-    for line in wer_file:
-        if line.startswith('TOTAL Percent'):
-            wer = float(line.split('Error = ')[1].split('%')[0])
-
-            return wer
-
 
 """
 This function visualizes the WER of different experiments by 
@@ -105,18 +89,6 @@ def visualize_cross_folds_wer(folds_experiment_directory, experiment_name):
     ax.set_ylabel('WER')
 
     plt.show()
-
-
-"""
-This function extracts the top n evaluation
-results from a given file. 
-"""
-def extract_topn_result_from_file(topn_file_name):
-    topn_file = open(topn_file_name, 'r')
-
-    for line in topn_file:
-        if line.startswith('ACCURACY'):
-            return float(line.split(':')[1].strip()) * 100
 
 
 """

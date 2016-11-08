@@ -170,7 +170,7 @@ def exp1(experiment_dir_path):
                 parser_path = fold_path + '/models/parser.cky'
 
                 evaluate.semantic_form(result_file_name, eval_path + '/sem_full/' + result_file, parser_path)
-                evaluate.semantic_form(result_file_name, eval_path + '/sem_partial/' + result_file, parser_path)
+                evaluate.semantic_form_partial(result_file_name, eval_path + '/sem_partial/' + result_file, parser_path)
                 evaluate.wer(result_file_name, eval_path + '/wer/' + result_file)
                 evaluate.correct_in_top_n(result_file_name, eval_path + '/top_1/' + result_file, 1)
                 evaluate.correct_in_top_n(result_file_name, eval_path + '/top_5/' + result_file, 5)
