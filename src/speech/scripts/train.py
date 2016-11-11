@@ -96,7 +96,7 @@ def train_new_lm(lm_train_file, lm_path):
     #Calls it to create lm. 
     subprocess.call(args)
 
-def adapt_accoustic_model(acoustic_model_path, corpus_folder, recordings_dir, dict_path):
+def adapt_accoustic_model(acoustic_model_path, corpus_folder, recordings_dir, dict_path, new_model_name ='adapted_ac_model', exp_name ='train'):
     #Paths needed for execution. 
     bin_path = '../bin'
     sphinxbase_lib_path = '../resources/sphinxbase_install/lib/'
@@ -111,7 +111,7 @@ def adapt_accoustic_model(acoustic_model_path, corpus_folder, recordings_dir, di
     args.append('-samprate')
     args.append('16000')
     args.append('-c')
-    args.append(corpus_folder + '/asr_training/train.fileids')
+    args.append(corpus_folder + '/asr_training/' + exp_name + '.fileids')
     args.append('-di')
     args.append(recordings_dir)
     args.append('-do')
@@ -145,9 +145,9 @@ def adapt_accoustic_model(acoustic_model_path, corpus_folder, recordings_dir, di
     args.append('-dictfn')
     args.append(dict_path)
     args.append('-ctlfn')
-    args.append(corpus_folder + '/asr_training/train.fileids')
+    args.append(corpus_folder + '/asr_training/' + exp_name + '.fileids')
     args.append('-lsnfn')
-    args.append(corpus_folder + '/asr_training/train.transcription')
+    args.append(corpus_folder + '/asr_training/' + exp_name + '.transcription')
     args.append('-accumdir')
     args.append(corpus_folder + '/models/ac_model_adapt_files')
     args.append('-cepdir')
@@ -158,13 +158,13 @@ def adapt_accoustic_model(acoustic_model_path, corpus_folder, recordings_dir, di
 
     #Copies acoustic model folder to new folder. This folder will now be adapted. 
     #If directory exists from previous run, it's deleted before creating a new folder copy. 
-    if os.path.isdir(corpus_folder + '/models/adapted_ac_model'):
-        shutil.rmtree(corpus_folder + '/models/adapted_ac_model')
+    if os.path.isdir(corpus_folder + '/models/' + new_model_name):
+        shutil.rmtree(corpus_folder + '/models/' + new_model_name)
 
-    shutil.copytree(acoustic_model_path, corpus_folder + '/models/adapted_ac_model')
+    shutil.copytree(acoustic_model_path, corpus_folder + '/models/' + new_model_name)
 
     #Sets path for adapted acoustic model. 
-    adapted_ac_model = corpus_folder + '/models/adapted_ac_model'
+    adapted_ac_model = corpus_folder + '/models/' + new_model_name
 
     #Uses MAP algorithm to adapt model.
     args = [bin_path + '/map_adapt']
@@ -193,7 +193,6 @@ def adapt_accoustic_model(acoustic_model_path, corpus_folder, recordings_dir, di
 
     #Runs executable to adapt model.
     subprocess.call(args)
-
 
 def print_usage():
     print 'To train new parser: ./train.py new_parser [parser_train_file] [parser_save_path] [ont_path] [lex_path] [lex_weight]'
@@ -224,5 +223,7 @@ if __name__ == '__main__':
     elif sys.argv[1] == 'adapt_ac_model':
         if len(sys.argv) == 6:
             adapt_accoustic_model(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
+        elif len(sys.argv) == 8:
+            adapt_accoustic_model(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7])
         else:
             print_usage()

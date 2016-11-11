@@ -239,6 +239,16 @@ def consolidate_topn_results(fold_folder, experiment_name, n):
 
 
 """
+Gathers the names of all experiments 
+run by checking the current results files. 
+"""
+def get_experiment_names(fold_folder):
+    #Every experiment folder should have a fold 0
+    experiments_path = fold_folder + '/0/experiments/asr/result_files/'
+
+    return os.listdir(experiments_path)
+
+"""
 Consolidates the results from 
 all folds on the WER
 evaluation metric for an experiment type. 

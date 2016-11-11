@@ -2019,3 +2019,4 @@ class CKYParser:
     def tokenize(self, s):
         str_parts = s.split()
         return [str_parts]
+

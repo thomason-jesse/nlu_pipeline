@@ -306,6 +306,9 @@ def make_exp_dir_structure(exp_dir):
 
     #Folder to store models in (e.g parser and language models).
     make_dir(exp_dir + '/models')
+    make_dir(exp_dir + '/models/adapted_ac_model')
+    make_dir(exp_dir + '/models/re_trained_baseline_ac_model')
+    make_dir(exp_dir + '/models/re_trained_cky_ac_model')
 
     #Folder to store log files in for experiments or training runs.
     make_dir(exp_dir + '/logs')
@@ -522,6 +525,46 @@ def create_lm_training_file(corpus_folder, lm_training_file_folder):
 
     #Closes the training file. 
     lm_training_file.close()
+
+"""
+Extracts a transcript from an experiment result file. 
+Used for re-training an acoustic model. 
+"""
+def extract_transcript_from_results_file(file_name, ids_file_name, transcript_file_name, test_file_name):
+    #Open files for reading / writing. 
+    results_file = open(file_name, 'r')
+    test_file = open(test_file_name, 'r')
+    ids_file = open(ids_file_name, 'w')
+    transcript_file = open(transcript_file_name, 'w')
+
+    #Used for retrieving a result. 
+    retrieve_flag = 0
+    
+    for line in results_file:
+        # '#' delimits the first line for a phrase result, next line will be top hypothesis. 
+        if line.startswith('#'):
+            retrieve_flag = 1
+
+        #If retrieve flag is set, then fetch hypothesis. 
+        elif retrieve_flag == 1:
+            #Get recording file path from test file. 
+            phrase, _, _, recording_path = test_file.readline().strip().split(';')
+            recording_path = recording_path.split('headset/')[1].split('.')[0]
+
+            #Get hypothesis string. 
+            hyp_string = line.split(';')[0]
+
+            #Write formatted data to transcripts and id files.
+            transcript_file.write('<s> ' + hyp_string + ' </s> (' + recording_path + ')\n')
+            ids_file.write(recording_path + '\n')
+
+            #Set to zero so that next hypotheses aren't fetched. 
+            retrieve_flag = 0
+
+    results_file.close()
+    ids_file.close()
+    transcript_file.close()
+    test_file.close()
 
 """
 Extracts necessary transcript information
