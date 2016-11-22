@@ -33,6 +33,7 @@ import ctypes
 import os
 import sys
 import numpy as np
+import math
 
 #TODO Change if necessary. 
 #Adds nlu_pipeline src folder in order to import modules from it. 
@@ -137,6 +138,13 @@ Used for CKY re-ranking.
 """
 def get_hyp_score(hypothesis):
     return hypothesis[1][1]
+
+"""
+Gets first first element of
+a list and returns it. 
+"""
+def get_second_element(l):
+    return l[1]
 
 """
 Returns the last element of a list. 
@@ -367,6 +375,94 @@ def re_rank_null_node(in_file_name, out_file_name, parser_path, temp_name=''):
 
     re_ranked_file.close()
 
+"""
+Internal method which re-ranks a hypothesis
+list by interpolating between the ASR scores
+and the parse scores. 
+"""
+def re_rank_hypotheses_with_interpolation(hyp_buff, weight):
+    #Will keep hypotheses and their scores in order to sort them at then end. 
+    hyps_and_scores = []
+
+    #Get all ASR and parse scores. 
+    asr_scores = [float(hyp.split(';')[3]) for hyp in hyp_buff]
+    parse_scores = [float(hyp.split(';')[2]) for hyp in hyp_buff]
+
+    #Now find sums so that we may normalize to form a probability distribution. 
+    asr_sum = float('-inf')
+    parse_sum = float('-inf')
+
+    for score in asr_scores:
+        asr_sum = np.logaddexp(asr_sum, score)
+
+    for score in parse_scores:
+        parse_sum = np.logaddexp(parse_sum, score)
+
+    for hyp in hyp_buff: 
+        #Get scores in order to interpolate. 
+        _, _, parse_score, asr_score = hyp.split(';')
+
+        parse_score = float(parse_score)
+        asr_score = float(asr_score)
+
+        #Subtract logarithm to get log-scale probability. 
+        parse_score = np.e ** (parse_score - parse_sum)
+        asr_score = np.e ** (asr_score - asr_sum)
+    
+        #Some times all parses are -inf
+        if math.isnan(parse_score):
+            interpolated_score = asr_score
+        else:
+            #Now interpolate and assign to hypothesis. 
+            interpolated_score = asr_score * weight + parse_score * (1.0 - weight)
+        
+        hyps_and_scores.append([hyp, interpolated_score])
+
+    #Sorts list. 
+    hyps_and_scores = sorted(hyps_and_scores, key=get_second_element, reverse=True)
+
+    return [hyp[0] for hyp in hyps_and_scores]
+
+"""
+Re-ranks a file which contains both speech
+and semantic parse scores by interpolating them 
+using a given value to weight them. 
+"""
+def re_rank_with_interpolation(in_file_name, out_file_name, weight):
+    in_file = open(in_file_name, 'r')
+    out_file = open(out_file_name, 'w')
+
+    line = in_file.readline()
+    hyp_buff = []
+
+    while not line == '':
+        #Denotes beginning of new phrase hypothesis list. 
+        if line.startswith('#'):
+            #Buffer will be empty before first phrase. 
+            if len(hyp_buff) > 0: 
+                hyp_buff = re_rank_hypotheses_with_interpolation(hyp_buff, weight)
+
+                #Write each hypothesis which is now re-ranked. 
+                for hyp in hyp_buff:
+                    out_file.write(hyp + '\n')
+
+                #Clear buffer. 
+                hyp_buff = []
+
+            #Now write start of new phrase to out file and get next line. 
+            out_file.write(line)
+
+        #Otherwise collect hypothesis for eventual re-ranking. 
+        else:
+            hyp_buff.append(line.strip())
+
+        #Now get next line. 
+        line = in_file.readline()
+
+    #Close files and finish. 
+    in_file.close()
+    out_file.close()
+
 
 """
 This method takes a file with n results
@@ -512,6 +608,7 @@ etc.
 def print_usage():
     print 'ASR Nbest: ./experiments asr_n_best [sphinx_shared_library] [ac_model] [lm] [dict] [test_file] [nbest_file] [n]'
     print 'CKYParser re-rank: ./experiments parser_rerank [nbest_file] [re-ranked_file_name] [parser_path] [temp_name] [optional: null_node]'
+    print 'Re-rank with interpolation: ./experiments rerank_interpolation [nbest_file] [out_file] [weight]'
 
 if __name__ == '__main__':
     if not len(sys.argv) >= 2:
@@ -525,6 +622,12 @@ if __name__ == '__main__':
             sphinx.init_decoder(sys.argv[3], sys.argv[4], sys.argv[5])
             sphinx.n_best(sys.argv[6], sys.argv[7], sys.argv[8])
             sphinx.close_decoder()
+
+    elif sys.argv[1] == 'rerank_interpolation':
+        if len(sys.argv) == 5:
+            re_rank_with_interpolation(sys.argv[2], sys.argv[3], float(sys.argv[4]))
+        else:
+            print_usage()
 
     elif sys.argv[1] == 'parser_rerank':
         if len(sys.argv) == 6:
