@@ -9,9 +9,14 @@ Author: Rodolfo Corona, rcorona@utexas.edu
 """
 
 #Python imports
+import matplotlib
+matplotlib.use('Agg')
+
 import sys
 import os
 import subprocess
+import numpy as np
+import matplotlib.pyplot as plt    
 
 #Speech pipeline imports.
 import preprocess
@@ -133,36 +138,50 @@ def exp1(experiment_dir_path):
             test_file_path = fold_path + '/experiments/asr/test_files/'
 
             #Runs ASR and parser re-ranking on each test fold.
-            for test_file in os.listdir(test_file_path):    
-                test_name = test_file.split('.')[0]
+            pids = []
 
-                args = ['./experiments.py', 'asr_n_best']               #Specifies ASR experiment. 
-                args.append('../sphinx/build/libsphinx.so')             #Path to shared library file used by Pocketsphinx. 
-                args.append(fold_path + '/models/adapted_ac_model/')    #Path to fold's acoustic model. 
-                args.append(fold_path + '/models/in-domain.lm')         #Path to fold's in-domain LM. 
-                args.append('../resources/cmudict-en-us.dict')          #Path to english dictionary used by Sphinx. 
-                args.append(test_file_path + test_file)                 #Path to the test file being experimented on. 
-                args.append(result_file_path + test_name + '.nbest')    #Path to result file from experiment. 
-                args.append('10')                                       #Specifies that top 10 hypotheses should be used. 
+            for test_file in os.listdir(test_file_path):   
+                #Speed up by forking. 
+                pid = os.fork()
 
-                #Log file. 
-                log_file = open(fold_path + '/logs/experiments/' + test_name + '.nbest', 'w')
+                #Add pid to list of pids to wait for. 
+                if not pid == 0:
+                    pids.append(pid)
+                #Child otherwise, so execute experiment. 
+                else:
+                    test_name = test_file.split('.')[0]
 
-                #Runs experiment. 
-                subprocess.call(args, stdout=log_file, stderr=log_file)
-                
-                #Re-ranks file using CKY Parser. 
-                args = ['./experiments.py', 'parser_rerank'] 
-                args.append(result_file_path + test_name + '.nbest') 
-                args.append(result_file_path + test_name + '.cky') 
-                args.append(fold_path + '/models/parser.cky')
-                args.append(fold_name)
+                    args = ['./experiments.py', 'asr_n_best']               #Specifies ASR experiment. 
+                    args.append('../sphinx/build/libsphinx.so')             #Path to shared library file used by Pocketsphinx. 
+                    args.append(fold_path + '/models/adapted_ac_model/')    #Path to fold's acoustic model. 
+                    args.append(fold_path + '/models/in-domain.lm')         #Path to fold's in-domain LM. 
+                    args.append('../resources/cmudict-en-us.dict')          #Path to english dictionary used by Sphinx. 
+                    args.append(test_file_path + test_file)                 #Path to the test file being experimented on. 
+                    args.append(result_file_path + test_name + '.nbest')    #Path to result file from experiment. 
+                    args.append('10')                                       #Specifies that top 10 hypotheses should be used. 
 
-                #Log file. 
-                log_file = open(fold_path + '/logs/experiments/' + test_name + '.cky', 'w')
+                    #Log file. 
+                    log_file = open(fold_path + '/logs/experiments/' + test_name + '.nbest', 'w')
 
-                #Runs  experiment. 
-                subprocess.call(args, stdout=log_file, stderr=log_file)
+                    #Runs experiment. 
+                    subprocess.call(args, stdout=log_file, stderr=log_file)
+                    
+                    #Re-ranks file using CKY Parser. 
+                    args = ['./experiments.py', 'parser_rerank'] 
+                    args.append(result_file_path + test_name + '.nbest') 
+                    args.append(result_file_path + test_name + '.cky') 
+                    args.append(fold_path + '/models/parser.cky')
+                    args.append(fold_name + '_' + test_name)
+
+                    #Log file. 
+                    log_file = open(fold_path + '/logs/experiments/' + test_name + '.cky', 'w')
+
+                    #Runs  experiment. 
+                    subprocess.call(args, stdout=log_file, stderr=log_file)
+
+            #Wait for all test files to be experimented on before evaluating. 
+            for pid in pids:
+                os.waitpid(pid)
 
             #Now evaluates files. 
             for result_file in os.listdir(result_file_path):
@@ -293,9 +312,67 @@ def average(l):
 
 """
 Consolidates and averages results for every evaluation
-metric over all folds. 
+metric over all folds into pyplot graphs. 
 """
-def consolidate_results(experiment_dir_path, consolidated_files_dir):
+def consolidate_results_to_pyplot(experiment_dir_path, consolidated_files_dir):
+    #Retrieves all experiment names in order to gather results. 
+    experiment_names = analysis.get_experiment_names(experiment_dir_path)
+    
+    #Results will be stored by experiment. 
+    results = {exp: {} for exp in experiment_names}
+
+    for exp in results:
+        results[exp] = {'wer': None, 'r': None, 'p': None, 'f1': None, 'sem_full': None, 'top_1': None, 'top_5': None}   
+
+    for exp in experiment_names: 
+        results[exp]['wer'] = average(analysis.consolidate_wer_results(experiment_dir_path, exp).values())
+        results[exp]['sem_full'] = average(analysis.consolidate_sem_full_results(experiment_dir_path, exp).values())
+        results[exp]['top_1'] = average(analysis.consolidate_topn_results(experiment_dir_path, exp, 1).values())
+        results[exp]['top_5'] = average(analysis.consolidate_topn_results(experiment_dir_path, exp, 5).values())
+
+        #Processes precision, recall, and f1 scores further. 
+        sem_partial = analysis.consolidate_sem_partial_results(experiment_dir_path, exp).values()
+        results[exp]['r'] = average([scores['r'] for scores in sem_partial])
+        results[exp]['p'] = average([scores['p'] for scores in sem_partial])
+        results[exp]['f1'] = average([scores['f1'] for scores in sem_partial])
+
+    #Cleaner names for experimenents for tables. 
+    exp_names_0 = {'0.nbest': 'BN',
+                 '0.cky': 'RN'}
+
+    exp_names_1 = {'1.nbest': 'BN',
+                 '1.cky': 'RN',
+                 '1.nbest_re_trained_baseline': 'BB',
+                 '1.nbest_re_trained_cky': 'BR',
+                 '1.cky_re_trained_baseline': 'RB',
+                 '1.cky_re_trained_cky': 'RR'}
+
+    metric_names = {"wer": "WER", "r": "Recall", "p": "Precision", "f1": "F1", "sem_full": "Full Semantic Form",
+                    "top_1": "Top 1", "top_5": "Top 5"}
+
+    #Make plots for each metric.
+    for metric in ['wer', 'r', 'p', 'f1', 'sem_full', 'top_1', 'top_5']:
+        for plt_group in [exp_names_0, exp_names_1]:
+            num_groups = len(plt_group.keys())    
+            index = np.arange(num_groups)
+            bar_width = 0.35
+
+            scores = [results[exp][metric] for exp in plt_group.keys()]
+
+            plt.bar(index, scores, bar_width, color='r')
+            plt.xlabel('Conditions')
+            plt.ylabel('Average')
+            plt.title(metric_names[metric] + ' Average Scores')
+            plt.xticks(index + bar_width / 2.0, [plt_group[exp] for exp in plt_group.keys()])
+
+            plt.savefig(metric + '_' + str(plt_group.keys()[0].split('.')[0]) + '.png')
+            plt.close()
+
+"""
+Consolidates and averages results for every evaluation
+metric over all folds into LaTex table format.  
+"""
+def consolidate_results_to_latex(experiment_dir_path, consolidated_files_dir):
     #Retrieves all experiment names in order to gather results. 
     experiment_names = analysis.get_experiment_names(experiment_dir_path)
     
@@ -377,7 +454,8 @@ def print_usage():
     print 'Train models: ./run_pipeline.py train [experiment_dir]'
     print 'Run 1st experiments (re-ranking on initial speech output): ./run_pipeline.py exp1 [experiment_dir]'
     print 'Run 2nd experiment (re-training w/ w/out re-ranking): ./run_pipeline.py exp2 [experiment_dir]'
-    print 'Consolidate experiment results: ./run_pipeline.py consolidate [experiment_dir] [consolidated_files_dir]'
+    print 'Consolidate experiment results to LaTex: ./run_pipeline.py consolidate_latex [experiment_dir] [consolidated_files_dir]'
+    print 'Consolidate experiment results to pyplot: ./run_pipeline.py consolidate_pyplot [experiment_dir] [consolidated_files_dir]'
 
 if __name__ == '__main__':
     if len(sys.argv) >= 2:
@@ -405,9 +483,15 @@ if __name__ == '__main__':
             else:
                 print_usage()
 
-        elif sys.argv[1] == 'consolidate':
+        elif sys.argv[1] == 'consolidate_latex':
             if len(sys.argv) == 4:
-                consolidate_results(sys.argv[2], sys.argv[3])
+                consolidate_results_to_latex(sys.argv[2], sys.argv[3])
+            else:
+                print_usage()
+
+        elif sys.argv[1] == 'consolidate_pyplot':
+            if len(sys.argv) == 4:
+                consolidate_results_to_pyplot(sys.argv[2], sys.argv[3])
             else:
                 print_usage()
 
