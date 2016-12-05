@@ -143,6 +143,10 @@ def extract_corpus_statistics(usr_file_folder):
     #Keeps track of how many user files there are. 
     num_usrs = 0
 
+    #Checks percentage of corpus <= 7 token length. 
+    at_below_7 = 0.0
+    num_phrases = 0.0
+
     #Iterates through each file in corpus folder. 
     for file_name in os.listdir(usr_file_folder):
         counter = 0
@@ -152,7 +156,14 @@ def extract_corpus_statistics(usr_file_folder):
             phrase, _, _, _ = line.strip().split(';')
 
             #Gets number of tokens in phrase. 
-            lengths.append(num_tokens(phrase))
+            phrase_length = num_tokens(phrase)
+            lengths.append(phrase_length)
+
+            #Check length threshold. 
+            if phrase_length <= 7:
+                at_below_7 +=1.0
+
+            num_phrases += 1.0
 
             counter += 1
 
@@ -164,8 +175,9 @@ def extract_corpus_statistics(usr_file_folder):
     avg_length = float(sum(lengths)) / float(len(lengths))
     avg_num_phrases = float(sum(counts)) / float(len(counts))
     phrase_range = [min(counts), max(counts)]
+    percent_at_below_7 = at_below_7 / num_phrases
 
-    return [avg_length, avg_num_phrases, num_usrs, phrase_range]
+    return [avg_length, avg_num_phrases, num_usrs, phrase_range, percent_at_below_7]
 
 """
 Extracts recall, precision, and f1 scores
@@ -446,6 +458,24 @@ def t_test(corpus_folds_dir, eval_metric, exp1, exp2):
         sys.exit()
 
 """
+Performs t-test for tuning results. 
+"""
+def t_test_tuning(exp_file_name, weight1, weight2):
+    exp_file = open(exp_file_name, 'r')
+
+    for line in exp_file:
+        weight = line.split(':')[0] 
+        
+        if weight == weight1:
+            exp1_values = [float(element) for element in line.split(':')[1].strip().split(';')]
+        elif weight == weight2:
+            exp2_values = [float(element) for element in line.split(':')[1].strip().split(';')]
+
+    print 'p-value: ' + str(ttest_rel(exp1_values, exp2_values)[1])
+    print str(weight1) + ': ' + str(float(sum(exp1_values)) / float(len(exp1_values)))
+    print str(weight2) + ': ' + str(float(sum(exp2_values)) / float(len(exp2_values)))
+
+"""
 Prints the usage options
 for this script. 
 """
@@ -454,6 +484,7 @@ def print_usage():
     print 'Count correct hypothesis indeces: ./analysis.py correct_hyp_indeces [corpus_folder] [exp_extension]'
     print 'Gather corpus statistics: ./analysis.py corpus_stats [corpus_usr_file_folder]'
     print 't-test for statistical significance in diff between two experiment types: ./analysis.py t_test [corpus_folds_dir] [evaluation_metric] [exp1_name] [exp2_name]'
+    print 't-test for tuning results: ./analysis.py t_test_tuning [results_file_name] [weight1] [weight2]'
 
 if __name__ == '__main__':
     if not len(sys.argv) >= 2:
@@ -472,14 +503,21 @@ if __name__ == '__main__':
         else:
             print_usage()
 
+    elif sys.argv[1] == 't_test_tuning':
+        if len(sys.argv) == 5:
+            t_test_tuning(sys.argv[2], sys.argv[3], sys.argv[4])
+        else:
+            print_usage()
+
     elif sys.argv[1] == 'corpus_stats':
         if len(sys.argv) == 3:
-            avg_len, avg_phrase, num_usrs, phrase_range = extract_corpus_statistics(sys.argv[2])
+            avg_len, avg_phrase, num_usrs, phrase_range, at_below_7 = extract_corpus_statistics(sys.argv[2])
 
             print "AVERAGE TOKENS PER PHRASE: " + str(avg_len)
             print "AVERAGE PHRASES PER USER: " + str(avg_phrase)
             print "NUM PHRASE RANGE: " + str(phrase_range)
             print "NUMBER OF USERS: " + str(num_usrs)
+            print "Percent of phrases at or below 7 tokens: " + str(at_below_7)
 
         else:
             print_usage()

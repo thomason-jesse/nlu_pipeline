@@ -405,17 +405,19 @@ def re_rank_hypotheses_with_interpolation(hyp_buff, weight):
         parse_score = float(parse_score)
         asr_score = float(asr_score)
 
-        #Subtract logarithm to get log-scale probability. 
-        parse_score = np.e ** (parse_score - parse_sum)
-        asr_score = np.e ** (asr_score - asr_sum)
+        #Subtract logarithm to get log-scale probability.
+        parse_score = parse_score - parse_sum
+        asr_score = asr_score - asr_sum
     
         #Some times all parses are -inf
-        if math.isnan(parse_score):
-            interpolated_score = asr_score
+        if math.isnan(parse_score) or parse_score == float('-inf') or weight == 0.0:
+            interpolated_score = np.log(1.0 - weight) + asr_score
+        elif weight == 1.0:
+            interpolated_score = np.log(weight) + parse_score
         else:
             #Now interpolate and assign to hypothesis. 
-            interpolated_score = asr_score * weight + parse_score * (1.0 - weight)
-        
+            interpolated_score = np.logaddexp(np.log(weight) + parse_score, np.log(1.0 - weight) + asr_score)
+       
         hyps_and_scores.append([hyp, interpolated_score])
 
     #Sorts list. 
@@ -458,6 +460,10 @@ def re_rank_with_interpolation(in_file_name, out_file_name, weight):
 
         #Now get next line. 
         line = in_file.readline()
+    
+    #Write last phrase results. 
+    for hyp in hyp_buff:
+        out_file.write(hyp + '\n')
 
     #Close files and finish. 
     in_file.close()
@@ -596,6 +602,57 @@ def re_rank_CKY(nbest_file_name, re_ranked_file_name, parser_path, temp_name='')
     #Updates n-best file. 
     os.rename(temp_name + 'temp.txt', nbest_file_name)
 
+"""
+Parses ground truth ASR transcript
+in a specific test file. 
+"""
+def parse_ground_truth_file(test_file_name, result_file, parser):
+    test_file = open(test_file_name)
+
+    for line in test_file:
+        print line.split(';')
+        phrase, true_sem_form, _, _ = line.split(';')
+        parse = get_first_valid_parse(tokenize_for_parser(phrase), parser)[0]
+
+        #Now convert parse to string. 
+        if not parse == None:
+            parse_str = parser.print_parse(parse.node)
+        else:
+            parse_str = "None"
+
+        #Take away CCG category from sem form. 
+        true_sem_form = ':'.join(true_sem_form.strip().split(':')[1:])
+
+        #Write result. 
+        result_file.write(true_sem_form + ';' + parse_str + '\n')
+
+"""
+Runs the parser on the ground truth
+speech transcriptions in order to check the upper 
+bound in parsing performance. Creates a result file
+for each fold within the specified results_folder. 
+"""
+def parse_ground_truth(experiment_dir, results_folder, test_file): 
+    for fold_name in os.listdir(experiment_dir):
+        pid = os.fork()
+
+        if pid == 0: 
+            #Loads parser for fold. 
+            parser_path = experiment_dir + fold_name + '/models/parser.cky'
+            parser = load_obj_general(parser_path)
+
+            #Will keep parsing results. 
+            result_file = open(results_folder + fold_name + '.txt', 'w')
+
+            #Parses from validation set. 
+            validation_file = experiment_dir + fold_name + '/experiments/asr/test_files/' + test_file
+            parse_ground_truth_file(validation_file, result_file, parser)
+
+            result_file.close()
+
+            #Child exit. 
+            sys.exit()
+
 #########################################################################################################
 
 
@@ -609,6 +666,7 @@ def print_usage():
     print 'ASR Nbest: ./experiments asr_n_best [sphinx_shared_library] [ac_model] [lm] [dict] [test_file] [nbest_file] [n]'
     print 'CKYParser re-rank: ./experiments parser_rerank [nbest_file] [re-ranked_file_name] [parser_path] [temp_name] [optional: null_node]'
     print 'Re-rank with interpolation: ./experiments rerank_interpolation [nbest_file] [out_file] [weight]'
+    print 'Run parser on speech ground truth: ./experiments parse_ground_truth [experiment_folder] [results_folder] [test_file_name]'
 
 if __name__ == '__main__':
     if not len(sys.argv) >= 2:
@@ -629,8 +687,17 @@ if __name__ == '__main__':
         else:
             print_usage()
 
+    elif sys.argv[1] == 'parse_ground_truth':
+        if len(sys.argv) == 5:
+            parse_ground_truth(sys.argv[2], sys.argv[3], sys.argv[4])
+        else:
+            print_usage()
+
     elif sys.argv[1] == 'parser_rerank':
         if len(sys.argv) == 6:
             re_rank_CKY(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
         elif len(sys.argv) == 7:
             re_rank_function(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6])
+
+    else:
+        print_usage()
