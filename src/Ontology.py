@@ -8,14 +8,15 @@ class Ontology:
     def __init__(self, ont_fname):
 
         # subsequent entries are tuples of indices into this list defining a binary hierarchy
-        self.types = ['t', 'e', 'd', 'a', 'c']
+        self.types = ['t', 'd', 'a', 'c', 'l', 'i', 'p']
 
         # get predicates and map from predicates to types
         self.preds, self.entries = self.read_sem_from_file(ont_fname)
 
+        #TODO Removed 'e' from list of types for speech parsing with typing, is it OK to comment this out???
         # set special UNK predicates the parser can assign to for parsing with unknowns in synonym detection
-        self.preds.append("UNK_E")
-        self.entries.append(self.types.index('e'))
+        #self.preds.append("UNK_E")
+        #self.entries.append(self.types.index('e'))
 
         # calculate and store number of arguments each predicate takes (atoms take 0)
         self.num_args = [self.calc_num_pred_args(i) for i in range(0, len(self.preds))]

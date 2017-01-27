@@ -1,0 +1,222 @@
+#imperative
+search :- M/PP/NP : lambda r:l.(lambda x:p.(searchroom(x,r)))
+bring :- M/NP/NP : lambda y:p.(lambda x:i.(bring(x,y)))
+bring :- M/PP/NP : lambda y:i.(lambda x:p.(bring(y,x)))
+walk :- M/PP : lambda x:l.(at(x))
+
+#prepositional arguments to commands
+for :- PP/NP : lambda x:p.(x)
+
+of :- PP/NP : lambda x:i.(x)
+of :- PP/NP : lambda x:p.(x)
+of :- PP/NP : lambda x:l.(x)
+
+
+in :- PP/NP : lambda x:l.(x)
+
+to :- PP/NP : lambda x:p.(x)
+to :- PP/NP : lambda x:l.(x)
+
+#confirmations
+yes :- C : yes
+no :- C : no
+none :- C : none
+
+#these are weird now bc there's some implicit knowledge in hasoffice that the second arg is an office
+'s office :- NP\NP : lambda x:p.(the(lambda y:l.(and(office(y), possesses(y,x)))))
+office of :- N/NP : lambda x:p.(lambda y:l.(possesses(y,x)))
+
+#entity descriptor words
+#can be type-raised to N/N : lambda x:e.(pred(x))
+#room :- N : room
+#person :- N : person
+#item :- N : item
+
+#closed category
+the :- NP/(N/N) : lambda P:<l,t>.(the(lambda x:l.(P(x))))
+#the :- NP/(N/N) : lambda P:<i,t>.(the_i(lambda x:i.(P(x))))
+
+a :- NP/(N/N) : lambda P:<i,t>.(a(lambda x:i.(P(x))))
+
+# room atoms
+three five one six :- NP : l3_516
+three five zero eight :- NP : l3_508
+three five one two :- NP : l3_512
+three five one zero :- NP : l3_510
+three four zero two :- NP : l3_402
+three four one eight :- NP : l3_418
+three four two zero :- NP : l3_420
+three four three two :- NP : l3_432
+three five zero two :- NP : l3_502
+three four fourteen b :- NP : l3_414b
+
+# people atoms
+bruce :- NP : bruce
+stacy :- NP : stacy
+dana :- NP : dana
+jivko :- NP : jivko
+peter :- NP : peter
+ray :- NP : ray
+shiqi :- NP : shiqi
+scott :- NP : scott
+jesse :- NP : jesse
+aishwarya :- NP : aishwarya
+rodolfo :- NP : rodolfo 
+
+# item atoms
+apple :- NP : apple
+basket :- NP : basket
+beverage :- NP : beverage
+binder :- NP : binder
+book :- NP : book
+box :- NP : box
+bread :- NP : bread
+cake :- NP : cake
+calendar :- NP : calendar
+cellphone :- NP : cellphone
+chips :- NP : chips
+coffee :- NP : coffee
+coke :- NP : coke
+container :- NP : container
+cupcake :- NP : cupcake
+dessert :- NP : dessert
+diary :- NP : diary
+doritos :- NP : doritos
+glass :- NP : glass
+hamburger :- NP : hamburger
+hammer :- NP : hammer
+juice :- NP : juice
+laptop :- NP : laptop
+ledger :- NP : ledger
+letter :- NP : letter
+milk :- NP : milk
+muffin :- NP : muffin
+notebook :- NP : notebook
+organizer :- NP : organizer
+pencil :- NP : pencil
+phone :- NP : phone
+pillow :- NP : pillow
+pizza :- NP : pizza
+salad :- NP : salad
+sandwich :- NP : sandwich
+snack :- NP : snack
+tea :- NP : tea
+trashcan :- NP : trashcan
+watch :- NP : watch
+water :- NP : water
+
+# Adjective predicates.
+aerosol :- NP/NP : lambda x:i.(aerosol(x))
+aluminum :- NP/NP : lambda x:i.(aluminum(x))
+big :- NP/NP : lambda x:i.(big(x))
+black :- NP/NP : lambda x:i.(black(x))
+blue :- NP/NP : lambda x:i.(blue(x))
+bright :- NP/NP : lambda x:i.(bright(x))
+brown :- NP/NP : lambda x:i.(brown(x))
+cardboard :- NP/NP : lambda x:i.(cardboard(x))
+circular :- NP/NP : lambda x:i.(circular(x))
+clear :- NP/NP : lambda x:i.(clear(x))
+closed :- NP/NP : lambda x:i.(closed(x))
+coffee :- NP/NP : lambda x:i.(coffee(x))
+colored :- NP/NP : lambda x:i.(colored(x))
+cream-colored :- NP/NP : lambda x:i.(cream-colored(x))
+curvy :- NP/NP : lambda x:i.(curvy(x))
+cylindrical :- NP/NP : lambda x:i.(cylindrical(x))
+empty :- NP/NP : lambda x:i.(empty(x))
+fat :- NP/NP : lambda x:i.(fat(x))
+foam :- NP/NP : lambda x:i.(foam(x))
+foamy :- NP/NP : lambda x:i.(foamy(x))
+full :- NP/NP : lambda x:i.(full(x))
+gray :- NP/NP : lambda x:i.(gray(x))
+green :- NP/NP : lambda x:i.(green(x))
+half-full :- NP/NP : lambda x:i.(half-full(x))
+heavy :- NP/NP : lambda x:i.(heavy(x))
+hollow :- NP/NP : lambda x:i.(hollow(x))
+large :- NP/NP : lambda x:i.(large(x))
+light :- NP/NP : lambda x:i.(light(x))
+liquid :- NP/NP : lambda x:i.(liquid(x))
+medium-sized :- NP/NP : lambda x:i.(medium-sized(x))
+metal :- NP/NP : lambda x:i.(metal(x))
+metallic :- NP/NP : lambda x:i.(metallic(x))
+narrow :- NP/NP : lambda x:i.(narrow(x))
+neon :- NP/NP : lambda x:i.(neon(x))
+open :- NP/NP : lambda x:i.(open(x))
+orange :- NP/NP : lambda x:i.(orange(x))
+orange-topped :- NP/NP : lambda x:i.(orange-topped(x))
+paper :- NP/NP : lambda x:i.(paper(x))
+pencil-shaped :- NP/NP : lambda x:i.(pencil-shaped(x))
+pink :- NP/NP : lambda x:i.(pink(x))
+plastic :- NP/NP : lambda x:i.(plastic(x))
+pointed :- NP/NP : lambda x:i.(pointed(x))
+pointy :- NP/NP : lambda x:i.(pointy(x))
+purple :- NP/NP : lambda x:i.(purple(x))
+rectangular :- NP/NP : lambda x:i.(rectangular(x))
+red :- NP/NP : lambda x:i.(red(x))
+rough :- NP/NP : lambda x:i.(rough(x))
+round :- NP/NP : lambda x:i.(round(x))
+shiny :- NP/NP : lambda x:i.(shiny(x))
+short :- NP/NP : lambda x:i.(short(x))
+silent :- NP/NP : lambda x:i.(silent(x))
+silver :- NP/NP : lambda x:i.(silver(x))
+skinny :- NP/NP : lambda x:i.(skinny(x))
+small :- NP/NP : lambda x:i.(small(x))
+soft :- NP/NP : lambda x:i.(soft(x))
+soup :- NP/NP : lambda x:i.(soup(x))
+spherical :- NP/NP : lambda x:i.(spherical(x))
+spiky :- NP/NP : lambda x:i.(spiky(x))
+squishy :- NP/NP : lambda x:i.(squishy(x))
+styrofoam :- NP/NP : lambda x:i.(styrofoam(x))
+tall :- NP/NP : lambda x:i.(tall(x))
+teal :- NP/NP : lambda x:i.(teal(x))
+thin :- NP/NP : lambda x:i.(thin(x))
+tiny :- NP/NP : lambda x:i.(tiny(x))
+top :- NP/NP : lambda x:i.(top(x))
+transparent :- NP/NP : lambda x:i.(transparent(x))
+water :- NP/NP : lambda x:i.(water(x))
+white :- NP/NP : lambda x:i.(white(x))
+wide :- NP/NP : lambda x:i.(wide(x))
+yellow :- NP/NP : lambda x:i.(yellow(x))
+
+# Predicate adjectival nouns.
+ball :- NP/NP : lambda x:i.(ball(x))
+beans :- NP/NP : lambda x:i.(beans(x))
+book :- NP/NP : lambda x:i.(book(x))
+bottle :- NP/NP : lambda x:i.(bottle(x))
+box :- NP/NP : lambda x:i.(box(x))
+bucket :- NP/NP : lambda x:i.(bucket(x))
+can :- NP/NP : lambda x:i.(can(x))
+canister :- NP/NP : lambda x:i.(canister(x))
+cap :- NP/NP : lambda x:i.(cap(x))
+carton :- NP/NP : lambda x:i.(carton(x))
+cellphone :- NP/NP : lambda x:i.(cellphone(x))
+chips :- NP/NP : lambda x:i.(chips(x))
+container :- NP/NP : lambda x:i.(container(x))
+crayon :- NP/NP : lambda x:i.(crayon(x))
+cup :- NP/NP : lambda x:i.(cup(x))
+cylinder :- NP/NP : lambda x:i.(cylinder(x))
+diary :- NP/NP : lambda x:i.(diary(x))
+drink :- NP/NP : lambda x:i.(drink(x))
+flask :- NP/NP : lambda x:i.(flask(x))
+floaty :- NP/NP : lambda x:i.(floaty(x))
+jar :- NP/NP : lambda x:i.(jar(x))
+laptop :- NP/NP : lambda x:i.(laptop(x))
+lid :- NP/NP : lambda x:i.(lid(x))
+marker :- NP/NP : lambda x:i.(marker(x))
+mug :- NP/NP : lambda x:i.(mug(x))
+notebook :- NP/NP : lambda x:i.(notebook(x))
+object :- NP/NP : lambda x:i.(object(x))
+pineapple :- NP/NP : lambda x:i.(pineapple(x))
+plush-toy :- NP/NP : lambda x:i.(plush-toy(x))
+prism :- NP/NP : lambda x:i.(prism(x))
+rectangle :- NP/NP : lambda x:i.(rectangle(x))
+roll :- NP/NP : lambda x:i.(roll(x))
+shaker :- NP/NP : lambda x:i.(shaker(x))
+sphere :- NP/NP : lambda x:i.(sphere(x))
+spray :- NP/NP : lambda x:i.(spray(x))
+spraycan :- NP/NP : lambda x:i.(spraycan(x))
+stuffed-animal :- NP/NP : lambda x:i.(stuffed-animal(x))
+thing :- NP/NP : lambda x:i.(thing(x))
+tin :- NP/NP : lambda x:i.(tin(x))
+tub :- NP/NP : lambda x:i.(tub(x))
+tube :- NP/NP : lambda x:i.(tube(x))
+wipes :- NP/NP : lambda x:i.(wipes(x))
