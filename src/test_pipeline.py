@@ -64,7 +64,7 @@ save_model(parser, 'parser')
 """
 
 # parser = load_model('parser')
-parser = load_obj_general('/home/rcorona/catkin_ws/src/bwi_speech/scripts/parser.cky')
+parser = load_obj_general('speech_resources/parser.cky')
 
 # Set parser hyperparams to best known values for test time
 parser.max_multiword_expression = 2  # max span of a multi-word expression to be considered during tokenization
