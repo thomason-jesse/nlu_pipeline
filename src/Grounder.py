@@ -51,7 +51,7 @@ class Grounder :
         self.perception_module.set_domain_of_discourse(domain_of_discourse)
             
     def predicate_holds(self, predicate, argument) :
-        print 'In predicate_holds with predicate = ', predicate, ', argument = ', argument
+        #print 'In predicate_holds with predicate = ', predicate, ', argument = ', argument
         if self.kb_predicates is not None and predicate in self.kb_predicates :
             if argument in self.kb_predicates[predicate] :
                 return True
@@ -78,6 +78,13 @@ class Grounder :
     # Returns all possible ontological assignments to lambdas of a given type
     def get_assignments_for_type(self, type):
         return [i for i in range(0, len(self.ontology.preds)) if self.ontology.entries[i] == type]    
+    
+    def pretty_print_groundings_list(self, groundings_list):
+        print
+        print 'Groundings list: '
+        for (groundings, lambda_assignments) in groundings_list:
+            print '\tGroundings = ', groundings
+            print '\t Lambda assignments = ', lambda_assignments
     
     # Expects an instance of class SemanticNode    
     # Returns (groundings, lambda_assignments) where 
@@ -110,7 +117,8 @@ class Grounder :
             # The node has children. They need to be grounded before this
             # node can be
             child_groundings = [self.ground_semantic_node(child) for child in parse.children]
-            #print [(str(grounding), prob) for (grounding, prob) in child_groundings]
+            #print 'child_groundings :'
+            #self.pretty_print_groundings_list(child_groundings)
             
             if parse.is_lambda and parse.is_lambda_instantiation :
                 # This corresponds to a lambda x.<type> function. It should
@@ -129,7 +137,6 @@ class Grounder :
                 #print 'lambda x node'
                 #print 'groundings = ', groundings    
                 #print 'lambda_assignments = ', lambda_assignments
-                #x = raw_input()
                 groundings = lambda_assignments[parse.lambda_name]
                 lambda_assignments.pop(parse.lambda_name, None) 
                     # This lambda variable should be removed because it is no longer in scope in upper nodes
@@ -200,7 +207,9 @@ class Grounder :
                                     # Probability that item1 is a ball and red is the 
                                     # product of the probability that it is a ball and 
                                     # the probability that it is red
-                    resultant_lambda_assignments = [(candidate, log_probs[candidate]) for candidate in common_candidates]
+                    resultant_lambda_assignments[variable] = [(candidate, log_probs[candidate]) for candidate in common_candidates]
+                    
+                #print 'Handling "and", resultant_lambda_assignments =', resultant_lambda_assignments
                 return ([], resultant_lambda_assignments)
 
             elif self.ontology.preds[parse.idx] == 'or' :
@@ -265,7 +274,11 @@ class Grounder :
                 true_tuples = self.kb_predicates[predicate]
                 if len(true_tuples) == 0 :
                     return ([], {})  
+                if type(true_tuples[0]) != tuple:
+                    true_tuples = [(x,) for x in true_tuples]
+                #print 'true_tuples = ', true_tuples
                     
+                # TODO: This fails when the predicate has only one term: eg office(x)
                 if len(parse.children) != len(true_tuples[0]) :
                     print 'Warning: Predicate ' + str(predicate) + ' expects ' + str(len(true_tuples[0])) + ' child nodes but has ' + str(len(parse.children)) + '!'
                     return ([], {})  
@@ -289,7 +302,7 @@ class Grounder :
                 #print 'true_tuples = ', true_tuples
                         
                 if len(true_tuples) == 0 or child_lambda_assignments is None :
-                    #print 'len(true_tuples) == 0 or child_lambda_assignments is None'
+                    print 'len(true_tuples) == 0 or child_lambda_assignments is None'
                     return ([], {})  
                     
                 allowed_vals = [candidate_tuple[child_lambda_assignments_idx] for candidate_tuple in true_tuples]
