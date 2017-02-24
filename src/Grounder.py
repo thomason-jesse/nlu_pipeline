@@ -222,7 +222,7 @@ class Grounder :
                 raise RuntimeError('Grounding of \'or\' predicate has not been implemented')
 
             elif self.ontology.preds[parse.idx] in ['a', 'the'] :
-                print 'Warning: \'a\' and \'the\' are treated equally for dialog purposes!' 
+                #print 'Warning: \'a\' and \'the\' are treated equally for dialog purposes!' 
                 #x = raw_input()
                 if len(parse.children) != 1 :
                     # Invalid parse
