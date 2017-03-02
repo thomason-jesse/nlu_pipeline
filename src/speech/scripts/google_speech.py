@@ -20,6 +20,8 @@ import google.auth.transport.grpc
 import google.auth.transport.requests
 from google.cloud.grpc.speech.v1beta1 import cloud_speech_pb2
 from google.cloud.grpc.speech.v1beta1.cloud_speech_pb2 import SpeechContext
+import os
+import ntpath
 
 # Keep the request alive for this many seconds
 DEADLINE_SECS = 60
@@ -33,17 +35,17 @@ class GoogleSpeech:
         self.service = cloud_speech_pb2.SpeechStub(
             self.make_channel('speech.googleapis.com', 443))
 
-        self.speech_context = ['stacy',
-                               'scott',
-                               'jesse',
-                               'shiqi',
-                               'jivko',
-                               'rodolfo',
-                               'aishwarya',
-                               'peter',
-                               'dana',
-                               'ray',
-                               'bruce']
+        self.speech_context = ['stacy', "stacy's", 'miller', "miller's",
+                               'scott', "scott's", 'niekum', "niekum's",
+                               'jesse', "jesse's", 'thomason', "thomason's", 
+                               'shiqi', "shiqi's", 'zhang', "zhang's",
+                               'jivko', "jivko's", 'sinapov', "sinapov's",
+                               'rodolfo', "rodolfo's", 'corona', "corona's",
+                               'aishwarya', "aishwarya's", 'padmakumar', "padmakumar's",
+                               'peter', "peter's", 'stone', "stone's",
+                               'dana', "dana's", 'ballard', "ballard's", 
+                               'ray', "ray's", 'mooney', "mooney's", 
+                               'bruce', "bruce's", 'porter', "porter's"]
 
 
     def make_channel(self, host, port):
@@ -58,7 +60,7 @@ class GoogleSpeech:
         return google.auth.transport.grpc.secure_authorized_channel(
             credentials, http_request, target)
 
-    def recognize(self, input_flac, encoding='FLAC', sample_rate=16000, language_code='en-US'):
+    def recognize(self, input_flac, encoding='FLAC', sample_rate=16000, language_code='en-US', output_file=None):
         #Read in audio data. 
         speech_content = open(input_flac, 'r').read()
 
@@ -83,12 +85,45 @@ class GoogleSpeech:
         ), DEADLINE_SECS)
 
         # Print the recognition result alternatives and confidence scores.
-        for result in response.results:
-            print('Result:')
-            for alternative in result.alternatives:
-                print(u'  ({}): {}'.format(
-                    alternative.confidence, alternative.transcript))
+        if output_file == None:
+            for result in response.results:
+                print('Result:')
+                for alternative in result.alternatives:
+                    print(u'  ({}): {}'.format(
+                        alternative.confidence, alternative.transcript))
+        #Write results to file. 
+        else: 
+            out_file = open(output_file, 'w')    
 
+            for result in response.results: 
+                for alternative in result.alternatives:
+                    out_file.write(alternative.transcript + ';' + str(alternative.confidence) + '\n')
+
+            out_file.close()
+
+    def recognize_folder(self, in_folder_path, out_folder_path):
+        """
+        Will create n-best result files for each 
+        file in a given corpus folder. Will write
+        results to individual files within the
+        given output folder. 
+        """
+        for usr_folder in os.listdir(in_folder_path):
+            #Path where recordings are kept for this user. 
+            usr_path = in_folder_path + usr_folder + '/recordings/'
+
+            for recording in os.listdir(usr_path):
+                #Path to recording. 
+                rec_path = usr_path + recording
+                
+                #Path to output file. 
+                file_name = ntpath.basename(rec_path).split('.')[0]
+                out_file = out_folder_path + file_name + '.nbest'
+
+                #Now run recognition request on the file. 
+                self.recognize(rec_path, output_file = out_file)
+
+                print 'Ran recognition on file: ' + file_name
 
     def _gcs_uri(self, text):
         if not text.startswith('gs://'):
@@ -100,5 +135,4 @@ class GoogleSpeech:
 if __name__ == '__main__':
     google_speech = GoogleSpeech()
 
-    google_speech.recognize(sys.argv[1])
-    google_speech.recognize(sys.argv[2])
+    google_speech.recognize_folder(sys.argv[1], sys.argv[2])
