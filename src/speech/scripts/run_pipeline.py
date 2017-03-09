@@ -495,9 +495,9 @@ def plot_tuning_results(results_dir):
 
     for metric in ['wer', 'sem_full', 'top_1', 'top_5', 'f1', 'p', 'r']:
         plt.plot(metric_results[metric][0], metric_results[metric][1], 'r')
-        plt.xlabel('Weight')
-        plt.ylabel('Avg')
-        plt.title(metric_names[metric])
+        plt.xlabel(r'$\beta$', fontsize =24)
+        plt.ylabel('Average Score', fontsize=24)
+        plt.title(metric_names[metric], fontsize=26)
         plt.xticks(np.arange(0.0, 1.1, 0.1))
         plt.savefig(results_dir + metric + '.png')
         plt.close()
@@ -514,7 +514,7 @@ def run_tuning_experiments(experiment_dir_path):
 
         if pid == 0: 
             result_path = experiment_dir_path + '/' + fold_name + '/tuning/results/'
-            nbest_path = experiment_dir_path + '/' + fold_name + '/experiments/asr/result_files/1.nbest'
+            nbest_path = experiment_dir_path + '/' + fold_name + '/experiments/asr/result_files/0.nbest'
 
             #Weights to interpolate over. 
             weights = np.arange(0.0, 1.005, 0.005)
@@ -530,6 +530,26 @@ def run_tuning_experiments(experiment_dir_path):
 
             sys.exit()
 
+        #Fork to speed up processing. 
+        pid = os.fork()
+
+        if pid == 0: 
+            result_path = experiment_dir_path + '/' + fold_name + '/tuning1/results/'
+            nbest_path = experiment_dir_path + '/' + fold_name + '/experiments/asr/result_files/1.nbest'
+
+            #Weights to interpolate over. 
+            weights = np.arange(0.0, 1.005, 0.005)
+
+            for weight in weights:
+                args = ['./experiments.py', 'rerank_interpolation']
+                args.append(nbest_path)
+                args.append(result_path + str(weight))
+                args.append(str(weight))
+
+                print "Fold " + str(fold_name) + " weight " + str(weight)
+                subprocess.call(args)
+
+            sys.exit()
 """
 Evaluates tuning experiments. 
 """
@@ -543,7 +563,7 @@ def evaluate_tuning(experiment_dir_path):
             parser_path = experiment_dir_path + '/' + fold_name + '/models/parser.cky'
 
             for result_file in os.listdir(result_path):
-                evaluate.wer(result_path + result_file, evaluation_path + '/wer/' + result_file, fold_name + '_' + result_file)
+                evaluate.wer(result_path + result_file, evaluation_path + '/wer/' + result_file, fold_name + '_' + result_file + '0')
                 evaluate.correct_in_top_n(result_path + result_file, evaluation_path + '/top_1/' + result_file, 1)
                 evaluate.correct_in_top_n(result_path + result_file, evaluation_path + '/top_5/' + result_file, 5)
                 evaluate.semantic_form(result_path + result_file, evaluation_path + '/sem_full/' + result_file, parser_path)
@@ -551,15 +571,87 @@ def evaluate_tuning(experiment_dir_path):
 
             sys.exit()
 
+        pid = os.fork()
+
+        if pid == 0:
+            result_path = experiment_dir_path + '/' + fold_name + '/tuning1/results/'
+            evaluation_path = experiment_dir_path + '/' + fold_name + '/tuning1/evaluations/'
+            parser_path = experiment_dir_path + '/' + fold_name + '/models/parser.cky'
+
+            for result_file in os.listdir(result_path):
+                evaluate.wer(result_path + result_file, evaluation_path + '/wer/' + result_file, fold_name + '_' + result_file + '1')
+                evaluate.correct_in_top_n(result_path + result_file, evaluation_path + '/top_1/' + result_file, 1)
+                evaluate.correct_in_top_n(result_path + result_file, evaluation_path + '/top_5/' + result_file, 5)
+                evaluate.semantic_form(result_path + result_file, evaluation_path + '/sem_full/' + result_file, parser_path)
+                evaluate.semantic_form_partial(result_path + result_file, evaluation_path + '/sem_partial/' + result_file, parser_path)
+
+            sys.exit()
 """
 Consolidates results form tuning experiments. 
 """
-def consolidates_tuning(experiment_dir_path, consolidate_path): 
+def consolidates_tuning(experiment_dir_path, consolidation_path):
+
+    consolidate_path = consolidation_path + '/tuning/'
     scores = {}
     weights = np.arange(0.0, 1.005, 0.005)
 
     for fold_name in os.listdir(experiment_dir_path): 
         evaluation_path = experiment_dir_path + '/' + fold_name + '/tuning/evaluations/'
+
+        for weight in weights:
+            if not weight in scores: 
+                scores[weight] = {'wer': [], 'sem_full': [], 'f1': [], 'p': [], 'r': [], 'top_1': [], 'top_5': []}
+
+            scores[weight]['wer'].append(analysis.extract_wer_from_file(evaluation_path + 'wer/' + str(weight)))
+            scores[weight]['top_1'].append(analysis.extract_topn_result_from_file(evaluation_path + 'top_1/' + str(weight)))
+            scores[weight]['top_5'].append(analysis.extract_topn_result_from_file(evaluation_path + 'top_5/' + str(weight)))
+            scores[weight]['sem_full'].append(analysis.extract_sem_full_avg_from_file(evaluation_path + 'sem_full/' + str(weight)))
+
+            f1, p, r = analysis.extract_sem_partial_scores_from_file(evaluation_path + 'sem_partial/' + str(weight))
+            scores[weight]['f1'].append(f1)
+            scores[weight]['p'].append(p)
+            scores[weight]['r'].append(r)
+
+    #Now consolidates results into files.  
+    wer_file = open(consolidate_path + 'wer.txt', 'w')
+    top_1_file = open(consolidate_path + 'top_1.txt', 'w')
+    top_5_file = open(consolidate_path + 'top_5.txt', 'w')
+    sem_full_file = open(consolidate_path + 'sem_full.txt', 'w')
+    f1_file = open(consolidate_path + 'f1.txt', 'w')
+    p_file = open(consolidate_path + 'p.txt', 'w')
+    r_file = open(consolidate_path + 'r.txt', 'w')
+
+    for weight in weights:
+        wer = [str(element) for element in scores[weight]['wer']]
+        top_1 = [str(element) for element in scores[weight]['top_1']]
+        top_5 = [str(element) for element in scores[weight]['top_5']]
+        f1 = [str(element) for element in scores[weight]['f1']]
+        p = [str(element) for element in scores[weight]['p']]
+        r = [str(element) for element in scores[weight]['r']]
+        sem_full = [str(element) for element in scores[weight]['sem_full']]
+
+        wer_file.write(str(weight) + ':' + ';'.join(wer) + '\n')
+        top_1_file.write(str(weight) + ':' + ';'.join(top_1) + '\n')
+        top_5_file.write(str(weight) + ':' + ';'.join(top_5) + '\n')
+        sem_full_file.write(str(weight) + ':' + ';'.join(sem_full) + '\n')
+        f1_file.write(str(weight) + ':' + ';'.join(f1) + '\n')
+        p_file.write(str(weight) + ':' + ';'.join(p) + '\n')
+        r_file.write(str(weight) + ':' + ';'.join(r) + '\n')
+
+    wer_file.close()
+    top_1_file.close()
+    top_5_file.close()
+    sem_full_file.close()
+    f1_file.close()
+    p_file.close()
+    r_file.close()
+
+    consolidate_path = consolidation_path + '/tuning1/'
+    scores = {}
+    weights = np.arange(0.0, 1.005, 0.005)
+
+    for fold_name in os.listdir(experiment_dir_path): 
+        evaluation_path = experiment_dir_path + '/' + fold_name + '/tuning1/evaluations/'
 
         for weight in weights:
             if not weight in scores: 

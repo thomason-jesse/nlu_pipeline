@@ -505,6 +505,9 @@ class CKYParser:
         self.max_hypothesis_categories_for_unknown_token_beam = 2  # for unknown token, max syntax categories tried
         self.max_expansions_per_non_terminal = 10  # decides how many expansions to store per CKY cell
 
+        #Maximum number of tokens to allow before flooring all hyper-parameters to speed up parsing. 
+        self.max_token_num = 7
+
         # behavioral parameters
         self.safety = True  # set to False once confident about node combination functions' correctness
 
@@ -748,11 +751,22 @@ class CKYParser:
         
                 # limits number of parses considered if longer than 7 tokens.
                 # TODO: this should be rewritten as a hyperparameter-controlled behavior
-                if len(tks) > 7:
-                    self.max_cky_trees_per_token_sequence_beam = 50
+                if len(tks) > self.max_token_num:
+
+                    self.max_multiword_expression = 2  # max span of a multi-word expression to be considered during tokenization
+                    self.max_new_senses_per_utterance = 1  # max number of new word senses that can be induced on a training example
+                    self.max_cky_trees_per_token_sequence_beam = 10  # for tokenization of an utterance, max cky trees considered
+                    self.max_hypothesis_categories_for_unknown_token_beam = 1  # for unknown token, max syntax categories tried
+                    self.max_expansions_per_non_terminal = 3  # decides how many expansions to store per CKY cell
                 else:
-                    self.max_cky_trees_per_token_sequence_beam = 100
-                
+                    self.max_multiword_expression = 2  # max span of a multi-word expression to be considered during tokenization
+                    self.max_new_senses_per_utterance = 2  # max number of new word senses that can be induced on a training example
+                    self.max_cky_trees_per_token_sequence_beam = 100  # for tokenization of an utterance, max cky trees considered
+                    self.max_hypothesis_categories_for_unknown_token_beam = 2  # for unknown token, max syntax categories tried
+                    self.max_expansions_per_non_terminal = 10  # decides how many expansions to store per CKY cell
+
+
+
                 for idx in range(0, len(tks)):
                     if tks[idx] in self.lexicon.surface_forms:
                         # TODO: could parameterize prior on surface forms
