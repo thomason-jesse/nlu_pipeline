@@ -93,7 +93,7 @@ class GoogleSpeech:
                 # See https://g.co/cloud/speech/docs/languages for a list of
                 # supported languages.
                 language_code=language_code,  # a BCP-47 language tag
-                speech_context = SpeechContext(phrases=self.speech_context),
+                #speech_context = SpeechContext(phrases=self.speech_context),
                 max_alternatives=20,
             ),
             audio=cloud_speech_pb2.RecognitionAudio(
@@ -231,6 +231,7 @@ class GoogleSpeech:
             print disjoint
         else:
             print 'File sets match!'
+            
     
     def _gcs_uri(self, text):
         if not text.startswith('gs://'):

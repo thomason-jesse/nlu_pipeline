@@ -121,8 +121,8 @@ it that is compatible with the format
 the CKYParser expects. 
 """
 def tokenize_for_parser(phrase):
-    #Currently only splits possessive. 
-    return phrase.replace("'", " '")
+    #Currently only splits possessive and removes periods. 
+    return phrase.replace("'", " '").replace('.', '').replace('&', 'and').lower()
 
 """
 This function takes a tokenized string
@@ -469,6 +469,75 @@ def re_rank_with_interpolation(in_file_name, out_file_name, weight):
     in_file.close()
     out_file.close()
 
+"""
+Given a test file, assigns
+parse confidence scores 
+to all hypotheses produced
+by the Google Speech API. 
+"""
+def give_google_parse_scores(test_file_path, results_file_path, parser_path, google_recognized_folder):      
+    
+    #Load parser and files. 
+    test_file = open(test_file_path, 'r')
+    result_file = open(results_file_path, 'w')
+
+    parser = load_obj_general(parser_path)
+    compute_parser_null_node_values(parser)
+
+    for line in test_file: 
+        #Get components of phrase. 
+        phrase, sem_form, denotation, rec = line.strip().split(';')
+        
+        #Write ground truth so that it may be evaluated. 
+        result_file.write('#' + line)
+
+        #Get name of recording to open google recognition results file. 
+        rec_name = os.path.splitext(os.path.basename(rec))[0]
+        
+        #Get nbest file. 
+        nbest_file = open(google_recognized_folder + rec_name + '.nbest', 'r')
+
+        for result_line in nbest_file:
+            hypothesis, google_hyp_score = result_line.strip().split(';')
+            
+            #Format google hypothesis for evaluation. 
+            hypothesis = hypothesis.replace('.', '').lower()
+
+            #Tokenize so we can parse. 
+            tokenized_hyp = tokenize_for_parser(hypothesis)
+            num_toks = len(tokenized_hyp.split())
+
+            #Some times parser suffers an error. 
+            try:
+                #Gets parse. 
+                parse = get_first_valid_parse(tokenized_hyp, parser)
+
+                if not parse[0] == None:
+                    #Computes avg. production probability. 
+                    avg_prod_prob = float('-inf')
+                    num_prods = 0.0
+                    productions = count_ccg_productions(parse[0])
+
+                    for production in productions:
+                        avg_prod_prob = np.logaddexp(avg_prod_prob, parser.theta.CCG_production[production])
+                        num_prods += float(productions[production])
+
+                    avg_prod_prob -= np.log(num_prods)
+
+                    #Modifies score according to number of null nodes. 
+                    num_nulls = 7 - num_toks
+                    parse_score = parse[1] + num_nulls * (parser.theta.null_prior + avg_prod_prob)
+
+                    parse = (parser.print_parse(parse[0].node), parse_score)                     
+
+            except:
+                parse = ('None', float('-inf')) 
+
+            #Now write speech hyp; speech score; parse hyp; parse score. 
+            result_file.write(hypothesis + ';' + google_hyp_score + ';' + str(parse[0]) + ';' + str(parse[1]) + '\n')
+            
+    test_file.close()
+    result_file.close()
 
 """
 This method takes a file with n results
@@ -667,6 +736,7 @@ def print_usage():
     print 'CKYParser re-rank: ./experiments parser_rerank [nbest_file] [re-ranked_file_name] [parser_path] [temp_name] [optional: null_node]'
     print 'Re-rank with interpolation: ./experiments rerank_interpolation [nbest_file] [out_file] [weight]'
     print 'Run parser on speech ground truth: ./experiments parse_ground_truth [experiment_folder] [results_folder] [test_file_name]'
+    print 'Assign parse scores to Google Speech API files: ./experiments parse_score_google [test_file_path] [results_file_path] [parser_path] [google_recognized_folder]'
 
 if __name__ == '__main__':
     if not len(sys.argv) >= 2:
@@ -698,6 +768,12 @@ if __name__ == '__main__':
             re_rank_CKY(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
         elif len(sys.argv) == 7:
             re_rank_function(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6])
+
+    elif sys.argv[1] == 'parse_score_google':
+        if len(sys.argv) == 6: 
+            give_google_parse_scores(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
+        else:
+            print_usage()
 
     else:
         print_usage()
