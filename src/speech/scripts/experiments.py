@@ -477,67 +477,112 @@ by the Google Speech API.
 """
 def give_google_parse_scores(test_file_path, results_file_path, parser_path, google_recognized_folder):      
     
-    #Load parser and files. 
+    #First see where we left off if we have already scored parts of this file. 
+    test_index_chkpt = 0
+    hyp_index_chkpt = 0
+
+    if os.path.exists(results_file_path):
+        result_file = open(results_file_path, 'r+')
+
+        #Check takes the form of determing both test line index and hypothesis line index. 
+        for line in result_file: 
+            if line.startswith('#'):
+                hyp_index_chkpt = 0
+                test_index_chkpt += 1
+            else: 
+                hyp_index_chkpt += 1
+
+        result_file.close()
+
+    #Get lines from test file and open result file for, but now for writing. 
     test_file = open(test_file_path, 'r')
-    result_file = open(results_file_path, 'w')
+    result_file = open(results_file_path, 'a+')
 
     parser = load_obj_general(parser_path)
     compute_parser_null_node_values(parser)
 
-    for line in test_file: 
-        #Get components of phrase. 
-        phrase, sem_form, denotation, rec = line.strip().split(';')
-        
-        #Write ground truth so that it may be evaluated. 
-        result_file.write('#' + line)
+    #Keep track of test line indexes, compare to checkpoint indexes s.t. we don't repeat any work. 
+    test_index = 1
 
-        #Get name of recording to open google recognition results file. 
-        rec_name = os.path.splitext(os.path.basename(rec))[0]
-        
-        #Get nbest file. 
-        nbest_file = open(google_recognized_folder + rec_name + '.nbest', 'r')
+    for line in test_file:
 
-        for result_line in nbest_file:
-            hypothesis, google_hyp_score = result_line.strip().split(';')
+        #Don't score line we've scored in the past. 
+        if test_index >= test_index_chkpt:
             
-            #Format google hypothesis for evaluation. 
-            hypothesis = hypothesis.replace('.', '').lower()
+            #Get components of phrase. 
+            phrase, sem_form, denotation, rec = line.strip().split(';')
 
-            #Tokenize so we can parse. 
-            tokenized_hyp = tokenize_for_parser(hypothesis)
-            num_toks = len(tokenized_hyp.split())
+            #Make sure we don't already have ground truth written. 
+            if not (test_index == test_index_chkpt):    
+                result_file.write('#' + line)
+                result_file.flush()
 
-            #Some times parser suffers an error. 
-            try:
-                #Gets parse. 
-                parse = get_first_valid_parse(tokenized_hyp, parser)
-
-                if not parse[0] == None:
-                    #Computes avg. production probability. 
-                    avg_prod_prob = float('-inf')
-                    num_prods = 0.0
-                    productions = count_ccg_productions(parse[0])
-
-                    for production in productions:
-                        avg_prod_prob = np.logaddexp(avg_prod_prob, parser.theta.CCG_production[production])
-                        num_prods += float(productions[production])
-
-                    avg_prod_prob -= np.log(num_prods)
-
-                    #Modifies score according to number of null nodes. 
-                    num_nulls = 7 - num_toks
-                    parse_score = parse[1] + num_nulls * (parser.theta.null_prior + avg_prod_prob)
-
-                    parse = (parser.print_parse(parse[0].node), parse_score)                     
-
-            except:
-                parse = ('None', float('-inf')) 
-
-            #Now write speech hyp; speech score; parse hyp; parse score. 
-            result_file.write(hypothesis + ';' + google_hyp_score + ';' + str(parse[0]) + ';' + str(parse[1]) + '\n')
+            #Get name of recording to open google recognition results file. 
+            rec_name = os.path.splitext(os.path.basename(rec))[0]
             
-    test_file.close()
+            #Get nbest file. 
+            nbest_file = open(google_recognized_folder + rec_name + '.nbest', 'r')
+
+            hyp_index = 1
+
+            for result_line in nbest_file:
+                #Make sure we haven't already scored this hypothesis. 
+                if not (test_index == test_index_chkpt and hyp_index <= hyp_index_chkpt): 
+                    hypothesis, google_hyp_score = result_line.strip().split(';')
+                    
+                    #Format google hypothesis for evaluation. 
+                    hypothesis = hypothesis.replace('.', '').lower()
+
+                    #Tokenize so we can parse. 
+                    tokenized_hyp = tokenize_for_parser(hypothesis)
+                    num_toks = len(tokenized_hyp.split())
+
+                    #Some times parser suffers an error.
+
+                    #Only allow for top 10 hypotheses in order to reduce computation time.
+                    if hyp_index <= 10:
+                        try:
+                            #Gets parse. 
+                            parse = get_first_valid_parse(tokenized_hyp, parser)
+
+                            if not parse[0] == None:
+                                #Computes avg. production probability. 
+                                avg_prod_prob = float('-inf')
+                                num_prods = 0.0
+                                productions = count_ccg_productions(parse[0])
+
+                                for production in productions:
+                                    avg_prod_prob = np.logaddexp(avg_prod_prob, parser.theta.CCG_production[production])
+                                    num_prods += float(productions[production])
+
+                                avg_prod_prob -= np.log(num_prods)
+
+                                #Modifies score according to number of null nodes. 
+                                num_nulls = 7 - num_toks
+                                parse_score = parse[1] + num_nulls * (parser.theta.null_prior + avg_prod_prob)
+
+                                parse = (parser.print_parse(parse[0].node), parse_score)                     
+
+                        except KeyboardInterrupt:
+                            raise KeyboardInterrupt
+
+                        except:
+                            parse = ('None', float('-inf')) 
+
+                        #Now write speech hyp; speech score; parse hyp; parse score. 
+                        result_file.write(hypothesis + ';' + google_hyp_score + ';' + str(parse[0]) + ';' + str(parse[1]) + '\n')
+                        result_file.flush()
+
+                        print 'Done test line ' + str(test_index) + ' hyp ' + str(hyp_index)
+
+                hyp_index += 1
+
+        test_index += 1
+
     result_file.close()
+    test_file.close()
+
+    print 'FINISHED SCORING'
 
 """
 This method takes a file with n results
