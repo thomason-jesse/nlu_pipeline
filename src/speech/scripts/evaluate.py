@@ -702,7 +702,7 @@ def eval_asr_length(experiment_folder, result_file_name):
     for length in results: 
         print str(length) + ':' + str(results[length])
 
-def eval_parsing_time(parser_path, test_file_path, chkpt_file_path):
+def eval_parsing_time(parser_path, test_file_path, chkpt_file_path, log_file_path=None):
     #First open up files, particularly, read in checkpoint in case we've already worked on this file. 
     test_file = [line for line in open(test_file_path, 'r')]
     
@@ -712,13 +712,25 @@ def eval_parsing_time(parser_path, test_file_path, chkpt_file_path):
     else:
         chkpt = {'lines_parsed': set()}
 
-    print chkpt
+    #Log everything for analysis later. 
+    if not log_file_path: 
+        log_file_path = os.path.splitext(chkpt_file_path)[0] + '.log'
+
+    if os.path.exists(log_file_path):
+        log_file = open(log_file_path, 'a')
+    else:
+        log_file = open(log_file_path, 'w')
 
     #Finally, load the parser. 
     parser = load_obj_general(parser_path)
 
     not_done = True
     tok_len = 0
+
+    output_str = 'Starting from checkpoint: ' + str(chkpt)
+    print output_str
+    log_file.write(output_str + '\n')
+    log_file.flush()
 
     #Do this for phrases of all lengths starting from the shortest. 
     while not_done: 
@@ -754,7 +766,10 @@ def eval_parsing_time(parser_path, test_file_path, chkpt_file_path):
                 #Save checkpoint. 
                 pickle.dump(chkpt, open(chkpt_file_path, 'w'))
 
-                print 'Parsed phrase #' + str(index) + ', with ' + str(num_toks) + ' tokens, in ' + str(duration) + ' seconds.'
+                output_str = 'Parsed phrase #' + str(index) + ', with ' + str(num_toks) + ' tokens, in ' + str(duration) + ' seconds.'
+                print output_str
+                log_file.write(output_str + '\n')
+                log_file.flush()
 
                 #Check to see if number of parsed lines matches test file, if so, we're done. 
                 if len(chkpt['lines_parsed']) == len(test_file):
@@ -762,7 +777,12 @@ def eval_parsing_time(parser_path, test_file_path, chkpt_file_path):
 
             index += 1
 
-    print 'Done.'
+    output_str = 'Done.'
+    print output_str
+    log_file.write(output_str)
+
+    #Done loggging. 
+    log_file.close()
 
 def print_usage():
     print 'WER: ./evaluate.py wer [result_file] [evaluation_file_name]'
