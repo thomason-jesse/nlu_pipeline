@@ -34,6 +34,7 @@ import os
 import subprocess
 from experiments import get_first_valid_parse
 from experiments import tokenize_for_parser
+import post_process
 
 #Adds nlu_pipeline src folder in order to import modules from it. 
 nlu_pipeline_path = '/scratch/cluster/rcorona/nlu_pipeline/src/'
@@ -448,6 +449,133 @@ def evaluate_parse_file_partial(file_name, parser):
 
     return [f1_score, precision, recall]
 
+def eval_google_partial_sem_form(results, parser): 
+    #Counts for evaluation. 
+    recall = 0.0
+    precision = 0.0
+    f1_score = 0.0
+    total_count = 0.0
+
+    #Evaluates data set. 
+    for target, hypothesis in results:
+        total_count += 1.0
+
+        #Get the target semantic form. 
+        _, true_semantic_form, _, _ = target
+        true_semantic_form = ':'.join(true_semantic_form.split(':')[1:])
+        true_semantic_form = post_process.add_type_constraints(true_semantic_form.strip()) 
+
+        #Gets semantic node from true semantic form. 
+        true_node = parser.lexicon.read_semantic_form_from_str(true_semantic_form, None, None, [], False)
+
+        #Now attempt to get a semantic node from the semantic form string. 
+        hyp_sem_form_str = hypothesis[2]
+
+        #If None, then no valid parse was found. Therefore skip since this won't contribute to the score.  
+        if hyp_sem_form_str == "None":
+            continue
+        else:
+            hyp_node = parser.lexicon.read_semantic_form_from_str(hyp_sem_form_str, None, None, [], False)
+
+        #Evaluates recall and precision for hypothesis and adds values to counts. 
+        true_preds = [triple[0] for triple in parser.theta.count_semantics(true_node)]
+        hyp_preds = [triple[0] for triple in parser.theta.count_semantics(hyp_node)]
+        true_args = [triple[1] for triple in parser.theta.count_semantics(true_node)]
+        hyp_args = [triple[1] for triple in parser.theta.count_semantics(hyp_node)]
+
+        hyp_precision = 0.0
+        hyp_recall = 0.0
+
+        #precision = # correct preds out of total guessed. 
+        for hyp_pred in hyp_preds:
+            if hyp_pred in true_preds:
+                hyp_precision += 1.0
+
+        #recall = # correct preds out of total number correct. 
+        for true_pred in true_preds:
+            if true_pred in hyp_preds:
+                hyp_recall += 1.0
+
+        #Adds values. 
+        hyp_precision /= len(hyp_preds)
+        hyp_recall /= len(true_preds)
+
+        precision += hyp_precision
+        recall += hyp_recall
+
+        if not (hyp_precision == 0 and hyp_recall == 0):
+            f1_score += 2 * hyp_precision * hyp_recall / (hyp_precision + hyp_recall)   
+        
+    #Normalizes
+    precision /= total_count
+    recall /= total_count
+    f1_score /= total_count
+
+    #Now display results. 
+    print 'P: ' + str(precision)
+    print 'R: ' + str(recall)
+    print 'F1: ' + str(f1_score)
+
+def prepare_google_speech_results(raw_results, speech_scoring_function): 
+    results = []
+
+    #Targets will be paired with hypotheses. 
+    target = None
+    hypotheses = []
+
+    for row in raw_results: 
+        if row[0].startswith('#'): 
+            #First append previous pair to results if it exists. 
+            if target:
+                #First re-score speech confidence scores using given scoring function. 
+                hypotheses = speech_scoring_function(hypotheses)
+
+                results.append((target, hypotheses))
+
+            #New target to be read. 
+            target = row
+
+            #New hypothesis list to read in. 
+            hypotheses = []
+
+        #Otherwise, this is just another hypothesis to add. 
+        else:
+            hypotheses.append([row[0], float(row[1]), row[2], float(row[3])])
+
+    return results
+
+def re_rank_results(results, lambda1, lambda2): 
+    #Re-ranked results will only contain top ranked result. 
+    re_ranked_results = []
+
+    #Define a score function for each hypothesis. 
+    #TODO add actual interpolation. Right now assumes we are either re-ranking based solely on parser or not at all. 
+    if lambda1 == 1.0: 
+        score = lambda x: x[1]
+    elif lambda2 == 1.0: 
+        score = lambda x: x[3]
+
+    #Get top re-ranked hypothesis and append to list. 
+    for target, hypotheses in results: 
+        re_ranked_results.append((target, sorted(hypotheses, key=score, reverse=True)[0]))
+
+    return re_ranked_results
+
+def evaluate_google_speech_results(results_file_path, parser_path, lambda1, lambda2, eval_function=eval_google_partial_sem_form, speech_scoring_function=lambda x:x): 
+    #Read in result data. 
+    raw_results = [line.strip().split(';') for line in open(results_file_path, 'r')]
+
+    #Prepare data for evaluation.
+    results = prepare_google_speech_results(raw_results, speech_scoring_function)
+
+    #Load parser. 
+    parser = load_obj_general(parser_path)
+
+    #Re-rank results based on interpolation value. 
+    re_ranked_results = re_rank_results(results, lambda1, lambda2)
+
+    #Now run evaluation. 
+    eval_function(re_ranked_results, parser)
 
 def evaluate_parse_folder_partial(experiment_folder, result_folder): 
     #F1, precision, and recall values. 
@@ -579,6 +707,7 @@ def print_usage():
     print 'Grounding: ./evaluate.py grounding [ont file] [lex file] [kb pickle file]'
     print 'Evaluate parsing: ./evaluate.py evaluate_parsing [full/partial] [experiment_folder] [result_folder]'
     print 'Evaluate ASR per phrase length: ./evaluate asr_len [experiment_folder] [result_file_name]'
+    print 'Evaluate Google Speech Results: ./evaluate google_speech [result_file_path] [parser_path] [lambda1] [lambda2] [eval_function] [speech_scoring_function]'
 
 if __name__ == '__main__':
     if not len(sys.argv) >= 2:
@@ -628,6 +757,10 @@ if __name__ == '__main__':
             eval_asr_length(sys.argv[2], sys.argv[3])
         else:
             print_usage()
+
+    elif sys.argv[1] == 'google_speech': 
+        #TODO add usage checks. 
+        evaluate_google_speech_results(sys.argv[2], sys.argv[3], float(sys.argv[4]), float(sys.argv[5]))
 
     else:
         print_usage()
