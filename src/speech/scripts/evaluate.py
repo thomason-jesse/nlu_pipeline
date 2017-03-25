@@ -451,6 +451,31 @@ def evaluate_parse_file_partial(file_name, parser):
 
     return [f1_score, precision, recall]
 
+def eval_google_wer(results, parser): 
+    #Creates temporary files to run evaluations on.
+    os.chdir('../bin')
+    transcript_file = open('transcripts.txt', 'w')
+    hyp_file = open('hyp.txt', 'w')
+
+    #Used for naming phrases, needed by wer script. 
+    count = 0
+
+    for target, hypothesis in results:
+        transcript_file.write(target[0] + ' (phrase' + str(count) + ')\n')
+        hyp_file.write(hypothesis[0] + ' (phrase' + str(count) + ')\n')
+
+        count += 1
+
+    #Closes files so they may be read by WER evaluation script. 
+    transcript_file.close()
+    hyp_file.close()
+
+    #Prepares arguments for running WER evaluation. 
+    args = [bin_path + '/word_align.pl', 'transcripts.txt', 'hyp.txt']
+
+    #Evaluates WER. 
+    subprocess.call(args, stdout=None, stderr=None)
+
 def eval_google_partial_sem_form(results, parser): 
     #Counts for evaluation. 
     recall = 0.0
@@ -615,6 +640,8 @@ def evaluate_google_speech_results(results_file_path, parser_path, lambda1, lamb
         eval_function = eval_google_partial_sem_form
     elif eval_function == 'full_sem_form':
         eval_function = eval_google_full_sem_form
+    elif eval_function == 'wer':
+        eval_function = eval_google_wer
     else:
         raise NotImplementedError('Eval function ' + eval_function + ' currently has no implementation!')
 
