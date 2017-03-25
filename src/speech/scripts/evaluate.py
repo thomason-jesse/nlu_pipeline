@@ -35,6 +35,8 @@ import subprocess
 from experiments import get_first_valid_parse
 from experiments import tokenize_for_parser
 import post_process
+import pickle
+import time
 
 #Adds nlu_pipeline src folder in order to import modules from it. 
 nlu_pipeline_path = '/scratch/cluster/rcorona/nlu_pipeline/src/'
@@ -700,6 +702,68 @@ def eval_asr_length(experiment_folder, result_file_name):
     for length in results: 
         print str(length) + ':' + str(results[length])
 
+def eval_parsing_time(parser_path, test_file_path, chkpt_file_path):
+    #First open up files, particularly, read in checkpoint in case we've already worked on this file. 
+    test_file = [line for line in open(test_file_path, 'r')]
+    
+    #Get checkpoint if it already exists. 
+    if os.path.exists(chkpt_file_path): 
+        chkpt = pickle.load(open(chkpt_file_path, 'r'))
+    else:
+        chkpt = {'lines_parsed': set()}
+
+    print chkpt
+
+    #Finally, load the parser. 
+    parser = load_obj_general(parser_path)
+
+    not_done = True
+    tok_len = 0
+
+    #Do this for phrases of all lengths starting from the shortest. 
+    while not_done: 
+     
+        tok_len += 1
+
+        #Keep track of which lines we've done. 
+        index = 0
+
+        for line in test_file:
+            #Tokenize input to parser. 
+            phrase = tokenize_for_parser(line.split(';')[0])
+
+            #Get number of tokens to store statistic in checkpoint dictionary. 
+            num_toks = len(phrase.split())
+
+            #Only parse sentences with num_toks tokens so that we can go from shortest to longest. 
+            if num_toks == tok_len and not index in chkpt['lines_parsed']: 
+                #Now time to see how long it takes to parse. 
+                start_time = time.time()
+                parser.most_likely_cky_parse(phrase).next()
+                end_time = time.time()
+
+                duration = end_time - start_time
+
+                #Now store that data. 
+                if not num_toks in chkpt:
+                    chkpt[num_toks] = []
+
+                chkpt[num_toks].append(duration)
+                chkpt['lines_parsed'].add(index)
+
+                #Save checkpoint. 
+                pickle.dump(chkpt, open(chkpt_file_path, 'w'))
+
+                print 'Parsed phrase #' + str(index) + ', with ' + str(num_toks) + ' tokens, in ' + str(duration) + ' seconds.'
+
+                #Check to see if number of parsed lines matches test file, if so, we're done. 
+                if len(chkpt['lines_parsed']) == len(test_file):
+                    not_done = False
+
+            index += 1
+
+    print 'Done.'
+
 def print_usage():
     print 'WER: ./evaluate.py wer [result_file] [evaluation_file_name]'
     print 'Correct hypothesis in top n: ./evaluate.py top_n [result_file] [evaluation_file_name] [n]'
@@ -708,6 +772,7 @@ def print_usage():
     print 'Evaluate parsing: ./evaluate.py evaluate_parsing [full/partial] [experiment_folder] [result_folder]'
     print 'Evaluate ASR per phrase length: ./evaluate asr_len [experiment_folder] [result_file_name]'
     print 'Evaluate Google Speech Results: ./evaluate google_speech [result_file_path] [parser_path] [lambda1] [lambda2] [eval_function] [speech_scoring_function]'
+    print 'Evaluate parsing time: ./evaluate parsing_time [parser_path] [test_file] [checkpoint_file]'
 
 if __name__ == '__main__':
     if not len(sys.argv) >= 2:
@@ -761,6 +826,12 @@ if __name__ == '__main__':
     elif sys.argv[1] == 'google_speech': 
         #TODO add usage checks. 
         evaluate_google_speech_results(sys.argv[2], sys.argv[3], float(sys.argv[4]), float(sys.argv[5]))
+
+    elif sys.argv[1] == 'parsing_time':
+        if not len(sys.argv) == 5:
+            print_usage()
+        else:
+            eval_parsing_time(sys.argv[2], sys.argv[3], sys.argv[4])
 
     else:
         print_usage()
