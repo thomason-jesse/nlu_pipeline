@@ -518,6 +518,40 @@ def eval_google_partial_sem_form(results, parser):
     print 'R: ' + str(recall)
     print 'F1: ' + str(f1_score)
 
+def eval_google_full_sem_form(results, parser): 
+    #Counts for evaluation. 
+    count_correct = 0.0
+    total_count = 0.0
+
+    #Evaluates data set. 
+    for target, hypothesis in results:
+        total_count += 1.0
+ 
+        _, true_semantic_form, _, _ = target
+        true_semantic_form = ':'.join(true_semantic_form.split(':')[1:])
+        true_semantic_form = post_process.add_type_constraints(true_semantic_form.strip()) 
+
+        #Gets semantic node from true semantic form. 
+        true_node = parser.lexicon.read_semantic_form_from_str(true_semantic_form, None, None, [], False)
+
+        #Now attempt to get a semantic node from the semantic form string. 
+        hyp_sem_form_str = hypothesis[2]
+
+        #If None, then no valid parse was found. Therefore skip since this won't contribute to the score.  
+        if hyp_sem_form_str == "None":
+            continue
+        else:
+            hyp_node = parser.lexicon.read_semantic_form_from_str(hyp_sem_form_str, None, None, [], False)
+
+        #Evaluates equality.
+        are_equal = true_node.equal_allowing_commutativity(hyp_node, parser.commutative_idxs, True, parser.ontology)
+
+        if are_equal:
+            count_correct += 1.0
+
+    #Now display results. 
+    print 'Accuracy: ' + str(count_correct / total_count)  
+
 def prepare_google_speech_results(raw_results, speech_scoring_function): 
     results = []
 
@@ -563,7 +597,7 @@ def re_rank_results(results, lambda1, lambda2):
 
     return re_ranked_results
 
-def evaluate_google_speech_results(results_file_path, parser_path, lambda1, lambda2, eval_function=eval_google_partial_sem_form, speech_scoring_function=lambda x:x): 
+def evaluate_google_speech_results(results_file_path, parser_path, lambda1, lambda2, eval_function='partial_sem_form', speech_scoring_function=lambda x:x): 
     #Read in result data. 
     raw_results = [line.strip().split(';') for line in open(results_file_path, 'r')]
 
@@ -575,6 +609,14 @@ def evaluate_google_speech_results(results_file_path, parser_path, lambda1, lamb
 
     #Re-rank results based on interpolation value. 
     re_ranked_results = re_rank_results(results, lambda1, lambda2)
+
+    #Determine evaluation function. 
+    if eval_function == 'partial_sem_form':
+        eval_function = eval_google_partial_sem_form
+    elif eval_function == 'full_sem_form':
+        eval_function = eval_google_full_sem_form
+    else:
+        raise NotImplementedError('Eval function ' + eval_function + ' currently has no implementation!')
 
     #Now run evaluation. 
     eval_function(re_ranked_results, parser)
@@ -751,16 +793,23 @@ def eval_parsing_time(parser_path, test_file_path, chkpt_file_path, log_file_pat
             if num_toks == tok_len and not index in chkpt['lines_parsed']: 
                 #Now time to see how long it takes to parse. 
                 start_time = time.time()
-                parser.most_likely_cky_parse(phrase).next()
+                parse = parser.most_likely_cky_parse(phrase).next()
                 end_time = time.time()
 
+                #Get string representation of parsed semantic form.
+                if parse == None or parse[0] == None: 
+                    parse = 'None'
+                else: 
+                    parse_node = parse[0].node
+                    parse = parser.print_parse(parse_node)
+                
                 duration = end_time - start_time
 
                 #Now store that data. 
                 if not num_toks in chkpt:
                     chkpt[num_toks] = []
 
-                chkpt[num_toks].append(duration)
+                chkpt[num_toks].append([phrase, parse, duration])
                 chkpt['lines_parsed'].add(index)
 
                 #Save checkpoint. 
@@ -844,8 +893,10 @@ if __name__ == '__main__':
             print_usage()
 
     elif sys.argv[1] == 'google_speech': 
-        #TODO add usage checks. 
-        evaluate_google_speech_results(sys.argv[2], sys.argv[3], float(sys.argv[4]), float(sys.argv[5]))
+        if not len(sys.argv) == 8:
+            print_usage()
+        else:
+            evaluate_google_speech_results(sys.argv[2], sys.argv[3], float(sys.argv[4]), float(sys.argv[5]), sys.argv[6])
 
     elif sys.argv[1] == 'parsing_time':
         if not len(sys.argv) == 5:
