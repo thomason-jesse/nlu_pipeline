@@ -494,6 +494,8 @@ def give_google_parse_scores(test_file_path, results_file_path, parser_path, goo
 
         result_file.close()
 
+    print 'Starting at test example #' + str(test_index_chkpt) + ' hypothesis #' + str(hyp_index_chkpt)
+
     #Get lines from test file and open result file for, but now for writing. 
     test_file = open(test_file_path, 'r')
     result_file = open(results_file_path, 'a+')
@@ -542,6 +544,8 @@ def give_google_parse_scores(test_file_path, results_file_path, parser_path, goo
                     #Only allow for top 10 hypotheses in order to reduce computation time.
                     if hyp_index <= 10:
                         try:
+                            print 'Attempting to parse: ' + tokenized_hyp
+
                             #Gets parse. 
                             parse = get_first_valid_parse(tokenized_hyp, parser)
 
