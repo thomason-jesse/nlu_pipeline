@@ -2,7 +2,7 @@
 search :- M/PP/NP : lambda r:l.(lambda x:p.(searchroom(x,r)))
 bring :- M/NP/NP : lambda y:p.(lambda x:i.(bring(x,y)))
 bring :- M/PP/NP : lambda y:i.(lambda x:p.(bring(y,x)))
-walk :- M/PP : lambda x:l.(at(x))
+walk :- M/PP : lambda x:l.(walk(x))
 
 #prepositional arguments to commands
 for :- PP/NP : lambda x:p.(x)
@@ -49,6 +49,17 @@ three four two zero :- NP : l3_420
 three four three two :- NP : l3_432
 three five zero two :- NP : l3_502
 three four fourteen b :- NP : l3_414b
+
+3516 :- NP : l3_516
+3508 :- NP : l3_508
+3512 :- NP : l3_512
+3510 :- NP : l3_510
+3402 :- NP : l3_402
+3418 :- NP : l3_418
+3420 :- NP : l3_420
+3432 :- NP : l3_432
+3502 :- NP : l3_502
+3414 b :- NP : l3_414b
 
 # people atoms
 bruce :- NP : bruce
