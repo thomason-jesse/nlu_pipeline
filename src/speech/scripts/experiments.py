@@ -546,26 +546,33 @@ def give_google_parse_scores(test_file_path, results_file_path, parser_path, goo
                         try:
                             print 'Attempting to parse: ' + tokenized_hyp
 
-                            #Gets parse. 
-                            parse = get_first_valid_parse(tokenized_hyp, parser)
+                            #Make sure hypothesis isn't too long. 
+                            if len(tokenized_hyp.split()) > 7: 
+                                parse = ('None', float('-inf'))
+                            else:
 
-                            if not parse[0] == None:
-                                #Computes avg. production probability. 
-                                avg_prod_prob = float('-inf')
-                                num_prods = 0.0
-                                productions = count_ccg_productions(parse[0])
+                                #Gets parse.
+                                parse = get_first_valid_parse(tokenized_hyp, parser)
 
-                                for production in productions:
-                                    avg_prod_prob = np.logaddexp(avg_prod_prob, parser.theta.CCG_production[production])
-                                    num_prods += float(productions[production])
+                                if not parse[0] == None:
+                                    #Computes avg. production probability. 
+                                    avg_prod_prob = float('-inf')
+                                    num_prods = 0.0
+                                    productions = count_ccg_productions(parse[0])
 
-                                avg_prod_prob -= np.log(num_prods)
+                                    for production in productions:
+                                        avg_prod_prob = np.logaddexp(avg_prod_prob, parser.theta.CCG_production[production])
+                                        num_prods += float(productions[production])
 
-                                #Modifies score according to number of null nodes. 
-                                num_nulls = 7 - num_toks
-                                parse_score = parse[1] + num_nulls * (parser.theta.null_prior + avg_prod_prob)
+                                    avg_prod_prob -= np.log(num_prods)
 
-                                parse = (parser.print_parse(parse[0].node), parse_score)                     
+                                    #Modifies score according to number of null nodes. 
+                                    num_nulls = 7 - num_toks
+                                    parse_score = parse[1] + num_nulls * (parser.theta.null_prior + avg_prod_prob)
+
+                                    parse = (parser.print_parse(parse[0].node), parse_score)                     
+                                else:
+                                    parse = ('None', float('-inf'))
 
                         except KeyboardInterrupt:
                             raise KeyboardInterrupt
