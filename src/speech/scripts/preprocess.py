@@ -86,6 +86,7 @@ import os
 import glob
 import shutil
 import post_process
+from experiments import tokenize_for_parser
 
 ###########################################################################
 ################ GENERAL PREPROCESSING FUNCTIONS ##########################
@@ -470,7 +471,7 @@ Prepares a desired number of test files that will be used with the ASR
 by splitting all the usr files into the desired number of sets. 
 In other words, if you want two or n test sets, use this function. 
 """
-def create_asr_test_files(usr_files_folder, test_files_folder, num_test_files):
+def create_asr_test_files(usr_files_folder, test_files_folder, num_test_files, filter_len=None):
     #String input cast to int.
     num_test_files = int(num_test_files)
 
@@ -504,7 +505,10 @@ def create_asr_test_files(usr_files_folder, test_files_folder, num_test_files):
 
             #Adds phrase to 
             for line in usr_file:
-                test_file.write(line)
+                tok_phrase_len = len(tokenize_for_parser(line.split(';')[0]).split())
+
+                if not filter_len == None and tok_phrase_len <= filter_len:  
+                    test_file.write(line)
 
         test_file.close()
                 
@@ -627,7 +631,7 @@ def print_usage():
     print 'Parser train file: ./preprocess.py create_parser_training_file [corpus_folder] [parser_training_file_folder] [Optional: filter_length]'
     print 'LM train file:  ./preprocess.py create_lm_training_file [corpus_folder] [lm_training_file_folder]'
     print 'Corpus transcript files: ./preprocess.py create_transcript_files [corpus_folder] [transcript_files_folder]'
-    print 'Create ASR testing files: ./preprocess.py create_asr_test_files [usr_files_folder] [test_files_folder] [num_test_files]'
+    print 'Create ASR testing files: ./preprocess.py create_asr_test_files [usr_files_folder] [test_files_folder] [num_test_files] [Optional: filter_length]'
 
 if __name__ == '__main__':
     if not len(sys.argv) >= 4:
@@ -681,8 +685,10 @@ if __name__ == '__main__':
     elif sys.argv[1] == 'create_asr_test_files':
         if len(sys.argv) == 5:
             create_asr_test_files(sys.argv[2], sys.argv[3], sys.argv[4])
+        elif len(sys.argv) == 6:
+            create_asr_test_files(sys.argv[2], sys.argv[3], sys.argv[4], int(sys.argv[5]))
         else:
-            print 'Create ASR testing files: ./preprocess.py create_asr_test_files [usr_files_folder] [test_files_folder] [num_test_files]'
+            print 'Create ASR testing files: ./preprocess.py create_asr_test_files [usr_files_folder] [test_files_folder] [num_test_files] [Optional: filter_length]'
     
     else:
         print_usage()

@@ -12,6 +12,7 @@ Author: Rodolfo Corona, rcorona@utexas.edu
 import sys
 import os
 from scipy.stats import ttest_rel
+from experiments import tokenize_for_parser
 
 #Path to nlu_pipeline modules. #TODO Change if needed. 
 nlu_pipeline_path = '/scratch/cluster/rcorona/nlu_pipeline/src/'
@@ -479,7 +480,7 @@ def t_test_tuning(exp_file_name, weight1, weight2):
 Averages number of training phrases
 over folds in an experiment folder. 
 """
-def compute_avg_training_phrases(corpus_folder_path): 
+def compute_avg_training_phrases(corpus_folder_path, filter_len=None): 
     avg_training_examples = []
     avg_test_examples = []
 
@@ -492,13 +493,25 @@ def compute_avg_training_phrases(corpus_folder_path):
         num_test_examples = 0
 
         for usr_file in os.listdir(training_folder):
-            num_training_examples += len([line for line in open(training_folder + usr_file, 'r')])
+            lines = [line for line in open(training_folder + usr_file, 'r')]
+
+            #Filter phrase length if desired.
+            if not filter_len == None: 
+                lines = [line for line in lines if len(tokenize_for_parser(line.split(';')[0]).split()) <= filter_len]
+
+            num_training_examples += len(lines)
 
         avg_training_examples.append(num_training_examples)
 
         #Do the same for test examples. 
         for usr_file in os.listdir(test_folder):
-            num_test_examples += len([line for line in open(test_folder + usr_file, 'r')])
+            lines = [line for line in open(test_folder + usr_file, 'r')]
+
+            #Filter phrase length if desired.
+            if not filter_len == None: 
+                lines = [line for line in lines if len(tokenize_for_parser(line.split(';')[0]).split()) <= filter_len]
+
+            num_test_examples += len(lines)
 
         avg_test_examples.append(num_test_examples)
 
@@ -519,7 +532,7 @@ def print_usage():
     print 'Gather corpus statistics: ./analysis.py corpus_stats [corpus_usr_file_folder]'
     print 't-test for statistical significance in diff between two experiment types: ./analysis.py t_test [corpus_folds_dir] [evaluation_metric] [exp1_name] [exp2_name]'
     print 't-test for tuning results: ./analysis.py t_test_tuning [results_file_name] [weight1] [weight2]'
-    print 'Average number of training/test phrases for an experiment folder: ./analysis.py avg_num_data_points [corpus_folder]'
+    print 'Average number of training/test phrases for an experiment folder: ./analysis.py avg_num_data_points [corpus_folder] [Optional: filter_length]'
 
 if __name__ == '__main__':
     if not len(sys.argv) >= 2:
@@ -563,11 +576,13 @@ if __name__ == '__main__':
         else:
             print_usage()
 
-    elif sys.argv[1] == 'avg_num_training_points':
-        if not len(sys.argv) == 3:
-            print_usage()
-        else:
+    elif sys.argv[1] == 'avg_num_data_points':
+        if len(sys.argv) == 3:
             compute_avg_training_phrases(sys.argv[2])
+        elif len(sys.argv) == 4:
+            compute_avg_training_phrases(sys.argv[2], int(sys.argv[3]))
+        else:
+            print_usage()
 
     else:
         print_usage()
