@@ -476,6 +476,40 @@ def t_test_tuning(exp_file_name, weight1, weight2):
     print str(weight2) + ': ' + str(float(sum(exp2_values)) / float(len(exp2_values)))
 
 """
+Averages number of training phrases
+over folds in an experiment folder. 
+"""
+def compute_avg_training_phrases(corpus_folder_path): 
+    avg_training_examples = []
+    avg_test_examples = []
+
+    for fold in os.listdir(corpus_folder_path):
+        training_folder = corpus_folder_path + fold + '/corpus/train/'
+        test_folder = corpus_folder_path + fold + '/corpus/test/'
+
+        #Now count number of lines (i.e. training examples) per file. 
+        num_training_examples = 0
+        num_test_examples = 0
+
+        for usr_file in os.listdir(training_folder):
+            num_training_examples += len([line for line in open(training_folder + usr_file, 'r')])
+
+        avg_training_examples.append(num_training_examples)
+
+        #Do the same for test examples. 
+        for usr_file in os.listdir(test_folder):
+            num_test_examples += len([line for line in open(test_folder + usr_file, 'r')])
+
+        avg_test_examples.append(num_test_examples)
+
+    #Now compute mean and display. 
+    mean_train = float(sum(avg_training_examples)) / float(len(avg_training_examples))
+    mean_test = float(sum(avg_test_examples)) / float(len(avg_test_examples))
+
+    print 'Average number of training examples in corpus: ' + str(mean_train)
+    print 'Average number of test examples in corpus: ' + str(mean_test)
+
+"""
 Prints the usage options
 for this script. 
 """
@@ -485,6 +519,7 @@ def print_usage():
     print 'Gather corpus statistics: ./analysis.py corpus_stats [corpus_usr_file_folder]'
     print 't-test for statistical significance in diff between two experiment types: ./analysis.py t_test [corpus_folds_dir] [evaluation_metric] [exp1_name] [exp2_name]'
     print 't-test for tuning results: ./analysis.py t_test_tuning [results_file_name] [weight1] [weight2]'
+    print 'Average number of training/test phrases for an experiment folder: ./analysis.py avg_num_data_points [corpus_folder]'
 
 if __name__ == '__main__':
     if not len(sys.argv) >= 2:
@@ -527,6 +562,12 @@ if __name__ == '__main__':
             t_test(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
         else:
             print_usage()
+
+    elif sys.argv[1] == 'avg_num_training_points':
+        if not len(sys.argv) == 3:
+            print_usage()
+        else:
+            compute_avg_training_phrases(sys.argv[2])
 
     else:
         print_usage()
