@@ -471,7 +471,7 @@ Prepares a desired number of test files that will be used with the ASR
 by splitting all the usr files into the desired number of sets. 
 In other words, if you want two or n test sets, use this function. 
 """
-def create_asr_test_files(usr_files_folder, test_files_folder, num_test_files, filter_len=None):
+def create_asr_test_files(usr_files_folder, test_files_folder, num_test_files, filter_len=float('inf')):
     #String input cast to int.
     num_test_files = int(num_test_files)
 
@@ -507,7 +507,7 @@ def create_asr_test_files(usr_files_folder, test_files_folder, num_test_files, f
             for line in usr_file:
                 tok_phrase_len = len(tokenize_for_parser(line.split(';')[0]).split())
 
-                if not filter_len == None and tok_phrase_len <= filter_len:  
+                if tok_phrase_len <= filter_len:  
                     test_file.write(line)
 
         test_file.close()

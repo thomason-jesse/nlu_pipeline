@@ -8,6 +8,8 @@ import ParseNode
 import SemanticNode
 import sys
 import numpy as np
+import multiprocessing
+import time
 
 from IPython import embed
 
@@ -508,6 +510,10 @@ class CKYParser:
         #Maximum number of tokens to allow before flooring all hyper-parameters to speed up parsing. 
         self.max_token_num = 7
 
+        #For imposing time limits (in seconds) on parsing computation. 
+        self.train_time_limit = 10
+        self.test_time_limit = 5
+
         # behavioral parameters
         self.safety = True  # set to False once confident about node combination functions' correctness
 
@@ -657,6 +663,48 @@ class CKYParser:
         # timer.end()
         return False
 
+    #Helper function to call in timed cky parse thread, will store resulting parse in parse_storage_list (list).  
+    def timed_cky_parse_helper(self, generator, storage_queue): 
+        parse = generator.next()
+
+        storage_queue.put(parse)
+
+    #Times out after the given amount of time. 
+    def time_out_helper(self, time_limit, storage_queue):
+        time.sleep(time_limit)
+
+        storage_queue.put((None, neg_inf, []))
+
+    #Given a cky parse generator, will try to generate a parse within the given time limit, otherwise returns (None, neg_inf, [])
+    def timed_cky_parse_generator_next(self, generator, time_limit=float('inf')): 
+        #This will keep the parse to be returned. 
+        parse_storage_queue = multiprocessing.Queue()
+
+        #Attempt to get parse within time limit. 
+        parsing_thread = multiprocessing.Process(target=self.timed_cky_parse_helper, args=(generator, parse_storage_queue))
+        parsing_thread.start()
+
+        #Time out thread. 
+        time_out_thread = multiprocessing.Process(target=self.time_out_helper, args=(time_limit, parse_storage_queue))
+        time_out_thread.start()
+
+        #Now wait for one of the two to finish and return result. 
+        waiting = True
+
+        while waiting: 
+            if not parsing_thread.is_alive(): 
+                time_out_thread.terminate()
+                waiting = False
+            
+            elif not time_out_thread.is_alive(): 
+                parsing_thread.terminate()
+                waiting = False
+
+        parse = parse_storage_queue.get()
+        print str(parse) + '\n'
+
+        return parse
+
     # take in data set d=(x,y) for x strings and y correct semantic forms and calculate training pairs
     # training pairs in t are of form (x, y_chosen, y_correct, chosen_lex_entries, correct_lex_entries)
     # k determines how many parses to get for re-ranking
@@ -669,12 +717,15 @@ class CKYParser:
         num_fails = 0
         num_genlex_only = 0
         for [x, y] in d:
-            # print "Training on: [" + str(x) + "," + self.print_parse(y) + "]"
+            print "Training on: [" + str(x) + "," + self.print_parse(y) + "]"
             correct_parse = None
             correct_new_lexicon_entries = []
 
             cky_parse_generator = self.most_likely_cky_parse(x, reranker_beam=reranker_beam, known_root=y)
-            chosen_parse, chosen_score, chosen_new_lexicon_entries = next(cky_parse_generator)
+
+            #Keep a time limit on parsing. 
+            #chosen_parse, chosen_score, chosen_new_lexicon_entries = next(cky_parse_generator) 
+            chosen_parse, chosen_score, chosen_new_lexicon_entries = self.timed_cky_parse_generator_next(cky_parse_generator, self.train_time_limit)
 
             current_parse = chosen_parse
             correct_score = chosen_score
@@ -697,7 +748,9 @@ class CKYParser:
                         num_trainable += 1
                     break
                 first = False
-                current_parse, correct_score, current_new_lexicon_entries = next(cky_parse_generator)
+                #current_parse, correct_score, current_new_lexicon_entries = next(cky_parse_generator)
+                current_parse, correct_score, current_new_lexicon_entries = self.timed_cky_parse_generator_next(cky_parse_generator, self.train_time_limit)
+
             if correct_parse is None:
                 # print "WARNING: could not find correct parse for '"+str(x)+"' during training"
                 num_fails += 1
