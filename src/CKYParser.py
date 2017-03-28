@@ -670,10 +670,8 @@ class CKYParser:
         storage_queue.put(parse)
 
     #Times out after the given amount of time. 
-    def time_out_helper(self, time_limit, storage_queue):
+    def time_out_helper(self, time_limit):
         time.sleep(time_limit)
-
-        storage_queue.put((None, neg_inf, []))
 
     #Given a cky parse generator, will try to generate a parse within the given time limit, otherwise returns (None, neg_inf, [])
     def timed_cky_parse_generator_next(self, generator, time_limit=float('inf')): 
@@ -705,6 +703,73 @@ class CKYParser:
 
         return parse
 
+    def timed_train_step(self, input_queue): 
+        x, y, t, num_trainable, num_matches, num_fails, num_genlex_only, reranker_beam = input_queue.get()
+
+        print "Training on: [" + str(x) + "," + self.print_parse(y) + "]"
+        correct_parse = None
+        correct_new_lexicon_entries = []
+
+        cky_parse_generator = self.most_likely_cky_parse(x, reranker_beam=reranker_beam, known_root=y)
+
+        #Keep a time limit on parsing. 
+        chosen_parse, chosen_score, chosen_new_lexicon_entries = next(cky_parse_generator) 
+        #chosen_parse, chosen_score, chosen_new_lexicon_entries = self.timed_cky_parse_generator_next(cky_parse_generator, self.train_time_limit)
+
+        current_parse = chosen_parse
+        correct_score = chosen_score
+        current_new_lexicon_entries = chosen_new_lexicon_entries
+        match = False
+        first = True
+        if chosen_parse is None:
+            # print "WARNING: could not find valid parse for '" + x + "' during training"
+            num_fails += 1
+            input_queue.put([t, num_trainable, num_matches, num_fails, num_genlex_only])
+            return 
+        while correct_parse is None and current_parse is not None:
+            if y.equal_allowing_commutativity(
+                    current_parse.node, self.commutative_idxs, ontology=self.ontology):
+                correct_parse = current_parse
+                correct_new_lexicon_entries = current_new_lexicon_entries
+                if first:
+                    match = True
+                    num_matches += 1
+                else:
+                    num_trainable += 1
+                break
+            first = False
+            current_parse, correct_score, current_new_lexicon_entries = next(cky_parse_generator)
+            #current_parse, correct_score, current_new_lexicon_entries = self.timed_cky_parse_generator_next(cky_parse_generator, self.train_time_limit)
+
+        if correct_parse is None:
+            # print "WARNING: could not find correct parse for '"+str(x)+"' during training"
+            num_fails += 1
+            input_queue.put([t, num_trainable, num_matches, num_fails, num_genlex_only])
+            return 
+        # print "\tx: "+str(x)  # DEBUG
+        # print "\t\tchosen_parse: "+self.print_parse(chosen_parse.node, show_category=True)  # DEBUG
+        # print "\t\tchosen_score: "+str(chosen_score)  # DEBUG
+        # print "\t\tchosen_new_lexicon_entries: "  # DEBUG
+        # for sf, sem in chosen_new_lexicon_entries:  # DEBUG
+        #     print "\t\t\t'"+sf+"':- "+self.print_parse(sem, show_category=True)  # DEBUG
+        if not match or len(correct_new_lexicon_entries) > 0:
+            if len(correct_new_lexicon_entries) > 0:
+                num_genlex_only += 1
+                # print "\tjust genlex"
+            else:
+                pass
+                # print "\ttraining example generated:"  # DEBUG
+                # print "\t\tcorrect_parse: "+self.print_parse(correct_parse.node, show_category=True)  # DEBUG
+                # print "\t\tcorrect_score: "+str(correct_score)  # DEBUG
+                # print "\t\tcorrect_new_lexicon_entries: "  # DEBUG
+                # for sf, sem in correct_new_lexicon_entries:  # DEBUG
+                #     print "\t\t\t'"+sf+"':- "+self.print_parse(sem, show_category=True)  # DEBUG
+                # print "\t\ty: "+self.print_parse(y, show_category=True)  # DEBUG
+            t.append([x, chosen_parse, correct_parse, chosen_new_lexicon_entries, correct_new_lexicon_entries])
+
+        #Put all variables abck into queue
+        input_queue.put([t, num_trainable, num_matches, num_fails, num_genlex_only])
+
     # take in data set d=(x,y) for x strings and y correct semantic forms and calculate training pairs
     # training pairs in t are of form (x, y_chosen, y_correct, chosen_lex_entries, correct_lex_entries)
     # k determines how many parses to get for re-ranking
@@ -716,69 +781,55 @@ class CKYParser:
         num_matches = 0
         num_fails = 0
         num_genlex_only = 0
+
+        #Keep track of number of time-outs. 
+        num_time_outs = 0
+
         for [x, y] in d:
-            print "Training on: [" + str(x) + "," + self.print_parse(y) + "]"
-            correct_parse = None
-            correct_new_lexicon_entries = []
 
-            cky_parse_generator = self.most_likely_cky_parse(x, reranker_beam=reranker_beam, known_root=y)
+            print [num_trainable, num_matches, num_fails, num_genlex_only, num_time_outs]
 
-            #Keep a time limit on parsing. 
-            #chosen_parse, chosen_score, chosen_new_lexicon_entries = next(cky_parse_generator) 
-            chosen_parse, chosen_score, chosen_new_lexicon_entries = self.timed_cky_parse_generator_next(cky_parse_generator, self.train_time_limit)
+            #This will keep track of training data amidst multithreading. . 
+            storage_queue = multiprocessing.Queue()
 
-            current_parse = chosen_parse
-            correct_score = chosen_score
-            current_new_lexicon_entries = chosen_new_lexicon_entries
-            match = False
-            first = True
-            if chosen_parse is None:
-                # print "WARNING: could not find valid parse for '" + x + "' during training"
-                num_fails += 1
-                continue
-            while correct_parse is None and current_parse is not None:
-                if y.equal_allowing_commutativity(
-                        current_parse.node, self.commutative_idxs, ontology=self.ontology):
-                    correct_parse = current_parse
-                    correct_new_lexicon_entries = current_new_lexicon_entries
-                    if first:
-                        match = True
-                        num_matches += 1
-                    else:
-                        num_trainable += 1
-                    break
-                first = False
-                #current_parse, correct_score, current_new_lexicon_entries = next(cky_parse_generator)
-                current_parse, correct_score, current_new_lexicon_entries = self.timed_cky_parse_generator_next(cky_parse_generator, self.train_time_limit)
+            storage_queue.put([x, y, t, num_trainable, num_matches, num_fails, num_genlex_only, reranker_beam])
 
-            if correct_parse is None:
-                # print "WARNING: could not find correct parse for '"+str(x)+"' during training"
-                num_fails += 1
-                continue
-            # print "\tx: "+str(x)  # DEBUG
-            # print "\t\tchosen_parse: "+self.print_parse(chosen_parse.node, show_category=True)  # DEBUG
-            # print "\t\tchosen_score: "+str(chosen_score)  # DEBUG
-            # print "\t\tchosen_new_lexicon_entries: "  # DEBUG
-            # for sf, sem in chosen_new_lexicon_entries:  # DEBUG
-            #     print "\t\t\t'"+sf+"':- "+self.print_parse(sem, show_category=True)  # DEBUG
-            if not match or len(correct_new_lexicon_entries) > 0:
-                if len(correct_new_lexicon_entries) > 0:
-                    num_genlex_only += 1
-                    # print "\tjust genlex"
-                else:
-                    pass
-                    # print "\ttraining example generated:"  # DEBUG
-                    # print "\t\tcorrect_parse: "+self.print_parse(correct_parse.node, show_category=True)  # DEBUG
-                    # print "\t\tcorrect_score: "+str(correct_score)  # DEBUG
-                    # print "\t\tcorrect_new_lexicon_entries: "  # DEBUG
-                    # for sf, sem in correct_new_lexicon_entries:  # DEBUG
-                    #     print "\t\t\t'"+sf+"':- "+self.print_parse(sem, show_category=True)  # DEBUG
-                    # print "\t\ty: "+self.print_parse(y, show_category=True)  # DEBUG
-                t.append([x, chosen_parse, correct_parse, chosen_new_lexicon_entries, correct_new_lexicon_entries])
+            #Attempt to get parse within time limit. 
+            train_step_thread = multiprocessing.Process(target=self.timed_train_step, args=(storage_queue,))
+            train_step_thread.start()
+
+            #Time out thread. 
+            time_out_thread = multiprocessing.Process(target=self.time_out_helper, args=(self.train_time_limit,))
+            time_out_thread.start()
+
+            #Now wait for one of the two to finish and return result. 
+            waiting = True
+
+            while waiting: 
+                if not train_step_thread.is_alive(): 
+                    time_out_thread.terminate()
+                    waiting = False
+               
+                    #Get back variables.  
+                    t, num_trainable, num_matches, num_fails, num_genlex_only = storage_queue.get()
+
+                    #See what we've collected so far. 
+                    #print str(t) + '\n'
+
+                elif not time_out_thread.is_alive(): 
+                    train_step_thread.terminate()
+                    waiting = False
+
+                    #Marks as time-out failure. 
+                    num_time_outs += 1
+                    num_fails += 1
+
+
         print "\tmatched "+str(num_matches)+"/"+str(len(d))  # DEBUG
         print "\ttrained "+str(num_trainable)+"/"+str(len(d))  # DEBUG
         print "\tgenlex only "+str(num_genlex_only)+"/"+str(len(d))  # DEBUG
         print "\tfailed "+str(num_fails)+"/"+str(len(d))  # DEBUG
+        print "\ttimed out "+str(num_time_outs)+"/"+str(len(d))
 
         # timer.end()
         return t, num_fails
