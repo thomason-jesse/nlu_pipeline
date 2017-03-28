@@ -706,7 +706,6 @@ class CKYParser:
     def timed_train_step(self, input_queue): 
         x, y, t, num_trainable, num_matches, num_fails, num_genlex_only, reranker_beam = input_queue.get()
 
-        print "Training on: [" + str(x) + "," + self.print_parse(y) + "]"
         correct_parse = None
         correct_new_lexicon_entries = []
 
@@ -786,8 +785,8 @@ class CKYParser:
         num_time_outs = 0
 
         for [x, y] in d:
-
             print [num_trainable, num_matches, num_fails, num_genlex_only, num_time_outs]
+            print "Training on: [" + str(x) + "," + self.print_parse(y) + "]"
 
             #This will keep track of training data amidst multithreading. . 
             storage_queue = multiprocessing.Queue()
@@ -805,7 +804,10 @@ class CKYParser:
             #Now wait for one of the two to finish and return result. 
             waiting = True
 
-            while waiting: 
+            while waiting:
+                #Sleep for one second to save CPU resources. 
+                time.sleep(1)
+
                 if not train_step_thread.is_alive(): 
                     time_out_thread.terminate()
                     waiting = False
