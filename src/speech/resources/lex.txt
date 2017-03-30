@@ -5,10 +5,13 @@ look :- (M/PP)/PP : lambda x:p.(lambda y:l.(searchroom(x,y)))
 tell me :- (M/PP)/PP : lambda x:p.(lambda y:l.(searchroom(x,y)))
 
 bring :- (M/PP)/NP : lambda y:p.(lambda x:i.(bring(x,y)))
-deliver :- (M/PP)/NP : lambda y:p.(lambda x:i.(bring(x,y)))
+bring :- (M/PP)/NP : lambda y:i.(lambda x:p.(bring(y,x)))
+deliver :- (M/PP)/NP : lambda y:i.(lambda x:p.(bring(y,x)))
 give :- (M/NP)/NP : lambda x:p.(lambda y:i.(bring(y,x)))
+give :- (M/PP)/NP : lambda x:i.(lambda y:p.(bring(x,y)))
 would like :- (M\NP)/NP : lambda x:p.(lambda y:i.(bring(y,x)))
 bring them :- (M\PP)/NP : lambda x:i.(lambda y:p.(bring(x,y)))
+take :- (M/PP)/NP : lambda y:i.(lambda x:p.(bring(y,x)))
 
 walk :- M/PP : lambda x:l.(walk(x))
 go :- M/PP : lambda x:l.(walk(x)) 
@@ -66,6 +69,7 @@ room :- NP/N : lambda x:l.(x)
 
 # people atoms
 bruce :- NP : bruce
+bruce porter :- NP : bruce
 stacy :- NP : stacy
 dana :- NP : dana
 jivko :- NP : jivko
@@ -96,30 +100,21 @@ apple :- NP : apple
 basket :- NP : basket
 beverage :- NP : beverage
 binder :- NP : binder
-book :- NP : book
-box :- NP : box
 bread :- NP : bread
 cake :- NP : cake
 calendar :- NP : calendar
-cellphone :- NP : cellphone
-chips :- NP : chips
-coffee :- NP : coffee
 coke :- NP : coke
-container :- NP : container
 cupcake :- NP : cupcake
 dessert :- NP : dessert
-diary :- NP : diary
 doritos :- NP : doritos
 glass :- NP : glass
 hamburger :- NP : hamburger
 hammer :- NP : hammer
 juice :- NP : juice
-laptop :- NP : laptop
 ledger :- NP : ledger
 letter :- NP : letter
 milk :- NP : milk
 muffin :- NP : muffin
-notebook :- NP : notebook
 organizer :- NP : organizer
 pencil :- NP : pencil
 phone :- NP : phone
@@ -131,7 +126,6 @@ snack :- NP : snack
 tea :- NP : tea
 trashcan :- NP : trashcan
 watch :- NP : watch
-water :- NP : water
 
 # Adjective predicates.
 aerosol :- NP/NP : lambda x:i.(aerosol(x))
