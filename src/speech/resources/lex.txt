@@ -1,65 +1,63 @@
 #imperative
-search :- M/PP/NP : lambda r:l.(lambda x:p.(searchroom(x,r)))
-bring :- M/NP/NP : lambda y:p.(lambda x:i.(bring(x,y)))
-bring :- M/PP/NP : lambda y:i.(lambda x:p.(bring(y,x)))
+check :- (M/PP)/PP : lambda x:p.(lambda y:l.(searchroom(x,y)))
+search :- (M/PP)/PP : lambda x:p.(lambda y:l.(searchroom(x,y)))
+look :- (M/PP)/PP : lambda x:p.(lambda y:l.(searchroom(x,y)))
+
+bring :- (M/PP)/NP : lambda y:p.(lambda x:i.(bring(x,y)))
+deliver :- (M/PP)/NP : lambda y:p.(lambda x:i.(bring(x,y)))
+give :- (M/NP)/NP : lambda x:p.(lambda y:i.(bring(y,x)))
+
+
 walk :- M/PP : lambda x:l.(walk(x))
+go :- M/PP : lambda x:l.(walk(x)) 
+needed :- M/PP : lambda x:l.(walk(x))
 
 #prepositional arguments to commands
 for :- PP/NP : lambda x:p.(x)
-
-of :- PP/NP : lambda x:i.(x)
-of :- PP/NP : lambda x:p.(x)
-of :- PP/NP : lambda x:l.(x)
-
-
+whether :- PP/NP : lambda x:p.(x)
 in :- PP/NP : lambda x:l.(x)
+is :- PP/PP : lambda x:l.(x)
+at :- PP/NP : lambda x:l.(x)
 
-to :- PP/NP : lambda x:p.(x)
+#to :- PP/NP : lambda x:p.(x)
 to :- PP/NP : lambda x:l.(x)
 
-#confirmations
-yes :- C : yes
-no :- C : no
-none :- C : none
+#Vaccous statements. 
+i :- M/M : lambda x:a.(x)
+would like :- M/M : lambda x:a.(x)
+i want :- M/M : lambda x:a.(x)
+you to :- M/M : lambda x:a.(x)
+for you :- M/M : lambda x:a.(x)
+to please :- M/M : lambda x:a.(x)
+go and :- M/M : lambda x:a.(x)
+go :- M/M : lambda x:a.(x)
+you are :- M/M : lambda x:a.(x)
+#please :- M/M : lambda x:a.(x)
 
 #these are weird now bc there's some implicit knowledge in hasoffice that the second arg is an office
 's office :- NP\NP : lambda x:p.(the(lambda y:l.(and(office(y), possesses(y,x)))))
-office of :- N/NP : lambda x:p.(lambda y:l.(possesses(y,x)))
-
-#entity descriptor words
-#can be type-raised to N/N : lambda x:e.(pred(x))
-#room :- N : room
-#person :- N : person
-#item :- N : item
 
 #closed category
+the :- NP/NP : lambda x:p.(x)
+the :- NP/NP : lambda x:i.(x)
 the :- NP/(N/N) : lambda P:<l,t>.(the(lambda x:l.(P(x))))
 #the :- NP/(N/N) : lambda P:<i,t>.(the_i(lambda x:i.(P(x))))
 
-a :- NP/(N/N) : lambda P:<i,t>.(a(lambda x:i.(P(x))))
+a :- NP/NP : lambda P:<i,t>.(a(lambda x:i.(P(x))))
 
 # room atoms
-three five one six :- NP : l3_516
-three five zero eight :- NP : l3_508
-three five one two :- NP : l3_512
-three five one zero :- NP : l3_510
-three four zero two :- NP : l3_402
-three four one eight :- NP : l3_418
-three four two zero :- NP : l3_420
-three four three two :- NP : l3_432
-three five zero two :- NP : l3_502
-three four fourteen b :- NP : l3_414b
-
-3516 :- NP : l3_516
-3508 :- NP : l3_508
-3512 :- NP : l3_512
-3510 :- NP : l3_510
-3402 :- NP : l3_402
-3418 :- NP : l3_418
-3420 :- NP : l3_420
-3432 :- NP : l3_432
-3502 :- NP : l3_502
-3414 b :- NP : l3_414b
+room :- NP/N : lambda x:l.(x) 
+				
+3516 :- N : l3_516
+3508 :- N : l3_508
+3512 :- N : l3_512
+3510 :- N : l3_510
+3402 :- N : l3_402
+3418 :- N : l3_418
+3420 :- N : l3_420
+3432 :- N : l3_432
+3502 :- N : l3_502
+3414 b :- N : l3_414b
 
 # people atoms
 bruce :- NP : bruce
@@ -67,12 +65,23 @@ stacy :- NP : stacy
 dana :- NP : dana
 jivko :- NP : jivko
 peter :- NP : peter
+peter stone :- NP : peter
 ray :- NP : ray
 shiqi :- NP : shiqi
 scott :- NP : scott
 jesse :- NP : jesse
 aishwarya :- NP : aishwarya
-rodolfo :- NP : rodolfo 
+rudy :- NP : rodolfo
+rodolfo corona :- NP : rodolfo
+niekum :- NP : scott
+
+#People titles. 
+mr :- NP/NP : lambda x:p.(x)
+professor :- NP/NP : lambda x:p.(x)
+doctor :- NP/NP : lambda x:p.(x)
+
+#Particular people titles. 
+grad student :- NP : jesse
 
 # item atoms
 apple :- NP : apple
@@ -189,45 +198,46 @@ wide :- NP/NP : lambda x:i.(wide(x))
 yellow :- NP/NP : lambda x:i.(yellow(x))
 
 # Predicate adjectival nouns.
-ball :- NP/NP : lambda x:i.(ball(x))
-beans :- NP/NP : lambda x:i.(beans(x))
-book :- NP/NP : lambda x:i.(book(x))
-bottle :- NP/NP : lambda x:i.(bottle(x))
-box :- NP/NP : lambda x:i.(box(x))
-bucket :- NP/NP : lambda x:i.(bucket(x))
-can :- NP/NP : lambda x:i.(can(x))
-canister :- NP/NP : lambda x:i.(canister(x))
-cap :- NP/NP : lambda x:i.(cap(x))
-carton :- NP/NP : lambda x:i.(carton(x))
-cellphone :- NP/NP : lambda x:i.(cellphone(x))
-chips :- NP/NP : lambda x:i.(chips(x))
-container :- NP/NP : lambda x:i.(container(x))
-crayon :- NP/NP : lambda x:i.(crayon(x))
-cup :- NP/NP : lambda x:i.(cup(x))
-cylinder :- NP/NP : lambda x:i.(cylinder(x))
-diary :- NP/NP : lambda x:i.(diary(x))
-drink :- NP/NP : lambda x:i.(drink(x))
-flask :- NP/NP : lambda x:i.(flask(x))
-floaty :- NP/NP : lambda x:i.(floaty(x))
-jar :- NP/NP : lambda x:i.(jar(x))
-laptop :- NP/NP : lambda x:i.(laptop(x))
-lid :- NP/NP : lambda x:i.(lid(x))
-marker :- NP/NP : lambda x:i.(marker(x))
-mug :- NP/NP : lambda x:i.(mug(x))
-notebook :- NP/NP : lambda x:i.(notebook(x))
-object :- NP/NP : lambda x:i.(object(x))
-pineapple :- NP/NP : lambda x:i.(pineapple(x))
-plush-toy :- NP/NP : lambda x:i.(plush-toy(x))
-prism :- NP/NP : lambda x:i.(prism(x))
-rectangle :- NP/NP : lambda x:i.(rectangle(x))
-roll :- NP/NP : lambda x:i.(roll(x))
-shaker :- NP/NP : lambda x:i.(shaker(x))
-sphere :- NP/NP : lambda x:i.(sphere(x))
-spray :- NP/NP : lambda x:i.(spray(x))
-spraycan :- NP/NP : lambda x:i.(spraycan(x))
-stuffed-animal :- NP/NP : lambda x:i.(stuffed-animal(x))
-thing :- NP/NP : lambda x:i.(thing(x))
-tin :- NP/NP : lambda x:i.(tin(x))
-tub :- NP/NP : lambda x:i.(tub(x))
-tube :- NP/NP : lambda x:i.(tube(x))
-wipes :- NP/NP : lambda x:i.(wipes(x))
+prism :- NP : lambda x:i.(prism(x))
+ball :- NP : lambda x:i.(ball(x))
+beans :- NP : lambda x:i.(beans(x))
+book :- NP : lambda x:i.(book(x))
+bottle :- NP : lambda x:i.(bottle(x))
+box :- NP : lambda x:i.(box(x))
+bucket :- NP : lambda x:i.(bucket(x))
+can :- NP : lambda x:i.(can(x))
+canister :- NP : lambda x:i.(canister(x))
+cap :- NP : lambda x:i.(cap(x))
+carton :- NP : lambda x:i.(carton(x))
+cellphone :- NP : lambda x:i.(cellphone(x))
+chips :- NP : lambda x:i.(chips(x))
+container :- NP : lambda x:i.(container(x))
+crayon :- NP : lambda x:i.(crayon(x))
+cup :- NP : lambda x:i.(cup(x))
+cylinder :- NP : lambda x:i.(cylinder(x))
+diary :- NP : lambda x:i.(diary(x))
+drink :- NP : lambda x:i.(drink(x))
+flask :- NP : lambda x:i.(flask(x))
+floaty :- NP : lambda x:i.(floaty(x))
+jar :- NP : lambda x:i.(jar(x))
+laptop :- NP : lambda x:i.(laptop(x))
+lid :- NP : lambda x:i.(lid(x))
+marker :- NP : lambda x:i.(marker(x))
+mug :- NP : lambda x:i.(mug(x))
+notebook :- NP : lambda x:i.(notebook(x))
+object :- NP : lambda x:i.(object(x))
+pineapple :- NP : lambda x:i.(pineapple(x))
+plush-toy :- NP : lambda x:i.(plush-toy(x))
+prism :- NP : lambda x:i.(prism(x))
+rectangle :- NP : lambda x:i.(rectangle(x))
+roll :- NP : lambda x:i.(roll(x))
+shaker :- NP : lambda x:i.(shaker(x))
+sphere :- NP : lambda x:i.(sphere(x))
+spray :- NP : lambda x:i.(spray(x))
+spraycan :- NP : lambda x:i.(spraycan(x))
+stuffed-animal :- NP : lambda x:i.(stuffed-animal(x))
+thing :- NP : lambda x:i.(thing(x))
+tin :- NP : lambda x:i.(tin(x))
+tub :- NP : lambda x:i.(tub(x))
+tube :- NP : lambda x:i.(tube(x))
+wipes :- NP : lambda x:i.(wipes(x))
