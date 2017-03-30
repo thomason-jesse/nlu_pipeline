@@ -1,57 +1,55 @@
 #imperative
-#check :- (M/PP)/PP : lambda x:p.(lambda y:l.(searchroom(x,y)))
-#search :- (M/PP)/PP : lambda x:p.(lambda y:l.(searchroom(x,y)))
-#look :- (M/PP)/PP : lambda x:p.(lambda y:l.(searchroom(x,y)))
-#tell me :- (M/PP)/PP : lambda x:p.(lambda y:l.(searchroom(x,y)))
+check :- (M/PP)/PP : lambda x:p.(lambda y:l.(searchroom(x,y)))
+search :- (M/PP)/PP : lambda x:p.(lambda y:l.(searchroom(x,y)))
+look :- (M/PP)/PP : lambda x:p.(lambda y:l.(searchroom(x,y)))
 
-#bring :- (M/PP)/NP : lambda y:p.(lambda x:i.(bring(x,y)))
-#bring :- (M/PP)/NP : lambda y:i.(lambda x:p.(bring(y,x)))
-#deliver :- (M/PP)/NP : lambda y:i.(lambda x:p.(bring(y,x)))
-#give :- (M/NP)/NP : lambda x:p.(lambda y:i.(bring(y,x)))
-#give :- (M/PP)/NP : lambda x:i.(lambda y:p.(bring(x,y)))
-#would like :- (M\NP)/NP : lambda x:p.(lambda y:i.(bring(y,x)))
-#bring them :- (M\PP)/NP : lambda x:i.(lambda y:p.(bring(x,y)))
-#take :- (M/PP)/NP : lambda y:i.(lambda x:p.(bring(y,x)))
+bring :- (M/PP)/NP : lambda y:i.(lambda x:p.(bring(y,x)))
+deliver :- (M/PP)/NP : lambda y:i.(lambda x:p.(bring(y,x)))
+give :- (M/NP)/N : lambda x:p.(lambda y:i.(bring(y,x)))
+give :- (M/NP)/NP : lambda x:p.(lambda y:i.(bring(y,x)))
+get :- (M/PP)/NP : lambda y:i.(lambda x:p.(bring(y,x)))
+take :- (M/PP)/NP : lambda y:i.(lambda x:p.(bring(y,x)))
 
-#walk :- M/PP : lambda x:l.(walk(x))
-#go :- M/PP : lambda x:l.(walk(x)) 
-#needed :- M/PP : lambda x:l.(walk(x))
+walk :- M/PP : lambda x:l.(walk(x))
+go :- M/PP : lambda x:l.(walk(x)) 
+needed :- M/PP : lambda x:l.(walk(x))
 
 #prepositional arguments to commands
-#for :- PP/NP : lambda x:p.(x)
-#whether :- PP/NP : lambda x:p.(x)
-#in :- PP/NP : lambda x:l.(x)
-#is :- PP/PP : lambda x:l.(x)
-#at :- PP/NP : lambda x:l.(x)
+for :- PP/N : lambda x:p.(x)
+for :- PP/NP : lambda x:p.(x)
+whether :- PP/N : lambda x:p.(x)
+whether :- PP/NP : lambda x:p.(x)
+in :- PP/N : lambda x:l.(x)
+is :- PP/PP : lambda x:l.(x)
+at :- PP/NP : lambda x:l.(x)
+if :- PP/N : lambda x:p.(x)
+if :- PP/NP : lambda x:p.(x)
 
-#to :- PP/NP : lambda x:p.(x)
-#to :- PP/NP : lambda x:l.(x)
-#to :- PP\NP : lambda x:p.(x)
+to :- PP/N : lambda x:p.(x)
+to :- PP/NP : lambda x:p.(x)
+to :- PP/N : lambda x:l.(x)
+to :- PP/NP : lambda x:l.(x)
 
 #Vaccous statements. 
-#i :- M/M : lambda x:a.(x)
-#would like :- M/M : lambda x:a.(x)
-#i want :- M/M : lambda x:a.(x)
-#can you :- M/M : lambda x:a.(x)
-#you to :- M/M : lambda x:a.(x)
-#for you :- M/M : lambda x:a.(x)
-#to please :- M/M : lambda x:a.(x)
-#go and :- M/M : lambda x:a.(x)
-#go :- M/M : lambda x:a.(x)
-#you are :- M/M : lambda x:a.(x)
-#please :- M/M : lambda x:a.(x)
+i want :- M/M : lambda x:a.(x)
+you to :- M/M : lambda x:a.(x)
+go and :- M/M : lambda x:a.(x)
+you are :- M/M : lambda x:a.(x)
+please :- M/M : lambda x:a.(x)
+please go :- M/M : lambda x:a.(x)
+could you :- M/M : lambda x:a.(x)
 
 #these are weird now bc there's some implicit knowledge in hasoffice that the second arg is an office
-#'s office :- NP\NP : lambda x:p.(the(lambda y:l.(and(office(y), possesses(y,x)))))
+'s office :- NP\N : lambda x:p.(the(lambda y:l.(and(office(y), possesses(y,x)))))
 
 #closed category
-#the :- NP/NP : lambda x:p.(x)
-#the :- NP/NP : lambda x:i.(x)
+the :- NP/N : lambda x:p.(x)
+the :- NP/N : lambda x:i.(x)
 
 a :- NP/N : lambda P:<i,t>.(a(lambda x:i.(P(x))))
 
 # room atoms
-room :- NP/N : lambda x:l.(x) 
+room :- N/N : lambda x:l.(x) 
 				
 3516 :- N : l3_516
 3508 :- N : l3_508
@@ -67,11 +65,13 @@ room :- NP/N : lambda x:l.(x)
 # people atoms
 bruce :- N : bruce
 bruce porter :- N : bruce
+porter :- N : bruce
 stacy :- N : stacy
 dana :- N : dana
 jivko :- N : jivko
 peter :- N : peter
 peter stone :- N : peter
+stone :- N : peter
 ray :- N : ray
 mooney :- N : ray
 shiqi :- N : shiqi
