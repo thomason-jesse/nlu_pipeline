@@ -785,7 +785,7 @@ class CKYParser:
         num_time_outs = 0
 
         for [x, y] in d:
-            print [num_trainable, num_matches, num_fails, num_genlex_only, num_time_outs]
+            print [num_trainable, num_matches, num_genlex_only, num_fails, num_time_outs]
             print "Training on: [" + str(x) + "," + self.print_parse(y) + "]"
 
             #This will keep track of training data amidst multithreading. . 
@@ -1669,6 +1669,9 @@ class CKYParser:
 
     # return true if A,B can be merged
     def can_perform_merge(self, a, b):
+        #TODO Change back if necessary. 
+        return False
+        
         if a is None or b is None:
             return False
         if self.lexicon.categories[a.category] != self.lexicon.categories[b.category]:
