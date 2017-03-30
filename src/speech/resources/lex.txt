@@ -1,57 +1,54 @@
 #imperative
-check :- (M/PP)/PP : lambda x:p.(lambda y:l.(searchroom(x,y)))
-search :- (M/PP)/PP : lambda x:p.(lambda y:l.(searchroom(x,y)))
-look :- (M/PP)/PP : lambda x:p.(lambda y:l.(searchroom(x,y)))
-tell me :- (M/PP)/PP : lambda x:p.(lambda y:l.(searchroom(x,y)))
+#check :- (M/PP)/PP : lambda x:p.(lambda y:l.(searchroom(x,y)))
+#search :- (M/PP)/PP : lambda x:p.(lambda y:l.(searchroom(x,y)))
+#look :- (M/PP)/PP : lambda x:p.(lambda y:l.(searchroom(x,y)))
+#tell me :- (M/PP)/PP : lambda x:p.(lambda y:l.(searchroom(x,y)))
 
-bring :- (M/PP)/NP : lambda y:p.(lambda x:i.(bring(x,y)))
-bring :- (M/PP)/NP : lambda y:i.(lambda x:p.(bring(y,x)))
-deliver :- (M/PP)/NP : lambda y:i.(lambda x:p.(bring(y,x)))
-give :- (M/NP)/NP : lambda x:p.(lambda y:i.(bring(y,x)))
-give :- (M/PP)/NP : lambda x:i.(lambda y:p.(bring(x,y)))
-would like :- (M\NP)/NP : lambda x:p.(lambda y:i.(bring(y,x)))
-bring them :- (M\PP)/NP : lambda x:i.(lambda y:p.(bring(x,y)))
-take :- (M/PP)/NP : lambda y:i.(lambda x:p.(bring(y,x)))
+#bring :- (M/PP)/NP : lambda y:p.(lambda x:i.(bring(x,y)))
+#bring :- (M/PP)/NP : lambda y:i.(lambda x:p.(bring(y,x)))
+#deliver :- (M/PP)/NP : lambda y:i.(lambda x:p.(bring(y,x)))
+#give :- (M/NP)/NP : lambda x:p.(lambda y:i.(bring(y,x)))
+#give :- (M/PP)/NP : lambda x:i.(lambda y:p.(bring(x,y)))
+#would like :- (M\NP)/NP : lambda x:p.(lambda y:i.(bring(y,x)))
+#bring them :- (M\PP)/NP : lambda x:i.(lambda y:p.(bring(x,y)))
+#take :- (M/PP)/NP : lambda y:i.(lambda x:p.(bring(y,x)))
 
-walk :- M/PP : lambda x:l.(walk(x))
-go :- M/PP : lambda x:l.(walk(x)) 
-needed :- M/PP : lambda x:l.(walk(x))
+#walk :- M/PP : lambda x:l.(walk(x))
+#go :- M/PP : lambda x:l.(walk(x)) 
+#needed :- M/PP : lambda x:l.(walk(x))
 
 #prepositional arguments to commands
-for :- PP/NP : lambda x:p.(x)
-whether :- PP/NP : lambda x:p.(x)
-in :- PP/NP : lambda x:l.(x)
-is :- PP/PP : lambda x:l.(x)
-at :- PP/NP : lambda x:l.(x)
+#for :- PP/NP : lambda x:p.(x)
+#whether :- PP/NP : lambda x:p.(x)
+#in :- PP/NP : lambda x:l.(x)
+#is :- PP/PP : lambda x:l.(x)
+#at :- PP/NP : lambda x:l.(x)
 
-to :- PP/NP : lambda x:p.(x)
-to :- PP/NP : lambda x:l.(x)
-to :- PP\NP : lambda x:p.(x)
+#to :- PP/NP : lambda x:p.(x)
+#to :- PP/NP : lambda x:l.(x)
+#to :- PP\NP : lambda x:p.(x)
 
 #Vaccous statements. 
-i :- M/M : lambda x:a.(x)
-would like :- M/M : lambda x:a.(x)
-i want :- M/M : lambda x:a.(x)
-can you :- M/M : lambda x:a.(x)
-you to :- M/M : lambda x:a.(x)
-for you :- M/M : lambda x:a.(x)
-to please :- M/M : lambda x:a.(x)
-go and :- M/M : lambda x:a.(x)
-go :- M/M : lambda x:a.(x)
-you are :- M/M : lambda x:a.(x)
-please :- M/M : lambda x:a.(x)
-
-#Semi vaccous statements. 
-wants you :- NP\NP : lambda x:p.(x)
+#i :- M/M : lambda x:a.(x)
+#would like :- M/M : lambda x:a.(x)
+#i want :- M/M : lambda x:a.(x)
+#can you :- M/M : lambda x:a.(x)
+#you to :- M/M : lambda x:a.(x)
+#for you :- M/M : lambda x:a.(x)
+#to please :- M/M : lambda x:a.(x)
+#go and :- M/M : lambda x:a.(x)
+#go :- M/M : lambda x:a.(x)
+#you are :- M/M : lambda x:a.(x)
+#please :- M/M : lambda x:a.(x)
 
 #these are weird now bc there's some implicit knowledge in hasoffice that the second arg is an office
-'s office :- NP\NP : lambda x:p.(the(lambda y:l.(and(office(y), possesses(y,x)))))
+#'s office :- NP\NP : lambda x:p.(the(lambda y:l.(and(office(y), possesses(y,x)))))
 
 #closed category
-the :- NP/NP : lambda x:p.(x)
-the :- NP/NP : lambda x:i.(x)
+#the :- NP/NP : lambda x:p.(x)
+#the :- NP/NP : lambda x:i.(x)
 
-a :- NP/NP : lambda P:<i,t>.(a(lambda x:i.(P(x))))
+a :- NP/N : lambda P:<i,t>.(a(lambda x:i.(P(x))))
 
 # room atoms
 room :- NP/N : lambda x:l.(x) 
@@ -68,178 +65,177 @@ room :- NP/N : lambda x:l.(x)
 3414 b :- N : l3_414b
 
 # people atoms
-bruce :- NP : bruce
-bruce porter :- NP : bruce
-stacy :- NP : stacy
-dana :- NP : dana
-jivko :- NP : jivko
-peter :- NP : peter
-peter stone :- NP : peter
-ray :- NP : ray
-mooney :- NP : ray
-shiqi :- NP : shiqi
-scott :- NP : scott
-jesse :- NP : jesse
-aishwarya :- NP : aishwarya
-rudy :- NP : rodolfo
-corona :- NP : rodolfo
-rodolfo corona :- NP : rodolfo
-niekum :- NP : scott
+bruce :- N : bruce
+bruce porter :- N : bruce
+stacy :- N : stacy
+dana :- N : dana
+jivko :- N : jivko
+peter :- N : peter
+peter stone :- N : peter
+ray :- N : ray
+mooney :- N : ray
+shiqi :- N : shiqi
+scott :- N : scott
+jesse :- N : jesse
+aishwarya :- N : aishwarya
+rudy :- N : rodolfo
+corona :- N : rodolfo
+rodolfo corona :- N : rodolfo
+niekum :- N : scott
 
 #People titles. 
-mr :- NP/NP : lambda x:p.(x)
-professor :- NP/NP : lambda x:p.(x)
-doctor :- NP/NP : lambda x:p.(x)
-dr :- NP/NP : lambda x:p.(x)
+mr :- N/N : lambda x:p.(x)
+professor :- N/N : lambda x:p.(x)
+doctor :- N/N : lambda x:p.(x)
+dr :- N/N : lambda x:p.(x)
 
 #Particular people titles. 
-grad student :- NP : jesse
+grad student :- N : jesse
 
 # item atoms
-apple :- NP : apple
-basket :- NP : basket
-beverage :- NP : beverage
-binder :- NP : binder
-bread :- NP : bread
-cake :- NP : cake
-calendar :- NP : calendar
-coke :- NP : coke
-cupcake :- NP : cupcake
-dessert :- NP : dessert
-doritos :- NP : doritos
-glass :- NP : glass
-hamburger :- NP : hamburger
-hammer :- NP : hammer
-juice :- NP : juice
-ledger :- NP : ledger
-letter :- NP : letter
-milk :- NP : milk
-muffin :- NP : muffin
-organizer :- NP : organizer
-pencil :- NP : pencil
-phone :- NP : phone
-pillow :- NP : pillow
-pizza :- NP : pizza
-salad :- NP : salad
-sandwich :- NP : sandwich
-snack :- NP : snack
-tea :- NP : tea
-trashcan :- NP : trashcan
-watch :- NP : watch
-
-# Adjective predicates.
-aerosol :- NP/NP : lambda x:i.(aerosol(x))
-aluminum :- NP/NP : lambda x:i.(aluminum(x))
-big :- NP/NP : lambda x:i.(big(x))
-black :- NP/NP : lambda x:i.(black(x))
-blue :- NP/NP : lambda x:i.(blue(x))
-bright :- NP/NP : lambda x:i.(bright(x))
-brown :- NP/NP : lambda x:i.(brown(x))
-cardboard :- NP/NP : lambda x:i.(cardboard(x))
-circular :- NP/NP : lambda x:i.(circular(x))
-clear :- NP/NP : lambda x:i.(clear(x))
-closed :- NP/NP : lambda x:i.(closed(x))
-coffee :- NP/NP : lambda x:i.(coffee(x))
-colored :- NP/NP : lambda x:i.(colored(x))
-cream-colored :- NP/NP : lambda x:i.(cream-colored(x))
-curvy :- NP/NP : lambda x:i.(curvy(x))
-cylindrical :- NP/NP : lambda x:i.(cylindrical(x))
-empty :- NP/NP : lambda x:i.(empty(x))
-fat :- NP/NP : lambda x:i.(fat(x))
-foam :- NP/NP : lambda x:i.(foam(x))
-foamy :- NP/NP : lambda x:i.(foamy(x))
-full :- NP/NP : lambda x:i.(full(x))
-gray :- NP/NP : lambda x:i.(gray(x))
-green :- NP/NP : lambda x:i.(green(x))
-half-full :- NP/NP : lambda x:i.(half-full(x))
-heavy :- NP/NP : lambda x:i.(heavy(x))
-hollow :- NP/NP : lambda x:i.(hollow(x))
-large :- NP/NP : lambda x:i.(large(x))
-light :- NP/NP : lambda x:i.(light(x))
-liquid :- NP/NP : lambda x:i.(liquid(x))
-medium-sized :- NP/NP : lambda x:i.(medium-sized(x))
-metal :- NP/NP : lambda x:i.(metal(x))
-metallic :- NP/NP : lambda x:i.(metallic(x))
-narrow :- NP/NP : lambda x:i.(narrow(x))
-neon :- NP/NP : lambda x:i.(neon(x))
-open :- NP/NP : lambda x:i.(open(x))
-orange :- NP/NP : lambda x:i.(orange(x))
-orange-topped :- NP/NP : lambda x:i.(orange-topped(x))
-paper :- NP/NP : lambda x:i.(paper(x))
-pencil-shaped :- NP/NP : lambda x:i.(pencil-shaped(x))
-pink :- NP/NP : lambda x:i.(pink(x))
-plastic :- NP/NP : lambda x:i.(plastic(x))
-pointed :- NP/NP : lambda x:i.(pointed(x))
-pointy :- NP/NP : lambda x:i.(pointy(x))
-purple :- NP/NP : lambda x:i.(purple(x))
-rectangular :- NP/NP : lambda x:i.(rectangular(x))
-red :- NP/NP : lambda x:i.(red(x))
-rough :- NP/NP : lambda x:i.(rough(x))
-round :- NP/NP : lambda x:i.(round(x))
-shiny :- NP/NP : lambda x:i.(shiny(x))
-short :- NP/NP : lambda x:i.(short(x))
-silent :- NP/NP : lambda x:i.(silent(x))
-silver :- NP/NP : lambda x:i.(silver(x))
-skinny :- NP/NP : lambda x:i.(skinny(x))
-small :- NP/NP : lambda x:i.(small(x))
-soft :- NP/NP : lambda x:i.(soft(x))
-soup :- NP/NP : lambda x:i.(soup(x))
-spherical :- NP/NP : lambda x:i.(spherical(x))
-spiky :- NP/NP : lambda x:i.(spiky(x))
-squishy :- NP/NP : lambda x:i.(squishy(x))
-styrofoam :- NP/NP : lambda x:i.(styrofoam(x))
-tall :- NP/NP : lambda x:i.(tall(x))
-teal :- NP/NP : lambda x:i.(teal(x))
-thin :- NP/NP : lambda x:i.(thin(x))
-tiny :- NP/NP : lambda x:i.(tiny(x))
-top :- NP/NP : lambda x:i.(top(x))
-transparent :- NP/NP : lambda x:i.(transparent(x))
-water :- NP/NP : lambda x:i.(water(x))
-white :- NP/NP : lambda x:i.(white(x))
-wide :- NP/NP : lambda x:i.(wide(x))
-yellow :- NP/NP : lambda x:i.(yellow(x))
+apple :- N : apple
+basket :- N : basket
+beverage :- N : beverage
+binder :- N : binder
+bread :- N : bread
+cake :- N : cake
+calendar :- N : calendar
+coke :- N : coke
+cupcake :- N : cupcake
+dessert :- N : dessert
+doritos :- N : doritos
+glass :- N : glass
+hamburger :- N : hamburger
+hammer :- N : hammer
+juice :- N : juice
+ledger :- N : ledger
+letter :- N : letter
+milk :- N : milk
+muffin :- N : muffin
+organizer :- N : organizer
+pencil :- N : pencil
+phone :- N : phone
+pillow :- N : pillow
+pizza :- N : pizza
+salad :- N : salad
+sandwich :- N : sandwich
+snack :- N : snack
+tea :- N : tea
+trashcan :- N : trashcan
+watch :- N : watch
 
 # Predicate adjectival nouns.
-prism :- NP : lambda x:i.(prism(x))
-ball :- NP : lambda x:i.(ball(x))
-beans :- NP : lambda x:i.(beans(x))
-book :- NP : lambda x:i.(book(x))
-bottle :- NP : lambda x:i.(bottle(x))
-box :- NP : lambda x:i.(box(x))
-bucket :- NP : lambda x:i.(bucket(x))
-can :- NP : lambda x:i.(can(x))
-canister :- NP : lambda x:i.(canister(x))
-cap :- NP : lambda x:i.(cap(x))
-carton :- NP : lambda x:i.(carton(x))
-cellphone :- NP : lambda x:i.(cellphone(x))
-chips :- NP : lambda x:i.(chips(x))
-container :- NP : lambda x:i.(container(x))
-crayon :- NP : lambda x:i.(crayon(x))
-cup :- NP : lambda x:i.(cup(x))
-cylinder :- NP : lambda x:i.(cylinder(x))
-diary :- NP : lambda x:i.(diary(x))
-drink :- NP : lambda x:i.(drink(x))
-flask :- NP : lambda x:i.(flask(x))
-floaty :- NP : lambda x:i.(floaty(x))
-jar :- NP : lambda x:i.(jar(x))
-laptop :- NP : lambda x:i.(laptop(x))
-lid :- NP : lambda x:i.(lid(x))
-marker :- NP : lambda x:i.(marker(x))
-mug :- NP : lambda x:i.(mug(x))
-notebook :- NP : lambda x:i.(notebook(x))
-object :- NP : lambda x:i.(object(x))
-pineapple :- NP : lambda x:i.(pineapple(x))
-plush-toy :- NP : lambda x:i.(plush-toy(x))
-prism :- NP : lambda x:i.(prism(x))
-rectangle :- NP : lambda x:i.(rectangle(x))
-roll :- NP : lambda x:i.(roll(x))
-shaker :- NP : lambda x:i.(shaker(x))
-sphere :- NP : lambda x:i.(sphere(x))
-spray :- NP : lambda x:i.(spray(x))
-spraycan :- NP : lambda x:i.(spraycan(x))
-stuffed-animal :- NP : lambda x:i.(stuffed-animal(x))
-thing :- NP : lambda x:i.(thing(x))
-tin :- NP : lambda x:i.(tin(x))
-tub :- NP : lambda x:i.(tub(x))
-tube :- NP : lambda x:i.(tube(x))
-wipes :- NP : lambda x:i.(wipes(x))
+ball :- N : lambda x:i.(ball(x))
+beans :- N : lambda x:i.(beans(x))
+book :- N : lambda x:i.(book(x))
+bottle :- N : lambda x:i.(bottle(x))
+box :- N : lambda x:i.(box(x))
+bucket :- N : lambda x:i.(bucket(x))
+can :- N : lambda x:i.(can(x))
+canister :- N : lambda x:i.(canister(x))
+cap :- N : lambda x:i.(cap(x))
+carton :- N : lambda x:i.(carton(x))
+cellphone :- N : lambda x:i.(cellphone(x))
+chips :- N : lambda x:i.(chips(x))
+container :- N : lambda x:i.(container(x))
+crayon :- N : lambda x:i.(crayon(x))
+cup :- N : lambda x:i.(cup(x))
+cylinder :- N : lambda x:i.(cylinder(x))
+diary :- N : lambda x:i.(diary(x))
+drink :- N : lambda x:i.(drink(x))
+flask :- N : lambda x:i.(flask(x))
+floaty :- N : lambda x:i.(floaty(x))
+jar :- N : lambda x:i.(jar(x))
+laptop :- N : lambda x:i.(laptop(x))
+lid :- N : lambda x:i.(lid(x))
+marker :- N : lambda x:i.(marker(x))
+mug :- N : lambda x:i.(mug(x))
+notebook :- N : lambda x:i.(notebook(x))
+object :- N : lambda x:i.(object(x))
+pineapple :- N : lambda x:i.(pineapple(x))
+plush-toy :- N : lambda x:i.(plush-toy(x))
+prism :- N : lambda x:i.(prism(x))
+rectangle :- N : lambda x:i.(rectangle(x))
+roll :- N : lambda x:i.(roll(x))
+shaker :- N : lambda x:i.(shaker(x))
+sphere :- N : lambda x:i.(sphere(x))
+spray :- N : lambda x:i.(spray(x))
+spraycan :- N : lambda x:i.(spraycan(x))
+stuffed-animal :- N : lambda x:i.(stuffed-animal(x))
+thing :- N : lambda x:i.(thing(x))
+tin :- N : lambda x:i.(tin(x))
+tub :- N : lambda x:i.(tub(x))
+tube :- N : lambda x:i.(tube(x))
+wipes :- N : lambda x:i.(wipes(x))
+
+# Adjective predicates.
+aerosol :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), aerosol(x))))
+aluminum :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), aluminum(x))))
+big :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), big(x))))
+black :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), black(x))))
+blue :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), blue(x))))
+bright :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), bright(x))))
+brown :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), brown(x))))
+cardboard :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), cardboard(x))))
+circular :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), circular(x))))
+clear :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), clear(x))))
+closed :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), closed(x))))
+coffee :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), coffee(x))))
+colored :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), colored(x))))
+cream-colored :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), cream-colored(x))))
+curvy :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), curvy(x))))
+cylindrical :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), cylindrical(x))))
+empty :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), empty(x))))
+fat :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), fat(x))))
+foam :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), foam(x))))
+foamy :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), foamy(x))))
+full :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), full(x))))
+gray :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), gray(x))))
+green :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), green(x))))
+half-full :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), half-full(x))))
+heavy :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), heavy(x))))
+hollow :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), hollow(x))))
+large :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), large(x))))
+light :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), light(x))))
+liquid :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), liquid(x))))
+medium-sized :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), medium-sized(x))))
+metal :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), metal(x))))
+metallic :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), metallic(x))))
+narrow :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), narrow(x))))
+neon :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), neon(x))))
+open :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), open(x))))
+orange :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), orange(x))))
+orange-topped :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), orange-topped(x))))
+paper :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), paper(x))))
+pencil-shaped :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), pencil-shaped(x))))
+pink :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), pink(x))))
+plastic :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), plastic(x))))
+pointed :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), pointed(x))))
+pointy :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), pointy(x))))
+purple :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), purple(x))))
+rectangular :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), rectangular(x))))
+red :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), red(x))))
+rough :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), rough(x))))
+round :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), round(x))))
+shiny :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), shiny(x))))
+short :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), short(x))))
+silent :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), silent(x))))
+silver :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), silver(x))))
+skinny :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), skinny(x))))
+small :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), small(x))))
+soft :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), soft(x))))
+soup :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), soup(x))))
+spherical :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), spherical(x))))
+spiky :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), spiky(x))))
+squishy :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), squishy(x))))
+styrofoam :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), styrofoam(x))))
+tall :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), tall(x))))
+teal :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), teal(x))))
+thin :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), thin(x))))
+tiny :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), tiny(x))))
+top :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), top(x))))
+transparent :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), transparent(x))))
+water :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), water(x))))
+white :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), white(x))))
+wide :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), wide(x))))
+yellow :- N/N : lambda P:<i,t>.(lambda x:i.(and(P(x), yellow(x))))
