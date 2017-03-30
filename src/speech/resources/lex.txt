@@ -2,11 +2,13 @@
 check :- (M/PP)/PP : lambda x:p.(lambda y:l.(searchroom(x,y)))
 search :- (M/PP)/PP : lambda x:p.(lambda y:l.(searchroom(x,y)))
 look :- (M/PP)/PP : lambda x:p.(lambda y:l.(searchroom(x,y)))
+tell me :- (M/PP)/PP : lambda x:p.(lambda y:l.(searchroom(x,y)))
 
 bring :- (M/PP)/NP : lambda y:p.(lambda x:i.(bring(x,y)))
 deliver :- (M/PP)/NP : lambda y:p.(lambda x:i.(bring(x,y)))
 give :- (M/NP)/NP : lambda x:p.(lambda y:i.(bring(y,x)))
-
+would like :- (M\NP)/NP : lambda x:p.(lambda y:i.(bring(y,x)))
+bring them :- (M\PP)/NP : lambda x:i.(lambda y:p.(bring(x,y)))
 
 walk :- M/PP : lambda x:l.(walk(x))
 go :- M/PP : lambda x:l.(walk(x)) 
@@ -19,20 +21,25 @@ in :- PP/NP : lambda x:l.(x)
 is :- PP/PP : lambda x:l.(x)
 at :- PP/NP : lambda x:l.(x)
 
-#to :- PP/NP : lambda x:p.(x)
+to :- PP/NP : lambda x:p.(x)
 to :- PP/NP : lambda x:l.(x)
+to :- PP\NP : lambda x:p.(x)
 
 #Vaccous statements. 
 i :- M/M : lambda x:a.(x)
 would like :- M/M : lambda x:a.(x)
 i want :- M/M : lambda x:a.(x)
+can you :- M/M : lambda x:a.(x)
 you to :- M/M : lambda x:a.(x)
 for you :- M/M : lambda x:a.(x)
 to please :- M/M : lambda x:a.(x)
 go and :- M/M : lambda x:a.(x)
 go :- M/M : lambda x:a.(x)
 you are :- M/M : lambda x:a.(x)
-#please :- M/M : lambda x:a.(x)
+please :- M/M : lambda x:a.(x)
+
+#Semi vaccous statements. 
+wants you :- NP\NP : lambda x:p.(x)
 
 #these are weird now bc there's some implicit knowledge in hasoffice that the second arg is an office
 's office :- NP\NP : lambda x:p.(the(lambda y:l.(and(office(y), possesses(y,x)))))
@@ -40,8 +47,6 @@ you are :- M/M : lambda x:a.(x)
 #closed category
 the :- NP/NP : lambda x:p.(x)
 the :- NP/NP : lambda x:i.(x)
-the :- NP/(N/N) : lambda P:<l,t>.(the(lambda x:l.(P(x))))
-#the :- NP/(N/N) : lambda P:<i,t>.(the_i(lambda x:i.(P(x))))
 
 a :- NP/NP : lambda P:<i,t>.(a(lambda x:i.(P(x))))
 
@@ -67,11 +72,13 @@ jivko :- NP : jivko
 peter :- NP : peter
 peter stone :- NP : peter
 ray :- NP : ray
+mooney :- NP : ray
 shiqi :- NP : shiqi
 scott :- NP : scott
 jesse :- NP : jesse
 aishwarya :- NP : aishwarya
 rudy :- NP : rodolfo
+corona :- NP : rodolfo
 rodolfo corona :- NP : rodolfo
 niekum :- NP : scott
 
@@ -79,6 +86,7 @@ niekum :- NP : scott
 mr :- NP/NP : lambda x:p.(x)
 professor :- NP/NP : lambda x:p.(x)
 doctor :- NP/NP : lambda x:p.(x)
+dr :- NP/NP : lambda x:p.(x)
 
 #Particular people titles. 
 grad student :- NP : jesse
