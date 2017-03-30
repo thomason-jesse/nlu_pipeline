@@ -34,6 +34,8 @@ import os
 import sys
 import numpy as np
 import math
+import time
+import multiprocessing
 
 #TODO Change if necessary. 
 #Adds nlu_pipeline src folder in order to import modules from it. 
@@ -151,6 +153,48 @@ Returns the last element of a list.
 """
 def get_last_element_as_float(l):
     return float(l[-1])
+
+def time_out_helper(time_limit): 
+    time.sleep(time_limit)
+
+def timed_get_first_valid_parse(phrase, parser, time_limit): 
+    #This will keep the parse to be returned. 
+    parse_storage_queue = multiprocessing.Queue()
+
+    #Put all arguments in the storage queue. 
+    parse_storage_queue.put([phrase, parser])
+
+    #Attempt to get parse within time limit. 
+    parsing_thread = multiprocessing.Process(target=get_first_valid_parse_helper, args=(parse_storage_queue,))
+    parsing_thread.start()
+
+    #Time out thread. 
+    time_out_thread = multiprocessing.Process(target=time_out_helper, args=(time_limit,))
+    time_out_thread.start()
+
+    #Now wait for one of the two to finish and return result. 
+    waiting = True
+
+    while waiting: 
+        if not parsing_thread.is_alive(): 
+            time_out_thread.terminate()
+            waiting = False
+        
+        elif not time_out_thread.is_alive(): 
+            parsing_thread.terminate()
+            waiting = False
+
+    if parse_storage_queue.empty():
+        return (None, float('-inf')) 
+    else: 
+        return parse_storage_queue.get()
+
+    return parse
+
+def get_first_valid_parse_helper(parse_storage_queue): 
+    phrase, parser = parse_storage_queue.get()
+
+    parse_storage_queue.put(get_first_valid_parse(phrase, parser, float('inf')))
 
 """
 Returns the best valid parse found given a parser
@@ -515,7 +559,8 @@ def give_google_parse_scores(test_file_path, results_file_path, parser_path, goo
             phrase, sem_form, denotation, rec = line.strip().split(';')
 
             #Make sure we don't already have ground truth written. 
-            if not (test_index == test_index_chkpt):    
+            if not (test_index == test_index_chkpt):
+                print '#' + line.strip()
                 result_file.write('#' + line)
                 result_file.flush()
 
@@ -544,7 +589,7 @@ def give_google_parse_scores(test_file_path, results_file_path, parser_path, goo
                     #Only allow for top 10 hypotheses in order to reduce computation time.
                     if hyp_index <= 10:
                         try:
-                            print 'Attempting to parse: ' + tokenized_hyp
+                            #print 'Attempting to parse: ' + tokenized_hyp
 
                             #Make sure hypothesis isn't too long. 
                             if len(tokenized_hyp.split()) > 7: 
@@ -552,7 +597,8 @@ def give_google_parse_scores(test_file_path, results_file_path, parser_path, goo
                             else:
 
                                 #Gets parse.
-                                parse = get_first_valid_parse(tokenized_hyp, parser)
+                                #parse = timed_get_first_valid_parse(tokenized_hyp, parser, 2)
+                                parse = timed_get_first_valid_parse(tokenized_hyp, parser, 2)
 
                                 if not parse[0] == None:
                                     #Computes avg. production probability. 
@@ -580,11 +626,14 @@ def give_google_parse_scores(test_file_path, results_file_path, parser_path, goo
                         except:
                             parse = ('None', float('-inf')) 
 
-                        #Now write speech hyp; speech score; parse hyp; parse score. 
-                        result_file.write(hypothesis + ';' + google_hyp_score + ';' + str(parse[0]) + ';' + str(parse[1]) + '\n')
+                        #Now write speech hyp; speech score; parse hyp; parse score.
+                        result_line = hypothesis + ';' + google_hyp_score + ';' + str(parse[0]) + ';' + str(parse[1])
+                        print result_line
+    
+                        result_file.write(result_line + '\n')
                         result_file.flush()
 
-                        print 'Done test line ' + str(test_index) + ' hyp ' + str(hyp_index)
+                        #print 'Done test line ' + str(test_index) + ' hyp ' + str(hyp_index)
 
                 hyp_index += 1
 
