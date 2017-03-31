@@ -64,10 +64,23 @@ def train_new_parser(parser_train_file, parser_path, ont_path, lex_path, lex_wei
     
     if not starting_parser_path == 'None': 
         parser = load_obj_general(starting_parser_path)
+        print  'Loaded parser: ' + starting_parser_path
+        print 'Will train and save updated version in : ' + parser_path
     else:
+        print 'Creating new parser to save in ' + parser_path    
+
         #Used to train new parser.
         parser = CKYParser.CKYParser(ont, lex, use_language_model=False, lexicon_weight=lex_weight)
-   
+
+        # Set parser hyperparams to best known values for test time
+        parser.max_multiword_expression = 2  # max span of a multi-word expression to be considered during tokenization
+        parser.max_new_senses_per_utterance = 2  # max number of new word senses that can be induced on a training example
+        parser.max_cky_trees_per_token_sequence_beam = 100  # for tokenization of an utterance, max cky trees considered
+        parser.max_hypothesis_categories_for_unknown_token_beam = 2  # for unknown token, max syntax categories tried
+        parser.max_expansions_per_non_terminal = 10  # decides how many expansions to store per CKY cel
+        parser.train_time_limit = 10
+        parser.default_skip = True
+
     #For record keeping. 
     print 'PARSER HYPERPARAMETERS: '
     print 'max_multiword_expression: ' + str(parser.max_multiword_expression)    
@@ -77,13 +90,6 @@ def train_new_parser(parser_train_file, parser_path, ont_path, lex_path, lex_wei
     print 'max_expansions_per_non_terminal: ' + str(parser.max_expansions_per_non_terminal)
     print 'train_time_limit: ' + str(parser.train_time_limit)
     print 'default_skip: ' + str(parser.default_skip)
-
-    # Set parser hyperparams to best known values for test time
-    parser.max_multiword_expression = 2  # max span of a multi-word expression to be considered during tokenization
-    parser.max_new_senses_per_utterance = 2  # max number of new word senses that can be induced on a training example
-    parser.max_cky_trees_per_token_sequence_beam = 100  # for tokenization of an utterance, max cky trees considered
-    parser.max_hypothesis_categories_for_unknown_token_beam = 2  # for unknown token, max syntax categories tried
-    parser.max_expansions_per_non_terminal = 10  # decides how many expansions to store per CKY cel
 
     # Read in train data. 
     data = parser.read_in_paired_utterance_semantics(parser_train_file)

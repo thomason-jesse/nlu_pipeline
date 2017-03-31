@@ -591,34 +591,33 @@ def give_google_parse_scores(test_file_path, results_file_path, parser_path, goo
                         try:
                             #print 'Attempting to parse: ' + tokenized_hyp
 
-                            #Make sure hypothesis isn't too long. 
-                            if len(tokenized_hyp.split()) > 7: 
-                                parse = ('None', float('-inf'))
+                            #Gets parse.
+                            start_time = time.time()
+                            parse = timed_get_first_valid_parse(tokenized_hyp, parser, 10)
+                            end_time = time.time()
+
+                            #Compute duration of parse for statistics. 
+                            duration = end_time - start_time
+
+                            if not parse[0] == None:
+                                #Computes avg. production probability. 
+                                avg_prod_prob = float('-inf')
+                                num_prods = 0.0
+                                productions = count_ccg_productions(parse[0])
+
+                                for production in productions:
+                                    avg_prod_prob = np.logaddexp(avg_prod_prob, parser.theta.CCG_production[production])
+                                    num_prods += float(productions[production])
+
+                                avg_prod_prob -= np.log(num_prods)
+
+                                #Modifies score according to number of null nodes (max num tokens in corpus is 16). 
+                                num_nulls = 16 - num_toks
+                                parse_score = parse[1] + num_nulls * (parser.theta.null_prior + avg_prod_prob)
+
+                                parse = (parser.print_parse(parse[0].node), parse_score)                     
                             else:
-
-                                #Gets parse.
-                                #parse = timed_get_first_valid_parse(tokenized_hyp, parser, 2)
-                                parse = timed_get_first_valid_parse(tokenized_hyp, parser, 2)
-
-                                if not parse[0] == None:
-                                    #Computes avg. production probability. 
-                                    avg_prod_prob = float('-inf')
-                                    num_prods = 0.0
-                                    productions = count_ccg_productions(parse[0])
-
-                                    for production in productions:
-                                        avg_prod_prob = np.logaddexp(avg_prod_prob, parser.theta.CCG_production[production])
-                                        num_prods += float(productions[production])
-
-                                    avg_prod_prob -= np.log(num_prods)
-
-                                    #Modifies score according to number of null nodes. 
-                                    num_nulls = 7 - num_toks
-                                    parse_score = parse[1] + num_nulls * (parser.theta.null_prior + avg_prod_prob)
-
-                                    parse = (parser.print_parse(parse[0].node), parse_score)                     
-                                else:
-                                    parse = ('None', float('-inf'))
+                                parse = ('None', float('-inf'))
 
                         except KeyboardInterrupt:
                             raise KeyboardInterrupt
@@ -627,7 +626,7 @@ def give_google_parse_scores(test_file_path, results_file_path, parser_path, goo
                             parse = ('None', float('-inf')) 
 
                         #Now write speech hyp; speech score; parse hyp; parse score.
-                        result_line = hypothesis + ';' + google_hyp_score + ';' + str(parse[0]) + ';' + str(parse[1])
+                        result_line = hypothesis + ';' + google_hyp_score + ';' + str(parse[0]) + ';' + str(parse[1]) + ';' + str(duration)
                         print result_line
     
                         result_file.write(result_line + '\n')
@@ -780,13 +779,18 @@ def re_rank_CKY(nbest_file_name, re_ranked_file_name, parser_path, temp_name='')
 Parses ground truth ASR transcript
 in a specific test file. 
 """
-def parse_ground_truth_file(test_file_name, result_file, parser):
-    test_file = open(test_file_name)
+def parse_ground_truth_file(test_file_path, result_file_path, parser_path):
+    #Load parser. 
+    parser = load_obj_general(parser_path)
+
+    #Open necessary files for running experiment. 
+    test_file = open(test_file_path, 'r')
+    result_file = open(result_file_path, 'w')
 
     for line in test_file:
-        print line.split(';')
+        print 'parsing: '  + line.split(';')[0]
         phrase, true_sem_form, _, _ = line.split(';')
-        parse = get_first_valid_parse(tokenize_for_parser(phrase), parser)[0]
+        parse = timed_get_first_valid_parse(tokenize_for_parser(phrase), parser, 10)[0]
 
         #Now convert parse to string. 
         if not parse == None:
@@ -840,7 +844,7 @@ def print_usage():
     print 'ASR Nbest: ./experiments asr_n_best [sphinx_shared_library] [ac_model] [lm] [dict] [test_file] [nbest_file] [n]'
     print 'CKYParser re-rank: ./experiments parser_rerank [nbest_file] [re-ranked_file_name] [parser_path] [temp_name] [optional: null_node]'
     print 'Re-rank with interpolation: ./experiments rerank_interpolation [nbest_file] [out_file] [weight]'
-    print 'Run parser on speech ground truth: ./experiments parse_ground_truth [experiment_folder] [results_folder] [test_file_name]'
+    print 'Run parser on speech ground truth: ./experiments parse_ground_truth [test_file] [results_file] [parser_path]'
     print 'Assign parse scores to Google Speech API files: ./experiments parse_score_google [test_file_path] [results_file_path] [parser_path] [google_recognized_folder]'
 
 if __name__ == '__main__':
@@ -864,7 +868,7 @@ if __name__ == '__main__':
 
     elif sys.argv[1] == 'parse_ground_truth':
         if len(sys.argv) == 5:
-            parse_ground_truth(sys.argv[2], sys.argv[3], sys.argv[4])
+            parse_ground_truth_file(sys.argv[2], sys.argv[3], sys.argv[4])
         else:
             print_usage()
 

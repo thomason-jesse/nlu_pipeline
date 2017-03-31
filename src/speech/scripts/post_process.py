@@ -272,42 +272,27 @@ def convert_numbers_corpus(corpus_folder):
         #Path to train and test sets. 
         train_path = corpus_folder + fold + '/corpus/train/'
         test_path = corpus_folder + fold + '/corpus/test/'
+        val_path = corpus_folder + fold + '/corpus/validation/'
 
-        for usr_file in os.listdir(train_path): 
-            file_path = train_path + usr_file
-            read_file = open(file_path, 'r')
+        for folder_path in [train_path, test_path, val_path]:
+            for usr_file in os.listdir(folder_path): 
+                file_path = folder_path + usr_file
+                read_file = open(file_path, 'r')
 
-            #File to eventually replace this with. 
-            temp_file_name = usr_file + '.temp'
-            temp_file = open(temp_file_name, 'w')
-          
-            print file_path
+                #File to eventually replace this with. 
+                temp_file_name = usr_file + '.temp'
+                temp_file = open(temp_file_name, 'w')
+              
+                print file_path
 
-            for line in read_file:
-                phrase, sem_form, denotation, rec = line.split(';')
-                phrase = convert_numbers(phrase)
-                temp_file.write(phrase + ';' + sem_form + ';' + denotation + ';' + rec)
+                for line in read_file:
+                    phrase, sem_form, denotation, rec = line.split(';')
+                    phrase = convert_numbers(phrase)
+                    temp_file.write(phrase + ';' + sem_form + ';' + denotation + ';' + rec)
 
-            read_file.close()
-            temp_file.close()
-            os.rename(temp_file_name, file_path)
-
-        for usr_file in os.listdir(test_path): 
-            file_path = test_path + usr_file
-            read_file = open(file_path, 'r')
-
-            #File to eventually replace this with. 
-            temp_file_name = usr_file + '.temp'
-            temp_file = open(temp_file_name, 'w')
-           
-            for line in read_file:
-                phrase, sem_form, denotation, rec = line.split(';')
-                phrase = convert_numbers(phrase)
-                temp_file.write(phrase + ';' + sem_form + ';' + denotation + ';' + rec)
-
-            read_file.close()
-            temp_file.close()
-            os.rename(temp_file_name, file_path)
+                read_file.close()
+                temp_file.close()
+                os.rename(temp_file_name, file_path)
 
 def print_usage():
     print 'To populate result file with semantic forms: ./post_process.py populate_semantic_forms [result_file_name] [test_file_name]'
