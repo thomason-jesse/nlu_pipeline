@@ -37,12 +37,15 @@ the given training file and saves it
 to the given parser_path using
 a given ontology and lexicon. 
 """
-def train_new_parser(parser_train_file, parser_path, ont_path, lex_path, lex_weight):
+def train_new_parser(parser_train_file, parser_path, ont_path, lex_path, lex_weight, percent_data_to_use=1.0, starting_parser_path='None'):
     #Converts to ensure floating point and not string. 
     if lex_weight == 'sys.maxint':
         lex_weight = sys.maxint
     else:
         lex_weight = float(lex_weight)
+
+    #Convert percent data to use from str if needed. 
+    percent_data_to_use = float(percent_data_to_use)
 
     #Instantiates ontology. 
     print "reading in Ontology"
@@ -59,23 +62,38 @@ def train_new_parser(parser_train_file, parser_path, ont_path, lex_path, lex_wei
     print "semantic forms: " + str(lex.semantic_forms)
     print "entries: " + str(lex.entries)
     
-    #Used to train new parser. 
-    parser = CKYParser.CKYParser(ont, lex, use_language_model=False, lexicon_weight=lex_weight)
-    
-    #Used to train existing parser on new data. 
-    #parser = load_obj_general(sys.argv[5])
+    if not starting_parser_path == 'None': 
+        parser = load_obj_general(starting_parser_path)
+    else:
+        #Used to train new parser.
+        parser = CKYParser.CKYParser(ont, lex, use_language_model=False, lexicon_weight=lex_weight)
+   
+    #For record keeping. 
+    print 'PARSER HYPERPARAMETERS: '
+    print 'max_multiword_expression: ' + str(parser.max_multiword_expression)    
+    print 'max_new_senses_per_utterance: ' + str(parser.max_new_senses_per_utterance)
+    print 'max_cky_trees_per_token_sequence_beam: ' + str(parser.max_cky_trees_per_token_sequence_beam)
+    print 'max_hypothesis_categories_for_unknown_token_beam: ' + str(parser.max_hypothesis_categories_for_unknown_token_beam)
+    print 'max_expansions_per_non_terminal: ' + str(parser.max_expansions_per_non_terminal)
+    print 'train_time_limit: ' + str(parser.train_time_limit)
+    print 'default_skip: ' + str(parser.default_skip)
 
     # Set parser hyperparams to best known values for test time
-    parser.max_multiword_expression = 4  # max span of a multi-word expression to be considered during tokenization
-    parser.max_new_senses_per_utterance = 0  # max number of new word senses that can be induced on a training example
+    parser.max_multiword_expression = 2  # max span of a multi-word expression to be considered during tokenization
+    parser.max_new_senses_per_utterance = 2  # max number of new word senses that can be induced on a training example
     parser.max_cky_trees_per_token_sequence_beam = 100  # for tokenization of an utterance, max cky trees considered
     parser.max_hypothesis_categories_for_unknown_token_beam = 2  # for unknown token, max syntax categories tried
-    parser.max_expansions_per_non_terminal = 10  # number of backpointers stored per nonterminal per cell in CKY chart
+    parser.max_expansions_per_non_terminal = 10  # decides how many expansions to store per CKY cel
 
     # Read in train data. 
     data = parser.read_in_paired_utterance_semantics(parser_train_file)
 
-    converged = parser.train_learner_on_semantic_forms(data, 20, reranker_beam=1)
+    #Prune training data to only use the percent specified.
+    num_to_use = int(len(data) * percent_data_to_use)
+    data = data[:num_to_use]
+
+    #Now train parser on this data. 
+    converged = parser.train_learner_on_semantic_forms(data, 1, reranker_beam=1)
     print '\n\n\nHand designed examples: converged = ', converged
 
     #Saves trained parser. 
@@ -195,7 +213,7 @@ def adapt_accoustic_model(acoustic_model_path, corpus_folder, recordings_dir, di
     subprocess.call(args)
 
 def print_usage():
-    print 'To train new parser: ./train.py new_parser [parser_train_file] [parser_save_path] [ont_path] [lex_path] [lex_weight]'
+    print 'To train new parser: ./train.py new_parser [parser_train_file] [parser_save_path] [ont_path] [lex_path] [lex_weight] [percent_data_to_use] [start_parser_path]'
     print 'To train new language model: ./train.py new_lm [lm_train_file] [lm_save_path]'
     print 'To adapt an accoustic model: ./train.py adapt_ac_model [accoustic_model_path] [corpus_folder] [recordings_dir] [dict_path]'
 
@@ -205,10 +223,10 @@ if __name__ == '__main__':
     
     #Train new parser case. 
     elif sys.argv[1] == 'new_parser':
-        if not len(sys.argv) == 7:
+        if not len(sys.argv) == 9:
             print_usage()
         else:
-            train_new_parser(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6])
+            train_new_parser(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7], sys.argv[8])
 
     #Train a new language model. 
     elif sys.argv[1] == 'new_lm':
