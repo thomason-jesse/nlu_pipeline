@@ -23,7 +23,7 @@ for time_limit in $( echo 5 10 100 ); do
 			#Path to output for condor script and training procedure of first epoch. 
 			output=${fold_path}/logs/training/${name}.out
 
-			condor_submit -a "parser_params = ${parser_params}" -a "log = ${log}" -a "output = ${output}" -a "fold_path = ${fold_path}"  submit_train.bash
+			condor_submit -a "parser_params = ${name}" -a "log = ${log}" -a "output = ${output}" -a "fold_path = ${fold_path}"  submit_train.bash
 		done
 	done
 done
