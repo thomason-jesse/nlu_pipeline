@@ -37,7 +37,7 @@ the given training file and saves it
 to the given parser_path using
 a given ontology and lexicon. 
 """
-def train_new_parser(parser_train_file, parser_path, ont_path, lex_path, lex_weight, percent_data_to_use=1.0, starting_parser_path='None'):
+def train_new_parser(parser_train_file, parser_path, ont_path, lex_path, lex_weight, percent_data_to_use, starting_parser_path, parser_hyper_params):
     #Converts to ensure floating point and not string. 
     if lex_weight == 'sys.maxint':
         lex_weight = sys.maxint
@@ -69,17 +69,20 @@ def train_new_parser(parser_train_file, parser_path, ont_path, lex_path, lex_wei
     else:
         print 'Creating new parser to save in ' + parser_path    
 
+        #Get hyper parameters from input. 
+        hyper_params =  parser_hyper_params.split('_')
+
         #Used to train new parser.
         parser = CKYParser.CKYParser(ont, lex, use_language_model=False, lexicon_weight=lex_weight)
 
         # Set parser hyperparams to best known values for test time
-        parser.max_multiword_expression = 2  # max span of a multi-word expression to be considered during tokenization
-        parser.max_new_senses_per_utterance = 2  # max number of new word senses that can be induced on a training example
-        parser.max_cky_trees_per_token_sequence_beam = 100  # for tokenization of an utterance, max cky trees considered
-        parser.max_hypothesis_categories_for_unknown_token_beam = 2  # for unknown token, max syntax categories tried
-        parser.max_expansions_per_non_terminal = 10  # decides how many expansions to store per CKY cel
-        parser.train_time_limit = 10
-        parser.default_skip = True
+        parser.max_multiword_expression = int(hyper_params[0])#2  # max span of a multi-word expression to be considered during tokenization
+        parser.max_new_senses_per_utterance = int(hyper_params[1])#2  # max number of new word senses that can be induced on a training example
+        parser.max_cky_trees_per_token_sequence_beam = int(hyper_params[2])#100  # for tokenization of an utterance, max cky trees considered
+        parser.max_hypothesis_categories_for_unknown_token_beam = int(hyper_params[3])#2  # for unknown token, max syntax categories tried
+        parser.max_expansions_per_non_terminal = int(hyper_params[4])#10  # decides how many expansions to store per CKY cel
+        parser.train_time_limit = int(hyper_params[4])#10
+        parser.default_skip = bool(hyper_params[5])#True
 
     #For record keeping. 
     print 'PARSER HYPERPARAMETERS: '
@@ -219,7 +222,7 @@ def adapt_accoustic_model(acoustic_model_path, corpus_folder, recordings_dir, di
     subprocess.call(args)
 
 def print_usage():
-    print 'To train new parser: ./train.py new_parser [parser_train_file] [parser_save_path] [ont_path] [lex_path] [lex_weight] [percent_data_to_use] [start_parser_path]'
+    print 'To train new parser: ./train.py new_parser [parser_train_file] [parser_save_path] [ont_path] [lex_path] [lex_weight] [percent_data_to_use] [start_parser_path] [parser_hyper_params]'
     print 'To train new language model: ./train.py new_lm [lm_train_file] [lm_save_path]'
     print 'To adapt an accoustic model: ./train.py adapt_ac_model [accoustic_model_path] [corpus_folder] [recordings_dir] [dict_path]'
 
@@ -229,10 +232,10 @@ if __name__ == '__main__':
     
     #Train new parser case. 
     elif sys.argv[1] == 'new_parser':
-        if not len(sys.argv) == 9:
+        if not len(sys.argv) == 10:
             print_usage()
         else:
-            train_new_parser(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7], sys.argv[8])
+            train_new_parser(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7], sys.argv[8], sys.argv[9])
 
     #Train a new language model. 
     elif sys.argv[1] == 'new_lm':
