@@ -37,7 +37,7 @@ the given training file and saves it
 to the given parser_path using
 a given ontology and lexicon. 
 """
-def train_new_parser(parser_train_file, parser_path, ont_path, lex_path, lex_weight, percent_data_to_use, starting_parser_path, parser_hyper_params):
+def train_new_parser(parser_train_file, parser_path, ont_path, lex_path, lex_weight, starting_parser_path, parser_hyper_params):
     #Converts to ensure floating point and not string. 
     if lex_weight == 'sys.maxint':
         lex_weight = sys.maxint
@@ -81,8 +81,9 @@ def train_new_parser(parser_train_file, parser_path, ont_path, lex_path, lex_wei
         parser.max_cky_trees_per_token_sequence_beam = int(hyper_params[2])#100  # for tokenization of an utterance, max cky trees considered
         parser.max_hypothesis_categories_for_unknown_token_beam = int(hyper_params[3])#2  # for unknown token, max syntax categories tried
         parser.max_expansions_per_non_terminal = int(hyper_params[4])#10  # decides how many expansions to store per CKY cel
-        parser.train_time_limit = int(hyper_params[4])#10
-        parser.default_skip = bool(hyper_params[5])#True
+        parser.train_time_limit = int(hyper_params[5])#10
+        parser.default_skip = bool(hyper_params[6])#True
+        parser.percent_train_data = float(hyper_params[7])
 
     #For record keeping. 
     print 'PARSER HYPERPARAMETERS: '
@@ -98,8 +99,10 @@ def train_new_parser(parser_train_file, parser_path, ont_path, lex_path, lex_wei
     data = parser.read_in_paired_utterance_semantics(parser_train_file)
 
     #Prune training data to only use the percent specified.
-    num_to_use = int(len(data) * percent_data_to_use)
+    num_to_use = int(len(data) * parser.percent_train_data)
     data = data[:num_to_use]
+
+    sys.exit()
 
     #Now train parser on this data. 
     converged = parser.train_learner_on_semantic_forms(data, 1, reranker_beam=1)
@@ -232,10 +235,10 @@ if __name__ == '__main__':
     
     #Train new parser case. 
     elif sys.argv[1] == 'new_parser':
-        if not len(sys.argv) == 10:
+        if not len(sys.argv) == 9:
             print_usage()
         else:
-            train_new_parser(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7], sys.argv[8], sys.argv[9])
+            train_new_parser(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6], sys.argv[7], sys.argv[8])
 
     #Train a new language model. 
     elif sys.argv[1] == 'new_lm':

@@ -1,6 +1,6 @@
-for time_limit in $( echo 2 5 10 20 50 100 ); do 
+for time_limit in $( echo 5 10 100 ); do 
 
-	for data_percent in $( echo 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 ); do 
+	for data_percent in $( echo 0.05 0.25 0.5 0.75 1.0 ); do 
 		#Parser hyper parameters. 
 		hyp1=2   		 		# max span of a multi-word expression to be considered during tokenization [2]
 		hyp2=2  		 		# max number of new word senses that can be induced on a training example [2]
@@ -23,7 +23,7 @@ for time_limit in $( echo 2 5 10 20 50 100 ); do
 			#Path to output for condor script and training procedure of first epoch. 
 			output=${fold_path}/logs/training/${name}.out
 
-			condor_submit -a "parser_params = ${parser_params}" -a "log = ${log}" -a "output = ${output}" -a "fold_path = ${fold_path}"  submit_condor.bash
+			condor_submit -a "parser_params = ${parser_params}" -a "log = ${log}" -a "output = ${output}" -a "fold_path = ${fold_path}"  submit_train.bash
 		done
 	done
 done
