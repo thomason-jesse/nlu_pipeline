@@ -1,11 +1,38 @@
 #Argument list. 
-data_percent=$1 #Percentage of training data to use per epoch of training. 
-starting_parser_path=$2 #Path to the parser with which to start training procedure. 
+parser_params=$1 #Parser hyperparameters in a string.  
+fold_path=$2	 #Path to the fold for the current experiment.  
 
-#First train a parser. 
+#Keep training parsers until we kill the job or it dies. 
+starting_parser="None"
+epoch=0
 
-#python train.py new_parser condor_test_dir/parser_train.txt condor_test_dir/parser_0.cky ../resources/ont.txt ../resources/lex.txt 50.0 ${data_percent} ${starting_parser_path}
+while true; do
+	#Name denoted by parser hyperparameters and epoch. 
+	name="${parser_params}_${epoch}"
+	parser_path=${fold_path}/models/${name}.cky	
 
-#python experiments.py parse_ground_truth condor_test_dir/test.txt condor_test_dir/gt_results.txt condor_test_dir/parser_0.cky
+	python train.py new_parser ${fold_path}/parser_training/parser_train.txt ${parser_path} ../resources/ont.txt ../resources/lex.txt 50.0 ${starting_parser} ${parser_params}
 
-python experiments.py parse_score_google condor_test_dir/test.txt condor_test_dir/google_results.txt condor_test_dir/parser_0.cky ../corpora/raw/google_recognized_with_names/
+	#If parser exists, then evaluate it. 
+	if [ -f ${parser_path} ]; then
+   		echo "Trained parser at ${parser_path}, epoch ${epoch}"
+
+		#Now submit job to evaluate performance on validation set.  
+		condor_submit -a "fold_path = ${fold_path}" -a "name = ${name}" -a "log = ${fold_path}/logs/validation/${name}.log" -a "output = ${fold_path}/logs/validation/${name}.out" submit_validation.bash
+
+		#And finally submit job to evaluate performance on 
+		condor_submit -a "fold_path = ${fold_path}" -a "name = ${name}" -a "log = ${fold_path}/logs/test/${name}.log" -a "output = ${fold_path}/logs/test/${name}.out" submit_test.bash
+		
+		#Update starting parser and epoch. 
+		starting_parser=${parser_path}
+		epoch=$((${epoch} + 1))
+
+	#Otherwise, exit with an error code for Condor. 
+   	else
+    	echo "Failed to save parser at ${parser_path}!"
+		exit 1
+	fi
+done
+
+
+
