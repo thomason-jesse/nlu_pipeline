@@ -10,14 +10,14 @@ Universe = vanilla
 
 #Will run the GPU job in our virtual environment. 
 executable = /bin/bash
-arguments = run_experiments.bash
+arguments = run_experiments.bash $(data_percent) $(starting_parser_path)
 
 #Condor job log file. 
-log = ${log}
+log = $(log)
 
 #Redirect standard out and error to these files. 
-output = ${output}
-error = ${error}
+output = $(output)
+error = $(error)
 
 #We want to know when the job finishes.
 Notification = Complete
