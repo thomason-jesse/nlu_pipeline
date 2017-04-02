@@ -44,9 +44,6 @@ def train_new_parser(parser_train_file, parser_path, ont_path, lex_path, lex_wei
     else:
         lex_weight = float(lex_weight)
 
-    #Convert percent data to use from str if needed. 
-    percent_data_to_use = float(percent_data_to_use)
-
     #Instantiates ontology. 
     print "reading in Ontology"
     ont = Ontology.Ontology(ont_path)
@@ -101,8 +98,6 @@ def train_new_parser(parser_train_file, parser_path, ont_path, lex_path, lex_wei
     #Prune training data to only use the percent specified.
     num_to_use = int(len(data) * parser.percent_train_data)
     data = data[:num_to_use]
-
-    sys.exit()
 
     #Now train parser on this data. 
     converged = parser.train_learner_on_semantic_forms(data, 1, reranker_beam=1)

@@ -398,6 +398,8 @@ def evaluate_parse_folder_full(experiment_folder, result_folder):
 def evaluate_parse_file_partial(file_name, parser): 
     result_file = open(file_name, 'r')
 
+    print file_name
+
     total_count = 0
 
     #Will hold return values. 
@@ -407,6 +409,9 @@ def evaluate_parse_file_partial(file_name, parser):
 
     for line in result_file:    
         true, hyp = line.strip().split(';')
+        
+        #Add type constraints if needed to the true semantic form. 
+        true = post_process.add_type_constraints(true) 
 
         if not hyp == 'None': 
             #Get semantic form nodes for hypothesis and ground  truth. 
@@ -648,7 +653,99 @@ def evaluate_google_speech_results(results_file_path, parser_path, lambda1, lamb
     #Now run evaluation. 
     eval_function(re_ranked_results, parser)
 
-def evaluate_parse_folder_partial(experiment_folder, result_folder): 
+"""
+Go through all folds in an experiment. Evaluate
+parsing performance for a given parameterization 
+over all folds and return the parameterization 
+that results in the best performance along with
+its scores. Does this for both partial and full
+semantic form evaluations. 
+
+result_file_extension denotes the file over which
+we are comparing performance. 
+"""
+def find_best_parsing_performance(experiment_folder, result_file_extension):   
+    #First get list of all parameterizations which have results over all folds. 
+    folds = os.listdir(experiment_folder)
+
+    #Holds all result files for each parameterization. 
+    result_files = {}
+
+    print 'Getting all result files for given extension...'
+
+    for fold in folds: 
+        #Path to where the result files should live. 
+        results_folder = experiment_folder + fold + '/experiments/asr/result_files/'
+
+        #Get number of test lines so that we can ensure each result file is actually finished. 
+        test_file = experiment_folder + fold + '/experiments/asr/test_files/' + result_file_extension + '.txt' 
+        num_test_lines = len([line for line in open(test_file, 'r')])
+
+        #Get all files. 
+        fold_result_files = os.listdir(results_folder)
+
+        #Now prune the ones that don't have the extension we are looking for. 
+        fold_result_files = [result_file for result_file in fold_result_files if result_file.split('.')[-1] == result_file_extension]
+
+        #Make sure result file has same number of lines as the original test file (i.e. is not still being written to).
+        fold_result_files = [result_file for result_file in fold_result_files if len([line for line in open(results_folder + result_file, 'r')]) == num_test_lines]
+
+        #Now store the path to each result file with the same parameterization from the other folds. 
+        for result_file in fold_result_files: 
+
+            #Some result_files may contain periods before the file extension. 
+            parameterization = '.'.join(result_file.split('.')[:-1])
+
+            #Path to the file so we can open and evaluate it later. 
+            file_path = results_folder + result_file
+
+            if not parameterization in result_files: 
+                result_files[parameterization] = []
+
+            result_files[parameterization].append(file_path)
+
+    #Now that we have all files sorted, prune the result_files that don't have results over all folds. 
+    result_files = {key: result_files[key] for key in result_files if len(result_files[key]) == len(folds)}
+
+    #Collect all average partial semantic form scores for each parameterization.
+    partial_sem_scores = {key: {'f1': [], 'p': [], 'r': []} for key in result_files.keys()}
+
+    print 'Getting partial semantic form scores...'
+
+    for parameterization in partial_sem_scores:  
+
+        #Load the parser for the parameterization. 
+        parser_path = experiment_folder + fold + '/models/' + parameterization + '.cky'
+        parser = load_obj_general(parser_path)
+
+        #Get score for each result file pertaning to parameterization. 
+        for result_file in result_files[parameterization]:         
+            f1, p, r = evaluate_parse_file_partial(result_file, parser)
+
+        partial_sem_scores[parameterization]['f1'].append(f1)
+        partial_sem_scores[parameterization]['p'].append(p)
+        partial_sem_scores[parameterization]['r'].append(r)
+
+    print 'Averaging partial semantic form scores...'
+
+    #Averaging function
+    avg = lambda x: float(sum(x)) / float(len(x))
+
+    partial_sem_scores = {key: {'f1': avg(partial_sem_scores[key]['f1']), 'p': avg(partial_sem_scores[key]['p']), 'r': avg(partial_sem_scores[key]['r'])} for key in result_files.keys()}
+
+    #Get best performing parameterization on F1 measure.
+    best_f1 = float('-inf')
+    best_f1_params = None
+
+    for params in partial_sem_scores: 
+        if partial_sem_scores[params]['f1'] > best_f1:
+            best_f1 = partial_sem_scores[params]['f1']
+            best_f1_params = params
+
+    print 'Best F1: ' + str(best_f1)
+    print 'Best F1 Parameters: ' + best_f1_params
+
+    """
     #F1, precision, and recall values. 
     f1_scores = []
     r_scores = []
@@ -670,6 +767,7 @@ def evaluate_parse_folder_partial(experiment_folder, result_folder):
     print "P: " + str((float(sum(p_scores)) / float(len(p_scores))))
     print "R: " + str((float(sum(r_scores)) / float(len(r_scores))))
     print "F1: " + str((float(sum(f1_scores)) / float(len(f1_scores))))
+    """
 
 def grounded_forms(ont_file, lex_file, kb_pickle):
     #Loads information needed for grounding. 
@@ -865,7 +963,7 @@ def print_usage():
     print 'Correct hypothesis in top n: ./evaluate.py top_n [result_file] [evaluation_file_name] [n]'
     print 'Semantic form evaluation: ./evaluate.py semantic_form [result_file] [evaluation_file_name] [parser] [full/partial]'
     print 'Grounding: ./evaluate.py grounding [ont file] [lex file] [kb pickle file]'
-    print 'Evaluate parsing: ./evaluate.py evaluate_parsing [full/partial] [experiment_folder] [result_folder]'
+    print 'Evaluate parsing: ./evaluate.py evaluate_parsing [experiment_folder] [result_file_extension]'
     print 'Evaluate ASR per phrase length: ./evaluate asr_len [experiment_folder] [result_file_name]'
     print 'Evaluate Google Speech Results: ./evaluate google_speech [result_file_path] [parser_path] [lambda1] [lambda2] [eval_function] [speech_scoring_function]'
     print 'Evaluate parsing time: ./evaluate parsing_time [parser_path] [test_file] [checkpoint_file]'
@@ -903,13 +1001,8 @@ if __name__ == '__main__':
             print_usage()
 
     elif sys.argv[1] == 'evaluate_parsing': 
-        if len(sys.argv) == 5:
-            if sys.argv[2] == 'full':
-                evaluate_parse_folder_full(sys.argv[3], sys.argv[4])
-            elif sys.argv[2] == 'partial':
-                evaluate_parse_folder_partial(sys.argv[3], sys.argv[4])
-            else:
-                print_usage()
+        if len(sys.argv) == 4:
+            find_best_parsing_performance(sys.argv[2], sys.argv[3])
         else:
             print_usage()
 
