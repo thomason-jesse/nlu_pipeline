@@ -366,6 +366,9 @@ def evaluate_parse_file_full(file_name, parser):
 
     for line in result_file:    
         true, hyp = line.strip().split(';')
+        
+        #Add type constraints if needed to the true semantic form. 
+        true = post_process.add_type_constraints(true)
 
         if not hyp == 'None': 
             #Get semantic form nodes for hypothesis and ground  truth. 
@@ -397,8 +400,6 @@ def evaluate_parse_folder_full(experiment_folder, result_folder):
 
 def evaluate_parse_file_partial(file_name, parser): 
     result_file = open(file_name, 'r')
-
-    print file_name
 
     total_count = 0
 
@@ -707,10 +708,10 @@ def find_best_parsing_performance(experiment_folder, result_file_extension):
     #Now that we have all files sorted, prune the result_files that don't have results over all folds. 
     result_files = {key: result_files[key] for key in result_files if len(result_files[key]) == len(folds)}
 
+    print 'Getting partial semantic form scores...'
+
     #Collect all average partial semantic form scores for each parameterization.
     partial_sem_scores = {key: {'f1': [], 'p': [], 'r': []} for key in result_files.keys()}
-
-    print 'Getting partial semantic form scores...'
 
     for parameterization in partial_sem_scores:  
 
@@ -719,7 +720,8 @@ def find_best_parsing_performance(experiment_folder, result_file_extension):
         parser = load_obj_general(parser_path)
 
         #Get score for each result file pertaning to parameterization. 
-        for result_file in result_files[parameterization]:         
+        for result_file in result_files[parameterization]:      
+            print result_file
             f1, p, r = evaluate_parse_file_partial(result_file, parser)
 
         partial_sem_scores[parameterization]['f1'].append(f1)
@@ -742,32 +744,44 @@ def find_best_parsing_performance(experiment_folder, result_file_extension):
             best_f1 = partial_sem_scores[params]['f1']
             best_f1_params = params
 
-    print 'Best F1: ' + str(best_f1)
-    print 'Best F1 Parameters: ' + best_f1_params
+    #Now get full semantic form scores. 
+    print 'Getting full semantic form scores...'
 
-    """
-    #F1, precision, and recall values. 
-    f1_scores = []
-    r_scores = []
-    p_scores = []
+    full_sem_scores = {key: [] for key in result_files.keys()}
 
-    for file_name in os.listdir(result_folder): 
-        #Get parser for file. 
-        fold_name = file_name.split('.')[0]
-        parser_path = experiment_folder + fold_name + '/models/parser.cky'
+    for parameterization in full_sem_scores:  
+
+        #Load the parser for the parameterization. 
+        parser_path = experiment_folder + fold + '/models/' + parameterization + '.cky'
         parser = load_obj_general(parser_path)
 
-        #Get evaluation values and append to pertinent lists. 
-        f1, p, r = evaluate_parse_file_partial(result_folder + file_name, parser)
+        #Get score for each result file pertaning to parameterization. 
+        for result_file in result_files[parameterization]:       
+            print result_file
+            full_sem_scores[parameterization].append(evaluate_parse_file_full(result_file, parser))
 
-        f1_scores.append(f1)
-        r_scores.append(r)
-        p_scores.append(p)
+    print 'Averaging full semantic form scores...'
 
-    print "P: " + str((float(sum(p_scores)) / float(len(p_scores))))
-    print "R: " + str((float(sum(r_scores)) / float(len(r_scores))))
-    print "F1: " + str((float(sum(f1_scores)) / float(len(f1_scores))))
-    """
+    #Averaging function
+    avg = lambda x: float(sum(x)) / float(len(x))
+
+    full_sem_scores = {key: avg(full_sem_scores[key]) for key in result_files.keys()}
+
+    #Get best performing parameterization on F1 measure.
+    best_full_score = float('-inf')
+    best_full_params = None
+
+    for params in full_sem_scores: 
+        if full_sem_scores[params] > best_full_score:
+            best_full_score = full_sem_scores[params]
+            best_full_params = params
+
+    print 'Best F1: ' + str(best_f1)
+    print 'Best F1 parameters: ' + best_f1_params
+
+    print 'Best full score: ' + str(best_full_score)
+    print 'Best full parameters: ' + best_full_params
+
 
 def grounded_forms(ont_file, lex_file, kb_pickle):
     #Loads information needed for grounding. 
