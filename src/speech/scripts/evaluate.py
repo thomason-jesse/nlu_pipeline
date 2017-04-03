@@ -544,10 +544,15 @@ def eval_google_partial_sem_form(results, parser):
     recall /= total_count
     f1_score /= total_count
 
-    #Now display results. 
+    #Now display results.
+    """
     print 'P: ' + str(precision)
     print 'R: ' + str(recall)
     print 'F1: ' + str(f1_score)
+    """
+
+    #Return F1 score for evaluation. 
+    return f1_score
 
 def eval_google_full_sem_form(results, parser): 
     #Counts for evaluation. 
@@ -580,8 +585,12 @@ def eval_google_full_sem_form(results, parser):
         if are_equal:
             count_correct += 1.0
 
+    accuracy = count_correct / total_count
+
     #Now display results. 
-    print 'Accuracy: ' + str(count_correct / total_count)  
+    #print 'Accuracy: ' + str(accuracy)
+
+    return accuracy
 
 def prepare_google_speech_results(raw_results, speech_scoring_function): 
     results = []
@@ -611,9 +620,12 @@ def prepare_google_speech_results(raw_results, speech_scoring_function):
 
     return results
 
-def re_rank_results(results, lambda1, lambda2): 
+def re_rank_results(results, lambda1): 
     #Re-ranked results will only contain top ranked result. 
     re_ranked_results = []
+
+    #Lambda 2 can be derived from lambda 1. 
+    lambda2 = 1.0 - lambda1
 
     #Define a score function for each hypothesis. 
     #TODO add actual interpolation. Right now assumes we are either re-ranking based solely on parser or not at all. 
@@ -628,9 +640,44 @@ def re_rank_results(results, lambda1, lambda2):
 
     return re_ranked_results
 
-def evaluate_google_speech_results(results_file_path, parser_path, lambda1, lambda2, eval_function='partial_sem_form', speech_scoring_function=lambda x:x): 
+"""
+Evaluates the google speech results of a particular parser
+parameterization over all folds of an experiment folder. 
+"""
+def evaluate_google_speech_results(experiment_folder, test_file_extension, parser_params, lambda1, eval_function='partial_semantic_form', speech_scoring_function=lambda x:x):
+
+    #Keep results per fold. 
+    results = []
+
+    for fold in os.listdir(experiment_folder): 
+        fold_path = experiment_folder + fold
+
+        #Determine path for the result file and the parser using the parser parameterization. 
+        result_file_path = fold_path + '/experiments/asr/result_files/' + parser_params + '.' + test_file_extension
+        parser_path = fold_path + '/models/' + parser_params + '.cky'
+
+        #Add result to list. 
+        results.append(evaluate_google_speech_result(result_file_path, parser_path, lambda1, eval_function, speech_scoring_function))
+
+    #Now average results and present. 
+    average = float(sum(results)) / float(len(results))
+
+    print 'Average performance using ' + eval_function + ' evaluation function: ' + str(average)
+    print results
+
+"""
+Evaluates the results of a Google Speech
+re-ranking experiment of an individual file 
+given a metric and weighting between 
+speech and semantic parsing confidence scores. 
+"""
+def evaluate_google_speech_result(results_file_path, parser_path, lambda1, eval_function='partial_sem_form', speech_scoring_function=lambda x:x): 
     #Read in result data. 
     raw_results = [line.strip().split(';') for line in open(results_file_path, 'r')]
+
+    #TODO Actually add a speech scoring function. 
+    if speech_scoring_function == 'None':
+        speech_scoring_function = lambda x:x
 
     #Prepare data for evaluation.
     results = prepare_google_speech_results(raw_results, speech_scoring_function)
@@ -639,7 +686,7 @@ def evaluate_google_speech_results(results_file_path, parser_path, lambda1, lamb
     parser = load_obj_general(parser_path)
 
     #Re-rank results based on interpolation value. 
-    re_ranked_results = re_rank_results(results, lambda1, lambda2)
+    re_ranked_results = re_rank_results(results, lambda1)
 
     #Determine evaluation function. 
     if eval_function == 'partial_sem_form':
@@ -652,7 +699,7 @@ def evaluate_google_speech_results(results_file_path, parser_path, lambda1, lamb
         raise NotImplementedError('Eval function ' + eval_function + ' currently has no implementation!')
 
     #Now run evaluation. 
-    eval_function(re_ranked_results, parser)
+    return eval_function(re_ranked_results, parser)
 
 """
 Go through all folds in an experiment. Evaluate
@@ -979,7 +1026,7 @@ def print_usage():
     print 'Grounding: ./evaluate.py grounding [ont file] [lex file] [kb pickle file]'
     print 'Evaluate parsing: ./evaluate.py evaluate_parsing [experiment_folder] [result_file_extension]'
     print 'Evaluate ASR per phrase length: ./evaluate asr_len [experiment_folder] [result_file_name]'
-    print 'Evaluate Google Speech Results: ./evaluate google_speech [result_file_path] [parser_path] [lambda1] [lambda2] [eval_function] [speech_scoring_function]'
+    print 'Evaluate Google Speech Results: ./evaluate google_speech [experiment_folder] [test_file_extension] [parser_params] [lambda1] [eval_function] [speech_scoring_function]'
     print 'Evaluate parsing time: ./evaluate parsing_time [parser_path] [test_file] [checkpoint_file]'
 
 if __name__ == '__main__':
@@ -1030,7 +1077,7 @@ if __name__ == '__main__':
         if not len(sys.argv) == 8:
             print_usage()
         else:
-            evaluate_google_speech_results(sys.argv[2], sys.argv[3], float(sys.argv[4]), float(sys.argv[5]), sys.argv[6])
+            evaluate_google_speech_results(sys.argv[2], sys.argv[3], sys.argv[4], float(sys.argv[5]), sys.argv[6], sys.argv[7])
 
     elif sys.argv[1] == 'parsing_time':
         if not len(sys.argv) == 5:
