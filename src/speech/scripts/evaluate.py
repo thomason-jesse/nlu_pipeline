@@ -479,8 +479,22 @@ def eval_google_wer(results, parser):
     #Prepares arguments for running WER evaluation. 
     args = [bin_path + '/word_align.pl', 'transcripts.txt', 'hyp.txt']
 
+    #Store WER results in a file so we can read it. 
+    wer_results_file = open('wer_results.txt', 'w')
+
     #Evaluates WER. 
-    subprocess.call(args, stdout=None, stderr=None)
+    subprocess.call(args, stdout=wer_results_file, stderr=wer_results_file)
+    wer_results_file.close()
+
+    wer_results_file = open('wer_results.txt', 'r')
+
+    for line in wer_results_file:
+        if line.startswith('TOTAL Percent'):
+            wer = float(line.split('Error = ')[1].split('%')[0])
+
+    return wer
+
+   
 
 def eval_google_partial_sem_form(results, parser): 
     #Counts for evaluation. 
@@ -630,13 +644,28 @@ def re_rank_results(results, lambda1):
     #Define a score function for each hypothesis. 
     #TODO add actual interpolation. Right now assumes we are either re-ranking based solely on parser or not at all. 
     if lambda1 == 1.0: 
-        score = lambda x: x[1]
+        score = lambda x: float(x[1])
     elif lambda2 == 1.0: 
-        score = lambda x: x[3]
+        score = lambda x: float(x[3])
 
-    #Get top re-ranked hypothesis and append to list. 
-    for target, hypotheses in results: 
-        re_ranked_results.append((target, sorted(hypotheses, key=score, reverse=True)[0]))
+    #Get top re-ranked hypothesis and append to list.
+    top_lens = []
+    re_ranked_lens = []
+
+    for target, hypotheses in results:
+        re_ranked_list = sorted(hypotheses, key=score, reverse=True)[0]
+        re_ranked_results.append((target, re_ranked_list))
+
+        #To see if shorter sentences are prefered. 
+        top_lens.append(len(hypotheses[0][0].split()))
+        re_ranked_lens.append(len(re_ranked_list[0].split()))
+
+    """
+    print 'Average 1st hyp length: ' + str(float(sum(top_lens)) / float(len(top_lens))) 
+    print 'Average re_ranked length: ' + str(float(sum(re_ranked_lens)) / float(len(re_ranked_lens)))
+
+    sys.exit()
+    """
 
     return re_ranked_results
 
@@ -829,6 +858,150 @@ def find_best_parsing_performance(experiment_folder, result_file_extension):
     print 'Best full score: ' + str(best_full_score)
     print 'Best full parameters: ' + best_full_params
 
+
+def find_best_lm_performance(experiment_folder, result_file_extension, parser_params, lambda1):
+    #First get list of all parameterizations which have results over all folds. 
+    folds = os.listdir(experiment_folder)
+
+    #TODO add actual speech scoring function. 
+    speech_scoring_function = lambda x:x
+
+    #Holds all result files for each parameterization. 
+    result_files = {}
+
+    print 'Getting all result files for given extension...'
+
+    for fold in folds:
+
+        #Parser path for evaluations. 
+        parser_path = experiment_folder + fold + '/models/' + parser_params + '.cky'
+
+        #Path to where the result files should live. 
+        results_folder = experiment_folder + fold + '/experiments/asr/result_files/'
+
+        #Get all files. 
+        fold_result_files = os.listdir(results_folder)
+
+        #Prune the ones that don't pertain to a language model.  
+        fold_result_files = [result_file for result_file in fold_result_files if result_file.endswith('_lm')]
+
+        #Prune the ones that don't pertain to the extension we want. 
+        fold_result_files = [result_file for result_file in fold_result_files if result_file_extension in result_file]
+
+        #Now store the path to each result file with the same parameterization from the other folds. 
+        for result_file in fold_result_files: 
+
+            #Some result_files may contain periods before the file extension. 
+            parameterization = '.'.join(result_file.split('.')[:-1])
+
+            #Path to the file so we can open and evaluate it later. 
+            lm_score_file_path = results_folder + result_file
+
+            #Path to the parser score file for the same test utterances. 
+            parse_score_file_path = results_folder + parser_params + '.' + result_file_extension #+ '_rerank'
+
+            if not parameterization in result_files: 
+                result_files[parameterization] = []
+
+            result_files[parameterization].append([lm_score_file_path, parse_score_file_path, parser_path])
+
+    #Now that we have all files sorted, prune the result_files that don't have results over all folds. 
+    result_files = {key: result_files[key] for key in result_files if len(result_files[key]) == len(folds)}
+
+    #Now get an F1 score for each parameterization. 
+    f1_scores = {}
+    full_sem_scores = {}
+    wer ={}
+
+    for params in result_files:
+
+        #To keep all f1 scores over folds. 
+        params_f1_scores = []
+        params_full_sem_scores = []
+        params_wer = []
+
+        for lm_score_file, parser_score_file, parser_path  in result_files[params]:
+
+            #Get lines for each file so we can give the phrase both its lm score and its semantic form from parsing. 
+            lm_score_lines = [line for line in open(lm_score_file, 'r')]
+            parser_score_lines = [line for line in open(parser_score_file, 'r')]
+
+            print lm_score_file
+            print parser_score_file
+
+            assert(len(lm_score_lines) == len(parser_score_lines))
+
+            #Now prepare results for evaluation by getting semantic form and lm score. 
+            raw_results = []
+
+            for i in range(len(lm_score_lines)):
+                #Both files will share the ground truth line. 
+                if lm_score_lines[i].startswith('#'):
+                    line = lm_score_lines[i].strip().split(';')
+                else:
+                    #Get the information we need from each file. 
+                    phrase, google_speech_score, sem_form, _, _ = parser_score_lines[i].strip().split(';')
+                    _, _, _, lm_score = lm_score_lines[i].strip().split(';')
+
+                    line = [phrase, google_speech_score, sem_form, lm_score]
+
+                raw_results.append(line)
+
+            #Now process to prepare for re-ranking. 
+            results = prepare_google_speech_results(raw_results, speech_scoring_function) 
+
+            #Now re-rank based on the given lambda parameter. 
+            re_ranked_results = re_rank_results(results, lambda1)
+
+            #Load parser for evaluating partial semantic forms. 
+            parser = load_obj_general(parser_path)
+
+            #Now evaluate full semantic form. 
+            params_f1_scores.append(eval_google_partial_sem_form(re_ranked_results, parser))
+            params_full_sem_scores.append(eval_google_full_sem_form(re_ranked_results, parser))       
+            params_wer.append(eval_google_wer(re_ranked_results, parser)) 
+
+            """
+            #TODO remove START
+            error_list = []
+            diffs = []
+
+            for i in range(len(re_ranked_results)): 
+                un_ranked = results[i][1][0]
+                re_ranked = re_ranked_results[i][1]
+
+                target = re_ranked_results[i][0]
+
+                un_ranked_wer = eval_google_wer([[target, un_ranked]], None)
+                re_ranked_wer = eval_google_wer([[target, re_ranked]], None)
+               
+                diff = re_ranked_wer - un_ranked_wer
+
+                error_list.append([un_ranked[0], un_ranked[3], re_ranked[0], re_ranked[3], diff])
+                diffs.append(diff)
+
+
+            error_list = sorted(error_list, key=lambda x:x[4], reverse=True)
+            
+            for line in error_list:
+                print line
+
+            print 'AVG: ' + str(float(sum(diffs)) / float(len(diffs)))
+
+            sys.exit()
+
+            # TODO remove END
+            """
+
+        #Add average f1 over all folds for this parameterization. 
+        f1_scores[params] = float(sum(params_f1_scores)) / float(len(params_f1_scores))
+        full_sem_scores[params] = float(sum(params_full_sem_scores)) / float(len(params_full_sem_scores))
+        wer[params] = float(sum(params_wer)) / float(len(params_wer))
+
+
+    print f1_scores
+    print full_sem_scores
+    print wer
 
 def grounded_forms(ont_file, lex_file, kb_pickle):
     #Loads information needed for grounding. 
@@ -1028,6 +1201,7 @@ def print_usage():
     print 'Evaluate ASR per phrase length: ./evaluate asr_len [experiment_folder] [result_file_name]'
     print 'Evaluate Google Speech Results: ./evaluate google_speech [experiment_folder] [test_file_extension] [parser_params] [lambda1] [eval_function] [speech_scoring_function]'
     print 'Evaluate parsing time: ./evaluate parsing_time [parser_path] [test_file] [checkpoint_file]'
+    print 'Find best performing LM scoring: ./evaluate lm_scoring [experiment_folder] [result_file_extension] [parser_params] [lambda1]'
 
 if __name__ == '__main__':
     if not len(sys.argv) >= 2:
@@ -1085,5 +1259,11 @@ if __name__ == '__main__':
         else:
             eval_parsing_time(sys.argv[2], sys.argv[3], sys.argv[4])
 
+    elif sys.argv[1] == 'lm_scoring':
+        if len(sys.argv) == 6: 
+            find_best_lm_performance(sys.argv[2], sys.argv[3], sys.argv[4], float(sys.argv[5]))
+        else:
+            print_usage()
+       
     else:
         print_usage()

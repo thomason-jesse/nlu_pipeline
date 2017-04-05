@@ -573,7 +573,10 @@ def give_google_parse_scores(test_file_path, results_file_path, parser_path, goo
 
             hyp_index = 1
 
+            print google_recognized_folder + rec_name + '.nbest'
+
             for result_line in nbest_file:
+
                 #Make sure we haven't already scored this hypothesis. 
                 if not (test_index == test_index_chkpt and hyp_index <= hyp_index_chkpt): 
                     hypothesis, google_hyp_score = result_line.strip().split(';')
@@ -644,53 +647,103 @@ def give_google_parse_scores(test_file_path, results_file_path, parser_path, goo
 
     print 'FINISHED SCORING'
 
+def give_experiments_lm_scores(experiment_path, test_file_name, lm_name, google_recognized_folder):
+    pids = []
+
+    #Each fold will have a thread scoring files. 
+    for fold in os.listdir(experiment_path):
+
+        pid = 0#os.fork()
+
+        if pid == 0: 
+            test_file_path = experiment_path + fold + '/experiments/asr/test_files/'+ test_file_name + '.txt'
+            result_file_path = experiment_path + fold + '/experiments/asr/result_files/' + lm_name + '.' + test_file_name + '_lm' 
+            lm_path = experiment_path + fold + '/models/language_models/' + lm_name + '.lm'
+
+            #Now give lm scores to this file.
+            print 'LM scoring ' + result_file_path
+            give_google_lm_scores(test_file_path, google_recognized_folder, result_file_path, lm_path, fold) 
+
+        else:
+            pids.append(pid)
+
+    for pid in pids:
+        os.waitpid(pid, 0)
+
 """
 Assigns lm probability scores to all google 
 speech hypotheses in a given file which 
 has already been processed by the parser. 
 """
-def give_google_lm_scores(results_file_path, new_results_file_path, lm_path): 
+def give_google_lm_scores(test_file_path, google_recognized_folder, result_file_path, lm_path, unique_name=''): 
 
-    results_file = open(results_file_path, 'r')
-    new_results_file = open(new_results_file_path, 'w')
+    test_file_lines = [line for line in open(test_file_path, 'r')]
+    results_file = open(result_file_path, 'w')
 
     #Num max tokens. 
     num_max_tokens = 16
+    
+    for line in test_file_lines:
 
-    for line in results_file: 
-        #If ground truth line, then simply re-write it. 
-        if line.startswith('#'):
-            new_results_file.write(line)
-        else: 
-            #We only need to the phrase to derive a score. 
-            phrase, google_score, sem_form, parser_score, time = line.strip().split(';')
+            #First write ground truth to our result file. 
+            results_file.write('#' + line)
 
-            #Pad phrase with UNK so that we can have comparable scores independent of phrase lenght. 
-            tokenized_phrase = phrase.split()
-            padded_phrase = ' '.join(tokenized_phrase + (['UNK'] * (num_max_tokens - len(tokenized_phrase))))
+            #Get components of phrase. 
+            phrase, sem_form, denotation, rec = line.strip().split(';')
 
-            #Phrase file to give to probability scorer. 
-            phrase_file = open('phrase.txt', 'w')
-            phrase_file.write(padded_phrase)
-            phrase_file.close()
+            #Get name of recording to open google recognition results file. 
+            rec_name = os.path.splitext(os.path.basename(rec))[0]
+            
+            #Get nbest file. 
+            nbest_file_lines = [line for line in open(google_recognized_folder + rec_name + '.nbest', 'r')]
 
-            #Prepares arguments  for runnin probability scoring. 
-            args = ['../bin/SRILM/bin/i686-m64/ngram', '-lm', lm_path, '-ppl', 'phrase.txt']
+            #For now, keep results to 10. 
+            num_done = 0
+            max_done = 10
 
-            #Now score the phrase.
-            prob_file = open('prob.txt', 'w')
-            subprocess.call(args, stdout=prob_file, stderr=prob_file)
-            prob_file.close()
+            #Now give a probability score to each line in the nbest file form google. 
+            for line in nbest_file_lines:
+                    
+                if num_done < max_done: 
 
-            #Now get the probability score from it. 
-            prob_file = open('prob.txt', 'r')
-            lm_score = float(prob_file.read().split('\n')[1].split('logprob= ')[1].split(' ppl')[0])
+                    num_done += 1    
 
-            #Write line updated with language model score. 
-            new_results_file.write(';'.join([phrase, google_score, sem_form, parser_score, time, str(lm_score)]) + '\n')
+                    #Get hypothesis and its confidence score. 
+                    phrase, google_score = line.strip().split(';')
+                        
+                    #Pad phrase with UNK so that we can have comparable scores independent of phrase lenght. 
+                    tokenized_phrase = phrase.split()
+                    padded_phrase = ' '.join(tokenized_phrase)# + (['UNK'] * (num_max_tokens - len(tokenized_phrase))))
+                    
+                    #Process s.t. alphabet matches our corpus. 
+                    padded_phrase = padded_phrase.lower().replace('&', 'and').replace('.', '')
+
+                    #Phrase file to give to probability scorer. 
+                    phrase_file = open(unique_name + 'phrase.txt', 'w')
+                    phrase_file.write(padded_phrase)
+                    phrase_file.close()
+
+                    #Prepares arguments  for runnin probability scoring. 
+                    args = ['../bin/SRILM/bin/i686-m64/ngram', '-lm', lm_path, '-ppl', unique_name + 'phrase.txt']
+
+                    #Now score the phrase.
+                    prob_file = open(unique_name + 'prob.txt', 'w')
+                    subprocess.call(args, stdout=prob_file, stderr=prob_file)
+                    prob_file.close()
+
+                    #Now get the probability score from it. 
+                    prob_file_lines = open(unique_name + 'prob.txt', 'r').read().split('\n')
+
+                    for line in prob_file_lines:
+                        if 'logprob' in line:
+                            lm_score = float(line.split('logprob= ')[1].split(' ppl')[0])
+
+                    #Write line updated with language model score.
+                    results_file.write(';'.join([phrase, google_score, phrase, str(lm_score)]) + '\n')
 
     #Close the newly written results file. 
-    new_results_file.close()
+    results_file.close()
+
 
 """
 This method takes a file with n results
@@ -895,7 +948,7 @@ def print_usage():
     print 'Re-rank with interpolation: ./experiments rerank_interpolation [nbest_file] [out_file] [weight]'
     print 'Run parser on speech ground truth: ./experiments parse_ground_truth [test_file] [results_file] [parser_path]'
     print 'Assign parse scores to Google Speech API files: ./experiments parse_score_google [test_file_path] [results_file_path] [parser_path] [google_recognized_folder]'
-    print 'Assign probability scores to Google Speech using an LM: ./experiments lm_score_google [result_file_path] [new_results_file_path] [lm_path]'
+    print 'Assign probability scores to Google Speech using an LM: ./experiments lm_score_google [experiment_path] [test_file_name] [lm_name] [google_recognized_folder]'
 
 if __name__ == '__main__':
     if not len(sys.argv) >= 2:
@@ -935,8 +988,8 @@ if __name__ == '__main__':
             print_usage()
 
     elif sys.argv[1] == 'lm_score_google': 
-        if len(sys.argv) == 5: 
-            give_google_lm_scores(sys.argv[2], sys.argv[3], sys.argv[4])
+        if len(sys.argv) == 6: 
+            give_experiments_lm_scores(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
         else: 
             print_usage()
     else:
