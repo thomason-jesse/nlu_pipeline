@@ -999,9 +999,9 @@ def find_best_lm_performance(experiment_folder, result_file_extension, parser_pa
         wer[params] = float(sum(params_wer)) / float(len(params_wer))
 
 
-    print f1_scores
-    print full_sem_scores
-    print wer
+    print 'F1: ' + str(f1_scores) + '\n' + str(params_f1_scores) + '\n'
+    print 'Full: ' + str(full_sem_scores) + '\n' + str(params_full_sem_scores) + '\n'
+    print 'WER: ' + str(wer) + '\n' + str(params_wer)
 
 def grounded_forms(ont_file, lex_file, kb_pickle):
     #Loads information needed for grounding. 
