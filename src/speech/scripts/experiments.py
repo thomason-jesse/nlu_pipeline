@@ -471,48 +471,179 @@ def re_rank_hypotheses_with_interpolation(hyp_buff, weight):
     return [hyp[0] for hyp in hyps_and_scores]
 
 """
-Re-ranks a file which contains both speech
-and semantic parse scores by interpolating them 
-using a given value to weight them. 
+Take in two lists of logprob scores
+and return a list of interpolated scores
+in the same order. 
 """
-def re_rank_with_interpolation(in_file_name, out_file_name, weight):
-    in_file = open(in_file_name, 'r')
-    out_file = open(out_file_name, 'w')
+def interpolate_score_lists(list1, list2, lambda1): 
+    assert(len(list1) == len(list2))
 
-    line = in_file.readline()
-    hyp_buff = []
+    #Lambda 2 can be derived from first lambda. 
+    lambda2 = 1.0 - lambda1
 
-    while not line == '':
-        #Denotes beginning of new phrase hypothesis list. 
-        if line.startswith('#'):
-            #Buffer will be empty before first phrase. 
-            if len(hyp_buff) > 0: 
-                hyp_buff = re_rank_hypotheses_with_interpolation(hyp_buff, weight)
+    #Turn weights into log form for logspace calculations. 
+    lambda1 = np.log(lambda1)
+    lambda2 = np.log(lambda2)
 
-                #Write each hypothesis which is now re-ranked. 
-                for hyp in hyp_buff:
-                    out_file.write(hyp + '\n')
+    #Sums start at 0 (-inf in logspace).
+    sum1 = float('-inf')
+    sum2 = float('-inf')
 
-                #Clear buffer. 
-                hyp_buff = []
+    for score in list1:
+        sum1 = np.logaddexp(sum1, score)
 
-            #Now write start of new phrase to out file and get next line. 
-            out_file.write(line)
+    for score in list2:
+        sum2 = np.logaddexp(sum2, score)
 
-        #Otherwise collect hypothesis for eventual re-ranking. 
+    interpolated_scores = []
+
+    for i in range(len(list1)):
+
+        #Subtract logarithm to get log-scale probability.
+        score1 = list1[i] - sum1
+        score2 = list2[i] - sum2
+
+        #If we subtracted -inf from any score, then it'll be nan. 
+        score1 = float('-inf') if math.isnan(score1) else score1
+        score2 = float('-inf') if math.isnan(score2) else score2
+
+        #If one of the lambdas is 0, then we don't have to interpolate. 
+        if lambda1 == float('-inf'):
+            interpolated_score = score2
+        elif lambda2 == float('-inf'): 
+            interpolated_score = score1
         else:
-            hyp_buff.append(line.strip())
 
-        #Now get next line. 
-        line = in_file.readline()
+            #If one of the scores is 0, then the interpolated score must equal the other. 
+            if score1 == float('-inf'):
+                interpolated_score = score2 + lambda2
+            elif score2 == float('-inf'):
+                interpolated_score = score1 + lambda1
+            else: 
+                #Actually interpolate.  
+                interpolated_score = np.logaddexp(score1 + lambda1, score2 + lambda2)
+           
+        interpolated_scores.append(interpolated_score)
+
+    return interpolated_scores
+
+def surrogate_score(score_list): 
+    #First element should have a confidence score. 
+    assert(score_list[0] > 0)
+
+    #All other elements should have 0.0 confidence scores. 
+    for element in score_list[1:-1]:
+        assert(element == 0.0)
+
+    #Give inverse squared ranks. 
+    rank = 2
+
+    #Get weights for distributing probability.
+    weights = [1.0 / (rank ** i) for i in range(1, len(score_list))]
+    weights = [element / sum(weights) for element in weights]
+    weights = [np.log(element) for element in weights]
+
+    #Get probability that is left. 
+    prob = np.log(1.0 - score_list[0])
+
+    #Now distribute probability. 
+    surrogate_scores = [prob + weights[i] for i in range(len(weights))] 
+    surrogate_scores += [np.log(score_list[0])]
     
-    #Write last phrase results. 
-    for hyp in hyp_buff:
-        out_file.write(hyp + '\n')
+    return surrogate_scores
 
-    #Close files and finish. 
-    in_file.close()
-    out_file.close()
+"""
+Process Google Speech scores to do two things. 
+1. Put them in logspace. 
+2. Assign surrogate scores in case only the top hypothesis has a confidence score. 
+"""
+def process_speech_scores(score_list): 
+    #First determine if we need to do surrogate scoring. 
+    if 0.0 in score_list:
+        return surrogate_score(score_list)
+    else:
+        return [np.log(score) for score in score_list]
+
+
+"""
+Test different interpolation values on a validation set
+file in order to see what the best interpolation parameters might 
+be. 
+"""
+def find_best_interpolation_values(experiment_folder, evaluation_name, parser_params, lm_params):
+
+    #Values to test for alpha (i.e. interpolation between parser and LM confidences).  
+    alphas = np.arange(0.0, 1.1, 0.1)
+    betas = np.arange(0.0, 1.1, 0.1) #TODO Change to include a full range once we have implemented the speech surrogate confidence scoring. 
+
+    #Average scores over folds. 
+    f1_avgs = []
+    acc_avgs = []
+
+    for alpha in alphas:
+        for beta in betas: 
+            for fold in os.listdir(experiment_folder):
+                 
+                #Derive paths for files we need. 
+                results_path = experiment_folder + fold + '/experiments/asr/result_files/'
+                parser_score_file_path = results_path + parser_params + '.' + evaluation_name + '_rerank'
+                lm_score_file_path = results_path + lm_params + '.' + evaluation_name + '_lm'
+
+                #Read in lines from each file for processing.
+                #TODO move up so that we only have to read in each one of these once per fold (rather than for each alpha and beta).    
+                parser_score_lines = [line for line in open(parser_score_file_path, 'r')]
+                lm_score_lines = [line for line in open(lm_score_file_path, 'r')]
+
+                assert(len(parser_score_lines) == len(lm_score_lines))
+
+                results = []
+                target = None
+
+                #Prepare results to re-rank with alpha.
+                for i in range(len(parser_score_lines)):
+                    #New test point, both files will share this line. 
+                    if parser_score_lines[i].startswith('#'):
+                        #Add the previous data point if we have it. 
+                        if not target == None:
+                            #Get scores in lists so that we may interpolate. 
+                            speech_scores = process_speech_scores([hypothesis[1] for hypothesis in hypotheses])
+                            parse_scores = [hypothesis[3] for hypothesis in hypotheses]
+                            lm_scores = [hypothesis[4] for hypothesis in hypotheses]
+
+                            #First interpolate parser and LM scores. 
+                            interpolated_scores = interpolate_score_lists(parse_scores, lm_scores, alpha)
+
+                            #Next interpolate this score with the speech score. 
+                            interpolated_scores = interpolate_score_lists(speech_scores, lm_scores, beta)
+
+                            #Now create hypothesis list with the interpolated scores. 
+                            new_hyp_list = []
+
+                            for i in range(len(hypotheses)):
+                                #We just need the phrase and semantic form from this hypothesis. 
+                                phrase, _, sem_form, _, _ = hypotheses[i]
+                                new_hyp_list.append([phrase, None, sem_form, interpolated_scores[i]])
+
+                            #Now re-rank the list. 
+                            re_ranked_list = sorted(new_hyp_list, key=lambda x: x[3], reverse=True)
+
+                            results.append((target, re_ranked_list))
+
+                        target = parser_score_lines[i].strip().split(';')
+
+                        #New hypothesis list for this target. 
+                        hypotheses = []
+                    else:
+                        #TODO use time if we want to incorporate it at some point. 
+                        phrase, speech_score, sem_form, parser_score, time = parser_score_lines[i].strip().split(';')
+                        _, _, _, lm_score = lm_score_lines[i].strip().split(';')
+
+                        #Prepare hypothesis for interpolated re-ranking. 
+                        hypothesis = [phrase, float(speech_score), sem_form, float(parser_score), float(lm_score)]
+                        hypotheses.append(hypothesis)
+
+                #Now evaluate results over folds. 
+                #TODO  
 
 """
 Given a test file, assigns
@@ -949,6 +1080,7 @@ def print_usage():
     print 'Run parser on speech ground truth: ./experiments parse_ground_truth [test_file] [results_file] [parser_path]'
     print 'Assign parse scores to Google Speech API files: ./experiments parse_score_google [test_file_path] [results_file_path] [parser_path] [google_recognized_folder]'
     print 'Assign probability scores to Google Speech using an LM: ./experiments lm_score_google [experiment_path] [test_file_name] [lm_name] [google_recognized_folder]'
+    print 'Find best interpolation values over Speech, Parser, and LM: ./experiments best_interpolation_values [experiment_path] [test_file_name] [parser_params] [lm_params]'
 
 if __name__ == '__main__':
     if not len(sys.argv) >= 2:
@@ -992,5 +1124,12 @@ if __name__ == '__main__':
             give_experiments_lm_scores(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
         else: 
             print_usage()
+
+    elif sys.argv[1] == 'best_interpolation_values':
+        if len(sys.argv) == 6:
+            find_best_interpolation_values(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
+        else:
+            print_usage()
+
     else:
         print_usage()
