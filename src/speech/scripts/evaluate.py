@@ -32,8 +32,7 @@ Author: Rodolfo Corona, rcorona@utexas.edu
 import sys
 import os
 import subprocess
-from experiments import get_first_valid_parse
-from experiments import tokenize_for_parser
+import experiments
 import post_process
 import pickle
 import time
@@ -215,7 +214,7 @@ def semantic_form(result_file_name, evaluation_file_name, parser_file):
 
         #Parses top hypothesis to get semantic node.
         if len(hyp) == 2: #In this case, only score and  phrase hyp are present. 
-            parse = get_first_valid_parse(tokenize_for_parser(hyp[0]), parser)[0]
+            parse = experiments.get_first_valid_parse(experiments.tokenize_for_parser(hyp[0]), parser)[0]
 
             #Continues of no valid parse was found for hypothesis. 
             if parse == None:
@@ -302,7 +301,7 @@ def semantic_form_partial(result_file_name, evaluation_file_name, parser_file):
 
         #Parses top hypothesis to get semantic node.
         if len(hyp) == 2: #In this case, only score and  phrase hyp are present. 
-            parse = get_first_valid_parse(tokenize_for_parser(hyp[0]), parser)[0]
+            parse = experiments.get_first_valid_parse(experiments.tokenize_for_parser(hyp[0]), parser)[0]
 
             #Continues if no valid parse was found for hypothesis. 
             if parse == None:
@@ -784,6 +783,9 @@ def find_best_parsing_performance(experiment_folder, result_file_extension):
     #Now that we have all files sorted, prune the result_files that don't have results over all folds. 
     result_files = {key: result_files[key] for key in result_files if len(result_files[key]) == len(folds)}
 
+    #TODO remove if we want to incorporate other training data percentages.
+    result_files = {key: result_files[key] for key in result_files if '1.0' in key}
+
     print 'Getting partial semantic form scores...'
 
     #Collect all average partial semantic form scores for each parameterization.
@@ -1063,7 +1065,7 @@ def eval_asr_length(experiment_folder, result_file_name):
         while not test_line == '':
             #Get test phrase length. 
             phrase = test_line.split(';')[0]
-            phrase_len = len(tokenize_for_parser(phrase).split())
+            phrase_len = len(experiments.tokenize_for_parser(phrase).split())
 
             #Find line where WER is held for phrase. 
             while not wer_line.startswith('Words'):
@@ -1143,7 +1145,7 @@ def eval_parsing_time(parser_path, test_file_path, chkpt_file_path, log_file_pat
 
         for line in test_file:
             #Tokenize input to parser. 
-            phrase = tokenize_for_parser(line.split(';')[0])
+            phrase = experiments.tokenize_for_parser(line.split(';')[0])
 
             #Get number of tokens to store statistic in checkpoint dictionary. 
             num_toks = len(phrase.split())

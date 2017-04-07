@@ -37,6 +37,7 @@ import math
 import time
 import multiprocessing
 import subprocess
+import evaluate
 
 #TODO Change if necessary. 
 #Adds nlu_pipeline src folder in order to import modules from it. 
@@ -482,18 +483,18 @@ def interpolate_score_lists(list1, list2, lambda1):
     lambda2 = 1.0 - lambda1
 
     #Turn weights into log form for logspace calculations. 
-    lambda1 = np.log(lambda1)
-    lambda2 = np.log(lambda2)
+    lambda1 = np.log(lambda1) if lambda1 > 0.0 else float('-inf')
+    lambda2 = np.log(lambda2) if lambda2 > 0.0 else float('-inf')
 
     #Sums start at 0 (-inf in logspace).
     sum1 = float('-inf')
     sum2 = float('-inf')
 
     for score in list1:
-        sum1 = np.logaddexp(sum1, score)
+        sum1 = np.logaddexp(sum1, score) if not score == float('-inf') else sum1
 
     for score in list2:
-        sum2 = np.logaddexp(sum2, score)
+        sum2 = np.logaddexp(sum2, score) if not score == float('-inf') else sum2
 
     interpolated_scores = []
 
@@ -572,27 +573,53 @@ be.
 """
 def find_best_interpolation_values(experiment_folder, evaluation_name, parser_params, lm_params):
 
+    #Read in all the necessary information we'll need for processing. 
+    parsers = {}
+    parser_score_lines_files = {}
+    lm_score_lines_files = {}
+
+    for fold in os.listdir(experiment_folder): 
+        #Derive paths for files we need. 
+        results_path = experiment_folder + fold + '/experiments/asr/result_files/'
+        parser_score_file_path = results_path + parser_params + '.' + evaluation_name + '_rerank'
+        lm_score_file_path = results_path + lm_params + '.' + evaluation_name + '_lm'
+
+        #Load parser for fold. 
+        parser_path = experiment_folder + fold + '/models/' + parser_params + '.cky'
+        parsers[fold] = load_obj_general(parser_path)
+
+        #Read in lines from each file for processing.
+        parser_score_lines_files[fold] = [line for line in open(parser_score_file_path, 'r')]
+        lm_score_lines_files[fold] = [line for line in open(lm_score_file_path, 'r')]
+
     #Values to test for alpha (i.e. interpolation between parser and LM confidences).  
     alphas = np.arange(0.0, 1.1, 0.1)
     betas = np.arange(0.0, 1.1, 0.1) #TODO Change to include a full range once we have implemented the speech surrogate confidence scoring. 
 
     #Average scores over folds. 
-    f1_avgs = []
-    acc_avgs = []
+    f1_avgs = {}
+    acc_avgs = {}
+    wer_avgs = {}
 
+    f1_file = open('f1_tuning.txt', 'w')
+    acc_file = open('acc_tuning.txt', 'w')
+    wer_file = open('wer_tuning.txt', 'w')
+
+    #Test all possible values. 
     for alpha in alphas:
-        for beta in betas: 
+        for beta in betas:
+            print 'Evaluating (alpha, beta): ' + str((alpha, beta))
+
+            f1_scores = []
+            acc_scores = []
+            wer_scores = []
+
             for fold in os.listdir(experiment_folder):
                  
-                #Derive paths for files we need. 
-                results_path = experiment_folder + fold + '/experiments/asr/result_files/'
-                parser_score_file_path = results_path + parser_params + '.' + evaluation_name + '_rerank'
-                lm_score_file_path = results_path + lm_params + '.' + evaluation_name + '_lm'
-
-                #Read in lines from each file for processing.
-                #TODO move up so that we only have to read in each one of these once per fold (rather than for each alpha and beta).    
-                parser_score_lines = [line for line in open(parser_score_file_path, 'r')]
-                lm_score_lines = [line for line in open(lm_score_file_path, 'r')]
+                #Access the data we need to process everything. 
+                parser = parsers[fold]
+                lm_score_lines = lm_score_lines_files[fold]
+                parser_score_lines = parser_score_lines_files[fold]
 
                 assert(len(parser_score_lines) == len(lm_score_lines))
 
@@ -614,18 +641,18 @@ def find_best_interpolation_values(experiment_folder, evaluation_name, parser_pa
                             interpolated_scores = interpolate_score_lists(parse_scores, lm_scores, alpha)
 
                             #Next interpolate this score with the speech score. 
-                            interpolated_scores = interpolate_score_lists(speech_scores, lm_scores, beta)
+                            interpolated_scores = interpolate_score_lists(speech_scores, interpolated_scores, beta)
 
                             #Now create hypothesis list with the interpolated scores. 
                             new_hyp_list = []
 
-                            for i in range(len(hypotheses)):
+                            for j in range(len(hypotheses)):
                                 #We just need the phrase and semantic form from this hypothesis. 
-                                phrase, _, sem_form, _, _ = hypotheses[i]
-                                new_hyp_list.append([phrase, None, sem_form, interpolated_scores[i]])
+                                phrase, _, sem_form, _, _ = hypotheses[j]
+                                new_hyp_list.append([phrase, None, sem_form, interpolated_scores[j]])
 
                             #Now re-rank the list. 
-                            re_ranked_list = sorted(new_hyp_list, key=lambda x: x[3], reverse=True)
+                            re_ranked_list = sorted(new_hyp_list, key=lambda x: x[3], reverse=True)[0]
 
                             results.append((target, re_ranked_list))
 
@@ -642,8 +669,25 @@ def find_best_interpolation_values(experiment_folder, evaluation_name, parser_pa
                         hypothesis = [phrase, float(speech_score), sem_form, float(parser_score), float(lm_score)]
                         hypotheses.append(hypothesis)
 
-                #Now evaluate results over folds. 
-                #TODO  
+                #Now evaluate results for this fold.
+                acc_scores.append(evaluate.eval_google_full_sem_form(results, parser))
+                f1_scores.append(evaluate.eval_google_partial_sem_form(results, parser))
+                wer_scores.append(evaluate.eval_google_wer(results, parser))
+
+            #Now average the scores and assign it to this (alpha, beta) pair. 
+            f1_avgs[(alpha, beta)] = float(sum(f1_scores)) / float(len(f1_scores))
+            acc_avgs[(alpha, beta)] = float(sum(acc_scores)) / float(len(acc_scores))
+            wer_avgs[(alpha, beta)] = float(sum(wer_scores)) / float(len(wer_scores))
+
+    for alpha in alphas: 
+        for beta in betas: 
+            f1_file.write(str((alpha, beta)) + ';' + str(f1_avgs[(alpha, beta)]) + '\n')
+            acc_file.write(str((alpha, beta)) + ';' + str(acc_avgs[(alpha, beta)]) + '\n')
+            wer_file.write(str((alpha, beta)) + ';' + str(wer_avgs[(alpha, beta)]) + '\n')
+
+    f1_file.close()
+    acc_file.close()
+    wer_file.close()
 
 """
 Given a test file, assigns
