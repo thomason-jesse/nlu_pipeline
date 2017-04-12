@@ -786,6 +786,7 @@ def find_best_parsing_performance(experiment_folder, result_file_extension):
     #TODO remove if we want to incorporate other training data percentages.
     result_files = {key: result_files[key] for key in result_files if '1.0' in key}
 
+    """
     print 'Getting partial semantic form scores...'
 
     #Collect all average partial semantic form scores for each parameterization.
@@ -821,6 +822,7 @@ def find_best_parsing_performance(experiment_folder, result_file_extension):
         if partial_sem_scores[params]['f1'] > best_f1:
             best_f1 = partial_sem_scores[params]['f1']
             best_f1_params = params
+    """
 
     #Now get full semantic form scores. 
     print 'Getting full semantic form scores...'
@@ -854,8 +856,10 @@ def find_best_parsing_performance(experiment_folder, result_file_extension):
             best_full_score = full_sem_scores[params]
             best_full_params = params
 
+    """
     print 'Best F1: ' + str(best_f1)
     print 'Best F1 parameters: ' + best_f1_params
+    """
 
     print 'Best full score: ' + str(best_full_score)
     print 'Best full parameters: ' + best_full_params
@@ -900,7 +904,8 @@ def find_best_lm_performance(experiment_folder, result_file_extension, parser_pa
             lm_score_file_path = results_folder + result_file
 
             #Path to the parser score file for the same test utterances. 
-            parse_score_file_path = results_folder + parser_params + '.' + result_file_extension #+ '_rerank'
+            parse_score_file_path = results_folder + parser_params + '.' + result_file_extension
+            parse_score_file_path = parse_score_file_path + '_rerank' if 'validation' in result_file_extension else parse_score_file_path
 
             if not parameterization in result_files: 
                 result_files[parameterization] = []

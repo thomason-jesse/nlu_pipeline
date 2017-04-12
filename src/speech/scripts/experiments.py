@@ -279,7 +279,7 @@ def compute_parser_null_node_values(parser):
     for pair in parser.theta.CCG_given_token:
         parser.theta.null_prior = np.logaddexp(parser.theta.null_prior, parser.theta.CCG_given_token[pair])
 
-    #Normalizes by |SF| * |CCG|
+    #Normalizes by |SF| * |CCG| #Avg. Production probability (atomic)
     parser.theta.null_prior -= np.log(len(parser.theta.lexicon.entries)) + np.log(len(parser.theta.lexicon.categories))
 
     #computes p(root|root, null) for each CCG category i.e. the contribution from adding the null node to the root.
@@ -302,7 +302,7 @@ def compute_parser_null_node_values(parser):
         #Normalizes (i.e. divides by |CCG| ). 
         parser.theta.null_conditional_prob[i] -= np.log(len(parser.theta.lexicon.categories))
 
-    #Computes p(_ | _, null) i.e. the average probability of a production. 
+    #Computes p(_ | _, null) i.e. the average probability of a production. #Avg. probability of a production (category)
     parser.theta.null_average_production_prob = float('-inf')
 
     for i in range(len(parser.theta.lexicon.categories)):
@@ -504,6 +504,9 @@ def interpolate_score_lists(list1, list2, lambda1):
         score1 = list1[i] - sum1
         score2 = list2[i] - sum2
 
+        list1[i] = score1
+        list2[i] = score2
+
         #If we subtracted -inf from any score, then it'll be nan. 
         score1 = float('-inf') if math.isnan(score1) else score1
         score2 = float('-inf') if math.isnan(score2) else score2
@@ -526,7 +529,7 @@ def interpolate_score_lists(list1, list2, lambda1):
            
         interpolated_scores.append(interpolated_score)
 
-    return interpolated_scores
+    return [interpolated_scores, list1, list2]
 
 def surrogate_score(score_list): 
     #First element should have a confidence score. 
@@ -567,6 +570,159 @@ def process_speech_scores(score_list):
 
 
 """
+Normalize parser scores based on phrase lenght. 
+"""
+def process_parse_scores(parse_scores, phrases, parser): 
+
+    assert(len(parse_scores) == len(phrases))
+
+    for i in range(len(parse_scores)):
+        num_nulls = 16 - len(tokenize_for_parser(phrases[i]).split())
+        num_nulls = 0 if num_nulls < 0 else num_nulls
+
+        parse_scores[i] += num_nulls * (parser.theta.null_prior + parser.theta.null_average_production_prob)
+
+    return parse_scores
+
+
+def average_interpolated_scores(folds, parsers, parser_score_lines_files, lm_score_lines_files, alpha, beta):
+               
+    f1_scores = []
+    acc_scores = []
+    wer_scores = []
+
+    for fold in folds: 
+        #Access the data we need to process everything. 
+        parser = parsers[fold]
+        lm_score_lines = lm_score_lines_files[fold]
+        parser_score_lines = parser_score_lines_files[fold]
+
+        #Prepare parser for normalization based on phrase length. 
+        compute_parser_null_node_values(parser)
+
+        assert(len(parser_score_lines) == len(lm_score_lines))
+
+        results = []
+        unranked_results = []
+        target = None
+
+        #Prepare results to re-rank with alpha.
+        for i in range(len(parser_score_lines)):
+            #New test point, both files will share this line. 
+            if parser_score_lines[i].startswith('#'):
+                #Add the previous data point if we have it. 
+                if not target == None:
+                    #Get scores in lists so that we may interpolate. 
+                    speech_scores = process_speech_scores([hypothesis[1] for hypothesis in hypotheses])
+                    parse_scores = process_parse_scores([hypothesis[3] for hypothesis in hypotheses], [hypothesis[0] for hypothesis in hypotheses], parser)
+                    lm_scores = [hypothesis[4] for hypothesis in hypotheses]
+
+                    #First interpolate parser and LM scores. 
+                    interpolated_scores, parse_scores, lm_scores = interpolate_score_lists(parse_scores, lm_scores, alpha)
+
+                    """
+                    print '****************'
+
+                    for i in range(len(hypotheses)):
+                        print [hypotheses[i][0], hypotheses[i][2], parse_scores[i], lm_scores[i]]
+
+                    print '***************'
+                    """
+
+                    #Next interpolate this score with the speech score. 
+                    interpolated_scores, _, _ = interpolate_score_lists(speech_scores, interpolated_scores, beta)
+
+                    #Now create hypothesis list with the interpolated scores. 
+                    new_hyp_list = []
+
+                    for j in range(len(hypotheses)):
+                        #We just need the phrase and semantic form from this hypothesis. 
+                        phrase, _, sem_form, _, _ = hypotheses[j]
+                        new_hyp_list.append([phrase, None, sem_form, interpolated_scores[j]])
+
+                    #Now re-rank the list. 
+                    re_ranked_list = sorted(new_hyp_list, key=lambda x: x[3], reverse=True)[0]
+
+                    results.append((target, re_ranked_list))
+
+                    #Keep track of the un-reranked results. 
+                    unranked_results.append((target, new_hyp_list[0]))
+
+                target = parser_score_lines[i].strip().split(';')
+
+                #New hypothesis list for this target. 
+                hypotheses = []
+            else:
+                #TODO use time if we want to incorporate it at some point. 
+                phrase, speech_score, sem_form, parser_score, time = parser_score_lines[i].strip().split(';')
+                _, _, _, lm_score = lm_score_lines[i].strip().split(';')
+
+                #Prepare hypothesis for interpolated re-ranking. 
+                hypothesis = [phrase, float(speech_score), sem_form, float(parser_score), float(lm_score)]
+                hypotheses.append(hypothesis)
+
+        assert(len(unranked_results) == len(results))
+
+        """
+        for i in range(len(unranked_results)):
+            unranked_acc = evaluate.eval_google_full_sem_form([unranked_results[i]], parser)
+            ranked_acc = evaluate.eval_google_full_sem_form([results[i]], parser)
+
+            unranked_wer = evaluate.eval_google_wer([unranked_results[i]], parser)
+            ranked_wer = evaluate.eval_google_wer([results[i]], parser)
+
+            if ranked_acc > unranked_acc and ranked_wer < unranked_wer: 
+                print results[i]
+                print ''
+                print unranked_results[i]
+
+                print [unranked_wer, unranked_acc, ranked_wer, ranked_acc]
+         """
+
+        #Now evaluate results for this fold.
+        acc_scores.append(evaluate.eval_google_full_sem_form(results, parser))
+        f1_scores.append(evaluate.eval_google_partial_sem_form(results, parser))
+        wer_scores.append(evaluate.eval_google_wer(results, parser))
+
+    print 'ACC: ' + str(acc_scores)
+    print 'WER: ' + str(wer_scores)
+
+    f1_avg = float(sum(f1_scores)) / float(len(f1_scores))
+    acc_avg = float(sum(acc_scores)) / float(len(acc_scores))
+    wer_avg = float(sum(wer_scores)) / float(len(wer_scores))
+
+    return [f1_avg, acc_avg, wer_avg]
+
+def evaluate_file_with_interpolation(experiment_folder, evaluation_name, parser_params, lm_params, alpha, beta): 
+    #Read in all the necessary information we'll need for processing. 
+    parsers = {}
+    parser_score_lines_files = {}
+    lm_score_lines_files = {}
+
+    folds = os.listdir(experiment_folder)
+
+    for fold in folds: 
+        #Derive paths for files we need. 
+        results_path = experiment_folder + fold + '/experiments/asr/result_files/'
+        parser_score_file_path = results_path + parser_params + '.' + evaluation_name 
+        parser_score_file_path = parser_score_file_path + '_rerank' if 'validation' in evaluation_name else parser_score_file_path
+        lm_score_file_path = results_path + lm_params + '.' + evaluation_name + '_lm'
+
+        #Load parser for fold. 
+        parser_path = experiment_folder + fold + '/models/' + parser_params + '.cky'
+        parsers[fold] = load_obj_general(parser_path)
+
+        #Read in lines from each file for processing.
+        parser_score_lines_files[fold] = [line for line in open(parser_score_file_path, 'r')]
+        lm_score_lines_files[fold] = [line for line in open(lm_score_file_path, 'r')]
+
+    #Get averages for each evaluation metric using alpha and beta parameters. 
+    f1_avg, acc_avg, wer_avg = average_interpolated_scores(folds, parsers, parser_score_lines_files, lm_score_lines_files, alpha, beta) 
+
+    print [wer_avg, acc_avg, f1_avg]
+
+
+"""
 Test different interpolation values on a validation set
 file in order to see what the best interpolation parameters might 
 be. 
@@ -578,10 +734,13 @@ def find_best_interpolation_values(experiment_folder, evaluation_name, parser_pa
     parser_score_lines_files = {}
     lm_score_lines_files = {}
 
-    for fold in os.listdir(experiment_folder): 
+    folds = os.listdir(experiment_folder)
+
+    for fold in folds: 
         #Derive paths for files we need. 
         results_path = experiment_folder + fold + '/experiments/asr/result_files/'
-        parser_score_file_path = results_path + parser_params + '.' + evaluation_name + '_rerank'
+        parser_score_file_path = results_path + parser_params + '.' + evaluation_name
+        parser_score_file_path = parser_score_file_path + '_rerank' if 'validation' in evaluation_name else parser_score_file_path
         lm_score_file_path = results_path + lm_params + '.' + evaluation_name + '_lm'
 
         #Load parser for fold. 
@@ -610,74 +769,8 @@ def find_best_interpolation_values(experiment_folder, evaluation_name, parser_pa
         for beta in betas:
             print 'Evaluating (alpha, beta): ' + str((alpha, beta))
 
-            f1_scores = []
-            acc_scores = []
-            wer_scores = []
-
-            for fold in os.listdir(experiment_folder):
-                 
-                #Access the data we need to process everything. 
-                parser = parsers[fold]
-                lm_score_lines = lm_score_lines_files[fold]
-                parser_score_lines = parser_score_lines_files[fold]
-
-                assert(len(parser_score_lines) == len(lm_score_lines))
-
-                results = []
-                target = None
-
-                #Prepare results to re-rank with alpha.
-                for i in range(len(parser_score_lines)):
-                    #New test point, both files will share this line. 
-                    if parser_score_lines[i].startswith('#'):
-                        #Add the previous data point if we have it. 
-                        if not target == None:
-                            #Get scores in lists so that we may interpolate. 
-                            speech_scores = process_speech_scores([hypothesis[1] for hypothesis in hypotheses])
-                            parse_scores = [hypothesis[3] for hypothesis in hypotheses]
-                            lm_scores = [hypothesis[4] for hypothesis in hypotheses]
-
-                            #First interpolate parser and LM scores. 
-                            interpolated_scores = interpolate_score_lists(parse_scores, lm_scores, alpha)
-
-                            #Next interpolate this score with the speech score. 
-                            interpolated_scores = interpolate_score_lists(speech_scores, interpolated_scores, beta)
-
-                            #Now create hypothesis list with the interpolated scores. 
-                            new_hyp_list = []
-
-                            for j in range(len(hypotheses)):
-                                #We just need the phrase and semantic form from this hypothesis. 
-                                phrase, _, sem_form, _, _ = hypotheses[j]
-                                new_hyp_list.append([phrase, None, sem_form, interpolated_scores[j]])
-
-                            #Now re-rank the list. 
-                            re_ranked_list = sorted(new_hyp_list, key=lambda x: x[3], reverse=True)[0]
-
-                            results.append((target, re_ranked_list))
-
-                        target = parser_score_lines[i].strip().split(';')
-
-                        #New hypothesis list for this target. 
-                        hypotheses = []
-                    else:
-                        #TODO use time if we want to incorporate it at some point. 
-                        phrase, speech_score, sem_form, parser_score, time = parser_score_lines[i].strip().split(';')
-                        _, _, _, lm_score = lm_score_lines[i].strip().split(';')
-
-                        #Prepare hypothesis for interpolated re-ranking. 
-                        hypothesis = [phrase, float(speech_score), sem_form, float(parser_score), float(lm_score)]
-                        hypotheses.append(hypothesis)
-
-                #Now evaluate results for this fold.
-                acc_scores.append(evaluate.eval_google_full_sem_form(results, parser))
-                f1_scores.append(evaluate.eval_google_partial_sem_form(results, parser))
-                wer_scores.append(evaluate.eval_google_wer(results, parser))
-
             #Now average the scores and assign it to this (alpha, beta) pair. 
-            f1_avgs[(alpha, beta)] = float(sum(f1_scores)) / float(len(f1_scores))
-            acc_avgs[(alpha, beta)] = float(sum(acc_scores)) / float(len(acc_scores))
-            wer_avgs[(alpha, beta)] = float(sum(wer_scores)) / float(len(wer_scores))
+            f1_avgs[(alpha, beta)], acc_avgs[(alpha, beta)], wer_avgs[(alpha, beta)] = average_interpolated_scores(folds, parsers, parser_score_lines_files, lm_score_lines_files, alpha, beta) 
 
     for alpha in alphas: 
         for beta in betas: 
@@ -888,7 +981,7 @@ def give_google_lm_scores(test_file_path, google_recognized_folder, result_file_
                         
                     #Pad phrase with UNK so that we can have comparable scores independent of phrase lenght. 
                     tokenized_phrase = phrase.split()
-                    padded_phrase = ' '.join(tokenized_phrase)# + (['UNK'] * (num_max_tokens - len(tokenized_phrase))))
+                    padded_phrase = ' '.join(tokenized_phrase + ['<unk>'] * (num_max_tokens - len(tokenized_phrase)))
                     
                     #Process s.t. alphabet matches our corpus. 
                     padded_phrase = padded_phrase.lower().replace('&', 'and').replace('.', '')
@@ -1125,6 +1218,7 @@ def print_usage():
     print 'Assign parse scores to Google Speech API files: ./experiments parse_score_google [test_file_path] [results_file_path] [parser_path] [google_recognized_folder]'
     print 'Assign probability scores to Google Speech using an LM: ./experiments lm_score_google [experiment_path] [test_file_name] [lm_name] [google_recognized_folder]'
     print 'Find best interpolation values over Speech, Parser, and LM: ./experiments best_interpolation_values [experiment_path] [test_file_name] [parser_params] [lm_params]'
+    print 'Evaluate a file using interpolation: ./experiments evaluate_with_interpolation [experiment_path] [test_file_name] [parser_params] [lm_params] [alpha] [beta]'
 
 if __name__ == '__main__':
     if not len(sys.argv) >= 2:
@@ -1172,6 +1266,12 @@ if __name__ == '__main__':
     elif sys.argv[1] == 'best_interpolation_values':
         if len(sys.argv) == 6:
             find_best_interpolation_values(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
+        else:
+            print_usage()
+
+    elif sys.argv[1] == 'evaluate_with_interpolation':
+        if len(sys.argv) == 8: 
+            evaluate_file_with_interpolation(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], float(sys.argv[6]), float(sys.argv[7])) 
         else:
             print_usage()
 

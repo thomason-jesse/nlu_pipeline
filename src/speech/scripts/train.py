@@ -116,7 +116,7 @@ def train_new_lm(lm_train_file, lm_path):
     srilm_path = '../bin/SRILM/bin/i686-m64/ngram-count'
     
     #Arguments to call it. 
-    args = [srilm_path, '-order', '3', '-unk', '-interpolate', '-wbdiscount', '-text', lm_train_file, '-lm', lm_path]
+    args = [srilm_path, '-order', '3', '-unk', '-text', lm_train_file, '-lm', lm_path]
 
     #Calls it to create lm. 
     subprocess.call(args)
