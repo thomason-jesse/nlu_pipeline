@@ -532,15 +532,22 @@ def eval_google_partial_sem_form(results, parser):
         hyp_precision = 0.0
         hyp_recall = 0.0
 
+        true_pos = 0.0
+
+        for true_pred in set(true_preds):
+            tc = true_preds.count(true_pred)
+            true_pos += float(min(hyp_preds.count(true_pred), tc))
+
+        #recall = # correct preds out of total number correct. 
         #precision = # correct preds out of total guessed. 
+        hyp_precision += true_pos
+        hyp_recall += true_pos
+
+        """
         for hyp_pred in hyp_preds:
             if hyp_pred in true_preds:
                 hyp_precision += 1.0
-
-        #recall = # correct preds out of total number correct. 
-        for true_pred in true_preds:
-            if true_pred in hyp_preds:
-                hyp_recall += 1.0
+        """
 
         #Adds values. 
         hyp_precision /= len(hyp_preds)
@@ -575,10 +582,11 @@ def eval_google_full_sem_form(results, parser):
     #Evaluates data set. 
     for target, hypothesis in results:
         total_count += 1.0
- 
+
         _, true_semantic_form, _, _ = target
         true_semantic_form = ':'.join(true_semantic_form.split(':')[1:])
         true_semantic_form = post_process.add_type_constraints(true_semantic_form.strip()) 
+
 
         #Gets semantic node from true semantic form. 
         true_node = parser.lexicon.read_semantic_form_from_str(true_semantic_form, None, None, [], False)

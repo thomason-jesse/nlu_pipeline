@@ -584,12 +584,33 @@ def process_parse_scores(parse_scores, phrases, parser):
 
     return parse_scores
 
+def timeout_proportion(results, parser):
+    #Keep total count vs timeout count. 
+    total  = 0.0
+    timeouts = 0.0
+
+    for result in results:
+        incorrect = (evaluate.eval_google_full_sem_form([result], parser) == 0.0)
+
+        if incorrect: 
+            target, hypothesis = result
+
+            sem_form = hypothesis[2]
+            time = hypothesis[4]
+
+            if sem_form == 'None' and time >= 10.0:
+                timeouts += 1.0
+            
+            total += 1.0
+
+    return timeouts / total
 
 def average_interpolated_scores(folds, parsers, parser_score_lines_files, lm_score_lines_files, alpha, beta):
                
     f1_scores = []
     acc_scores = []
     wer_scores = []
+    timeouts = []
 
     for fold in folds: 
         #Access the data we need to process everything. 
@@ -637,8 +658,8 @@ def average_interpolated_scores(folds, parsers, parser_score_lines_files, lm_sco
 
                     for j in range(len(hypotheses)):
                         #We just need the phrase and semantic form from this hypothesis. 
-                        phrase, _, sem_form, _, _ = hypotheses[j]
-                        new_hyp_list.append([phrase, None, sem_form, interpolated_scores[j]])
+                        phrase, _, sem_form, _, _, time = hypotheses[j]
+                        new_hyp_list.append([phrase, None, sem_form, interpolated_scores[j], time])
 
                     #Now re-rank the list. 
                     re_ranked_list = sorted(new_hyp_list, key=lambda x: x[3], reverse=True)[0]
@@ -658,7 +679,7 @@ def average_interpolated_scores(folds, parsers, parser_score_lines_files, lm_sco
                 _, _, _, lm_score = lm_score_lines[i].strip().split(';')
 
                 #Prepare hypothesis for interpolated re-ranking. 
-                hypothesis = [phrase, float(speech_score), sem_form, float(parser_score), float(lm_score)]
+                hypothesis = [phrase, float(speech_score), sem_form, float(parser_score), float(lm_score), float(time)]
                 hypotheses.append(hypothesis)
 
         assert(len(unranked_results) == len(results))
@@ -677,19 +698,27 @@ def average_interpolated_scores(folds, parsers, parser_score_lines_files, lm_sco
                 print unranked_results[i]
 
                 print [unranked_wer, unranked_acc, ranked_wer, ranked_acc]
-         """
+
+        sys.exit()
+        """
 
         #Now evaluate results for this fold.
+        timeouts.append(timeout_proportion(results, parser))
         acc_scores.append(evaluate.eval_google_full_sem_form(results, parser))
         f1_scores.append(evaluate.eval_google_partial_sem_form(results, parser))
         wer_scores.append(evaluate.eval_google_wer(results, parser))
 
     print 'ACC: ' + str(acc_scores)
     print 'WER: ' + str(wer_scores)
+    print 'F1: ' + str(f1_scores)
+    print 'TIMEOUTS: ' + str(timeouts)
 
     f1_avg = float(sum(f1_scores)) / float(len(f1_scores))
     acc_avg = float(sum(acc_scores)) / float(len(acc_scores))
     wer_avg = float(sum(wer_scores)) / float(len(wer_scores))
+    timeout_avg = float(sum(timeouts)) / float(len(timeouts))
+
+    print 'TIMEOUT AVG: ' + str(timeout_avg)
 
     return [f1_avg, acc_avg, wer_avg]
 
