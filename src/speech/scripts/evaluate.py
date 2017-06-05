@@ -1118,6 +1118,48 @@ def eval_asr_length(experiment_folder, result_file_name):
     for length in results: 
         print str(length) + ':' + str(results[length])
 
+def time_stats(experiment_folder, result_file_name):
+    fails = []
+    parse_times = []
+
+    for fold_name in os.listdir(experiment_folder):
+        
+        #Open result file to read in times. 
+        result_file = open(experiment_folder + fold_name + '/experiments/asr/result_files/' + result_file_name, 'r')
+        
+        total = 0.0
+        fail = 0.0
+
+        parse_time_total = 0.0
+        total_parses = 0.0
+
+        for line in result_file: 
+            if line.startswith('#'):
+                #Start of new result line. 
+                pass
+            else:
+                #Otherwise extract time.
+                line_results = line.split(';')
+                parse, time = [line_results[2], float(line_results[-1].strip())]
+
+                if time > 10.0: 
+                    fail += 1.0
+                else:
+                    if not parse == 'None': 
+                        parse_time_total += time
+                        total_parses += 1.0
+
+                total += 1.0
+
+        fails.append(fail / total)
+        parse_times.append(parse_time_total / total_parses)
+
+    avg_fails = sum(fails) / float(len(fails))
+    avg_parsing_time = sum(parse_times) / float(len(parse_times))
+
+    print 'Avg fails: ' + str(avg_fails)
+    print 'Avg parse times: ' + str(avg_parsing_time)
+
 def eval_parsing_time(parser_path, test_file_path, chkpt_file_path, log_file_path=None):
     #First open up files, particularly, read in checkpoint in case we've already worked on this file. 
     test_file = [line for line in open(test_file_path, 'r')]
@@ -1217,6 +1259,7 @@ def print_usage():
     print 'Evaluate Google Speech Results: ./evaluate google_speech [experiment_folder] [test_file_extension] [parser_params] [lambda1] [eval_function] [speech_scoring_function]'
     print 'Evaluate parsing time: ./evaluate parsing_time [parser_path] [test_file] [checkpoint_file]'
     print 'Find best performing LM scoring: ./evaluate lm_scoring [experiment_folder] [result_file_extension] [parser_params] [lambda1]'
+    print 'Get timing statistics: ./evaluate.py time_stats [experiment_folder] [result_file_name]'
 
 if __name__ == '__main__':
     if not len(sys.argv) >= 2:
@@ -1279,6 +1322,12 @@ if __name__ == '__main__':
             find_best_lm_performance(sys.argv[2], sys.argv[3], sys.argv[4], float(sys.argv[5]))
         else:
             print_usage()
-       
+      
+    elif sys.argv[1] == 'time_stats':
+        if len(sys.argv) == 4:
+            time_stats(sys.argv[2], sys.argv[3])
+        else:
+            print_usage()
+
     else:
         print_usage()
