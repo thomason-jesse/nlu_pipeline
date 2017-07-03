@@ -486,6 +486,7 @@ def interpolate_score_lists(list1, list2, lambda1):
     lambda1 = np.log(lambda1) if lambda1 > 0.0 else float('-inf')
     lambda2 = np.log(lambda2) if lambda2 > 0.0 else float('-inf')
 
+    """
     #Sums start at 0 (-inf in logspace).
     sum1 = float('-inf')
     sum2 = float('-inf')
@@ -495,14 +496,15 @@ def interpolate_score_lists(list1, list2, lambda1):
 
     for score in list2:
         sum2 = np.logaddexp(sum2, score) if not score == float('-inf') else sum2
-
+    """
+            
     interpolated_scores = []
 
     for i in range(len(list1)):
 
         #Subtract logarithm to get log-scale probability.
-        score1 = list1[i] - sum1
-        score2 = list2[i] - sum2
+        score1 = list1[i] #- sum1
+        score2 = list2[i] #- sum2
 
         list1[i] = score1
         list2[i] = score2
@@ -520,13 +522,15 @@ def interpolate_score_lists(list1, list2, lambda1):
 
             #If one of the scores is 0, then the interpolated score must equal the other. 
             if score1 == float('-inf'):
-                interpolated_score = score2 + lambda2
+                interpolated_score = score2 #+ lambda2
             elif score2 == float('-inf'):
                 interpolated_score = score1 + lambda1
             else: 
                 #Actually interpolate.  
-                interpolated_score = np.logaddexp(score1 + lambda1, score2 + lambda2)
-           
+                interpolated_score = score1 + score2#np.logaddexp(score1 + lambda1, score2)# + lambda2)
+
+        #print([score1, score1+lambda1,score2])
+
         interpolated_scores.append(interpolated_score)
 
     return [interpolated_scores, list1, list2]
@@ -605,18 +609,68 @@ def timeout_proportion(results, parser):
 
     return timeouts / total
 
-def average_interpolated_scores(folds, parsers, parser_score_lines_files, lm_score_lines_files, alpha, beta):
+"""
+Check to see if all hypotheses in a given
+list contain ONLY in-domain words. 
+"""
+def in_domain(hypotheses, vocab): 
+    for hypothesis in hypotheses: 
+        phrase = tokenize_for_parser(hypothesis[0])
+        words = set(phrase.split())
+
+        diff = words - vocab
+
+        if len(diff) == 0:
+            return True
+
+    return False
+
+def compute_oov_failures(results, parser, vocab):
+    #TODO failure counts. 
+    oov_failures = 0.0
+    in_vocab_failures = 0.0
+
+    for target, hypotheses in results: 
+        #First check for failure. 
+        failed = (evaluate.eval_google_partial_sem_form([(target, hypotheses[0])], parser) == 0.0)
+
+        if failed:
+            
+            #Check to see if all hypotheses have OOV words, which means they would have been perhaps too difficult to parse. 
+            if in_domain(hypotheses, vocab):
+                in_vocab_failures += 1.0
+            else:
+                oov_failures += 1.0
+
+    total = oov_failures + in_vocab_failures
+    """
+    print 'IN VOCAB: ' + str(in_vocab_failures)
+    print 'OOV: ' + str(oov_failures)
+    print 'TOTAL: ' + str(oov_failures + in_vocab_failures)
+    """
+
+    return oov_failures / total 
+
+def average_interpolated_scores(folds, parsers, parser_score_lines_files, lm_score_lines_files, alpha, beta, vocabs=None):
                
     f1_scores = []
     acc_scores = []
     wer_scores = []
     timeouts = []
+    oov_failures = []
+    in_domain_proportions = []
 
+    #For in-domain results. 
+    in_domain_acc = []
+    in_domain_f1 = []
+    in_domain_wer = []
+    
     for fold in folds: 
         #Access the data we need to process everything. 
         parser = parsers[fold]
         lm_score_lines = lm_score_lines_files[fold]
         parser_score_lines = parser_score_lines_files[fold]
+        vocab = vocabs[fold] if vocabs else None
 
         #Prepare parser for normalization based on phrase length. 
         compute_parser_null_node_values(parser)
@@ -624,6 +678,7 @@ def average_interpolated_scores(folds, parsers, parser_score_lines_files, lm_sco
         assert(len(parser_score_lines) == len(lm_score_lines))
 
         results = []
+        all_reranked_results = []
         unranked_results = []
         target = None
 
@@ -641,6 +696,8 @@ def average_interpolated_scores(folds, parsers, parser_score_lines_files, lm_sco
                     #First interpolate parser and LM scores. 
                     interpolated_scores, parse_scores, lm_scores = interpolate_score_lists(parse_scores, lm_scores, alpha)
 
+                    
+
                     """
                     print '****************'
 
@@ -651,7 +708,7 @@ def average_interpolated_scores(folds, parsers, parser_score_lines_files, lm_sco
                     """
 
                     #Next interpolate this score with the speech score. 
-                    interpolated_scores, _, _ = interpolate_score_lists(speech_scores, interpolated_scores, beta)
+                    #interpolated_scores, _, _ = interpolate_score_lists(speech_scores, interpolated_scores, beta)
 
                     #Now create hypothesis list with the interpolated scores. 
                     new_hyp_list = []
@@ -662,9 +719,10 @@ def average_interpolated_scores(folds, parsers, parser_score_lines_files, lm_sco
                         new_hyp_list.append([phrase, None, sem_form, interpolated_scores[j], time])
 
                     #Now re-rank the list. 
-                    re_ranked_list = sorted(new_hyp_list, key=lambda x: x[3], reverse=True)[0]
+                    re_ranked_list = sorted(new_hyp_list, key=lambda x: x[3], reverse=True)
 
-                    results.append((target, re_ranked_list))
+                    all_reranked_results.append((target, re_ranked_list))
+                    results.append((target, re_ranked_list[0]))
 
                     #Keep track of the un-reranked results. 
                     unranked_results.append((target, new_hyp_list[0]))
@@ -685,6 +743,11 @@ def average_interpolated_scores(folds, parsers, parser_score_lines_files, lm_sco
         assert(len(unranked_results) == len(results))
 
         """
+        #Figure out how many of our failures are due to OOV words.
+        if vocab: 
+            oov_failures.append(compute_oov_failures(all_reranked_results, parser, vocab))
+    
+
         for i in range(len(unranked_results)):
             unranked_acc = evaluate.eval_google_full_sem_form([unranked_results[i]], parser)
             ranked_acc = evaluate.eval_google_full_sem_form([results[i]], parser)
@@ -702,23 +765,61 @@ def average_interpolated_scores(folds, parsers, parser_score_lines_files, lm_sco
         sys.exit()
         """
 
+        """
+        #Filter all_reranked_results to contain only fully in-domain hypothesis lists. 
+        in_domain_results = []
+
+        for target, hypotheses in all_reranked_results: 
+            if in_domain(hypotheses, vocab):
+                in_domain_results.append((target, hypotheses[0]))
+
+        in_domain_proportions.append(float(len(in_domain_results)) / float(len(all_reranked_results)))
+
+        in_domain_acc.append(evaluate.eval_google_full_sem_form(in_domain_results, parser))
+        in_domain_f1.append(evaluate.eval_google_partial_sem_form(in_domain_results, parser))
+        in_domain_wer.append(evaluate.eval_google_wer(in_domain_results, parser))
+        """
+
         #Now evaluate results for this fold.
-        timeouts.append(timeout_proportion(results, parser))
+        #timeouts.append(timeout_proportion(results, parser))
         acc_scores.append(evaluate.eval_google_full_sem_form(results, parser))
         f1_scores.append(evaluate.eval_google_partial_sem_form(results, parser))
         wer_scores.append(evaluate.eval_google_wer(results, parser))
 
+    """
     print 'ACC: ' + str(acc_scores)
     print 'WER: ' + str(wer_scores)
     print 'F1: ' + str(f1_scores)
     print 'TIMEOUTS: ' + str(timeouts)
+    """
+
+    """
+    if len(oov_failures) > 0: 
+        print 'OOV FAILURES: ' + str(oov_failures) 
+    """
 
     f1_avg = float(sum(f1_scores)) / float(len(f1_scores))
     acc_avg = float(sum(acc_scores)) / float(len(acc_scores))
     wer_avg = float(sum(wer_scores)) / float(len(wer_scores))
-    timeout_avg = float(sum(timeouts)) / float(len(timeouts))
+    #timeout_avg = float(sum(timeouts)) / float(len(timeouts))
+
+    """
+    #In domain results. 
+    in_domain_acc_avg = float(sum(in_domain_acc)) / float(len(in_domain_acc))
+    in_domain_f1_avg = float(sum(in_domain_f1)) / float(len(in_domain_f1))
+    in_domain_wer_avg = float(sum(in_domain_wer)) / float(len(in_domain_wer))
+    in_domain_proportion_avg = float(sum(in_domain_proportions)) / float(len(in_domain_proportions))
+
+    if len(oov_failures) > 0: 
+        oov_failures_avg = float(sum(oov_failures)) / float(len(oov_failures))
+        print 'OOV FAIULRES AVG.: ' + str(oov_failures_avg)
 
     print 'TIMEOUT AVG: ' + str(timeout_avg)
+    print 'IN-DOMAIN ACC: ' + str(in_domain_acc_avg)
+    print 'IN-DOMAIN F1: ' + str(in_domain_f1_avg)
+    print 'IN-DOMAIN WER: ' + str(in_domain_wer_avg)
+    print 'IN-DOMAIN Proportion AVG: ' + str(in_domain_proportion_avg)
+    """
 
     return [f1_avg, acc_avg, wer_avg]
 
@@ -727,6 +828,7 @@ def evaluate_file_with_interpolation(experiment_folder, evaluation_name, parser_
     parsers = {}
     parser_score_lines_files = {}
     lm_score_lines_files = {}
+    vocabs = {}
 
     folds = os.listdir(experiment_folder)
 
@@ -737,16 +839,19 @@ def evaluate_file_with_interpolation(experiment_folder, evaluation_name, parser_
         parser_score_file_path = parser_score_file_path + '_rerank' if 'validation' in evaluation_name else parser_score_file_path
         lm_score_file_path = results_path + lm_params + '.' + evaluation_name + '_lm'
 
-        #Load parser for fold. 
+        #Load parser for fold.  
         parser_path = experiment_folder + fold + '/models/' + parser_params + '.cky'
         parsers[fold] = load_obj_general(parser_path)
+
+        vocab_path = experiment_folder + fold + '/models/' + 'vocab.pkl'
+        vocabs[fold] = load_obj_general(vocab_path)
 
         #Read in lines from each file for processing.
         parser_score_lines_files[fold] = [line for line in open(parser_score_file_path, 'r')]
         lm_score_lines_files[fold] = [line for line in open(lm_score_file_path, 'r')]
 
     #Get averages for each evaluation metric using alpha and beta parameters. 
-    f1_avg, acc_avg, wer_avg = average_interpolated_scores(folds, parsers, parser_score_lines_files, lm_score_lines_files, alpha, beta) 
+    f1_avg, acc_avg, wer_avg = average_interpolated_scores(folds, parsers, parser_score_lines_files, lm_score_lines_files, alpha, beta, vocabs) 
 
     print [wer_avg, acc_avg, f1_avg]
 
@@ -781,8 +886,9 @@ def find_best_interpolation_values(experiment_folder, evaluation_name, parser_pa
         lm_score_lines_files[fold] = [line for line in open(lm_score_file_path, 'r')]
 
     #Values to test for alpha (i.e. interpolation between parser and LM confidences).  
-    alphas = np.arange(0.0, 1.1, 0.1)
-    betas = np.arange(0.0, 1.1, 0.1) #TODO Change to include a full range once we have implemented the speech surrogate confidence scoring. 
+    #alphas = np.arange(0.0, 1.1, 0.1)
+    alphas = [(10.0 ** (e+70)) for e in range(0,11)]
+    betas = np.arange(0.0, 0.1, 0.1) #TODO Change to include a full range once we have implemented the speech surrogate confidence scoring. 
 
     #Average scores over folds. 
     f1_avgs = {}

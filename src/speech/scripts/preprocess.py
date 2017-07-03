@@ -87,6 +87,7 @@ import glob
 import shutil
 import post_process
 from experiments import tokenize_for_parser
+import pickle
 
 ###########################################################################
 ################ GENERAL PREPROCESSING FUNCTIONS ##########################
@@ -382,7 +383,27 @@ def split_into_folds(corpus_folder, fold_corpus_folder, num_folds):
                 shutil.copy(corpus_file, path + '/corpus/train/')
 
             counter += 1
-                
+        
+def pickle_vocabularies(experiment_folder, vocab_name): 
+    for fold in os.listdir(experiment_folder): 
+        vocab = set()
+    
+        lm_train_file_path = experiment_folder + fold + '/asr_training/lm_train.txt'
+        lm_train_lines = [line for line in open(lm_train_file_path, 'r')]
+
+        for line in lm_train_lines: 
+            phrase = tokenize_for_parser(line.replace('<s>', '').replace('</s>', '').strip())
+  
+            for word in phrase.split(): 
+                vocab.add(word)
+
+
+        #Now pickle the vocabulary we've collected. 
+        vocab_file_path = experiment_folder + fold + '/models/' + vocab_name
+
+        with open(vocab_file_path, 'w') as vocab_file:
+            pickle.dump(vocab, vocab_file)
+
 ###############################################################################
 ################## PARSER TRAINING CORPUS RELATED FUNCTIONS ###################
 ###############################################################################
@@ -635,6 +656,7 @@ def print_usage():
     print 'LM train file:  ./preprocess.py create_lm_training_file [corpus_folder] [lm_training_file_folder]'
     print 'Corpus transcript files: ./preprocess.py create_transcript_files [corpus_folder] [transcript_files_folder]'
     print 'Create ASR testing files: ./preprocess.py create_asr_test_files [usr_files_folder] [test_files_folder] [num_test_files] [file basename] [file extension]'
+    print 'Pickle the vocabularies for an experiment: ./preprocess.py pickle_vocabs [experiment_folder] [vocab_name]'
 
 if __name__ == '__main__':
     if not len(sys.argv) >= 4:
@@ -688,6 +710,12 @@ if __name__ == '__main__':
     elif sys.argv[1] == 'create_asr_test_files':
         if len(sys.argv) == 7:
             create_asr_test_files(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6])
+        else:
+            print_usage()
+
+    elif sys.argv[1] == 'pickle_vocabs': 
+        if len(sys.argv) == 4:
+            pickle_vocabularies(sys.argv[2], sys.argv[3])
         else:
             print_usage()
 

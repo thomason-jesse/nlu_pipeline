@@ -456,6 +456,64 @@ def evaluate_parse_file_partial(file_name, parser):
 
     return [f1_score, precision, recall]
 
+def eval_google_wer_nbest(results, parser): 
+    #Creates temporary files to run evaluations on.
+    os.chdir('../bin')
+
+    #Prepares arguments for running WER evaluation. 
+    args = [bin_path + '/word_align.pl', 'transcripts.txt', 'hyp.txt']
+
+    #Used for naming phrases, needed by wer script. 
+    count = 0
+
+    #Keep wer for all data points to average. 
+    wers = []
+
+    num_results = len(results)
+    n_done = 0
+
+    for target, hypotheses in results:
+
+        hyp_wers = []
+
+        for hypothesis in hypotheses: 
+            transcript_file = open('transcripts.txt', 'w')
+            hyp_file = open('hyp.txt', 'w')
+
+            transcript_file.write(target[0] + ' (phrase' + str(count) + ')\n')
+            hyp_file.write(hypothesis[0] + ' (phrase' + str(count) + ')\n')
+
+            count += 1
+
+            #Closes files so they may be read by WER evaluation script. 
+            transcript_file.close()
+            hyp_file.close()
+
+            #Store WER results in a file so we can read it. 
+            wer_results_file = open('wer_results.txt', 'w')
+
+            #Evaluates WER. 
+            subprocess.call(args, stdout=wer_results_file, stderr=wer_results_file)
+            wer_results_file.close()
+
+            wer_results_file = open('wer_results.txt', 'r')
+
+            for line in wer_results_file:
+                if line.startswith('TOTAL Percent'):
+                    wer = float(line.split('Error = ')[1].split('%')[0])
+                    hyp_wers.append(wer)
+
+        #Only take the best performance from all hypotheses. 
+        wers.append(min(hyp_wers))
+        n_done += 1
+
+        print('Done ' + str(n_done) + ' of ' + str(num_results))
+
+    wer_avg = float(sum(wers)) / float(len(wers))
+
+    return wer_avg
+
+
 def eval_google_wer(results, parser): 
     #Creates temporary files to run evaluations on.
     os.chdir('../bin')
@@ -493,7 +551,87 @@ def eval_google_wer(results, parser):
 
     return wer
 
-   
+def eval_google_partial_sem_form_nbest(results, parser): 
+    #Counts for evaluation. 
+    f1_scores = []
+
+    #Evaluates data set. 
+    for target, hypotheses in results:
+        hyp_f1_scores = []
+
+        for hypothesis in hypotheses: 
+            #Get the target semantic form. 
+            _, true_semantic_form, _, _ = target
+            true_semantic_form = ':'.join(true_semantic_form.split(':')[1:])
+            true_semantic_form = post_process.add_type_constraints(true_semantic_form.strip()) 
+
+            #Gets semantic node from true semantic form. 
+            true_node = parser.lexicon.read_semantic_form_from_str(true_semantic_form, None, None, [], False)
+
+            #Now attempt to get a semantic node from the semantic form string. 
+            hyp_sem_form_str = hypothesis[2]
+
+            #If None, then no valid parse was found. Therefore skip since this won't contribute to the score.  
+            if hyp_sem_form_str == "None":
+                continue
+            else:
+                hyp_node = parser.lexicon.read_semantic_form_from_str(hyp_sem_form_str, None, None, [], False)
+
+            #Evaluates recall and precision for hypothesis and adds values to counts. 
+            true_preds = [triple[0] for triple in parser.theta.count_semantics(true_node)]
+            hyp_preds = [triple[0] for triple in parser.theta.count_semantics(hyp_node)]
+            true_args = [triple[1] for triple in parser.theta.count_semantics(true_node)]
+            hyp_args = [triple[1] for triple in parser.theta.count_semantics(hyp_node)]
+
+            hyp_precision = 0.0
+            hyp_recall = 0.0
+
+            true_pos = 0.0
+
+            for true_pred in set(true_preds):
+                tc = true_preds.count(true_pred)
+                true_pos += float(min(hyp_preds.count(true_pred), tc))
+
+            #recall = # correct preds out of total number correct. 
+            #precision = # correct preds out of total guessed. 
+            hyp_precision += true_pos
+            hyp_recall += true_pos
+
+            """
+            for hyp_pred in hyp_preds:
+                if hyp_pred in true_preds:
+                    hyp_precision += 1.0
+            """
+
+            #Adds values. 
+            hyp_precision /= len(hyp_preds)
+            hyp_recall /= len(true_preds)
+
+            if not (hyp_precision == 0 and hyp_recall == 0):
+                hyp_f1_score = 2 * hyp_precision * hyp_recall / (hyp_precision + hyp_recall)   
+            else:
+                hyp_f1_score = 0
+
+            hyp_f1_scores.append(hyp_f1_score)
+
+        #Now add best f1 score.
+        if len(hyp_f1_scores) == 0:
+            f1_scores.append(0.0)
+        else:
+            f1_scores.append(max(hyp_f1_scores))
+
+    #Normalizes
+    f1_score = float(sum(f1_scores)) / float(len(f1_scores))
+
+    #Now display results.
+    """
+    print 'P: ' + str(precision)
+    print 'R: ' + str(recall)
+    print 'F1: ' + str(f1_score)
+    """
+
+    #Return F1 score for evaluation. 
+    return f1_score  
 
 def eval_google_partial_sem_form(results, parser): 
     #Counts for evaluation. 
@@ -702,6 +840,32 @@ def evaluate_google_speech_results(experiment_folder, test_file_extension, parse
     print results
 
 """
+Evaluates the google speech results of a particular parser
+parameterization over all folds of an experiment folder. 
+"""
+def evaluate_google_speech_results_nbest(experiment_folder, test_file_extension, parser_params, lambda1, eval_function='partial_semantic_form', speech_scoring_function=lambda x:x):
+
+    #Keep results per fold. 
+    results = []
+
+    for fold in os.listdir(experiment_folder): 
+        fold_path = experiment_folder + fold
+
+        #Determine path for the result file and the parser using the parser parameterization. 
+        result_file_path = fold_path + '/experiments/asr/result_files/' + parser_params + '.' + test_file_extension
+        parser_path = fold_path + '/models/' + parser_params + '.cky'
+
+        #Add result to list. 
+        results.append(evaluate_google_speech_result_nbest(result_file_path, parser_path, lambda1, eval_function, speech_scoring_function))
+
+    #Now average results and present. 
+    average = float(sum(results)) / float(len(results))
+
+    print 'Average performance using ' + eval_function + ' evaluation function: ' + str(average)
+    print results
+
+
+"""
 Evaluates the results of a Google Speech
 re-ranking experiment of an individual file 
 given a metric and weighting between 
@@ -736,6 +900,36 @@ def evaluate_google_speech_result(results_file_path, parser_path, lambda1, eval_
 
     #Now run evaluation. 
     return eval_function(re_ranked_results, parser)
+
+"""
+Find upper bound performance in google speech results. 
+"""
+def evaluate_google_speech_result_nbest(results_file_path, parser_path, lambda1, eval_function='partial_sem_form', speech_scoring_function=lambda x:x): 
+    #Read in result data. 
+    raw_results = [line.strip().split(';') for line in open(results_file_path, 'r')]
+
+    #TODO Actually add a speech scoring function. 
+    if speech_scoring_function == 'None':
+        speech_scoring_function = lambda x:x
+
+    #Prepare data for evaluation.
+    results = prepare_google_speech_results(raw_results, speech_scoring_function)
+
+    #Load parser. 
+    parser = load_obj_general(parser_path)
+
+    #Determine evaluation function. 
+    if eval_function == 'partial_sem_form':
+        eval_function = eval_google_partial_sem_form_nbest
+    elif eval_function == 'full_sem_form':
+        eval_function = eval_google_full_sem_form_nbest
+    elif eval_function == 'wer':
+        eval_function = eval_google_wer_nbest
+    else:
+        raise NotImplementedError('Eval function ' + eval_function + ' currently has no implementation!')
+
+    #Now run evaluation. 
+    return eval_function(results, parser)
 
 """
 Go through all folds in an experiment. Evaluate
@@ -1254,12 +1448,13 @@ def print_usage():
     print 'Correct hypothesis in top n: ./evaluate.py top_n [result_file] [evaluation_file_name] [n]'
     print 'Semantic form evaluation: ./evaluate.py semantic_form [result_file] [evaluation_file_name] [parser] [full/partial]'
     print 'Grounding: ./evaluate.py grounding [ont file] [lex file] [kb pickle file]'
-    print 'Evaluate parsing: ./evaluate.py evaluate_parsing [experiment_folder] [result_file_extension]'
+    print 'Evaluate parsing: ./evaluate.py find_best_parsing_performance [experiment_folder] [result_file_extension]'
     print 'Evaluate ASR per phrase length: ./evaluate asr_len [experiment_folder] [result_file_name]'
     print 'Evaluate Google Speech Results: ./evaluate google_speech [experiment_folder] [test_file_extension] [parser_params] [lambda1] [eval_function] [speech_scoring_function]'
     print 'Evaluate parsing time: ./evaluate parsing_time [parser_path] [test_file] [checkpoint_file]'
-    print 'Find best performing LM scoring: ./evaluate lm_scoring [experiment_folder] [result_file_extension] [parser_params] [lambda1]'
+    print 'Find best performing LM scoring: ./evaluate find_best_lm_performance [experiment_folder] [result_file_extension] [parser_params] [lambda1]'
     print 'Get timing statistics: ./evaluate.py time_stats [experiment_folder] [result_file_name]'
+    print 'Evalute Nbest Google Speech Results: ./evaluate google_speech_nbest [experiment_folder] [test_file_extension] [parser_params] [lambda1] [eval_function] [speech_scoring_function]'
 
 if __name__ == '__main__':
     if not len(sys.argv) >= 2:
@@ -1293,7 +1488,7 @@ if __name__ == '__main__':
         else:
             print_usage()
 
-    elif sys.argv[1] == 'evaluate_parsing': 
+    elif sys.argv[1] == 'find_best_parsing_performance': 
         if len(sys.argv) == 4:
             find_best_parsing_performance(sys.argv[2], sys.argv[3])
         else:
@@ -1311,13 +1506,19 @@ if __name__ == '__main__':
         else:
             evaluate_google_speech_results(sys.argv[2], sys.argv[3], sys.argv[4], float(sys.argv[5]), sys.argv[6], sys.argv[7])
 
+    elif sys.argv[1] == 'google_speech_nbest':
+        if not len(sys.argv) == 8:
+            print_usage()
+        else:
+            evaluate_google_speech_results_nbest(sys.argv[2], sys.argv[3], sys.argv[4], float(sys.argv[5]), sys.argv[6], sys.argv[7])
+
     elif sys.argv[1] == 'parsing_time':
         if not len(sys.argv) == 5:
             print_usage()
         else:
             eval_parsing_time(sys.argv[2], sys.argv[3], sys.argv[4])
 
-    elif sys.argv[1] == 'lm_scoring':
+    elif sys.argv[1] == 'find_best_lm_performance':
         if len(sys.argv) == 6: 
             find_best_lm_performance(sys.argv[2], sys.argv[3], sys.argv[4], float(sys.argv[5]))
         else:
