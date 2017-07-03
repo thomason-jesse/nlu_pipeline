@@ -486,7 +486,6 @@ def interpolate_score_lists(list1, list2, lambda1):
     lambda1 = np.log(lambda1) if lambda1 > 0.0 else float('-inf')
     lambda2 = np.log(lambda2) if lambda2 > 0.0 else float('-inf')
 
-    """
     #Sums start at 0 (-inf in logspace).
     sum1 = float('-inf')
     sum2 = float('-inf')
@@ -496,7 +495,6 @@ def interpolate_score_lists(list1, list2, lambda1):
 
     for score in list2:
         sum2 = np.logaddexp(sum2, score) if not score == float('-inf') else sum2
-    """
             
     interpolated_scores = []
 
@@ -696,8 +694,6 @@ def average_interpolated_scores(folds, parsers, parser_score_lines_files, lm_sco
                     #First interpolate parser and LM scores. 
                     interpolated_scores, parse_scores, lm_scores = interpolate_score_lists(parse_scores, lm_scores, alpha)
 
-                    
-
                     """
                     print '****************'
 
@@ -708,7 +704,7 @@ def average_interpolated_scores(folds, parsers, parser_score_lines_files, lm_sco
                     """
 
                     #Next interpolate this score with the speech score. 
-                    #interpolated_scores, _, _ = interpolate_score_lists(speech_scores, interpolated_scores, beta)
+                    interpolated_scores, _, _ = interpolate_score_lists(speech_scores, interpolated_scores, beta)
 
                     #Now create hypothesis list with the interpolated scores. 
                     new_hyp_list = []
@@ -886,8 +882,7 @@ def find_best_interpolation_values(experiment_folder, evaluation_name, parser_pa
         lm_score_lines_files[fold] = [line for line in open(lm_score_file_path, 'r')]
 
     #Values to test for alpha (i.e. interpolation between parser and LM confidences).  
-    #alphas = np.arange(0.0, 1.1, 0.1)
-    alphas = [(10.0 ** (e+70)) for e in range(0,11)]
+    alphas = np.arange(0.0, 1.1, 0.1)
     betas = np.arange(0.0, 0.1, 0.1) #TODO Change to include a full range once we have implemented the speech surrogate confidence scoring. 
 
     #Average scores over folds. 
