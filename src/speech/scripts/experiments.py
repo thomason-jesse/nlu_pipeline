@@ -589,10 +589,11 @@ def timeout_proportion(results, parser):
         incorrect = (evaluate.eval_google_full_sem_form([result], parser) == 0.0)
 
         if incorrect: 
-            target, hypothesis = result
+            target, hypotheses = result
 
-            sem_form = hypothesis[2]
-            time = hypothesis[4]
+            #Evaluate based on top-ranked result. 
+            sem_form = hypotheses[0][2]
+            time = hypotheses[0][4]
 
             if sem_form == 'None' and time >= 10.0:
                 timeouts += 1.0
@@ -658,7 +659,10 @@ def average_interpolated_scores(folds, parsers, parser_score_lines_files, lm_sco
                         new_hyp_list.append([phrase, None, sem_form, interpolated_scores[j], time])
 
                     #Now re-rank the list. 
-                    re_ranked_list = sorted(new_hyp_list, key=lambda x: x[3], reverse=True)[0]
+                    re_ranked_list = sorted(new_hyp_list, key=lambda x: x[3], reverse=True)
+                    
+                    # TODO Uncomment to get only top-ranked hypothesis. 
+                    #re_ranked_list = [re_ranked_list[0]]
 
                     results.append((target, re_ranked_list))
 
