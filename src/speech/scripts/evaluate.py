@@ -36,21 +36,18 @@ import experiments
 import post_process
 import pickle
 import time
+import editdistance
 
 #Adds nlu_pipeline src folder in order to import modules from it. 
 nlu_pipeline_path = '/scratch/cluster/rcorona/nlu_pipeline/src/'
 sys.path.append(nlu_pipeline_path)
 
 #Nlu pipeline modules.
-try:
-    import CKYParser
-    from Grounder import Grounder
-    from Lexicon import Lexicon
-    from Ontology import Ontology
-    from utils import *
-except ImportError:
-    print 'ERROR: Unable to load nlu_pipeline_modules! Verify that nlu_pipeline_path is set correctly!'
-    sys.exit()
+import CKYParser
+from Grounder import Grounder
+from Lexicon import Lexicon
+from Ontology import Ontology
+from utils import *
 
 #Stores the binary executables, some of which are used by this script. 
 bin_path = os.path.abspath('../bin')
@@ -456,7 +453,29 @@ def evaluate_parse_file_partial(file_name, parser):
 
     return [f1_score, precision, recall]
 
-def eval_google_wer(results, parser): 
+def eval_google_wer(results, parser):
+
+    dist = 0.0
+    words = 0.0
+
+    #Evaluate WER for every target-hypothesis pair. 
+    for target, hypothesis in results:
+        #Gold transcript to evaluate against. 
+        gold_transcript = target[0].replace('#', '').strip().split()
+        hyp = hypothesis[0].strip().split()
+
+        #Tally total number of edits and total number of words.  
+        dist += float(editdistance.eval(gold_transcript, hyp))
+        words += float(len(hyp))
+        
+    #WER is Levenshtein distance normalized over utterance length. 
+    wer = dist / words
+
+    return wer
+
+    """
+    OLD WAY OF COMPUTING WER
+
     #Creates temporary files to run evaluations on.
     os.chdir('../bin')
     transcript_file = open('transcripts.txt', 'w')
@@ -466,7 +485,7 @@ def eval_google_wer(results, parser):
     count = 0
 
     for target, hypothesis in results:
-        transcript_file.write(target[0] + ' (phrase' + str(count) + ')\n')
+        transcript_file.write(target[0].replace('#', '') + ' (phrase' + str(count) + ')\n')
         hyp_file.write(hypothesis[0] + ' (phrase' + str(count) + ')\n')
 
         count += 1
@@ -492,7 +511,7 @@ def eval_google_wer(results, parser):
             wer = float(line.split('Error = ')[1].split('%')[0])
 
     return wer
-
+    """
    
 
 def eval_google_partial_sem_form(results, parser): 

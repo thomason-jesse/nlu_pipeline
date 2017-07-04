@@ -45,13 +45,9 @@ nlu_pipeline_path = '/scratch/cluster/rcorona/nlu_pipeline/src/'
 sys.path.append(nlu_pipeline_path)
 
 #Nlu pipeline modules.
-try:
-    import CKYParser
-    from CKYParser import count_ccg_productions
-    from utils import *
-except ImportError:
-    print 'ERROR: Unable to load nlu_pipeline_modules! Verify that nlu_pipeline_path is set correctly!'
-    sys.exit()
+import CKYParser
+from CKYParser import count_ccg_productions
+from utils import *
 
 
 
