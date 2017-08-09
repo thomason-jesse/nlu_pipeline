@@ -1211,8 +1211,12 @@ def parse_ground_truth_file(test_file_path, result_file_path, parser_path):
         #Take away CCG category from sem form. 
         true_sem_form = ':'.join(true_sem_form.strip().split(':')[1:])
 
+        # Create result lines with dummy values for unneeded fields.
+        ground_truth_line = '#_;M : ' + true_sem_form + ';_;_\n'
+        result_line = '_;0.0;' + parse_str + ';1.0;10.0\n' 
+        
         #Write result. 
-        result_file.write(true_sem_form + ';' + parse_str + '\n')
+        result_file.write(ground_truth_line + result_line)
 
 """
 Runs the parser on the ground truth

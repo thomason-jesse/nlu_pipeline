@@ -1278,10 +1278,10 @@ class CKYParser:
                 if len(semantic_candidates[idx]) == 0:
                     assignments.append(None)  # no known semantic assignment
                 else:
-                    assignment_idx = curr % len(semantic_candidates[idx])
+                    assignment_idx = int(curr % len(semantic_candidates[idx]))
                     assignments.append(assignment_idx)
                     if expressions[idx] in self.lexicon.surface_forms:  # surface form is in lexicon
-                        key = (semantic_candidates[idx][assignment_idx],
+                        key = (semantic_candidates[int(idx)][int(assignment_idx)],
                                self.lexicon.surface_forms.index(expressions[idx]))
                         score += self.theta.lexicon_entry_given_token[key] \
                             if key in self.theta.lexicon_entry_given_token else \
