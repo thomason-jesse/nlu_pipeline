@@ -533,7 +533,7 @@ def eval_google_partial_sem_form(results, parser):
     total_count = 0.0
 
     #Evaluates data set. 
-    for target, hypotheses in results:
+    for target, hypothesis in results:
         total_count += 1.0
 
         #Get the target semantic form. 
@@ -550,54 +550,52 @@ def eval_google_partial_sem_form(results, parser):
         #Get best performing hypothesis out of list we are considering.
         buff = []
 
-        for hypothesis in hypotheses:
+        #Now attempt to get a semantic node from the semantic form string. 
+        hyp_sem_form_str = hypothesis[2]
 
-            #Now attempt to get a semantic node from the semantic form string. 
-            hyp_sem_form_str = hypothesis[2]
+        #If None, then no valid parse was found. Therefore skip since this won't contribute to the score.  
+        if hyp_sem_form_str == "None":
+            score = 0.0
+        else:
+            hyp_node = parser.lexicon.read_semantic_form_from_str(hyp_sem_form_str, None, None, [], False)
 
-            #If None, then no valid parse was found. Therefore skip since this won't contribute to the score.  
-            if hyp_sem_form_str == "None":
-                score = 0.0
+            #Evaluates recall and precision for hypothesis and adds values to counts. 
+            hyp_preds = [triple[0] for triple in parser.theta.count_semantics(hyp_node)]
+            hyp_args = [triple[1] for triple in parser.theta.count_semantics(hyp_node)]
+
+            hyp_precision = 0.0
+            hyp_recall = 0.0
+
+            true_pos = 0.0
+
+            for true_pred in set(true_preds):
+                tc = true_preds.count(true_pred)
+                true_pos += float(min(hyp_preds.count(true_pred), tc))
+
+            #recall = # correct preds out of total number correct. 
+            #precision = # correct preds out of total guessed. 
+            hyp_precision += true_pos
+            hyp_recall += true_pos
+
+            """
+            for hyp_pred in hyp_preds:
+                if hyp_pred in true_preds:
+                    hyp_precision += 1.0
+            """
+
+            #Adds values. 
+            hyp_precision /= len(hyp_preds)
+            hyp_recall /= len(true_preds)
+
+            #precision += hyp_precision
+            #recall += hyp_recall
+
+            if not (hyp_precision == 0 and hyp_recall == 0):
+                score = 2 * hyp_precision * hyp_recall / (hyp_precision + hyp_recall)   
             else:
-                hyp_node = parser.lexicon.read_semantic_form_from_str(hyp_sem_form_str, None, None, [], False)
+                score = 0.0
 
-                #Evaluates recall and precision for hypothesis and adds values to counts. 
-                hyp_preds = [triple[0] for triple in parser.theta.count_semantics(hyp_node)]
-                hyp_args = [triple[1] for triple in parser.theta.count_semantics(hyp_node)]
-
-                hyp_precision = 0.0
-                hyp_recall = 0.0
-
-                true_pos = 0.0
-
-                for true_pred in set(true_preds):
-                    tc = true_preds.count(true_pred)
-                    true_pos += float(min(hyp_preds.count(true_pred), tc))
-
-                #recall = # correct preds out of total number correct. 
-                #precision = # correct preds out of total guessed. 
-                hyp_precision += true_pos
-                hyp_recall += true_pos
-
-                """
-                for hyp_pred in hyp_preds:
-                    if hyp_pred in true_preds:
-                        hyp_precision += 1.0
-                """
-
-                #Adds values. 
-                hyp_precision /= len(hyp_preds)
-                hyp_recall /= len(true_preds)
-
-                #precision += hyp_precision
-                #recall += hyp_recall
-
-                if not (hyp_precision == 0 and hyp_recall == 0):
-                    score = 2 * hyp_precision * hyp_recall / (hyp_precision + hyp_recall)   
-                else:
-                    score = 0.0
-
-            buff.append(score)
+        buff.append(score)
 
         #Get best performing f1 score from list of candidate hypotheses. 
         f1_score += max(buff)
@@ -623,7 +621,7 @@ def eval_google_full_sem_form(results, parser):
     total_count = 0.0
 
     #Evaluates data set. 
-    for target, hypotheses in results:
+    for target, hypothesis in results:
         total_count += 1.0
 
         _, true_semantic_form, _, _ = target
@@ -633,27 +631,24 @@ def eval_google_full_sem_form(results, parser):
         #Gets semantic node from true semantic form. 
         true_node = parser.lexicon.read_semantic_form_from_str(true_semantic_form, None, None, [], False)
 
-        #Iterate over all possible hypotheses we are considering, picking best performing one.
+        #Now attempt to get a semantic node from the semantic form string. 
+        hyp_sem_form_str = hypothesis[2]
+
         buff = []
 
-        for hypothesis in hypotheses:
+        #If None, then no valid parse was found. Therefore skip since this won't contribute to the score.  
+        if hyp_sem_form_str == "None":
+            buff.append(0.0)
+        else:
+            hyp_node = parser.lexicon.read_semantic_form_from_str(hyp_sem_form_str, None, None, [], False)
 
-            #Now attempt to get a semantic node from the semantic form string. 
-            hyp_sem_form_str = hypothesis[2]
+            #Evaluates equality.
+            are_equal = true_node.equal_allowing_commutativity(hyp_node, parser.commutative_idxs, True, parser.ontology)
 
-            #If None, then no valid parse was found. Therefore skip since this won't contribute to the score.  
-            if hyp_sem_form_str == "None":
-                buff.append(0.0)
+            if are_equal:
+                buff.append(1.0)
             else:
-                hyp_node = parser.lexicon.read_semantic_form_from_str(hyp_sem_form_str, None, None, [], False)
-
-                #Evaluates equality.
-                are_equal = true_node.equal_allowing_commutativity(hyp_node, parser.commutative_idxs, True, parser.ontology)
-
-                if are_equal:
-                    buff.append(1.0)
-                else:
-                    buff.append(0.0)
+                buff.append(0.0)
 
         #Get best accuracy from best performing hypothesis. 
         count_correct += max(buff)
@@ -1264,7 +1259,7 @@ def print_usage():
     print ('Correct hypothesis in top n: ./evaluate.py top_n [result_file] [evaluation_file_name] [n]')
     print ('Semantic form evaluation: ./evaluate.py semantic_form [result_file] [evaluation_file_name] [parser] [full/partial]')
     print ('Grounding: ./evaluate.py grounding [ont file] [lex file] [kb pickle file]')
-    print ('Evaluate parsing: ./evaluate.py evaluate_parsing [experiment_folder] [result_file_extension]')
+    print ('Evaluate parsing: ./evaluate.py find_best_parsing_performance [experiment_folder] [result_file_extension]')
     print ('Evaluate ASR per phrase length: ./evaluate asr_len [experiment_folder] [result_file_name]')
     print ('Evaluate Google Speech Results: ./evaluate google_speech [experiment_folder] [test_file_extension] [parser_params] [lambda1] [eval_function] [speech_scoring_function]')
     print ('Evaluate parsing time: ./evaluate parsing_time [parser_path] [test_file] [checkpoint_file]')
@@ -1302,7 +1297,7 @@ if __name__ == '__main__':
         else:
             print_usage()
 
-    elif sys.argv[1] == 'evaluate_parsing': 
+    elif sys.argv[1] == 'find_best_parsing_performance': 
         if len(sys.argv) == 4:
             find_best_parsing_performance(sys.argv[2], sys.argv[3])
         else:
