@@ -232,7 +232,8 @@ def semantic_form(result_file_name, evaluation_file_name, parser_file):
             count_correct += 1
 
 
-        #Prints information for the logs. 
+        #Prints information for the logs.
+        """
         print '**********************************************'
         print "Ground truth phrase: " + phrase
         print "Ground truth node: " + str(true_node) 
@@ -247,6 +248,7 @@ def semantic_form(result_file_name, evaluation_file_name, parser_file):
         print "Equal: " + str(are_equal)
         print '***********************************************'
         print ''
+        """
 
     #Writes evaluation results.
     evaluation_file = open(evaluation_file_name, 'w')
@@ -748,8 +750,8 @@ def evaluate_google_speech_results(experiment_folder, test_file_extension, parse
     #Now average results and present. 
     average = float(sum(results)) / float(len(results))
 
-    print 'Average performance using ' + eval_function + ' evaluation function: ' + str(average)
-    print results
+    print ('Average performance using ' + eval_function + ' evaluation function: ' + str(average))
+    print (results)
 
 """
 Evaluates the results of a Google Speech
@@ -805,7 +807,7 @@ def find_best_parsing_performance(experiment_folder, result_file_extension):
     #Holds all result files for each parameterization. 
     result_files = {}
 
-    print 'Getting all result files for given extension...'
+    print ('Getting all result files for given extension...')
 
     for fold in folds: 
         #Path to where the result files should live. 
@@ -883,7 +885,7 @@ def find_best_parsing_performance(experiment_folder, result_file_extension):
     """
 
     #Now get full semantic form scores. 
-    print 'Getting full semantic form scores...'
+    print ('Getting full semantic form scores...')
 
     full_sem_scores = {key: [] for key in result_files.keys()}
 
@@ -895,10 +897,10 @@ def find_best_parsing_performance(experiment_folder, result_file_extension):
 
         #Get score for each result file pertaning to parameterization. 
         for result_file in result_files[parameterization]:       
-            print result_file
+            print (result_file)
             full_sem_scores[parameterization].append(evaluate_parse_file_full(result_file, parser))
 
-    print 'Averaging full semantic form scores...'
+    print ('Averaging full semantic form scores...')
 
     #Averaging function
     avg = lambda x: float(sum(x)) / float(len(x))
@@ -919,8 +921,8 @@ def find_best_parsing_performance(experiment_folder, result_file_extension):
     print 'Best F1 parameters: ' + best_f1_params
     """
 
-    print 'Best full score: ' + str(best_full_score)
-    print 'Best full parameters: ' + best_full_params
+    print ('Best full score: ' + str(best_full_score))
+    print ('Best full parameters: ' + best_full_params)
 
 
 def find_best_lm_performance(experiment_folder, result_file_extension, parser_params, lambda1):
@@ -933,7 +935,7 @@ def find_best_lm_performance(experiment_folder, result_file_extension, parser_pa
     #Holds all result files for each parameterization. 
     result_files = {}
 
-    print 'Getting all result files for given extension...'
+    print ('Getting all result files for given extension...')
 
     for fold in folds:
 
@@ -991,8 +993,8 @@ def find_best_lm_performance(experiment_folder, result_file_extension, parser_pa
             lm_score_lines = [line for line in open(lm_score_file, 'r')]
             parser_score_lines = [line for line in open(parser_score_file, 'r')]
 
-            print lm_score_file
-            print parser_score_file
+            print (lm_score_file)
+            print (parser_score_file)
 
             assert(len(lm_score_lines) == len(parser_score_lines))
 
@@ -1064,9 +1066,9 @@ def find_best_lm_performance(experiment_folder, result_file_extension, parser_pa
         wer[params] = float(sum(params_wer)) / float(len(params_wer))
 
 
-    print 'F1: ' + str(f1_scores) + '\n' + str(params_f1_scores) + '\n'
-    print 'Full: ' + str(full_sem_scores) + '\n' + str(params_full_sem_scores) + '\n'
-    print 'WER: ' + str(wer) + '\n' + str(params_wer)
+    print ('F1: ' + str(f1_scores) + '\n' + str(params_f1_scores) + '\n')
+    print ('Full: ' + str(full_sem_scores) + '\n' + str(params_full_sem_scores) + '\n')
+    print ('WER: ' + str(wer) + '\n' + str(params_wer))
 
 def grounded_forms(ont_file, lex_file, kb_pickle):
     #Loads information needed for grounding. 
@@ -1096,16 +1098,16 @@ def grounded_forms(ont_file, lex_file, kb_pickle):
         examples.append((text, form, grounding))
         i += 3
     
-    print kb_predicates
+    print (kb_predicates)
 
     for (text, sem_form, grounding) in examples :
-        print text
-        print 'True grounding = ', grounding
+        print (text)
+        print ('True grounding = ', grounding)
         groundings, lambda_assignments = grounder.ground_semantic_node(sem_form)
         grounding_strs = [(str(grounding), prob) for (grounding, prob) in groundings]
-        print 'Predicted groundings = ', grounding_strs
-        print 'Lambda assignemnts = ', lambda_assignments
-        print 
+        print ('Predicted groundings = ', grounding_strs)
+        print ('Lambda assignemnts = ', lambda_assignments)
+        print () 
 
 def eval_asr_length(experiment_folder, result_file_name): 
     averages = {}
@@ -1166,7 +1168,7 @@ def eval_asr_length(experiment_folder, result_file_name):
 
     #Now print performance for each length. 
     for length in results: 
-        print str(length) + ':' + str(results[length])
+        print (str(length) + ':' + str(results[length]))
 
 def eval_parsing_time(parser_path, test_file_path, chkpt_file_path, log_file_path=None):
     #First open up files, particularly, read in checkpoint in case we've already worked on this file. 
@@ -1194,7 +1196,7 @@ def eval_parsing_time(parser_path, test_file_path, chkpt_file_path, log_file_pat
     tok_len = 0
 
     output_str = 'Starting from checkpoint: ' + str(chkpt)
-    print output_str
+    print (output_str)
     log_file.write(output_str + '\n')
     log_file.flush()
 
@@ -1240,7 +1242,7 @@ def eval_parsing_time(parser_path, test_file_path, chkpt_file_path, log_file_pat
                 pickle.dump(chkpt, open(chkpt_file_path, 'w'))
 
                 output_str = 'Parsed phrase #' + str(index) + ', with ' + str(num_toks) + ' tokens, in ' + str(duration) + ' seconds.'
-                print output_str
+                print (output_str)
                 log_file.write(output_str + '\n')
                 log_file.flush()
 
@@ -1251,22 +1253,22 @@ def eval_parsing_time(parser_path, test_file_path, chkpt_file_path, log_file_pat
             index += 1
 
     output_str = 'Done.'
-    print output_str
+    print (output_str)
     log_file.write(output_str)
 
     #Done loggging. 
     log_file.close()
 
 def print_usage():
-    print 'WER: ./evaluate.py wer [result_file] [evaluation_file_name]'
-    print 'Correct hypothesis in top n: ./evaluate.py top_n [result_file] [evaluation_file_name] [n]'
-    print 'Semantic form evaluation: ./evaluate.py semantic_form [result_file] [evaluation_file_name] [parser] [full/partial]'
-    print 'Grounding: ./evaluate.py grounding [ont file] [lex file] [kb pickle file]'
-    print 'Evaluate parsing: ./evaluate.py evaluate_parsing [experiment_folder] [result_file_extension]'
-    print 'Evaluate ASR per phrase length: ./evaluate asr_len [experiment_folder] [result_file_name]'
-    print 'Evaluate Google Speech Results: ./evaluate google_speech [experiment_folder] [test_file_extension] [parser_params] [lambda1] [eval_function] [speech_scoring_function]'
-    print 'Evaluate parsing time: ./evaluate parsing_time [parser_path] [test_file] [checkpoint_file]'
-    print 'Find best performing LM scoring: ./evaluate lm_scoring [experiment_folder] [result_file_extension] [parser_params] [lambda1]'
+    print ('WER: ./evaluate.py wer [result_file] [evaluation_file_name]')
+    print ('Correct hypothesis in top n: ./evaluate.py top_n [result_file] [evaluation_file_name] [n]')
+    print ('Semantic form evaluation: ./evaluate.py semantic_form [result_file] [evaluation_file_name] [parser] [full/partial]')
+    print ('Grounding: ./evaluate.py grounding [ont file] [lex file] [kb pickle file]')
+    print ('Evaluate parsing: ./evaluate.py evaluate_parsing [experiment_folder] [result_file_extension]')
+    print ('Evaluate ASR per phrase length: ./evaluate asr_len [experiment_folder] [result_file_name]')
+    print ('Evaluate Google Speech Results: ./evaluate google_speech [experiment_folder] [test_file_extension] [parser_params] [lambda1] [eval_function] [speech_scoring_function]')
+    print ('Evaluate parsing time: ./evaluate parsing_time [parser_path] [test_file] [checkpoint_file]')
+    print ('Find best performing LM scoring: ./evaluate lm_scoring [experiment_folder] [result_file_extension] [parser_params] [lambda1]')
 
 if __name__ == '__main__':
     if not len(sys.argv) >= 2:

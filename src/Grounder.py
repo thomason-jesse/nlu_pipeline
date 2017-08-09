@@ -77,7 +77,7 @@ class Grounder :
                 return ([], lambda_assignments)
             else :
                 # Invalid parse
-                print 'Warning: Leaf node is not ontology atom or lambda variable!'
+                print('Warning: Leaf node is not ontology atom or lambda variable!')
                 return ([], {})   
         
         else :
@@ -92,12 +92,12 @@ class Grounder :
                 # such as 'and' operations get their own nodes
                 if len(parse.children) != 1 :
                     # Invalid parse
-                    print 'Warning: Lambda node should have only one child but has ' + str(len(parse.children)) + ' children!'
+                    print('Warning: Lambda node should have only one child but has ' + str(len(parse.children)) + ' children!')
                     return ([], {})   
                 (groundings, lambda_assignments) = child_groundings[0]
                 if parse.lambda_name not in lambda_assignments :
                     # Invalid parse
-                    print 'Warning: No downstream use of lambda variable ' + str(parse.lambda_name) + '!'
+                    print('Warning: No downstream use of lambda variable ' + str(parse.lambda_name) + '!')
                     return ([], {})   
                 groundings = lambda_assignments[parse.lambda_name]
                 lambda_assignments.pop(parse.lambda_name, None) 
@@ -146,9 +146,9 @@ class Grounder :
                 all_lambda_assignments = [lambda_assignments for (groundings, lambda_assignments) in child_groundings]
                 
                 # Will only consider assignments to variables that are grounded in all children
-                common_lambda_variables = set([key for key in all_lambda_assignments[0].keys() if len(all_lambda_assignments[0][key]) > 0])
+                common_lambda_variables = set([key for key in list(all_lambda_assignments[0].keys()) if len(all_lambda_assignments[0][key]) > 0])
                 for lambda_assignments in all_lambda_assignments :
-                    possible_lambda_variables = [key for key in lambda_assignments.keys() if len(lambda_assignments[key]) > 0]
+                    possible_lambda_variables = [key for key in list(lambda_assignments.keys()) if len(lambda_assignments[key]) > 0]
                     common_lambda_variables = common_lambda_variables.intersection(possible_lambda_variables)
                     
                 resultant_lambda_assignments = dict()
@@ -180,10 +180,10 @@ class Grounder :
                 raise RuntimeError('Grounding of \'or\' predicate has not been implemented')
 
             elif self.ontology.preds[parse.idx] in ['a', 'the'] :
-                print 'Warning: \'a\' and \'the\' are treated equally for dialog purposes!' 
+                print('Warning: \'a\' and \'the\' are treated equally for dialog purposes!') 
                 if len(parse.children) != 1 :
                     # Invalid parse
-                    print 'Warning: \'a\' or \'the\' nodes should have only one child but has ' + str(len(parse.children)) + ' children!'
+                    print('Warning: \'a\' or \'the\' nodes should have only one child but has ' + str(len(parse.children)) + ' children!')
                     return ([], {})   
                 random_child = random.choice(child_groundings)
                 return (random_child[0], {})
@@ -194,7 +194,7 @@ class Grounder :
                 
                 if len(parse.children) != 1 :
                     # Invalid parse
-                    print 'Warning: Classifier predicate node should have only one child but has ' + str(len(parse.children)) + ' children!'
+                    print('Warning: Classifier predicate node should have only one child but has ' + str(len(parse.children)) + ' children!')
                     return ([], {})  
 
                 classifier_name = self.ontology.preds[parse.idx]
@@ -203,7 +203,7 @@ class Grounder :
                     
                 (groundings, lambda_assignments) = child_groundings[0]
                 resultant_lambda_assignments = dict()
-                for variable in lambda_assignments.keys() :
+                for variable in list(lambda_assignments.keys()) :
                     possible_assignments = lambda_assignments[variable]
                     items = [assignment for assignment in possible_assignments if assignment[0].startswith('item_')]
                         # Only atoms which are 'item_<item_num>' can be classified
@@ -211,7 +211,7 @@ class Grounder :
                         item_indices = [int(item[0].split('_')[1]) for item in items]
                         vgg_features = self.test_object_features[item_indices, :]
                         probs = self.perception_module.get_classifier_log_probs(vgg_features)    
-                        resultant_lambda_assignments[variable] = zip(items, probs)
+                        resultant_lambda_assignments[variable] = list(zip(items, probs))
                     
                 return ([], resultant_lambda_assignments)
                 
@@ -226,11 +226,11 @@ class Grounder :
                     return ([], {})  
                     
                 if len(parse.children) != len(true_tuples[0]) :
-                    print 'Warning: Predicate ' + str(predicate) + ' expects ' + str(len(true_tuples[0])) + ' child nodes but has ' + str(len(parse.children)) + '!'
+                    print('Warning: Predicate ' + str(predicate) + ' expects ' + str(len(true_tuples[0])) + ' child nodes but has ' + str(len(parse.children)) + '!')
                     return ([], {})  
 
                 all_lambda_assignments = [lambda_assignments for (groundings, lambda_assignments) in child_groundings]
-                num_children_with_lambda_assignments = len([lambda_assignments for lambda_assignments in all_lambda_assignments if len(lambda_assignments.keys()) > 0])
+                num_children_with_lambda_assignments = len([lambda_assignments for lambda_assignments in all_lambda_assignments if len(list(lambda_assignments.keys())) > 0])
                 if num_children_with_lambda_assignments > 1 :
                     raise RuntimeError('Grounder cannot handle KB predicates that need to resolve multiple lambda variables')
                 #print 'all_lambda_assignments = ', all_lambda_assignments
@@ -241,7 +241,7 @@ class Grounder :
                     if groundings is not None and len(groundings) > 0 :
                         groundings_without_probs = [grounding for (grounding, prob) in groundings]
                         true_tuples = [candidate_tuple for candidate_tuple in true_tuples if candidate_tuple[child_idx] in groundings_without_probs]
-                    if lambda_assignments is not None and len(lambda_assignments.keys()) > 0 :
+                    if lambda_assignments is not None and len(list(lambda_assignments.keys())) > 0 :
                         child_lambda_assignments = lambda_assignments
                         child_lambda_assignments_idx = child_idx
                 #print 'child_lambda_assignments = ', child_lambda_assignments

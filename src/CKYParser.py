@@ -56,13 +56,13 @@ class Parameters:
 
     #Prints a dictionarie's values in a more formatted way. 
     def print_dict(self, title, dictionary, decoding_keys=None):
-        print title
-        print '#--------------------'
+        print(title)
+        print('#--------------------')
 
         import operator
 
         #Sorts dictionary by value in descending order. 
-        sorted_dict = sorted(dictionary.items(), key=operator.itemgetter(1), reverse=True)
+        sorted_dict = sorted(list(dictionary.items()), key=operator.itemgetter(1), reverse=True)
 
         for datum in sorted_dict:
             indeces = datum[0]
@@ -79,9 +79,9 @@ class Parameters:
 
                 indeces = tuple(decode_list)
 
-            print str(indeces) + ': ' + str(datum[1])
+            print(str(indeces) + ': ' + str(datum[1]))
 
-        print ''
+        print('')
 
     #Prints the model's parameters. 
     def print_parameters(self):
@@ -117,7 +117,7 @@ class Parameters:
         min_ccg_given_token = 0
         min_lexicon_entry = 0
 
-        language_model_surface_forms = range(0, len(self.lexicon.surface_forms))
+        language_model_surface_forms = list(range(0, len(self.lexicon.surface_forms)))
         if self.use_language_model:
             # get log probabilities for token_given_token ( P(sf|sf), P(sf=s|S)=1 )
             # use special indices -2 for start, -3 for end, -1 for unknown token
@@ -162,7 +162,7 @@ class Parameters:
                 # ( P(sem|surface), P(sem=s|S)=1 )
                 entry_nums = [self._lexicon_entry_given_token_counts[(sem_idx, sf_idx)]
                               for sem_idx in (self.lexicon.entries[sf_idx]
-                              if sf_idx != -1 else range(0, len(self.lexicon.semantic_forms)))
+                              if sf_idx != -1 else list(range(0, len(self.lexicon.semantic_forms))))
                               if (sem_idx, sf_idx) in self._lexicon_entry_given_token_counts]
                 entry_num_min = 0
                 entry_mass = 0
@@ -645,14 +645,14 @@ class CKYParser:
     def train_learner_on_semantic_forms(self, d, epochs=10, reranker_beam=1):
 
         for e in range(0, epochs):
-            print "epoch " + str(e)  # DEBUG
+            print("epoch " + str(e))  # DEBUG
 
             t, failures = self.get_training_pairs(d, reranker_beam=reranker_beam)
 
             if len(t) == 0:
                 # timer.end()
 
-                print "training converged at epoch " + str(e)
+                print("training converged at epoch " + str(e))
                 if failures == 0:
                     return True
                 else:
@@ -666,7 +666,7 @@ class CKYParser:
 
     #Helper function to call in timed cky parse thread, will store resulting parse in parse_storage_list (list).  
     def timed_cky_parse_helper(self, generator, storage_queue): 
-        parse = generator.next()
+        parse = next(generator)
 
         storage_queue.put(parse)
 
@@ -700,7 +700,7 @@ class CKYParser:
                 waiting = False
 
         parse = parse_storage_queue.get()
-        print str(parse) + '\n'
+        print(str(parse) + '\n')
 
         return parse
 
@@ -786,8 +786,8 @@ class CKYParser:
         num_time_outs = 0
 
         for [x, y] in d:
-            print [num_trainable, num_matches, num_genlex_only, num_fails, num_time_outs]
-            print "Training on: [" + str(x) + "," + self.print_parse(y) + "]"
+            print([num_trainable, num_matches, num_genlex_only, num_fails, num_time_outs])
+            print("Training on: [" + str(x) + "," + self.print_parse(y) + "]")
 
             #This will keep track of training data amidst multithreading. . 
             storage_queue = multiprocessing.Queue()
@@ -828,11 +828,11 @@ class CKYParser:
                     num_fails += 1
 
 
-        print "\tmatched "+str(num_matches)+"/"+str(len(d))  # DEBUG
-        print "\ttrained "+str(num_trainable)+"/"+str(len(d))  # DEBUG
-        print "\tgenlex only "+str(num_genlex_only)+"/"+str(len(d))  # DEBUG
-        print "\tfailed "+str(num_fails)+"/"+str(len(d))  # DEBUG
-        print "\ttimed out "+str(num_time_outs)+"/"+str(len(d))
+        print("\tmatched "+str(num_matches)+"/"+str(len(d)))  # DEBUG
+        print("\ttrained "+str(num_trainable)+"/"+str(len(d)))  # DEBUG
+        print("\tgenlex only "+str(num_genlex_only)+"/"+str(len(d)))  # DEBUG
+        print("\tfailed "+str(num_fails)+"/"+str(len(d)))  # DEBUG
+        print("\ttimed out "+str(num_time_outs)+"/"+str(len(d)))
 
         # timer.end()
         return t, num_fails
@@ -890,7 +890,7 @@ class CKYParser:
                     ordered_skip_sequences = []  # no valid subset of this sequence; all tokens would be skipped
                 elif skips_allowed == 1:
                     skip_sequences = []
-                    for idx, score in sorted(skip_scores[seq_idx].items(), key=operator.itemgetter(1), reverse=True):
+                    for idx, score in sorted(list(skip_scores[seq_idx].items()), key=operator.itemgetter(1), reverse=True):
                         skip_sequences.append([tk_seqs[seq_idx][t]
                                               for t in range(0, len(tk_seqs[seq_idx]))
                                               if t != idx])
@@ -992,7 +992,7 @@ class CKYParser:
 
         # yield remaining best candidates in order
         score_dict = {idx: scores[idx] for idx in range(0, len(scores))}
-        for idx, score in sorted(score_dict.items(), key=operator.itemgetter(1), reverse=True):
+        for idx, score in sorted(list(score_dict.items()), key=operator.itemgetter(1), reverse=True):
             # timer.end()
             yield candidates[idx], score, new_lex[idx]
 
@@ -1155,7 +1155,7 @@ class CKYParser:
         # print "ccg_tree: "+str(ccg_tree)  # DEBUG
 
         # if root key is the only entry in the chart, can only associate it with the known parse root
-        if len(ccg_tree.keys()) == 1:
+        if len(list(ccg_tree.keys())) == 1:
             # timer.end()
             # print "... root is singular"  # DEBUG
             yield parse_root, 0
@@ -1214,7 +1214,7 @@ class CKYParser:
                        or (pair[1] == 0 and prod[1] == pair[2].category and prod[2] == pair[0].category)):
                         match_scores[pair_idx] = self.theta.CCG_production[prod]
         # print "... total of " + str(len(match_scores.keys())) + " created for return"  # DEBUG
-        for pair_idx, score in sorted(match_scores.items(), key=operator.itemgetter(1), reverse=True):
+        for pair_idx, score in sorted(list(match_scores.items()), key=operator.itemgetter(1), reverse=True):
             children = [candidate_pairs[pair_idx][0], candidate_pairs[pair_idx][2]] \
                 if candidate_pairs[pair_idx][1] == 1 else \
                 [candidate_pairs[pair_idx][2], candidate_pairs[pair_idx][0]]
@@ -1297,7 +1297,7 @@ class CKYParser:
             scores[tuple(assignments)] = score
 
         # yield the assignment tuples in order by score as lists of ParseNodes
-        for assignment, score in sorted(scores.items(), key=operator.itemgetter(1), reverse=True):
+        for assignment, score in sorted(list(scores.items()), key=operator.itemgetter(1), reverse=True):
             nodes = [ParseNode.ParseNode(None,
                                          copy.deepcopy(self.lexicon.semantic_forms[
                                                        semantic_candidates[idx][assignment[idx]]])
@@ -1514,7 +1514,7 @@ class CKYParser:
                             for idx in range(0, len(lr_dirs[p_idx])):
                                 p = lr_dirs[p_idx][idx]
                                 hypothesis_categories_added = 0
-                                ccg_productions = self.theta.CCG_production.keys()[:]
+                                ccg_productions = list(self.theta.CCG_production.keys())[:]
                                 random.shuffle(ccg_productions)
                                 for prod in ccg_productions:
                                     # leaf m can be be combine with p
@@ -1816,7 +1816,7 @@ class CKYParser:
                                 b_without_lambda_headers = b_without_lambda_headers.children[0]
                             a_trace = a
                             lambda_map = {}
-                            while len(lambda_types.keys()) > 0:
+                            while len(list(lambda_types.keys())) > 0:
                                 name_found = None
                                 for name in lambda_types:
                                     if lambda_types[name] == a_trace.type:
@@ -1947,8 +1947,8 @@ class CKYParser:
             to_return[-1].set_category(ab.category)
             to_return[-1].set_return_type(self.ontology)
 
-        print "performed Split with '"+self.print_parse(ab, True)+"' to form '" + \
-              self.print_parse(to_return[0], True)+"', '"+self.print_parse(to_return[1], True)+"'"  # DEBUG
+        print("performed Split with '"+self.print_parse(ab, True)+"' to form '" + \
+              self.print_parse(to_return[0], True)+"', '"+self.print_parse(to_return[1], True)+"'")  # DEBUG
         candidate_pairs = [[to_return[0], to_return[1]], [copy.deepcopy(to_return[1]), copy.deepcopy(to_return[0])]]
         if self.safety:
             for idx in range(0, len(candidate_pairs)):

@@ -18,7 +18,7 @@ def save_model(obj, name):
 
 
 def save_obj_general(obj, name):
-    print 'Saving log'
+    print('Saving log')
     with open(str(name), 'wb') as f:
         pickle.dump(obj, f, pickle.HIGHEST_PROTOCOL)
     f.close()
@@ -34,7 +34,7 @@ def load_obj_general(name):
 
 def load_model(name, path=models_path):
     try:
-        print os.path.join(path, str(name) + '.pkl')  # DEBUG
+        print(os.path.join(path, str(name) + '.pkl'))  # DEBUG
         with open(os.path.join(path, str(name) + '.pkl'), 'rb') as f:
             return pickle.load(f)
     except IOError:
@@ -82,7 +82,7 @@ def checkDicts(dict1, dict2):
         if set(dict1.keys()) != set(dict2.keys()):
             return False   
         else:
-            for key in dict1.keys():
+            for key in list(dict1.keys()):
                 if type(dict1[key]) == list:
                     if not checkLists(dict1[key], dict2[key]):
                         return False  

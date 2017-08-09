@@ -337,7 +337,7 @@ class Lexicon:
         try:
             node.set_return_type(self.ontology)
         except TypeError as e:
-            print e
+            print(e)
             sys.exit("Offending string: '" + s + "'")
 
         if not node.validate_tree_structure():

@@ -99,8 +99,8 @@ class SemanticNode:
             return True
         for idx in range(0, len(self.children)):
             if self.children[idx].parent != self:
-                print "child "+str(idx)+" of "+str(self.children[idx]) + \
-                      " has non-matching parent "+str(self.children[idx].parent)  # DEBUG
+                print("child "+str(idx)+" of "+str(self.children[idx]) + \
+                      " has non-matching parent "+str(self.children[idx].parent))  # DEBUG
                 return False
             if not self.children[idx].validate_tree_structure():
                 return False

@@ -57,7 +57,7 @@ def populate_result_file_with_semantic_forms(result_file_name, test_file_name):
 
             #Ensures semantic forms were extracted correctly.
             if phrase not in semantic_forms:
-                print 'Phrase ' + phrase + ' not in test file semantic forms!' 
+                print('Phrase ' + phrase + ' not in test file semantic forms!') 
 
                 sys.exit()
             else:
@@ -88,7 +88,7 @@ def add_type_constraints(semantic_form):
 
             #Currently only expects one lambda, so assert that this is in fact true. 
             if 'lambda x:e' in new_semantic_form:
-                print "More than one lambda expression in walk command!: " + semantic_form + '\n'
+                print("More than one lambda expression in walk command!: " + semantic_form + '\n')
                 sys.exit()
 
     elif action == 'searchroom':
@@ -96,7 +96,7 @@ def add_type_constraints(semantic_form):
 
         #Currently expects no lambda expressions, so assert this. 
         if 'lambda' in new_semantic_form:
-            print "Lambda expression found in 'searchroom' command!: " + new_semantic_form + '\n'
+            print("Lambda expression found in 'searchroom' command!: " + new_semantic_form + '\n')
             sys.exit()
 
     elif action == 'bring':
@@ -106,12 +106,12 @@ def add_type_constraints(semantic_form):
 
             #Currently only expects one lambda expression, so assert this. 
             if 'lambda x:e' in new_semantic_form:
-                print "More than one lambda expression found in bring command!: " + semantic_form + '\n'
+                print("More than one lambda expression found in bring command!: " + semantic_form + '\n')
                 sys.exit()
         else:
             new_semantic_form = semantic_form
     else:
-        print "Unaccounted for action!: " + action + '\n'
+        print("Unaccounted for action!: " + action + '\n')
         sys.exit()
  
     #Returns typed semantic form.
@@ -208,7 +208,7 @@ def find_groundable_items(corpus_folder, pickle_file_name):
                     kb[pred] = [item]
 
     for pred in kb:
-        print str(pred) + ': ' + str(kb[pred])
+        print(str(pred) + ': ' + str(kb[pred]))
 
     #Adds in known atoms. 
     kb['possesses'] = [('scott', 'l3_404'), ('ray', 'l3_512'), ('dana', 'l3_510'), ('peter', 'l3_508'), ('shiqi', 'l3_432'), ('jivko', 'l3_420'),
@@ -218,7 +218,7 @@ def find_groundable_items(corpus_folder, pickle_file_name):
 
 
     for pred in kb:
-        print str(pred) + ': ' + str(kb[pred])
+        print(str(pred) + ': ' + str(kb[pred]))
 
     #Now pickles the kb. 
     pickle.dump(kb, open(pickle_file_name, 'w'))
@@ -283,7 +283,7 @@ def convert_numbers_corpus(corpus_folder):
                 temp_file_name = usr_file + '.temp'
                 temp_file = open(temp_file_name, 'w')
               
-                print file_path
+                print(file_path)
 
                 for line in read_file:
                     phrase, sem_form, denotation, rec = line.split(';')
@@ -295,10 +295,10 @@ def convert_numbers_corpus(corpus_folder):
                 os.rename(temp_file_name, file_path)
 
 def print_usage():
-    print 'To populate result file with semantic forms: ./post_process.py populate_semantic_forms [result_file_name] [test_file_name]'
-    print 'To add type constraints to semantic forms in a file: ./post_process.py type_constraints [file_name]'
-    print 'Determine groundable items in corpus: ./post_process.py create_entities_for_grounding [corpus_folder] [dict_pickle_name]'
-    print 'Convert numbers in train/test sets from alphabetical to numerical representation: ./post_process.py number_conversion [corpus_folder]'
+    print('To populate result file with semantic forms: ./post_process.py populate_semantic_forms [result_file_name] [test_file_name]')
+    print('To add type constraints to semantic forms in a file: ./post_process.py type_constraints [file_name]')
+    print('Determine groundable items in corpus: ./post_process.py create_entities_for_grounding [corpus_folder] [dict_pickle_name]')
+    print('Convert numbers in train/test sets from alphabetical to numerical representation: ./post_process.py number_conversion [corpus_folder]')
 
 if __name__ == '__main__':
     if not len(sys.argv) >= 2:

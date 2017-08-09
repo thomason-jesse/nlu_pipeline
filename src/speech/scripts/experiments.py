@@ -330,7 +330,7 @@ def get_avg_parse_production_prob(parser, parse):
     #Gets semantic node using semantic form string. 
     parse_node = parser.lexicon.read_semantic_form_from_str(parse, None, None, [], False)
  
-    print count_ccg_productions(parser.most_likely_cky_parse("go to ray 's office").next()[0])
+    print (count_ccg_productions(parser.most_likely_cky_parse("go to ray 's office").next()[0]))
 
     sys.exit()
 
@@ -585,6 +585,9 @@ def timeout_proportion(results, parser):
     total  = 0.0
     timeouts = 0.0
 
+    #Also keep track of number of hypothesis lists we were unable to parse. 
+    num_unparsed_lists = 0.0
+
     for result in results:
         incorrect = (evaluate.eval_google_full_sem_form([result], parser) == 0.0)
 
@@ -600,14 +603,15 @@ def timeout_proportion(results, parser):
             
             total += 1.0
 
-    return timeouts / total
+    return [timeouts / total, timeouts  / float(len(results))]
 
 def average_interpolated_scores(folds, parsers, parser_score_lines_files, lm_score_lines_files, alpha, beta):
                
     f1_scores = []
     acc_scores = []
     wer_scores = []
-    timeouts = []
+    timeouts_failures = []
+    timeouts_total = []
 
     for fold in folds: 
         #Access the data we need to process everything. 
@@ -662,7 +666,7 @@ def average_interpolated_scores(folds, parsers, parser_score_lines_files, lm_sco
                     re_ranked_list = sorted(new_hyp_list, key=lambda x: x[3], reverse=True)
                     
                     # TODO Uncomment to get only top-ranked hypothesis. 
-                    #re_ranked_list = [re_ranked_list[0]]
+                    re_ranked_list = [re_ranked_list[0]]
 
                     results.append((target, re_ranked_list))
 
@@ -703,22 +707,29 @@ def average_interpolated_scores(folds, parsers, parser_score_lines_files, lm_sco
         """
 
         #Now evaluate results for this fold.
-        timeouts.append(timeout_proportion(results, parser))
+        timeout_failure_prop, timeout_total_prop = timeout_proportion(results, parser)
+        timeouts_failures.append(timeout_failure_prop)
+        timeouts_total.append(timeout_total_prop)
+
         acc_scores.append(evaluate.eval_google_full_sem_form(results, parser))
         f1_scores.append(evaluate.eval_google_partial_sem_form(results, parser))
         wer_scores.append(evaluate.eval_google_wer(results, parser))
 
-    print 'ACC: ' + str(acc_scores)
-    print 'WER: ' + str(wer_scores)
-    print 'F1: ' + str(f1_scores)
-    print 'TIMEOUTS: ' + str(timeouts)
+    print ('ACC: ' + str(acc_scores))
+    print ('WER: ' + str(wer_scores))
+    print ('F1: ' + str(f1_scores))
+    print ('TIMEOUT proportions within failures: ' + str(timeouts_failures))
+    print ('TIMEOUT proportions total: ' + str(timeouts_total))
 
     f1_avg = float(sum(f1_scores)) / float(len(f1_scores))
     acc_avg = float(sum(acc_scores)) / float(len(acc_scores))
     wer_avg = float(sum(wer_scores)) / float(len(wer_scores))
-    timeout_avg = float(sum(timeouts)) / float(len(timeouts))
 
-    print 'TIMEOUT AVG: ' + str(timeout_avg)
+    timeout_fail_avg = float(sum(timeouts_failures)) / float(len(timeouts_failures))
+    timeout_total_avg = float(sum(timeouts_total)) / float(len(timeouts_total))
+
+    print ('TIMEOUT FAILURE AVG: ' + str(timeout_fail_avg))
+    print ('TIMEOUT TOTAL AVG: ' + str(timeout_total_avg))
 
     return [f1_avg, acc_avg, wer_avg]
 
@@ -748,7 +759,7 @@ def evaluate_file_with_interpolation(experiment_folder, evaluation_name, parser_
     #Get averages for each evaluation metric using alpha and beta parameters. 
     f1_avg, acc_avg, wer_avg = average_interpolated_scores(folds, parsers, parser_score_lines_files, lm_score_lines_files, alpha, beta) 
 
-    print [wer_avg, acc_avg, f1_avg]
+    print ([wer_avg, acc_avg, f1_avg])
 
 
 """
@@ -796,7 +807,7 @@ def find_best_interpolation_values(experiment_folder, evaluation_name, parser_pa
     #Test all possible values. 
     for alpha in alphas:
         for beta in betas:
-            print 'Evaluating (alpha, beta): ' + str((alpha, beta))
+            print ('Evaluating (alpha, beta): ' + str((alpha, beta)))
 
             #Now average the scores and assign it to this (alpha, beta) pair. 
             f1_avgs[(alpha, beta)], acc_avgs[(alpha, beta)], wer_avgs[(alpha, beta)] = average_interpolated_scores(folds, parsers, parser_score_lines_files, lm_score_lines_files, alpha, beta) 
@@ -836,7 +847,7 @@ def give_google_parse_scores(test_file_path, results_file_path, parser_path, goo
 
         result_file.close()
 
-    print 'Starting at test example #' + str(test_index_chkpt) + ' hypothesis #' + str(hyp_index_chkpt)
+    print ('Starting at test example #' + str(test_index_chkpt) + ' hypothesis #' + str(hyp_index_chkpt))
 
     #Get lines from test file and open result file for, but now for writing. 
     test_file = open(test_file_path, 'r')
@@ -858,7 +869,7 @@ def give_google_parse_scores(test_file_path, results_file_path, parser_path, goo
 
             #Make sure we don't already have ground truth written. 
             if not (test_index == test_index_chkpt):
-                print '#' + line.strip()
+                print ('#' + line.strip())
                 result_file.write('#' + line)
                 result_file.flush()
 
@@ -870,7 +881,7 @@ def give_google_parse_scores(test_file_path, results_file_path, parser_path, goo
 
             hyp_index = 1
 
-            print google_recognized_folder + rec_name + '.nbest'
+            print (google_recognized_folder + rec_name + '.nbest')
 
             for result_line in nbest_file:
 
@@ -928,7 +939,7 @@ def give_google_parse_scores(test_file_path, results_file_path, parser_path, goo
 
                         #Now write speech hyp; speech score; parse hyp; parse score.
                         result_line = hypothesis + ';' + google_hyp_score + ';' + str(parse[0]) + ';' + str(parse[1]) + ';' + str(duration)
-                        print result_line
+                        print (result_line)
     
                         result_file.write(result_line + '\n')
                         result_file.flush()
@@ -942,7 +953,7 @@ def give_google_parse_scores(test_file_path, results_file_path, parser_path, goo
     result_file.close()
     test_file.close()
 
-    print 'FINISHED SCORING'
+    print ('FINISHED SCORING')
 
 def give_experiments_lm_scores(experiment_path, test_file_name, lm_name, google_recognized_folder):
     pids = []
@@ -958,7 +969,7 @@ def give_experiments_lm_scores(experiment_path, test_file_name, lm_name, google_
             lm_path = experiment_path + fold + '/models/language_models/' + lm_name + '.lm'
 
             #Now give lm scores to this file.
-            print 'LM scoring ' + result_file_path
+            print ('LM scoring ' + result_file_path)
             give_google_lm_scores(test_file_path, google_recognized_folder, result_file_path, lm_path, fold) 
 
         else:
@@ -1187,7 +1198,7 @@ def parse_ground_truth_file(test_file_path, result_file_path, parser_path):
     result_file = open(result_file_path, 'w')
 
     for line in test_file:
-        print 'parsing: '  + line.split(';')[0]
+        print ('parsing: '  + line.split(';')[0])
         phrase, true_sem_form, _, _ = line.split(';')
         parse = timed_get_first_valid_parse(tokenize_for_parser(phrase), parser, 10)[0]
 
@@ -1240,14 +1251,14 @@ the n-best hypothesis from Spinx, re-ranking,
 etc. 
 """
 def print_usage():
-    print 'ASR Nbest: ./experiments asr_n_best [sphinx_shared_library] [ac_model] [lm] [dict] [test_file] [nbest_file] [n]'
-    print 'CKYParser re-rank: ./experiments parser_rerank [nbest_file] [re-ranked_file_name] [parser_path] [temp_name] [optional: null_node]'
-    print 'Re-rank with interpolation: ./experiments rerank_interpolation [nbest_file] [out_file] [weight]'
-    print 'Run parser on speech ground truth: ./experiments parse_ground_truth [test_file] [results_file] [parser_path]'
-    print 'Assign parse scores to Google Speech API files: ./experiments parse_score_google [test_file_path] [results_file_path] [parser_path] [google_recognized_folder]'
-    print 'Assign probability scores to Google Speech using an LM: ./experiments lm_score_google [experiment_path] [test_file_name] [lm_name] [google_recognized_folder]'
-    print 'Find best interpolation values over Speech, Parser, and LM: ./experiments best_interpolation_values [experiment_path] [test_file_name] [parser_params] [lm_params]'
-    print 'Evaluate a file using interpolation: ./experiments evaluate_with_interpolation [experiment_path] [test_file_name] [parser_params] [lm_params] [alpha] [beta]'
+    print ('ASR Nbest: ./experiments asr_n_best [sphinx_shared_library] [ac_model] [lm] [dict] [test_file] [nbest_file] [n]')
+    print ('CKYParser re-rank: ./experiments parser_rerank [nbest_file] [re-ranked_file_name] [parser_path] [temp_name] [optional: null_node]')
+    print ('Re-rank with interpolation: ./experiments rerank_interpolation [nbest_file] [out_file] [weight]')
+    print ('Run parser on speech ground truth: ./experiments parse_ground_truth [test_file] [results_file] [parser_path]')
+    print ('Assign parse scores to Google Speech API files: ./experiments parse_score_google [test_file_path] [results_file_path] [parser_path] [google_recognized_folder]')
+    print ('Assign probability scores to Google Speech using an LM: ./experiments lm_score_google [experiment_path] [test_file_name] [lm_name] [google_recognized_folder]')
+    print ('Find best interpolation values over Speech, Parser, and LM: ./experiments best_interpolation_values [experiment_path] [test_file_name] [parser_params] [lm_params]')
+    print ('Evaluate a file using interpolation: ./experiments evaluate_with_interpolation [experiment_path] [test_file_name] [parser_params] [lm_params] [alpha] [beta]')
 
 if __name__ == '__main__':
     if not len(sys.argv) >= 2:
