@@ -612,12 +612,18 @@ def average_interpolated_scores(folds, parsers, parser_score_lines_files, lm_sco
     wer_scores = []
     timeouts_failures = []
     timeouts_total = []
+    non_timeout_props = []
+    oov_prop = []
+    phrase_lens_timeout_list = []
+    phrase_lens_no_timeout_list = []
 
     for fold in folds: 
         #Access the data we need to process everything. 
         parser = parsers[fold]
         lm_score_lines = lm_score_lines_files[fold]
         parser_score_lines = parser_score_lines_files[fold]
+        vocab_path = '../corpora/processed/10_folds_all_lengths_google_numbers/' + fold + '/models/vocab.pkl'
+        vocab = load_obj_general(vocab_path)
 
         #Prepare parser for normalization based on phrase length. 
         compute_parser_null_node_values(parser)
@@ -711,15 +717,96 @@ def average_interpolated_scores(folds, parsers, parser_score_lines_files, lm_sco
         timeouts_failures.append(timeout_failure_prop)
         timeouts_total.append(timeout_total_prop)
 
+        # OOV word stats.
+        total_timeout_utterances = 0.0
+        all_oov_utterances = 0.0
+
+        for target, hypotheses in results: 
+            all_timed_out = True
+            
+            for hypothesis in hypotheses:
+                time = hypothesis[-1]
+
+                if time < 10.0:
+                    all_timed_out = False
+
+            if all_timed_out: 
+                all_oov = True
+
+                for hypothesis in hypotheses: 
+                    phrase = set(tokenize_for_parser(hypothesis[0]).split())
+                    diff = len(phrase - vocab)
+                   
+                    if diff == 0:
+                        all_oov = False
+
+                total_timeout_utterances += 1.0
+
+                if all_oov:
+                    all_oov_utterances += 1.0
+
+        oov_prop.append(all_oov_utterances / total_timeout_utterances)
+
+        phrase_lens_timeout = []
+        phrase_lens_no_timeout = []
+
+        # Get stats for phrase length timeouts.  
+        for target, hypotheses in results: 
+            top = hypotheses[0]
+            phrase_len = float(len(tokenize_for_parser(top[0]).split()))
+            timeout = (top[-1] > 10.0)
+
+            if not timeout:
+                phrase_lens_no_timeout.append(phrase_len)
+            else:
+                phrase_lens_timeout.append(phrase_len)
+
+        phrase_lens_timeout_list.append(np.mean(phrase_lens_timeout))
+        phrase_lens_no_timeout_list.append(np.mean(phrase_lens_no_timeout))
+
+        # Check accuracy for utterances which got at least one parse. 
+        # TODO Remove to get full dataset metrics.
+        non_timeout_results = []
+
+        for target, hypotheses in results:
+            top = hypotheses[0]
+            time = top[-1]
+
+            if time < 10.0: 
+                non_timeout_results.append((target, hypotheses))
+
+        non_timeout_props.append(float(len(non_timeout_results)) / float(len(results)))
+        results = non_timeout_results
+        #
+
         acc_scores.append(evaluate.eval_google_full_sem_form(results, parser))
         f1_scores.append(evaluate.eval_google_partial_sem_form(results, parser))
         wer_scores.append(evaluate.eval_google_wer(results, parser))
+
+    """
+    Average parsing times for utterances for which timeout was not experienced. 
+    parsing_times = []
+
+    for target, hypotheses in results:
+        for hypothesis in hypotheses: 
+            time = hypothesis[-1]
+
+            if time < 10.0:
+                parsing_times.append(time)
+
+    print('TIMES:')
+    print(np.mean(parsing_times))
+    """
 
     print ('ACC: ' + str(acc_scores))
     print ('WER: ' + str(wer_scores))
     print ('F1: ' + str(f1_scores))
     print ('TIMEOUT proportions within failures: ' + str(timeouts_failures))
     print ('TIMEOUT proportions total: ' + str(timeouts_total))
+    print('Non-timeout props: ' + str(non_timeout_props))
+    print('OOV PROP: ' + str(oov_prop))
+    print('Timeout phrase lens: ' + str(phrase_lens_timeout_list))
+    print('No timeout phrase lens: ' + str(phrase_lens_no_timeout_list))
 
     f1_avg = float(sum(f1_scores)) / float(len(f1_scores))
     acc_avg = float(sum(acc_scores)) / float(len(acc_scores))
